@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -28,11 +28,12 @@ endif()
 add_executable(premia-gui Premia.cpp TDAmeritrade.cpp 
                     State/Manager.cpp State/StartState.cpp State/QuoteState.cpp 
                     Graphics/Texture.cpp
-                    imgui/imgui.cpp
-                    imgui/imgui_demo.cpp
-                    imgui/imgui_draw.cpp
-                    imgui/imgui_widgets.cpp
-                    imgui/imgui_impl_sdl.cpp
+                    Libraries/imgui/imgui.cpp
+                    Libraries/imgui/imgui_demo.cpp
+                    Libraries/imgui/imgui_draw.cpp
+                    Libraries/imgui/imgui_widgets.cpp
+                    Libraries/imgui/imgui_impl_sdl.cpp
+                    Libraries/imgui/imgui_sdl.cpp
                     )
 include_directories("../assets")
 
@@ -67,7 +68,7 @@ set(QL_LIBRARY /usr/local/Cellar/quantlib/1.22/lib/libQuantLib.dylib)
 set(QL_INCLUDE_DIR /usr/local/Cellar/quantlib/1.22/include)
 
 # Set where the ImGui files are stored
-set(IMGUI_PATH  "${CMAKE_SOURCE_DIR}/imgui")
+set(IMGUI_PATH  "${CMAKE_SOURCE_DIR}/Libraries/imgui")
     
 # Compile as static library 
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
