@@ -19,8 +19,9 @@
 
 #include <curl/curl.h>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_sdl.h"
+#include "Libraries/imgui/imgui.h"
+#include "Libraries/imgui/imgui_sdl.h"
+#include "Libraries/imgui/imgui_impl_sdl.h"
 
 #include <stdio.h>
 #include <cstdlib>
