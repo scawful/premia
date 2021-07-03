@@ -65,6 +65,11 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
         textures["VXX_LAST_PRICE"].loadFromRenderedText( pRenderer, priceFont, vxx_last_price, fontColor );
     }
 
+    ImGui::CreateContext();
+	ImGuiSDL::Initialize(pRenderer, 782, 543);
+    ImGui::StyleColorsClassic();
+
+
 }
 
 void StartState::cleanup()
@@ -102,8 +107,11 @@ void StartState::resume()
 
 void StartState::handleEvents( Manager* premia )
 {
+    int wheel = 0;
     SDL_Event event;
     SDL_Color fontColor = { 255, 255, 255 };
+
+    ImGuiIO& io = ImGui::GetIO();
 
     while ( SDL_PollEvent(&event) ) 
     {
@@ -123,26 +131,57 @@ void StartState::handleEvents( Manager* premia )
                 }
 
             case SDL_WINDOWEVENT:
-                switch ( event.window.event) 
+                switch ( event.window.event ) 
                 {
                     case SDL_WINDOWEVENT_CLOSE:   // exit game
                         premia->quit();
                         break;
-
+                    case SDL_WINDOWEVENT_SIZE_CHANGED:
+                        io.DisplaySize.x = static_cast<float>(event.window.data1);
+					    io.DisplaySize.y = static_cast<float>(event.window.data2);
+                        break;
                     default:
                         break;
                 }
-                break;      
+                break;  
+
+            case SDL_MOUSEWHEEL:
+                wheel = event.wheel.y;
+                break;
 
             default:
                 break;
         }
     }
 
+    int mouseX, mouseY;
+    const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+
+    io.DeltaTime = 1.0f / 60.0f;
+    io.MousePos = ImVec2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+    io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
+    io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+    io.MouseWheel = static_cast<float>(wheel);
+
 }
 
 void StartState::update( Manager* game )
 {
+    SDL_Texture* texture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, 100, 100);
+	{
+		SDL_SetRenderTarget(pRenderer, texture);
+		SDL_SetRenderDrawColor(pRenderer, 255, 0, 255, 255);
+		SDL_RenderClear(pRenderer);
+		SDL_SetRenderTarget(pRenderer, nullptr);
+	}
+
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow();
+
+    ImGui::Begin("Image");
+    ImGui::Image(texture, ImVec2(100, 100));
+    ImGui::End();
+
     SDL_RenderClear(this->pRenderer);
 }
 
@@ -150,15 +189,20 @@ void StartState::draw( Manager* game )
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor(this->pRenderer, 0, 0, 0, 0);
-    SDL_GetWindowSize(this->pWindow, &w, &h);
-    SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect(this->pRenderer, &f);
+    SDL_SetRenderDrawColor( this->pRenderer, 0, 0, 0, 0 );
+    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_Rect f = { 0, 0, 1920, 1080 };
+    SDL_RenderFillRect( this->pRenderer, &f );
 
+    ImGui::Render();
+    ImGuiSDL::Render(ImGui::GetDrawData());
+
+    
     titleTexture.render( pRenderer, (SCREEN_WIDTH  - titleTexture.getWidth()) / 2, 10 );
     subtitleTexture.render( pRenderer, (SCREEN_WIDTH - subtitleTexture.getWidth()) / 2, 75 );
     textures["POWERED"].render( pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) - 50, 125 );
     textures["TDA_SHILL"].render( pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) + textures["TDA_SHILL"].getWidth() - 50, 125 );
+    
 
     textures["SPY_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["SPY_LAST_PRICE"].getWidth()) / 2) - 160, 400);
     textures["QQQ_LAST_PRICE"].render( pRenderer, (SCREEN_WIDTH - textures["QQQ_LAST_PRICE"].getWidth()) / 2, 400 );
