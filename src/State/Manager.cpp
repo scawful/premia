@@ -18,7 +18,7 @@ void Manager::init(int width, int height)
             SDL_WINDOWPOS_UNDEFINED,            // initial y position
             width,                              // width, in pixels
             height,                             // height, in pixels
-            0                                   // flags - see below
+            SDL_WINDOW_RESIZABLE                // flags - see below
         );
         
         if ( pWindow == NULL )
@@ -54,18 +54,7 @@ void Manager::init(int width, int height)
 
         }
     }
-
-    // SDL_GLContext gl_context = SDL_GL_CreateContext(pWindow);
-
-    // IMGUI_CHECKVERSION();
-    // ImGui::CreateContext();
-    // ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-    // ImGui::StyleColorsDark();
-    // ImGui_ImplSDL2_InitForOpenGL(pWindow, gl_context);
-
-    // ImGui::ShowDemoWindow();
-
+    ImGui_ImplSDL2_InitForPremia( pWindow );
 }
 
 void Manager::cleanup()
@@ -76,11 +65,17 @@ void Manager::cleanup()
         states.pop_back();
     }
 
+    ImGuiSDL::Deinitialize();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
     // Close and destroy the window
     SDL_DestroyRenderer( pRenderer );
     SDL_DestroyWindow( pWindow );
     pWindow = NULL;
     pRenderer = NULL;
+
+    ImGui::DestroyContext();
     
     // Final clean up
     TTF_Quit();
