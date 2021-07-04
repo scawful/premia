@@ -10,7 +10,8 @@ namespace tda
                 this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
                 break;
             case PRICE_HISTORY:
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}";
+                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}";
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
                 break;
             default:
                 break;
@@ -86,7 +87,24 @@ namespace tda
         }
     }
 
-    void TDAmeritrade::set_period_type(PeriodType periodType)
+    void TDAmeritrade::set_retrieval_type( RetrievalType type )
+    {
+        switch ( type )
+        {
+            case QUOTE:
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
+                break;
+            case PRICE_HISTORY:
+                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
+                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=day&period=2&frequencyType=minute&frequency=15";
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=month&period=6&frequencyType=weekly&frequency=1";
+                break;
+            default:
+                break;
+        }
+    }
+
+    void TDAmeritrade::set_period_type( PeriodType periodType )
     {
         this->_period_type = periodType;
     }
@@ -96,9 +114,40 @@ namespace tda
         this->_col_name = name;
     }
 
+    boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory( std::string ticker )
+    {
+        set_retrieval_type( PRICE_HISTORY );
+
+        std::string url = this->_base_url;
+        string_replace(url, "{ticker}", ticker);
+
+        std::time_t now = std::time(0);
+        std::string output_file_name = ticker + "_" + std::to_string(now) + ".json";
+
+        download_file(url, output_file_name);
+
+        std::ifstream xmlFile(output_file_name, std::ios::in | std::ios::binary);
+
+        boost::property_tree::ptree propertyTree;
+        
+        try {
+            read_json(xmlFile, propertyTree);
+        }
+        catch ( std::exception& json_parser_error )
+        {
+            SDL_Log("%s", json_parser_error.what() );
+        }
+
+        boost::shared_ptr<PriceHistory> new_price_history_data = boost::make_shared<PriceHistory>( propertyTree );
+
+        std::remove(output_file_name.c_str());
+
+        return new_price_history_data;
+        
+    }
+
     boost::shared_ptr<tda::Quote> TDAmeritrade::createQuote( std::string ticker )
     {
-
         std::string url = this->_base_url;
         string_replace(url, "{ticker}", ticker);
 
@@ -134,9 +183,9 @@ namespace tda
         boost::property_tree::ptree propertyTree;
         read_json(jsonFile, propertyTree);
 
-        for (auto & array_element: propertyTree) 
+        for ( auto & array_element: propertyTree ) 
         {
-            for (auto & property: array_element.second) 
+            for ( auto & property: array_element.second ) 
             {
                 std::cout << property.first << " = " << property.second.get_value < std::string > () << "\n";
             }
@@ -152,7 +201,7 @@ namespace tda
 
     void Quote::initVariables()
     {
-        for (auto & array_element: this->quoteData ) 
+        for (auto & array_element: quoteData ) 
         {
             for (auto & property: array_element.second) 
             {
@@ -163,13 +212,93 @@ namespace tda
 
     Quote::Quote( boost::property_tree::ptree quote_data )
     {
-        this->quoteData = quote_data;
+        quoteData = quote_data;
 
         initVariables();
     }
 
     std::string Quote::getQuoteVariable( std::string variable )
     {
-        return this->quoteVariables[variable];
+        return quoteVariables[variable];
+    }
+
+    /* =============== PriceHistory Class =============== */
+
+    void PriceHistory::initVariables()
+    {
+        for ( auto& history_it: priceHistoryData )
+        {
+            if ( history_it.first == "candles" )
+            {
+                for ( auto& candle_it: history_it.second )
+                {
+                    tda::Candle newCandle;
+                    std::string datetime;
+                    double volume = 0.0;
+                    std::pair<double, double> high_low;
+                    std::pair<double, double> open_close;
+
+                    for ( auto& candle2_it: candle_it.second )
+                    {
+                        if ( candle2_it.first == "high" )
+                            high_low.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                        if ( candle2_it.first == "low" )
+                            high_low.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                        
+                        if ( candle2_it.first == "open" )
+                            open_close.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                        if ( candle2_it.first == "close" )
+                            open_close.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+
+                        if ( candle2_it.first == "volume" )
+                            volume = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                            
+                        if ( candle2_it.first == "datetime" )
+                        {
+                            // std::stringstream dt_ss;
+                            // std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(candle2_it.second.get_value<std::string> ());
+
+                            //%a %d %b %Y - %I:%M:%S%p
+                            //%H:%M:%S
+                            //dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
+                            //datetime = dt_ss.str();
+                            datetime = candle2_it.second.get_value<std::string> ();
+
+                            //boost::gregorian::date newdelta(boost::posix_time::from_time_t(dt).date());
+                            //boost::posix_time::from_time_t(dt);
+                        }
+                        
+                    }
+
+                    newCandle.datetime = datetime;
+                    newCandle.highLow = high_low;
+                    newCandle.openClose = open_close;
+                    newCandle.volume = volume;
+
+                    candleVector.push_back( newCandle );
+                }
+            }
+        }
+    }
+
+    PriceHistory::PriceHistory( boost::property_tree::ptree price_history_data )
+    {
+        priceHistoryData = price_history_data;
+        initVariables();
+    }
+
+    std::vector< Candle > PriceHistory::getCandleVector()
+    {
+        return candleVector;
+    }
+
+    std::string PriceHistory::getCandleDataVariable( std::string variable )
+    {
+        return candleData[ variable ];
+    }
+
+    std::string PriceHistory::getPriceHistoryVariable( std::string variable )
+    {
+        return priceHistoryVariables[variable];
     }
 }

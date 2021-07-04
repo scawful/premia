@@ -17,6 +17,9 @@ private:
 
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
     boost::shared_ptr<tda::Quote> quoteData;
+    boost::shared_ptr<tda::PriceHistory> priceHistoryData;
+
+    std::vector< tda::Candle > candleVector;
 
 protected:
     QuoteState() { }

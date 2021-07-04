@@ -6,6 +6,14 @@
 
 namespace tda
 {
+    struct Candle
+    {
+        double volume;
+        std::pair<double, double> highLow;
+        std::pair<double, double> openClose;     
+        std::string datetime;
+    };
+
     class Quote 
     {
     private:
@@ -15,10 +23,28 @@ namespace tda
         void initVariables();
 
     public:
-        Quote(boost::property_tree::ptree quote_data);
+        Quote( boost::property_tree::ptree quote_data );
 
         std::string getQuoteVariable( std::string variable );
 
+    };
+
+    class PriceHistory
+    {
+        private:
+            boost::property_tree::ptree priceHistoryData;
+            std::map<std::string, std::string> priceHistoryVariables;
+            std::map<std::string, std::string> candleData;
+            std::vector< Candle > candleVector;
+
+            void initVariables();
+            
+        public:
+            PriceHistory( boost::property_tree::ptree price_history_data );
+
+            std::vector< Candle > getCandleVector();
+            std::string getCandleDataVariable( std::string variable );
+            std::string getPriceHistoryVariable( std::string variable );
     };
 
     enum PeriodType 
@@ -65,9 +91,11 @@ namespace tda
     public:
         TDAmeritrade( RetrievalType type );
 
+        void set_retrieval_type( RetrievalType type );
         void set_period_type( PeriodType interval );
         void set_col_name( std::string col_name );
 
+        boost::shared_ptr<tda::PriceHistory> createPriceHistory( std::string ticker );
         boost::shared_ptr<tda::Quote> createQuote( std::string ticker );
         void retrieveQuoteData( std::string ticker, bool keep_file );
     };

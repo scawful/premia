@@ -92,17 +92,17 @@ void StartState::cleanup()
         it->second.free();
     }
 
-    printf("StartState Cleanup\n");
+    SDL_Log("StartState Cleanup\n");
 }
 
 void StartState::pause()
 {
-    printf("StartState Pause\n");
+    SDL_Log("StartState Pause\n");
 }
 
 void StartState::resume()
 {
-    printf("StartState Resume\n");
+    SDL_Log("StartState Resume\n");
 }
 
 void StartState::handleEvents( Manager* premia )
@@ -129,7 +129,16 @@ void StartState::handleEvents( Manager* premia )
                     default:
                         break;
                 }
-
+            case SDL_KEYUP:
+            {
+                int key = event.key.keysym.scancode;
+                IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
+                io.KeysDown[key] = (event.type == SDL_KEYDOWN);
+                io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
+                io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
+                io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
+            }
+            
             case SDL_WINDOWEVENT:
                 switch ( event.window.event ) 
                 {
@@ -144,6 +153,10 @@ void StartState::handleEvents( Manager* premia )
                         break;
                 }
                 break;  
+
+            case SDL_TEXTINPUT:
+                io.AddInputCharactersUTF8(event.text.text);
+                break;
 
             case SDL_MOUSEWHEEL:
                 wheel = event.wheel.y;
@@ -167,20 +180,10 @@ void StartState::handleEvents( Manager* premia )
 
 void StartState::update( Manager* game )
 {
-    SDL_Texture* texture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, 100, 100);
-	{
-		SDL_SetRenderTarget(pRenderer, texture);
-		SDL_SetRenderDrawColor(pRenderer, 255, 0, 255, 255);
-		SDL_RenderClear(pRenderer);
-		SDL_SetRenderTarget(pRenderer, nullptr);
-	}
-
     ImGui::NewFrame();
+    ImGui::SetNextWindowPos(ImVec2(200, 200));
     ImGui::ShowDemoWindow();
 
-    ImGui::Begin("Image");
-    ImGui::Image(texture, ImVec2(100, 100));
-    ImGui::End();
 
     SDL_RenderClear(this->pRenderer);
 }
@@ -189,20 +192,18 @@ void StartState::draw( Manager* game )
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( this->pRenderer, 0, 0, 0, 0 );
-    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( pRenderer, 0, 0, 0, 0 );
+    SDL_GetWindowSize( pWindow, &w, &h );
     SDL_Rect f = { 0, 0, 1920, 1080 };
-    SDL_RenderFillRect( this->pRenderer, &f );
+    SDL_RenderFillRect( pRenderer, &f );
 
+    titleTexture.render(pRenderer, (SCREEN_WIDTH  - titleTexture.getWidth()) / 2, 10);
+    subtitleTexture.render(pRenderer, (SCREEN_WIDTH - subtitleTexture.getWidth()) / 2, 75);
+    textures["POWERED"].render(pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) - 50, 125);
+    textures["TDA_SHILL"].render(pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) + textures["TDA_SHILL"].getWidth() - 50, 125);
+    
     ImGui::Render();
     ImGuiSDL::Render(ImGui::GetDrawData());
-
-    
-    titleTexture.render( pRenderer, (SCREEN_WIDTH  - titleTexture.getWidth()) / 2, 10 );
-    subtitleTexture.render( pRenderer, (SCREEN_WIDTH - subtitleTexture.getWidth()) / 2, 75 );
-    textures["POWERED"].render( pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) - 50, 125 );
-    textures["TDA_SHILL"].render( pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) + textures["TDA_SHILL"].getWidth() - 50, 125 );
-    
 
     textures["SPY_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["SPY_LAST_PRICE"].getWidth()) / 2) - 160, 400);
     textures["QQQ_LAST_PRICE"].render( pRenderer, (SCREEN_WIDTH - textures["QQQ_LAST_PRICE"].getWidth()) / 2, 400 );
@@ -211,5 +212,5 @@ void StartState::draw( Manager* game )
     textures["IWM_LAST_PRICE"].render( pRenderer, (SCREEN_WIDTH - textures["IWM_LAST_PRICE"].getWidth()) / 2, 425 );
     textures["VXX_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["VXX_LAST_PRICE"].getWidth()) / 2) + 156, 425 );
 
-    SDL_RenderPresent(this->pRenderer);
+    SDL_RenderPresent(pRenderer);
 }
