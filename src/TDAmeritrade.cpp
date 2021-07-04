@@ -96,8 +96,8 @@ namespace tda
                 break;
             case PRICE_HISTORY:
                 //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=day&period=2&frequencyType=minute&frequency=15";
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=month&period=6&frequencyType=weekly&frequency=1";
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=day&period=2&frequencyType=minute&frequency=1";
+                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=month&period=6&frequencyType=weekly&frequency=1";
                 break;
             default:
                 break;
@@ -234,7 +234,6 @@ namespace tda
                 {
                     tda::Candle newCandle;
                     std::string datetime;
-                    double volume = 0.0;
                     std::pair<double, double> high_low;
                     std::pair<double, double> open_close;
 
@@ -251,7 +250,7 @@ namespace tda
                             open_close.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
 
                         if ( candle2_it.first == "volume" )
-                            volume = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                            newCandle.volume = stoi( candle2_it.second.get_value<std::string> () );
                             
                         if ( candle2_it.first == "datetime" )
                         {
@@ -262,7 +261,7 @@ namespace tda
                             //%H:%M:%S
                             //dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
                             //datetime = dt_ss.str();
-                            datetime = candle2_it.second.get_value<std::string> ();
+                            datetime = boost::lexical_cast<std::string>(candle2_it.second.get_value<std::string> ());
 
                             //boost::gregorian::date newdelta(boost::posix_time::from_time_t(dt).date());
                             //boost::posix_time::from_time_t(dt);
@@ -273,7 +272,6 @@ namespace tda
                     newCandle.datetime = datetime;
                     newCandle.highLow = high_low;
                     newCandle.openClose = open_close;
-                    newCandle.volume = volume;
 
                     candleVector.push_back( newCandle );
                 }

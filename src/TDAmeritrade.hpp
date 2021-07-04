@@ -8,7 +8,7 @@ namespace tda
 {
     struct Candle
     {
-        double volume;
+        int volume;
         std::pair<double, double> highLow;
         std::pair<double, double> openClose;     
         std::string datetime;
