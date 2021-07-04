@@ -66,7 +66,6 @@ void Manager::cleanup()
     }
 
     ImGuiSDL::Deinitialize();
-    ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
 
     // Close and destroy the window
@@ -75,8 +74,6 @@ void Manager::cleanup()
     pWindow = NULL;
     pRenderer = NULL;
 
-    ImGui::DestroyContext();
-    
     // Final clean up
     TTF_Quit();
     IMG_Quit();
