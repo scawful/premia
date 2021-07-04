@@ -39,6 +39,8 @@
 #include "Libraries/imgui/imgui.h"
 #include "Libraries/imgui/imgui_sdl.h"
 #include "Libraries/imgui/imgui_impl_sdl.h"
+#include "Libraries/imgui/implot.h"
+#include "Libraries/imgui/implot_internal.h"
 
 #define SCREEN_WIDTH 782
 #define SCREEN_HEIGHT 543

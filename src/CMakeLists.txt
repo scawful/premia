@@ -34,6 +34,9 @@ add_executable(premia-gui Premia.cpp TDAmeritrade.cpp
                     Libraries/imgui/imgui_widgets.cpp
                     Libraries/imgui/imgui_impl_sdl.cpp
                     Libraries/imgui/imgui_sdl.cpp
+                    Libraries/imgui/implot.cpp
+                    Libraries/imgui/implot_items.cpp
+                    Libraries/imgui/implot_demo.cpp
                     )
 include_directories("../assets")
 
