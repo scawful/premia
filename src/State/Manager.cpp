@@ -66,6 +66,7 @@ void Manager::cleanup()
     }
 
     ImGuiSDL::Deinitialize();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 
     // Close and destroy the window
