@@ -10,7 +10,6 @@ namespace tda
                 this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
                 break;
             case PRICE_HISTORY:
-                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}";
                 this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
                 break;
             default:
@@ -25,6 +24,21 @@ namespace tda
     std::string TDAmeritrade::get_api_interval_value(int value)
     {
         return EnumAPIValues[value];
+    }
+
+    std::string TDAmeritrade::get_api_frequency_type(int value)
+    {
+        return EnumAPIFreq[value];
+    }
+
+    std::string TDAmeritrade::get_api_period_amount(int value)
+    {
+        return EnumAPIPeriod[value];
+    }
+
+    std::string TDAmeritrade::get_api_frequency_amount(int value)
+    {
+        return EnumAPIFreqAmt[value];
     }
 
     std::string TDAmeritrade::timestamp_from_string(std::string date)
@@ -96,8 +110,7 @@ namespace tda
                 break;
             case PRICE_HISTORY:
                 //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=day&period=2&frequencyType=minute&frequency=1";
-                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=month&period=6&frequencyType=weekly&frequency=1";
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=ytd&period=1&frequencyType=daily&frequency=1&needExtendedHoursData=true";
                 break;
             default:
                 break;
@@ -112,6 +125,47 @@ namespace tda
     void TDAmeritrade::set_col_name( std::string name )
     {
         this->_col_name = name;
+    }
+
+    void TDAmeritrade::set_price_history_parameters( std::string ticker, PeriodType ptype, int period_amt, 
+                                                     FrequencyType ftype, int freq_amt, bool ext )
+    {
+        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
+        string_replace(new_url, "{ticker}", ticker);
+        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
+        string_replace(new_url, "{period}", get_api_period_amount(period_amt));
+        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
+        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
+
+        if (!ext)
+            string_replace(new_url, "{ext}", "false");
+        else
+            string_replace(new_url, "{ext}", "true");
+
+        this->_base_url = new_url;
+        this->_current_ticker = ticker;
+    }
+
+    boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory( )
+    {
+        std::time_t now = std::time(0);
+        std::string output_file_name = this->_current_ticker + "_" + std::to_string(now) + ".json";
+        download_file(this->_base_url, output_file_name);
+        std::ifstream jsonFile(output_file_name, std::ios::in | std::ios::binary );
+        boost::property_tree::ptree propertyTree;
+        
+        try {
+            read_json(jsonFile, propertyTree);
+        }
+        catch ( std::exception& json_parser_error ) {
+            SDL_Log("%s", json_parser_error.what() );
+        }
+
+        boost::shared_ptr<PriceHistory> new_price_history_data = boost::make_shared<PriceHistory>( propertyTree );
+        std::remove(output_file_name.c_str());
+
+        return new_price_history_data;
     }
 
     boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory( std::string ticker )
@@ -254,17 +308,16 @@ namespace tda
                             
                         if ( candle2_it.first == "datetime" )
                         {
-                            // std::stringstream dt_ss;
-                            // std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(candle2_it.second.get_value<std::string> ());
+                            std::stringstream dt_ss;
+                            std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(candle2_it.second.get_value<std::string> ());
+                            newCandle.raw_datetime = secsSinceEpoch;
+                            secsSinceEpoch *= 0.001;
 
                             //%a %d %b %Y - %I:%M:%S%p
                             //%H:%M:%S
-                            //dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
-                            //datetime = dt_ss.str();
-                            datetime = boost::lexical_cast<std::string>(candle2_it.second.get_value<std::string> ());
-
-                            //boost::gregorian::date newdelta(boost::posix_time::from_time_t(dt).date());
-                            //boost::posix_time::from_time_t(dt);
+                            dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
+                            datetime = dt_ss.str();
+                            //datetime = boost::lexical_cast<std::string>(candle2_it.second.get_value<std::string> ());
                         }
                         
                     }
@@ -275,6 +328,10 @@ namespace tda
 
                     candleVector.push_back( newCandle );
                 }
+            }
+            else if ( history_it.first == "symbol" )
+            {
+                priceHistoryVariables["symbol"] = history_it.second.get_value<std::string>();
             }
         }
     }

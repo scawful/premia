@@ -12,6 +12,7 @@ namespace tda
         std::pair<double, double> highLow;
         std::pair<double, double> openClose;     
         std::string datetime;
+        time_t raw_datetime;
     };
 
     class Quote 
@@ -71,6 +72,9 @@ namespace tda
     };
 
     static const std::string EnumAPIValues[] { "day", "month", "year", "ytd" };
+    static const std::string EnumAPIFreq[] { "minute", "daily", "weekly", "monthly" };
+    static const std::string EnumAPIPeriod[] { "1", "2", "3", "4", "5", "6", "10", "15", "20" };
+    static const std::string EnumAPIFreqAmt[] { "1", "5", "10", "15", "30" };
 
     class TDAmeritrade 
     {
@@ -81,8 +85,12 @@ namespace tda
         FrequencyType _frequency_type;
         std::string _base_url;
         std::string _col_name;
+        std::string _current_ticker;
 
         std::string get_api_interval_value(int value);
+        std::string get_api_frequency_type(int value);
+        std::string get_api_period_amount(int value);
+        std::string get_api_frequency_amount(int value);
         std::string timestamp_from_string(std::string date);
         bool string_replace(std::string& str, const std::string from, const std::string to);
         std::string build_url(std::string ticker, std::string start_date, std::string end_date);
@@ -94,7 +102,10 @@ namespace tda
         void set_retrieval_type( RetrievalType type );
         void set_period_type( PeriodType interval );
         void set_col_name( std::string col_name );
+        void set_price_history_parameters( std::string ticker, PeriodType ptype, int period_amt, 
+                                           FrequencyType ftype, int freq_amt, bool ext = true );
 
+        boost::shared_ptr<tda::PriceHistory> createPriceHistory( );
         boost::shared_ptr<tda::PriceHistory> createPriceHistory( std::string ticker );
         boost::shared_ptr<tda::Quote> createQuote( std::string ticker );
         void retrieveQuoteData( std::string ticker, bool keep_file );
