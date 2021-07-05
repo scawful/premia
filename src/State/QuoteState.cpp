@@ -9,6 +9,7 @@ void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
+    ticker_symbol = "TLT";
     setQuote( "TLT" );
 
     SDL_Color fontColor = { 255, 255, 255 };
@@ -20,20 +21,38 @@ void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     descTexture.loadFromRenderedText( pRenderer, tickerFont, quoteData->getQuoteVariable("description"), fontColor );
 
     ImGui::CreateContext();
+    ImPlot::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
 
     candleVector = priceHistoryData->getCandleVector();
 
-    for ( auto& vector_it: candleVector )
+    // for ( auto& vector_it: candleVector )
+    // {
+    //     std::cout << "open: " << vector_it.openClose.first << "\n";
+    //     std::cout << "close: " << vector_it.openClose.second << "\n";
+    //     std::cout << "high: " << vector_it.highLow.first << "\n";
+    //     std::cout << "low: " << vector_it.highLow.second << "\n";
+    //     std::cout << "volume: " << vector_it.volume << "\n";
+    //     std::cout << "datetime: " << vector_it.datetime << "\n";
+    //     std::cout << "raw_datetime: " << vector_it.raw_datetime << "\n";
+    // }
+
+    for ( int i = 0; i < candleVector.size(); i++ )
     {
-        std::cout << "open: " << vector_it.openClose.first << "\n";
-        std::cout << "close: " << vector_it.openClose.second << "\n";
-        std::cout << "high: " << vector_it.highLow.first << "\n";
-        std::cout << "low: " << vector_it.highLow.second << "\n";
-        std::cout << "volume: " << vector_it.volume << "\n";
-        std::cout << "datetime: " << vector_it.datetime << "\n";
+        volumeVector.push_back( candleVector[i].volume );
     }
+
+    detailed_quote = "Exchange: " + quoteData->getQuoteVariable("exchangeName") +
+                                 "\nBid: $" + quoteData->getQuoteVariable("bidPrice") + " - Size: " + quoteData->getQuoteVariable("bidSize") +
+                                 "\nAsk: $" + quoteData->getQuoteVariable("askPrice") + " - Size: " + quoteData->getQuoteVariable("askSize") +
+                                 "\nOpen: $" + quoteData->getQuoteVariable("openPrice") +
+                                 "\nClose: $" + quoteData->getQuoteVariable("closePrice") +
+                                 "\n52 Week High: $" + quoteData->getQuoteVariable("52WkHigh") +
+                                 "\n52 Week Low: $" + quoteData->getQuoteVariable("52WkLow") +
+                                 "\nTotal Volume: " + quoteData->getQuoteVariable("totalVolume");
+
+    title_string = quoteData->getQuoteVariable("symbol") + " - " + quoteData->getQuoteVariable("description");
 
 }
 
@@ -58,6 +77,102 @@ void QuoteState::setQuote( std::string ticker )
 {
     quoteData = tda_data_interface->createQuote( ticker );
     priceHistoryData = tda_data_interface->createPriceHistory( ticker );
+}
+
+template <typename T>
+int BinarySearch(const T* arr, int l, int r, T x) {
+    if (r >= l) {
+        int mid = l + (r - l) / 2;
+        if (arr[mid] == x)
+            return mid;
+        if (arr[mid] > x)
+            return BinarySearch(arr, l, mid - 1, x);
+        return BinarySearch(arr, mid + 1, r, x);
+    }
+    return -1;
+}
+
+void QuoteState::createCandleChart( float width_percent, int count, ImVec4 bullCol, ImVec4 bearCol, bool tooltip )
+{
+    size_t vecSize = candleVector.size();
+    double xs[vecSize];
+    double highs[vecSize];
+    double lows[vecSize];
+    double opens[vecSize];
+    double closes[vecSize];
+
+    for ( int i = 0; i < candleVector.size(); i++ )
+    {
+        double new_dt = boost::lexical_cast<double>(candleVector[i].raw_datetime);
+        new_dt *= 0.001;
+        xs[i] = new_dt;
+        highs[i] = candleVector[i].highLow.first;
+        lows[i] = candleVector[i].highLow.second;
+        opens[i] = candleVector[i].openClose.first;
+        closes[i] = candleVector[i].openClose.second;
+    }
+
+    // get ImGui window DrawList
+    ImDrawList* draw_list = ImPlot::GetPlotDrawList();
+    
+    // calc real value width
+    double half_width = count > 1 ? (xs[1] - xs[0]) * width_percent : width_percent;
+
+    // custom tool
+    if ( ImPlot::IsPlotHovered() && tooltip ) 
+    {
+        ImPlotPoint mouse   = ImPlot::GetPlotMousePos();
+        mouse.x             = ImPlot::RoundTime(ImPlotTime::FromDouble(mouse.x), ImPlotTimeUnit_Day).ToDouble();
+        float  tool_l       = ImPlot::PlotToPixels(mouse.x - half_width * 1.5, mouse.y).x;
+        float  tool_r       = ImPlot::PlotToPixels(mouse.x + half_width * 1.5, mouse.y).x;
+        float  tool_t       = ImPlot::GetPlotPos().y;
+        float  tool_b       = tool_t + ImPlot::GetPlotSize().y;
+        ImPlot::PushPlotClipRect();
+        draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b), IM_COL32(128,128,128,64));
+        ImPlot::PopPlotClipRect();
+        // find mouse location index
+        int idx = BinarySearch(xs, 0, count - 1, mouse.x);
+        // render tool tip (won't be affected by plot clip rect)
+        if (idx != -1) {
+            ImGui::BeginTooltip();
+            char buff[32];
+            ImPlot::FormatDate(ImPlotTime::FromDouble(xs[idx]),buff,32,ImPlotDateFmt_DayMoYr,ImPlot::GetStyle().UseISO8601);
+            ImGui::Text("Day:   %s",  buff);
+            ImGui::Text("Open:  $%.2f", opens[idx]);
+            ImGui::Text("Close: $%.2f", closes[idx]);
+            ImGui::Text("Low:   $%.2f", lows[idx]);
+            ImGui::Text("High:  $%.2f", highs[idx]);
+            ImGui::EndTooltip();
+        }
+    }
+
+    // begin plot item
+    if ( ImPlot::BeginItem( priceHistoryData->getPriceHistoryVariable("symbol").c_str() ) ) 
+    {
+        // override legend icon color
+        ImPlot::GetCurrentItem()->Color = IM_COL32(64,64,64,255);
+        // fit data if requested
+        if (ImPlot::FitThisFrame()) {
+            for (int i = 0; i < count; ++i) {
+                ImPlot::FitPoint(ImPlotPoint(xs[i], lows[i]));
+                ImPlot::FitPoint(ImPlotPoint(xs[i], highs[i]));
+            }
+        }
+        // render data
+        for (int i = 0; i < count; ++i) 
+        {
+            ImVec2 open_pos  = ImPlot::PlotToPixels(xs[i] - half_width, opens[i]);
+            ImVec2 close_pos = ImPlot::PlotToPixels(xs[i] + half_width, closes[i]);
+            ImVec2 low_pos   = ImPlot::PlotToPixels(xs[i], lows[i]);
+            ImVec2 high_pos  = ImPlot::PlotToPixels(xs[i], highs[i]);
+            ImU32 color      = ImGui::GetColorU32(opens[i] > closes[i] ? bearCol : bullCol);
+            draw_list->AddLine(low_pos, high_pos, color);
+            draw_list->AddRectFilled(open_pos, close_pos, color);
+        }
+
+        // end plot item
+        ImPlot::EndItem();
+    }
 }
 
 void QuoteState::handleEvents( Manager* premia )
@@ -127,7 +242,6 @@ void QuoteState::update( Manager* game )
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT), ImGuiCond_Once);
     
-    std::string title_string = this->quoteData->getQuoteVariable("symbol") + " - " + this->quoteData->getQuoteVariable("description");
     if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar ))
     {
         // Early out if the window is collapsed, as an optimization.
@@ -163,17 +277,63 @@ void QuoteState::update( Manager* game )
         ImGui::EndMenuBar();
     }
 
-    std::string detailed_quote = "Exchange: " + quoteData->getQuoteVariable("exchangeName") +
-                                 "\nBid: $" + quoteData->getQuoteVariable("bidPrice") + " - Size: " + quoteData->getQuoteVariable("bidSize") +
-                                 "\nAsk: $" + quoteData->getQuoteVariable("askPrice") + " - Size: " + quoteData->getQuoteVariable("askSize") +
-                                 "\nOpen: $" + quoteData->getQuoteVariable("openPrice") +
-                                 "\nClose: $" + quoteData->getQuoteVariable("closePrice") +
-                                 "\n52 Week High: $" + quoteData->getQuoteVariable("52WkHigh") +
-                                 "\n52 Week Low: $" + quoteData->getQuoteVariable("52WkLow") +
-                                 "\nTotal Volume: " + quoteData->getQuoteVariable("totalVolume");
-
     ImGui::Text( "%s", detailed_quote.c_str() );
     ImGui::Spacing();
+
+    // ====== implot chart ======= //
+
+    static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
+    static bool tooltip = false;
+    // ImGui::Checkbox("Show Tooltip", &tooltip);
+    // ImGui::SameLine();
+    static ImVec4 bullCol = ImVec4(0.000f, 1.000f, 0.441f, 1.000f);
+    static ImVec4 bearCol = ImVec4(0.853f, 0.050f, 0.310f, 1.000f);
+    ImGui::SameLine(); ImGui::ColorEdit4("##Bull", &bullCol.x, ImGuiColorEditFlags_NoInputs);
+    ImGui::SameLine(); ImGui::ColorEdit4("##Bear", &bearCol.x, ImGuiColorEditFlags_NoInputs);
+
+    ImGui::SetNextItemWidth( 75.f );
+    ImGui::SameLine(); ImGui::Combo("Period", &period_type, "Day\0Month\0Year\0YTD\0");
+    ImGui::SetNextItemWidth( 50.f );
+    ImGui::SameLine(); ImGui::Combo("Type | ", &period_amount, " 1\0 2\0 3\0 4\0 5\0 6\0 10\0 15\0 20\0");
+
+    ImGui::SetNextItemWidth( 75.f );
+    ImGui::SameLine(); ImGui::Combo("Frequency ", &frequency_type, "Minute\0Daily\0Weekly\0Monthly\0");
+    ImGui::SetNextItemWidth( 50.f );
+    ImGui::SameLine(); ImGui::Combo("Amount", &frequency_amount, " 1\0 5\0 10\0 15\0 30\0");
+
+    ImGui::SameLine();
+
+    if ( ImGui::Button("Apply") ) 
+    {
+        std::cout << "Change chart settings!" << std::endl;
+        tda_data_interface->set_price_history_parameters( ticker_symbol, tda::PeriodType(period_type), period_amount, 
+                                                          tda::FrequencyType(frequency_type), frequency_amount );
+        priceHistoryData = tda_data_interface->createPriceHistory();
+        candleVector = priceHistoryData->getCandleVector();
+    }  
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        ImGui::Text("Edit name:");
+        //ImGui::InputText("##edit", name, IM_ARRAYSIZE(name));
+        if (ImGui::Button("Close"))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+
+    ImPlot::GetStyle().UseLocalTime = true;
+    ImPlot::SetNextPlotFormatY("$%.2f");
+    ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 130, 180);
+
+    if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL,ImVec2(-1,0),0,
+                            ImPlotAxisFlags_Time,
+                            ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit)) 
+    {
+        createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
+        ImPlot::EndPlot();
+    }
+
+    //ImGui::PlotHistogram("Volume", volumeVector, volumeVector.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
     // ===== drawable chart ====== //
 
@@ -184,17 +344,6 @@ void QuoteState::update( Manager* game )
     static bool adding_line = false;
 
     ImGui::Checkbox("Enable grid", &opt_enable_grid);
-
-    // Typically you would use a BeginChild()/EndChild() pair to benefit from a clipping region + own scrolling.
-    // Here we demonstrate that this can be replaced by simple offsetting + custom drawing + PushClipRect/PopClipRect() calls.
-    // To use a child window instead we could use, e.g:
-    //      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));      // Disable padding
-    //      ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(50, 50, 50, 255));  // Set a background color
-    //      ImGui::BeginChild("canvas", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_NoMove);
-    //      ImGui::PopStyleColor();
-    //      ImGui::PopStyleVar();
-    //      [...]
-    //      ImGui::EndChild();
 
     // Using InvisibleButton() as a convenience 1) it will advance the layout cursor and 2) allows us to use IsItemHovered()/IsItemActive()
     ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();      // ImDrawList API uses screen coordinates!
@@ -258,7 +407,7 @@ void QuoteState::update( Manager* game )
     draw_list->PushClipRect(canvas_p0, canvas_p1, true);
     if (opt_enable_grid)
     {
-        const float GRID_STEP = 64.0f;
+        const float GRID_STEP = 32.0f;
         for (float x = fmodf(scrolling.x, GRID_STEP); x < canvas_sz.x; x += GRID_STEP)
             draw_list->AddLine(ImVec2(canvas_p0.x + x, canvas_p0.y), ImVec2(canvas_p0.x + x, canvas_p1.y), IM_COL32(200, 200, 200, 40));
         for (float y = fmodf(scrolling.y, GRID_STEP); y < canvas_sz.y; y += GRID_STEP)

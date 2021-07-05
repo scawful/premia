@@ -15,11 +15,14 @@ private:
     PTexture tickerTexture;
     PTexture descTexture;
 
+    std::string detailed_quote, title_string, ticker_symbol;
+
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
     boost::shared_ptr<tda::Quote> quoteData;
     boost::shared_ptr<tda::PriceHistory> priceHistoryData;
 
     std::vector< tda::Candle > candleVector;
+    std::vector< int > volumeVector;
 
 protected:
     QuoteState() { }
@@ -32,6 +35,7 @@ public:
     void resume();
 
     void setQuote( std::string ticker );
+    void createCandleChart( float width_percent, int count, ImVec4 bullCol, ImVec4 bearCol, bool tooltip );
 
     void handleEvents( Manager* premia );
     void update( Manager* premia );
