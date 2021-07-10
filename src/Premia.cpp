@@ -1,17 +1,13 @@
 #include "State/StartState.hpp"
+#include "State/QuoteState.hpp"
+#include "State/OptionState.hpp"
 
 int main( int argc, char* argv[] )
 {
     Manager premia;
-    
-    // QuantLib::Option::Type OptionType(QuantLib::Option::Call);
-    // std::cout << "Option Type = " << OptionType << std::endl;
-
-    // tda::TDAmeritrade tda_api_interface(tda::QUOTE);
-    // tda_api_interface.retrieveQuoteData( "TLT", false );
 
     premia.init();
-    premia.change( StartState::instance() );
+    premia.change( QuoteState::instance() );
     
     while ( premia.running() )
     {
