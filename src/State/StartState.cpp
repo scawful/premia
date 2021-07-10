@@ -1,6 +1,7 @@
 //  StartState Class
 #include "StartState.hpp"
 #include "QuoteState.hpp"
+#include "OptionState.hpp"
 
 StartState StartState::m_StartState;
 
@@ -123,7 +124,10 @@ void StartState::handleEvents( Manager* premia )
                     case SDLK_ESCAPE:
                         premia->quit();
                         break;
-                    case SDLK_SPACE:
+                    case SDLK_LEFT:
+                        premia->change( OptionState::instance() );
+                        break;
+                    case SDLK_RIGHT:
                         premia->change( QuoteState::instance() );
                         break;
                     default:

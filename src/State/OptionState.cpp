@@ -1,6 +1,7 @@
 //  OptionState Class
 #include "OptionState.hpp"
 #include "StartState.hpp"
+#include "QuoteState.hpp"
 
 OptionState OptionState::m_OptionState;
 
@@ -55,7 +56,10 @@ void OptionState::handleEvents( Manager* premia )
                     case SDLK_ESCAPE:
                         premia->quit();
                         break;
-                    case SDLK_SPACE:
+                    case SDLK_LEFT:
+                        premia->change( QuoteState::instance() );
+                        break;
+                    case SDLK_RIGHT:
                         premia->change( StartState::instance() );
                         break;
                     default:
@@ -166,6 +170,8 @@ void OptionState::update( Manager* game )
         ImGui::TableHeadersRow();
 
         // Demonstrate using clipper for large vertical lists
+        static bool select_option = false;
+
         ImGuiListClipper clipper;
         clipper.Begin(optionsDateTimeObj[current_item].strikePriceObj.size());
         while (clipper.Step())
@@ -182,7 +188,8 @@ void OptionState::update( Manager* game )
                             ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["putCall"].c_str() );
                             break;
                         case 1:
-                            ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str() );
+                            ImGui::Selectable(optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str(), &select_option);
+                            //ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str() );
                             break;
                         case 2:
                             ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["bid"].c_str() );

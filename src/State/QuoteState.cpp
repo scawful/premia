@@ -222,7 +222,7 @@ void QuoteState::handleEvents( Manager* premia )
                     case SDLK_ESCAPE:
                         premia->quit();
                         break;
-                    case SDLK_SPACE:
+                    case SDLK_LEFT:
                         premia->change( StartState::instance() );
                         break;
                     case SDLK_RIGHT:
