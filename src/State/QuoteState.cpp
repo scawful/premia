@@ -1,8 +1,31 @@
 //  QuoteState Class
 #include "QuoteState.hpp"
 #include "StartState.hpp"
+#include "OptionState.hpp"
 
 QuoteState QuoteState::m_QuoteState;
+
+void QuoteState::initCandleArrays()
+{
+    size_t vecSize = candleVector.size();
+    double xs[vecSize];
+    double highs[vecSize];
+    double lows[vecSize];
+    double opens[vecSize];
+    double closes[vecSize];
+
+    for ( int i = 0; i < candleVector.size(); i++ )
+    {
+        double new_dt = boost::lexical_cast<double>(candleVector[i].raw_datetime);
+        new_dt *= 0.001;
+        xs[i] = new_dt;
+        highs[i] = candleVector[i].highLow.first;
+        lows[i] = candleVector[i].highLow.second;
+        opens[i] = candleVector[i].openClose.first;
+        closes[i] = candleVector[i].openClose.second;
+    }
+
+}
 
 void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 {
@@ -77,6 +100,12 @@ void QuoteState::setQuote( std::string ticker )
 {
     quoteData = tda_data_interface->createQuote( ticker );
     priceHistoryData = tda_data_interface->createPriceHistory( ticker );
+}
+
+template <typename T>
+inline T RandomRange(T min, T max) {
+    T scale = rand() / (T) RAND_MAX;
+    return min + scale * ( max - min );
 }
 
 template <typename T>
@@ -196,6 +225,9 @@ void QuoteState::handleEvents( Manager* premia )
                     case SDLK_SPACE:
                         premia->change( StartState::instance() );
                         break;
+                    case SDLK_RIGHT:
+                        premia->change( OptionState::instance() );
+                        break;
                     default:
                         break;
                 }
@@ -238,11 +270,12 @@ void QuoteState::handleEvents( Manager* premia )
 void QuoteState::update( Manager* game )
 {    
     ImGui::NewFrame();
-
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT), ImGuiCond_Once);
+    //ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT), ImGuiCond_Once);
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
     
-    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar ))
+    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove ))
     {
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();
@@ -321,6 +354,7 @@ void QuoteState::update( Manager* game )
         ImGui::EndPopup();
     }
 
+
     ImPlot::GetStyle().UseLocalTime = true;
     ImPlot::SetNextPlotFormatY("$%.2f");
     ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 130, 180);
@@ -335,112 +369,179 @@ void QuoteState::update( Manager* game )
 
     //ImGui::PlotHistogram("Volume", volumeVector, volumeVector.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
+    // ===========================  // 
+
+        /*
+        static double xs1[101], ys1[101], ys2[101], ys3[101];
+        srand(0);
+        for (int i = 0; i < 101; ++i) {
+            xs1[i] = (float)i;
+            ys1[i] = RandomRange(400.0,450.0);
+            ys2[i] = RandomRange(275.0,350.0);
+            ys3[i] = RandomRange(150.0,225.0);
+        }
+
+        for ( int i = 0; i < candleVector.size(); i++ )
+        {
+            
+        }
+
+        static bool show_lines = true;
+        static bool show_fills = true;
+        static float fill_ref = 0;
+        static int shade_mode = 0;
+        ImGui::Checkbox("Lines",&show_lines); ImGui::SameLine();
+        ImGui::Checkbox("Fills",&show_fills);
+        if (show_fills) {
+            ImGui::SameLine();
+            if (ImGui::RadioButton("To -INF",shade_mode == 0))
+                shade_mode = 0;
+            ImGui::SameLine();
+            if (ImGui::RadioButton("To +INF",shade_mode == 1))
+                shade_mode = 1;
+            ImGui::SameLine();
+            if (ImGui::RadioButton("To Ref",shade_mode == 2))
+                shade_mode = 2;
+            if (shade_mode == 2) {
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(100);
+                ImGui::DragFloat("##Ref",&fill_ref, 1, -100, 500);
+            }
+        }
+
+
+        ImPlot::SetNextPlotLimits(0,100,0,500);
+        if (ImPlot::BeginPlot("Stock Prices", "Days", "Price")) {
+            if (show_fills) {
+                ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.25f);
+                ImPlot::PlotShaded("EMA(9)", xs1, ys1, 101, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
+                ImPlot::PlotShaded("EMA(50)", xs1, ys2, 101, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
+                ImPlot::PlotShaded("EMA(100)", xs1, ys3, 101, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
+                ImPlot::PopStyleVar();
+            }
+            if (show_lines) {
+                ImPlot::PlotLine("EMA(9)", xs1, ys1, 101);
+                ImPlot::PlotLine("EMA(50)", xs1, ys2, 101);
+                ImPlot::PlotLine("EMA(100)", xs1, ys3, 101);
+            }
+            ImPlot::EndPlot();
+        }
+        */
+
     // ===== drawable chart ====== //
 
-    static ImVector<ImVec2> points;
-    static ImVec2 scrolling(0.0f, 0.0f);
-    static bool opt_enable_grid = true;
-    static bool opt_enable_context_menu = true;
-    static bool adding_line = false;
+        /*
+        static ImVector<ImVec2> points;
+        static ImVec2 scrolling(0.0f, 0.0f);
+        static bool opt_enable_grid = true;
+        static bool opt_enable_context_menu = true;
+        static bool adding_line = false;
 
-    ImGui::Checkbox("Enable grid", &opt_enable_grid);
+        ImGui::Checkbox("Enable grid", &opt_enable_grid);
 
-    // Using InvisibleButton() as a convenience 1) it will advance the layout cursor and 2) allows us to use IsItemHovered()/IsItemActive()
-    ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();      // ImDrawList API uses screen coordinates!
-    ImVec2 canvas_sz = ImVec2( 600.f, 250.f );
-    // ImVec2 canvas_sz = ImGui::GetContentRegionAvail();   // Resize canvas to what's available
-    // if (canvas_sz.x < 50.0f) canvas_sz.x = 50.0f;
-    // if (canvas_sz.y < 50.0f) canvas_sz.y = 50.0f;
-    ImVec2 canvas_p1 = ImVec2(canvas_p0.x + canvas_sz.x, canvas_p0.y + canvas_sz.y);
+        // Using InvisibleButton() as a convenience 1) 
+        // it will advance the layout cursor and 2) allows us to use IsItemHovered()/IsItemActive()
+        ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();      // ImDrawList API uses screen coordinates!
+        ImVec2 canvas_sz = ImVec2( 600.f, 250.f );
+        // ImVec2 canvas_sz = ImGui::GetContentRegionAvail();   // Resize canvas to what's available
+        // if (canvas_sz.x < 50.0f) canvas_sz.x = 50.0f;
+        // if (canvas_sz.y < 50.0f) canvas_sz.y = 50.0f;
+        ImVec2 canvas_p1 = ImVec2(canvas_p0.x + canvas_sz.x, canvas_p0.y + canvas_sz.y);
 
-    // Draw border and background color
-    ImGuiIO& io = ImGui::GetIO();
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
-    draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
+        // Draw border and background color
+        ImGuiIO& io = ImGui::GetIO();
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
+        draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
 
-    // This will catch our interactions
-    ImGui::InvisibleButton("canvas", canvas_sz, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
-    const bool is_hovered = ImGui::IsItemHovered(); // Hovered
-    const bool is_active = ImGui::IsItemActive();   // Held
-    const ImVec2 origin(canvas_p0.x + scrolling.x, canvas_p0.y + scrolling.y); // Lock scrolled origin
-    const ImVec2 mouse_pos_in_canvas(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
+        // This will catch our interactions
+        ImGui::InvisibleButton("canvas", canvas_sz, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
+        const bool is_hovered = ImGui::IsItemHovered(); // Hovered
+        const bool is_active = ImGui::IsItemActive();   // Held
+        const ImVec2 origin(canvas_p0.x + scrolling.x, canvas_p0.y + scrolling.y); // Lock scrolled origin
+        const ImVec2 mouse_pos_in_canvas(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
 
-    // Add first and second point
-    if (is_hovered && !adding_line && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-    {
-        points.push_back(mouse_pos_in_canvas);
-        points.push_back(mouse_pos_in_canvas);
-        adding_line = true;
-    }
-    if (adding_line)
-    {
-        points.back() = mouse_pos_in_canvas;
-        if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
-            adding_line = false;
-    }
+        // Add first and second point
+        if (is_hovered && !adding_line && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            points.push_back(mouse_pos_in_canvas);
+            points.push_back(mouse_pos_in_canvas);
+            adding_line = true;
+        }
 
-    // Pan (we use a zero mouse threshold when there's no context menu)
-    // You may decide to make that threshold dynamic based on whether the mouse is hovering something etc.
-    const float mouse_threshold_for_pan = opt_enable_context_menu ? -1.0f : 0.0f;
-    if (is_active && ImGui::IsMouseDragging(ImGuiMouseButton_Right, mouse_threshold_for_pan))
-    {
-        scrolling.x += io.MouseDelta.x;
-        scrolling.y += io.MouseDelta.y;
-    }
-
-    // Context menu (under default mouse threshold)
-    ImVec2 drag_delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right);
-    if (opt_enable_context_menu && ImGui::IsMouseReleased(ImGuiMouseButton_Right) && drag_delta.x == 0.0f && drag_delta.y == 0.0f)
-        ImGui::OpenPopupOnItemClick("context");
-    if (ImGui::BeginPopup("context"))
-    {
         if (adding_line)
-            points.resize(points.size() - 2);
-        adding_line = false;
-        if (ImGui::MenuItem("Remove one", NULL, false, points.Size > 0)) { points.resize(points.size() - 2); }
-        if (ImGui::MenuItem("Remove all", NULL, false, points.Size > 0)) { points.clear(); }
-        ImGui::EndPopup();
-    }
+        {
+            points.back() = mouse_pos_in_canvas;
+            if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
+                adding_line = false;
+        }
 
-    // Draw grid + all lines in the canvas
-    draw_list->PushClipRect(canvas_p0, canvas_p1, true);
-    if (opt_enable_grid)
-    {
-        const float GRID_STEP = 32.0f;
-        for (float x = fmodf(scrolling.x, GRID_STEP); x < canvas_sz.x; x += GRID_STEP)
-            draw_list->AddLine(ImVec2(canvas_p0.x + x, canvas_p0.y), ImVec2(canvas_p0.x + x, canvas_p1.y), IM_COL32(200, 200, 200, 40));
-        for (float y = fmodf(scrolling.y, GRID_STEP); y < canvas_sz.y; y += GRID_STEP)
-            draw_list->AddLine(ImVec2(canvas_p0.x, canvas_p0.y + y), ImVec2(canvas_p1.x, canvas_p0.y + y), IM_COL32(200, 200, 200, 40));
-    }
-    for (int n = 0; n < points.Size; n += 2)
-        draw_list->AddLine(ImVec2(origin.x + points[n].x, origin.y + points[n].y), ImVec2(origin.x + points[n + 1].x, origin.y + points[n + 1].y), IM_COL32(255, 255, 0, 255), 2.0f);
-    draw_list->PopClipRect();
+        // Pan (we use a zero mouse threshold when there's no context menu)
+        // You may decide to make that threshold dynamic based on whether the mouse is hovering something etc.
+        const float mouse_threshold_for_pan = opt_enable_context_menu ? -1.0f : 0.0f;
+        if (is_active && ImGui::IsMouseDragging(ImGuiMouseButton_Right, mouse_threshold_for_pan))
+        {
+            scrolling.x += io.MouseDelta.x;
+            scrolling.y += io.MouseDelta.y;
+        }
+
+        // Context menu (under default mouse threshold)
+        ImVec2 drag_delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right);
+        if (opt_enable_context_menu && ImGui::IsMouseReleased(ImGuiMouseButton_Right) && drag_delta.x == 0.0f && drag_delta.y == 0.0f)
+            ImGui::OpenPopupOnItemClick("context");
+        if (ImGui::BeginPopup("context"))
+        {
+            if (adding_line)
+                points.resize(points.size() - 2);
+            adding_line = false;
+            if (ImGui::MenuItem("Remove one", NULL, false, points.Size > 0)) { points.resize(points.size() - 2); }
+            if (ImGui::MenuItem("Remove all", NULL, false, points.Size > 0)) { points.clear(); }
+            ImGui::EndPopup();
+        }
+
+        // Draw grid + all lines in the canvas
+        draw_list->PushClipRect(canvas_p0, canvas_p1, true);
+        if (opt_enable_grid)
+        {
+            const float GRID_STEP = 32.0f;
+            for (float x = fmodf(scrolling.x, GRID_STEP); x < canvas_sz.x; x += GRID_STEP)
+                draw_list->AddLine(ImVec2(canvas_p0.x + x, canvas_p0.y), ImVec2(canvas_p0.x + x, canvas_p1.y), IM_COL32(200, 200, 200, 40));
+            for (float y = fmodf(scrolling.y, GRID_STEP); y < canvas_sz.y; y += GRID_STEP)
+                draw_list->AddLine(ImVec2(canvas_p0.x, canvas_p0.y + y), ImVec2(canvas_p1.x, canvas_p0.y + y), IM_COL32(200, 200, 200, 40));
+        }
+
+        for (int n = 0; n < points.Size; n += 2)
+            draw_list->AddLine(ImVec2(origin.x + points[n].x, origin.y + points[n].y), ImVec2(origin.x + points[n + 1].x, origin.y + points[n + 1].y), IM_COL32(255, 255, 0, 255), 2.0f);
+        draw_list->PopClipRect();
+        */
 
     // ====================================== //
     
-    static bool animate = true;
+        /*
+        static bool animate = true;
+        static float arr[] = { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
 
-    static float arr[] = { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
+        // Use functions to generate output
+        // FIXME: This is rather awkward because current plot API only pass in indices.
+        // We probably want an API passing floats and user provide sample rate/count.
+        struct Funcs
+        {
+            static float Sin(void*, int i) { return sinf(i * 0.1f); }
+            static float Saw(void*, int i) { return (i & 1) ? 1.0f : -1.0f; }
+        };
+        static int func_type = 0, display_count = 70;
+        ImGui::Separator();
+        ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
+        ImGui::Combo("func", &func_type, "Daily\0Weekly\0Monthly\0");
+        ImGui::SameLine();
+        ImGui::SliderInt("Time Period", &display_count, 1, 360);
+        float (*func)(void*, int) = (func_type == 0) ? Funcs::Sin : Funcs::Saw;
+        ImGui::PlotLines("Momentum", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0, 80));
+        ImGui::PlotHistogram("MACD", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0, 80));
+        ImGui::PlotHistogram("Volume", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
+        */
 
-    // Use functions to generate output
-    // FIXME: This is rather awkward because current plot API only pass in indices.
-    // We probably want an API passing floats and user provide sample rate/count.
-    struct Funcs
-    {
-        static float Sin(void*, int i) { return sinf(i * 0.1f); }
-        static float Saw(void*, int i) { return (i & 1) ? 1.0f : -1.0f; }
-    };
-    static int func_type = 0, display_count = 70;
-    ImGui::Separator();
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    ImGui::Combo("func", &func_type, "Daily\0Weekly\0Monthly\0");
-    ImGui::SameLine();
-    ImGui::SliderInt("Time Period", &display_count, 1, 360);
-    float (*func)(void*, int) = (func_type == 0) ? Funcs::Sin : Funcs::Saw;
-    ImGui::PlotLines("Momentum", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0, 80));
-    ImGui::PlotHistogram("MACD", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0, 80));
-    ImGui::PlotHistogram("Volume", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
+    // ====================================== // 
 
     ImGui::End();
 

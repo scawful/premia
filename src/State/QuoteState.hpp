@@ -24,6 +24,9 @@ private:
     std::vector< tda::Candle > candleVector;
     std::vector< int > volumeVector;
 
+    // Functions
+    void initCandleArrays();
+
 protected:
     QuoteState() { }
 
