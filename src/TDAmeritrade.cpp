@@ -12,6 +12,9 @@ namespace tda
             case PRICE_HISTORY:
                 this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
                 break;
+            case OPTION_CHAIN:
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}";
+                break;
             default:
                 break;
         }
@@ -112,6 +115,9 @@ namespace tda
                 //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
                 this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=ytd&period=1&frequencyType=daily&frequency=1&needExtendedHoursData=true";
                 break;
+            case OPTION_CHAIN:
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+                break;
             default:
                 break;
         }
@@ -147,11 +153,56 @@ namespace tda
         this->_current_ticker = ticker;
     }
 
-    boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory( )
+    void TDAmeritrade::set_price_history_parameters( std::string ticker, PeriodType ptype, 
+                                                     time_t start_date, time_t end_date,
+                                                     FrequencyType ftype, int freq_amt, bool ext )
+    {
+        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
+        string_replace(new_url, "{ticker}", ticker);
+        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
+        string_replace(new_url, "{startDate}", boost::lexical_cast<std::string>(start_date));
+        string_replace(new_url, "{endDate}", boost::lexical_cast<std::string>(end_date));
+        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
+        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
+
+        if (!ext)
+            string_replace(new_url, "{ext}", "false");
+        else
+            string_replace(new_url, "{ext}", "true");
+
+        this->_base_url = new_url;
+        this->_current_ticker = ticker;
+    }
+
+    void TDAmeritrade::set_option_chain_parameters( std::string ticker, std::string contractType, std::string strikeCount,
+                                                    bool includeQuotes, std::string strategy, std::string range,
+                                                    std::string expMonth, std::string optionType )
+    {
+        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+
+        string_replace(new_url, "{ticker}", ticker);
+        string_replace(new_url, "{contractType}", contractType);
+        string_replace(new_url, "{strikeCount}", strikeCount);
+        string_replace(new_url, "{strategy}", strategy);
+        string_replace(new_url, "{range}", range);
+        string_replace(new_url, "{expMonth}", expMonth);
+        string_replace(new_url, "{optionType}", optionType);
+
+        if (!includeQuotes)
+            string_replace(new_url, "{includeQuotes}", "FALSE");
+        else
+            string_replace(new_url, "{includeQuotes}", "TRUE");
+
+        this->_base_url = new_url;
+        this->_current_ticker = ticker;
+    }
+
+    boost::property_tree::ptree TDAmeritrade::createPropertyTree( std::string ticker, std::string new_url )
     {
         std::time_t now = std::time(0);
         std::string output_file_name = this->_current_ticker + "_" + std::to_string(now) + ".json";
-        download_file(this->_base_url, output_file_name);
+        download_file(new_url, output_file_name);
         std::ifstream jsonFile(output_file_name, std::ios::in | std::ios::binary );
         boost::property_tree::ptree propertyTree;
         
@@ -162,8 +213,15 @@ namespace tda
             SDL_Log("%s", json_parser_error.what() );
         }
 
-        boost::shared_ptr<PriceHistory> new_price_history_data = boost::make_shared<PriceHistory>( propertyTree );
         std::remove(output_file_name.c_str());
+
+        return propertyTree;
+    }
+
+    boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory( )
+    {
+        boost::property_tree::ptree propertyTree = createPropertyTree( this->_current_ticker, this->_base_url );;
+        boost::shared_ptr<PriceHistory> new_price_history_data = boost::make_shared<PriceHistory>( propertyTree );
 
         return new_price_history_data;
     }
@@ -171,33 +229,13 @@ namespace tda
     boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory( std::string ticker )
     {
         set_retrieval_type( PRICE_HISTORY );
-
         std::string url = this->_base_url;
         string_replace(url, "{ticker}", ticker);
 
-        std::time_t now = std::time(0);
-        std::string output_file_name = ticker + "_" + std::to_string(now) + ".json";
-
-        download_file(url, output_file_name);
-
-        std::ifstream xmlFile(output_file_name, std::ios::in | std::ios::binary);
-
-        boost::property_tree::ptree propertyTree;
-        
-        try {
-            read_json(xmlFile, propertyTree);
-        }
-        catch ( std::exception& json_parser_error )
-        {
-            SDL_Log("%s", json_parser_error.what() );
-        }
-
+        boost::property_tree::ptree propertyTree = createPropertyTree( ticker, url );
         boost::shared_ptr<PriceHistory> new_price_history_data = boost::make_shared<PriceHistory>( propertyTree );
 
-        std::remove(output_file_name.c_str());
-
-        return new_price_history_data;
-        
+        return new_price_history_data;        
     }
 
     boost::shared_ptr<tda::Quote> TDAmeritrade::createQuote( std::string ticker )
@@ -220,6 +258,14 @@ namespace tda
         std::remove(output_file_name.c_str());
 
         return new_quote_data;
+    }
+
+    boost::shared_ptr<tda::OptionChain> TDAmeritrade::createOptionChain( std::string ticker )
+    {
+        //set_retrieval_type( OPTION_CHAIN );
+        boost::property_tree::ptree propertyTree = createPropertyTree( ticker, this->_base_url );
+        boost::shared_ptr<OptionChain> new_option_chain_data = boost::make_shared<OptionChain>( propertyTree );
+        return new_option_chain_data;
     }
 
     void TDAmeritrade::retrieveQuoteData( std::string ticker, bool keep_file )
@@ -355,5 +401,77 @@ namespace tda
     std::string PriceHistory::getPriceHistoryVariable( std::string variable )
     {
         return priceHistoryVariables[variable];
+    }
+
+    /* =============== OptionChain Class =============== */
+
+    void OptionChain::initVariables()
+    {
+        for ( auto &option_it: optionChainData )
+        {
+            if ( option_it.first == "callExpDateMap" )
+            {
+                for ( auto &date_it: option_it.second )
+                {
+                    OptionsDateTimeObj options_dt_obj;
+                    options_dt_obj.datetime = date_it.first;
+
+                    for ( auto &strike_it: date_it.second )
+                    {
+                        StrikePriceMap imported_strike;
+                        imported_strike.strikePrice = strike_it.first;
+
+                        for ( auto &contract_it: strike_it.second )
+                        {
+                            //std::cout << details_it.first << " :: " << details_it.second.get_value< std::string >() << std::endl;
+                            for ( auto &details_it: contract_it.second )
+                            {
+                                imported_strike.raw_option[ details_it.first ] = details_it.second.get_value< std::string >();
+                            }
+
+                            options_dt_obj.strikePriceObj.push_back( imported_strike );
+                        }
+                    }
+
+                    optionsDateTimeVector.push_back( options_dt_obj );
+                }
+            }
+            
+            if ( option_it.first == "putExpDateMap" )
+            {
+                for ( auto &date_it: option_it.second )
+                {
+                    
+                }
+            }
+
+            optionChainMap[ option_it.first ] = option_it.second.get_value< std::string >();
+        }
+    }
+
+    OptionChain::OptionChain( boost::property_tree::ptree option_chain_data )
+    {
+        optionChainData = option_chain_data;
+        initVariables();
+    }
+
+    std::vector<OptionsDateTimeObj> OptionChain::getOptionsDateTimeObj()
+    {
+        return optionsDateTimeVector;
+    }
+
+    std::string OptionChain::getCallVariable( std::string variable )
+    {
+        return callExpDateMap[ variable ];
+    }
+
+    std::string OptionChain::getPutVariable( std::string variable )
+    {
+        return putExpDateMap[ variable ];
+    }
+
+    std::string OptionChain::getOptionChainDataVariable( std::string variable )
+    {
+        return optionChainMap[ variable ];
     }
 }
