@@ -182,8 +182,11 @@ void StartState::update( Manager* game )
 {
     ImGui::NewFrame();
     ImGui::SetNextWindowPos(ImVec2(200, 200));
+    
+    /* hide demo windows unless necessary
     ImGui::ShowDemoWindow();
-
+    ImPlot::ShowDemoWindow();
+    */
 
     SDL_RenderClear(this->pRenderer);
 }
