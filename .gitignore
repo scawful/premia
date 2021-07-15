@@ -1,1 +1,4 @@
 build/**
+.vscode/**
+premia.code-workspace
+apikey.hpp
