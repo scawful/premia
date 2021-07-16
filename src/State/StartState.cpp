@@ -2,6 +2,7 @@
 #include "StartState.hpp"
 #include "QuoteState.hpp"
 #include "OptionState.hpp"
+#include "DemoState.hpp"
 
 StartState StartState::m_StartState;
 
@@ -17,6 +18,8 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     quotes["TLT"] = tda_data_interface->createQuote( "TLT" );
     quotes["IWM"] = tda_data_interface->createQuote( "IWM" );
     quotes["VXX"] = tda_data_interface->createQuote( "VXX" );
+
+    premiaLogo.loadFromFile( pRenderer, "../assets/sigma.png" );
 
     SDL_Color fontColor = { 255, 255, 255 };
     titleFont = TTF_OpenFont( "../assets/arial.ttf", 64 );
@@ -130,6 +133,9 @@ void StartState::handleEvents( Manager* premia )
                     case SDLK_RIGHT:
                         premia->change( QuoteState::instance() );
                         break;
+                    case SDLK_DOWN:
+                        premia->change( DemoState::instance() );
+                        break;
                     default:
                         break;
                 }
@@ -185,32 +191,32 @@ void StartState::handleEvents( Manager* premia )
 void StartState::update( Manager* game )
 {
     ImGui::NewFrame();
-    ImGui::SetNextWindowPos(ImVec2(200, 200));
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
     
-    /* hide demo windows unless necessary
-    ImGui::ShowDemoWindow();
-    ImPlot::ShowDemoWindow();
-    */
+    std::string title_string = "Premia Pro";
+    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
+    {
+        // Early out if the window is collapsed, as an optimization.
+        ImGui::End();
+        return;
+    }
+
+    ImGui::End();    
 
     SDL_RenderClear(this->pRenderer);
 }
 
 void StartState::draw( Manager* game )
 {
-    // fill window bounds
-    int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( pRenderer, 0, 0, 0, 0 );
-    SDL_GetWindowSize( pWindow, &w, &h );
-    SDL_Rect f = { 0, 0, 1920, 1080 };
-    SDL_RenderFillRect( pRenderer, &f );
+    ImGui::Render();
+    ImGuiSDL::Render(ImGui::GetDrawData());
 
     titleTexture.render(pRenderer, (SCREEN_WIDTH  - titleTexture.getWidth()) / 2, 10);
     subtitleTexture.render(pRenderer, (SCREEN_WIDTH - subtitleTexture.getWidth()) / 2, 75);
     textures["POWERED"].render(pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) - 50, 125);
     textures["TDA_SHILL"].render(pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) + textures["TDA_SHILL"].getWidth() - 50, 125);
-    
-    ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
 
     textures["SPY_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["SPY_LAST_PRICE"].getWidth()) / 2) - 160, 400);
     textures["QQQ_LAST_PRICE"].render( pRenderer, (SCREEN_WIDTH - textures["QQQ_LAST_PRICE"].getWidth()) / 2, 400 );
@@ -219,5 +225,7 @@ void StartState::draw( Manager* game )
     textures["IWM_LAST_PRICE"].render( pRenderer, (SCREEN_WIDTH - textures["IWM_LAST_PRICE"].getWidth()) / 2, 425 );
     textures["VXX_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["VXX_LAST_PRICE"].getWidth()) / 2) + 156, 425 );
 
+    //SDL_Rect rect = { 0, 0, 100, 100 };
+    //premiaLogo.render( pRenderer, 0, 0, &rect );
     SDL_RenderPresent(pRenderer);
 }

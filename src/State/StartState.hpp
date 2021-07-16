@@ -24,6 +24,7 @@ private:
     PTexture spyLastPrice;
     PTexture qqqLastPrice;
     PTexture diaLastPrice;
+    PTexture premiaLogo;
 
     std::map<std::string, PTexture> textures;
     std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
