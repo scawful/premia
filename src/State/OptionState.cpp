@@ -4,6 +4,8 @@
 #include "QuoteState.hpp"
 
 OptionState OptionState::m_OptionState;
+static bool select_options[] = {false};
+static int last_select = 0;
 
 void OptionState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 {
@@ -104,11 +106,11 @@ void OptionState::handleEvents( Manager* premia )
 void OptionState::update( Manager* game )
 {    
     ImGui::NewFrame();
-
+    ImGuiIO& io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
     
-    if (!ImGui::Begin( "Option Chain", NULL, ImGuiWindowFlags_MenuBar ))
+    if (!ImGui::Begin( "Option Chain", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize ))
     {
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();
@@ -149,7 +151,7 @@ void OptionState::update( Manager* game )
 
     ImGui::Combo("Expiration Date", &current_item, datetime_array.data(), datetime_array.size());
 
-    static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+    static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingFixedFit;
 
     const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
@@ -188,7 +190,7 @@ void OptionState::update( Manager* game )
                             ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["putCall"].c_str() );
                             break;
                         case 1:
-                            ImGui::Selectable(optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str(), &select_option);
+                            ImGui::Selectable(optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str(), &select_options[row]);
                             //ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str() );
                             break;
                         case 2:
@@ -213,6 +215,27 @@ void OptionState::update( Manager* game )
         ImGui::EndTable();
     }
     ImGui::TreePop();
+
+    for ( int i = 0; i < optionsDateTimeObj[current_item].strikePriceObj.size(); i++ )
+    {
+        if ( select_options[i] == true && last_select == 0 )
+        {
+            last_select = i;
+            ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[i].raw_option["description"].c_str() );
+        }
+        else if ( select_options[i] == true && last_select > 0 )
+        {
+            select_options[last_select] = false;
+            last_select = i;
+            ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[i].raw_option["description"].c_str() );
+        }
+        else if ( select_options[i] == false && last_select == i )
+        {
+            last_select = 0;
+        }
+    }
+
+    ImGui::Text("Last: %d", last_select );
 
     ImGui::End();
 
