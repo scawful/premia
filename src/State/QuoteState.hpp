@@ -10,10 +10,6 @@ private:
 
     SDL_Window *pWindow = NULL;
     SDL_Renderer *pRenderer = NULL;
-    TTF_Font *tickerFont = NULL;
-
-    PTexture tickerTexture;
-    PTexture descTexture;
 
     std::string detailed_quote, title_string, ticker_symbol;
 

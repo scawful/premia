@@ -35,54 +35,19 @@ void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     ticker_symbol = "TLT";
     setQuote( "TLT" );
 
-    SDL_Color fontColor = { 255, 255, 255 };
-    tickerFont = TTF_OpenFont( "../assets/arial.ttf", 52 );
-    tickerTexture.loadFromRenderedText( pRenderer, tickerFont, quoteData->getQuoteVariable("symbol"), fontColor );
-
-    TTF_CloseFont( tickerFont );
-    tickerFont = TTF_OpenFont( "../assets/arial.ttf", 32 );
-    descTexture.loadFromRenderedText( pRenderer, tickerFont, quoteData->getQuoteVariable("description"), fontColor );
-
     ImGui::CreateContext();
     ImPlot::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
 
-    candleVector = priceHistoryData->getCandleVector();
-
-    // for ( auto& vector_it: candleVector )
-    // {
-    //     std::cout << "open: " << vector_it.openClose.first << "\n";
-    //     std::cout << "close: " << vector_it.openClose.second << "\n";
-    //     std::cout << "high: " << vector_it.highLow.first << "\n";
-    //     std::cout << "low: " << vector_it.highLow.second << "\n";
-    //     std::cout << "volume: " << vector_it.volume << "\n";
-    //     std::cout << "datetime: " << vector_it.datetime << "\n";
-    //     std::cout << "raw_datetime: " << vector_it.raw_datetime << "\n";
-    // }
-
     for ( int i = 0; i < candleVector.size(); i++ )
     {
         volumeVector.push_back( candleVector[i].volume );
     }
-
-    detailed_quote = "Exchange: " + quoteData->getQuoteVariable("exchangeName") +
-                                 "\nBid: $" + quoteData->getQuoteVariable("bidPrice") + " - Size: " + quoteData->getQuoteVariable("bidSize") +
-                                 "\nAsk: $" + quoteData->getQuoteVariable("askPrice") + " - Size: " + quoteData->getQuoteVariable("askSize") +
-                                 "\nOpen: $" + quoteData->getQuoteVariable("openPrice") +
-                                 "\nClose: $" + quoteData->getQuoteVariable("closePrice") +
-                                 "\n52 Week High: $" + quoteData->getQuoteVariable("52WkHigh") +
-                                 "\n52 Week Low: $" + quoteData->getQuoteVariable("52WkLow") +
-                                 "\nTotal Volume: " + quoteData->getQuoteVariable("totalVolume");
-
-    title_string = quoteData->getQuoteVariable("symbol") + " - " + quoteData->getQuoteVariable("description");
-
 }
 
 void QuoteState::cleanup()
 {
-    TTF_CloseFont( tickerFont );
-
     SDL_Log("QuoteState Cleanup\n");
 }
 
@@ -100,17 +65,46 @@ void QuoteState::setQuote( std::string ticker )
 {
     quoteData = tda_data_interface->createQuote( ticker );
     priceHistoryData = tda_data_interface->createPriceHistory( ticker );
+
+    detailed_quote = "Exchange: " + quoteData->getQuoteVariable("exchangeName") +
+                                 "\nBid: $" + quoteData->getQuoteVariable("bidPrice") + " - Size: " + quoteData->getQuoteVariable("bidSize") +
+                                 "\nAsk: $" + quoteData->getQuoteVariable("askPrice") + " - Size: " + quoteData->getQuoteVariable("askSize") +
+                                 "\nOpen: $" + quoteData->getQuoteVariable("openPrice") +
+                                 "\nClose: $" + quoteData->getQuoteVariable("closePrice") +
+                                 "\n52 Week High: $" + quoteData->getQuoteVariable("52WkHigh") +
+                                 "\n52 Week Low: $" + quoteData->getQuoteVariable("52WkLow") +
+                                 "\nTotal Volume: " + quoteData->getQuoteVariable("totalVolume");
+
+    title_string = quoteData->getQuoteVariable("symbol") + " - " + quoteData->getQuoteVariable("description");
+
+    ticker_symbol = ticker;
+
+    candleVector = priceHistoryData->getCandleVector();
+
+    // for ( auto& vector_it: candleVector )
+    // {
+    //     std::cout << "open: " << vector_it.openClose.first << "\n";
+    //     std::cout << "close: " << vector_it.openClose.second << "\n";
+    //     std::cout << "high: " << vector_it.highLow.first << "\n";
+    //     std::cout << "low: " << vector_it.highLow.second << "\n";
+    //     std::cout << "volume: " << vector_it.volume << "\n";
+    //     std::cout << "datetime: " << vector_it.datetime << "\n";
+    //     std::cout << "raw_datetime: " << vector_it.raw_datetime << "\n";
+    // }
 }
 
 template <typename T>
-inline T RandomRange(T min, T max) {
+inline T RandomRange(T min, T max) 
+{
     T scale = rand() / (T) RAND_MAX;
     return min + scale * ( max - min );
 }
 
 template <typename T>
-int BinarySearch(const T* arr, int l, int r, T x) {
-    if (r >= l) {
+int BinarySearch(const T* arr, int l, int r, T x) 
+{
+    if (r >= l) 
+    {
         int mid = l + (r - l) / 2;
         if (arr[mid] == x)
             return mid;
@@ -231,6 +225,19 @@ void QuoteState::handleEvents( Manager* premia )
                     default:
                         break;
                 }
+            case SDL_TEXTINPUT:
+                io.AddInputCharactersUTF8(event.text.text);
+                break;
+            
+            case SDL_KEYUP:
+            {
+                int key = event.key.keysym.scancode;
+                IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
+                io.KeysDown[key] = (event.type == SDL_KEYDOWN);
+                io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
+                io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
+                io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
+            }
 
             case SDL_WINDOWEVENT:
                 switch ( event.window.event ) 
@@ -271,22 +278,69 @@ void QuoteState::update( Manager* game )
 {    
     ImGui::NewFrame();
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    //ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT), ImGuiCond_Once);
     ImGuiIO& io = ImGui::GetIO();
     ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
     
-    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove ))
+    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
     {
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();
         return;
     }
 
+    static bool new_quote_bool = false;
+
     ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
 
     // Menu Bar
     if (ImGui::BeginMenuBar())
     {
+        if (ImGui::BeginMenu("File"))
+        {
+            if ( ImGui::BeginMenu("New Instrument") )
+            {
+                if ( ImGui::MenuItem("SPY") )
+                    setQuote("SPY");
+
+                if ( ImGui::MenuItem("QQQ") )
+                    setQuote("QQQ");
+
+                if ( ImGui::MenuItem("DIA") )
+                    setQuote("DIA");
+
+                if ( ImGui::MenuItem("TLT") )
+                    setQuote("TLT");
+
+                if ( ImGui::MenuItem("VXX") )
+                    setQuote("VXX");
+                
+                ImGui::EndMenu();
+            }
+
+            ImGui::MenuItem("Save");
+            ImGui::MenuItem("Save As..");
+            
+            ImGui::Separator();
+            if (ImGui::BeginMenu("Options"))
+            {
+                static bool enabled = true;
+                ImGui::MenuItem("Enabled", "", &enabled);
+                ImGui::BeginChild("child", ImVec2(0, 60), true);
+                for (int i = 0; i < 10; i++)
+                    ImGui::Text("Scrolling Text %d", i);
+                ImGui::EndChild();
+                static float f = 0.5f;
+                static int n = 0;
+                ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
+                ImGui::InputFloat("Input", &f, 0.1f);
+                ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
+                ImGui::EndMenu();
+            }
+
+            ImGui::MenuItem("Quit", "CMD + Q");
+
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("Trade"))
         {
             ImGui::MenuItem("Main menu bar");
@@ -309,6 +363,11 @@ void QuoteState::update( Manager* game )
         }
         ImGui::EndMenuBar();
     }
+
+    static char buf[64] = "";
+    ImGui::Text("Symbol: ");
+    ImGui::SameLine(); ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
+    ImGui::SameLine(); ImGui::Button("Apply");
 
     ImGui::Text( "%s", detailed_quote.c_str() );
     ImGui::Spacing();
@@ -559,9 +618,6 @@ void QuoteState::draw( Manager* game )
 
     ImGui::Render();
     ImGuiSDL::Render(ImGui::GetDrawData());
-
-    //tickerTexture.render( pRenderer, 10, 0 );
-    //descTexture.render( pRenderer, 10, 50 );
 
     SDL_RenderPresent( this->pRenderer );
 }
