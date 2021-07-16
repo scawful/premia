@@ -7,7 +7,7 @@ int main( int argc, char* argv[] )
     Manager premia;
 
     premia.init();
-    premia.change( QuoteState::instance() );
+    premia.change( StartState::instance() );
     
     while ( premia.running() )
     {

@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set the project name
-project(premia-gui VERSION 1.0)
+project(Premia VERSION 1.0)
 
 #set compiler flags based on compiler
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
@@ -24,9 +24,19 @@ if (NOT CONFIGURED_ONCE)
         CACHE STRING "Flags used by the compiler during all build types." FORCE)
 endif()
 
+set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
+set(ICON_NAME "sigma.icns")
+set(MAC_ICON "../assets/${ICON_NAME}")
+set(MACOSX_BUNDLE_ICON_FILE ${ICON_NAME})
+
+set_property(SOURCE "${MAC_ICON}" PROPERTY
+MACOSX_PACKAGE_LOCATION Resources)
+
 # add the executable
-add_executable(premia-gui Premia.cpp TDAmeritrade.cpp 
-                    State/Manager.cpp State/StartState.cpp State/QuoteState.cpp 
+# MACOSX_BUNDLE ${MAC_ICON}
+add_executable(Premia  Premia.cpp TDAmeritrade.cpp
+                    State/Manager.cpp State/DemoState.cpp
+                    State/StartState.cpp State/QuoteState.cpp State/OptionState.cpp
                     Graphics/Texture.cpp
                     Libraries/imgui/imgui.cpp
                     Libraries/imgui/imgui_demo.cpp
@@ -36,8 +46,7 @@ add_executable(premia-gui Premia.cpp TDAmeritrade.cpp
                     Libraries/imgui/imgui_sdl.cpp
                     Libraries/imgui/implot.cpp
                     Libraries/imgui/implot_items.cpp
-                    Libraries/imgui/implot_demo.cpp
-                    )
+                    Libraries/imgui/implot_demo.cpp )
 include_directories("../assets")
 
 set(MY_LIBRARY_DIR /usr/local/Cellar)
@@ -97,7 +106,7 @@ include_directories( ${CURL_INCLUDE_DIR} )
 add_library(quantlib STATIC IMPORTED)
 set_property(TARGET quantlib PROPERTY IMPORTED_LOCATION ${QL_LIBRARY})
 
-target_link_libraries(premia-gui ${BOOST_LIBRARIES} 
+target_link_libraries(Premia ${BOOST_LIBRARIES} 
                                  ${SDL2_LIBRARIES} 
                                  ${SDL_IMAGE_LIBRARIES} 
                                  ${SDL_TTF_LIBRARIES} 
@@ -106,7 +115,6 @@ target_link_libraries(premia-gui ${BOOST_LIBRARIES}
                                  ${OPENGL_LIBRARIES}
                                  ImGui
                                  quantlib )
-
 
 set (source "${CMAKE_SOURCE_DIR}/assets")
 set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")
