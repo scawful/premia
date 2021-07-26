@@ -4,7 +4,7 @@
 #define Manager_hpp
 
 #include "../core.hpp"
-#include "../TDAmeritrade.hpp"
+#include "../TDAmeritrade/TDAmeritrade.hpp"
 #include "../Graphics/Texture.hpp"
 
 class State;

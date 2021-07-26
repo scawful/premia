@@ -1,78 +1,15 @@
 #ifndef TDAmeritrade_hpp
 #define TDAmeritrade_hpp
 
-#include "core.hpp"
-#include "apikey.hpp"
+#include "../core.hpp"
+#include "../apikey.hpp"
+#include "Data/PricingStructures.hpp"
+#include "Data/Quote.hpp"
+#include "Data/PriceHistory.hpp"
 
 namespace tda
 {
-    // Pricing Structures 
-
-    struct Candle
-    {
-        int volume;
-        std::pair<double, double> highLow;
-        std::pair<double, double> openClose;     
-        std::string datetime;
-        time_t raw_datetime;
-    };
-
-    struct OptionsContract
-    {
-        std::string putCall;
-        double bid, ask, bidSize, askSize;
-        double open, close, high, low;
-        double delta, gamma, theta, vega, rho;
-    };
-
-    struct StrikePriceMap
-    {
-        std::string strikePrice;
-        std::unordered_map<std::string, std::string> raw_option;
-        std::unordered_map<std::string, OptionsContract> options;
-    };
-
-    struct OptionsDateTimeObj
-    {
-        std::string datetime;
-        std::vector<StrikePriceMap> strikePriceObj;
-    };
-
-
     // Data Objects
-
-    class Quote 
-    {
-    private:
-        boost::property_tree::ptree quoteData;
-        std::map<std::string, std::string> quoteVariables;
-
-        void initVariables();
-
-    public:
-        Quote( boost::property_tree::ptree quote_data );
-
-        std::string getQuoteVariable( std::string variable );
-
-    };
-
-    class PriceHistory
-    {
-    private:
-        boost::property_tree::ptree priceHistoryData;
-        std::map<std::string, std::string> priceHistoryVariables;
-        std::map<std::string, std::string> candleData;
-        std::vector< Candle > candleVector;
-
-        void initVariables();
-            
-    public:
-        PriceHistory( boost::property_tree::ptree price_history_data );
-
-        std::vector< Candle > getCandleVector();
-        std::string getCandleDataVariable( std::string variable );
-        std::string getPriceHistoryVariable( std::string variable );
-    };
 
     class OptionChain
     {
@@ -94,6 +31,26 @@ namespace tda
         std::string getPutVariable( std::string variable );
         std::string getOptionChainDataVariable( std::string variable );
 
+    };
+
+    // ================ Account Class Header ================ //
+
+    class Account
+    {
+    private:
+        boost::property_tree::ptree accountData;
+
+        std::unordered_map<std::string, std::string> accountInfoMap;
+        std::unordered_map<std::string, std::string> positionsInfoMap;
+        
+        std::unordered_map<std::string, std::string> currentBalanceMap;        
+
+        void initVariables();
+
+    public:
+        Account( boost::property_tree::ptree account_data );
+
+        std::string getAccountVariable( std::string variable );
     };
 
     // API Enumerators
@@ -169,6 +126,7 @@ namespace tda
         boost::shared_ptr<tda::PriceHistory> createPriceHistory( );
         boost::shared_ptr<tda::PriceHistory> createPriceHistory( std::string ticker );
         boost::shared_ptr<tda::OptionChain> createOptionChain( std::string ticker );
+        boost::shared_ptr<tda::Account> createAccount( std::string account_num );
         void retrieveQuoteData( std::string ticker, bool keep_file );
     };
 

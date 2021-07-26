@@ -268,6 +268,15 @@ namespace tda
         return new_option_chain_data;
     }
 
+    boost::shared_ptr<tda::Account> TDAmeritrade::createAccount( std::string account_num )
+    {
+        std::string account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions";
+        string_replace( account_url, "{accountNum}", account_num );
+        boost::property_tree::ptree propertyTree = createPropertyTree( account_num, account_url );
+        boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( propertyTree );
+        return new_account_data;
+    }
+
     void TDAmeritrade::retrieveQuoteData( std::string ticker, bool keep_file )
     {
         std::string url = this->_base_url;
@@ -295,112 +304,6 @@ namespace tda
         {
             std::remove(output_file_name.c_str());
         }
-    }
-
-    /* =============== Quote Class =============== */
-
-    void Quote::initVariables()
-    {
-        for (auto & array_element: quoteData ) 
-        {
-            for (auto & property: array_element.second) 
-            {
-                quoteVariables[ property.first ] = property.second.get_value < std::string > ();
-            }
-        }
-    }
-
-    Quote::Quote( boost::property_tree::ptree quote_data )
-    {
-        quoteData = quote_data;
-
-        initVariables();
-    }
-
-    std::string Quote::getQuoteVariable( std::string variable )
-    {
-        return quoteVariables[variable];
-    }
-
-    /* =============== PriceHistory Class =============== */
-
-    void PriceHistory::initVariables()
-    {
-        for ( auto& history_it: priceHistoryData )
-        {
-            if ( history_it.first == "candles" )
-            {
-                for ( auto& candle_it: history_it.second )
-                {
-                    tda::Candle newCandle;
-                    std::string datetime;
-                    std::pair<double, double> high_low;
-                    std::pair<double, double> open_close;
-
-                    for ( auto& candle2_it: candle_it.second )
-                    {
-                        if ( candle2_it.first == "high" )
-                            high_low.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-                        if ( candle2_it.first == "low" )
-                            high_low.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-                        
-                        if ( candle2_it.first == "open" )
-                            open_close.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-                        if ( candle2_it.first == "close" )
-                            open_close.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-
-                        if ( candle2_it.first == "volume" )
-                            newCandle.volume = stoi( candle2_it.second.get_value<std::string> () );
-                            
-                        if ( candle2_it.first == "datetime" )
-                        {
-                            std::stringstream dt_ss;
-                            std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(candle2_it.second.get_value<std::string> ());
-                            newCandle.raw_datetime = secsSinceEpoch;
-                            secsSinceEpoch *= 0.001;
-
-                            //%a %d %b %Y - %I:%M:%S%p
-                            //%H:%M:%S
-                            dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
-                            datetime = dt_ss.str();
-                            //datetime = boost::lexical_cast<std::string>(candle2_it.second.get_value<std::string> ());
-                        }
-                        
-                    }
-
-                    newCandle.datetime = datetime;
-                    newCandle.highLow = high_low;
-                    newCandle.openClose = open_close;
-
-                    candleVector.push_back( newCandle );
-                }
-            }
-            else if ( history_it.first == "symbol" )
-            {
-                priceHistoryVariables["symbol"] = history_it.second.get_value<std::string>();
-            }
-        }
-    }
-
-    PriceHistory::PriceHistory( boost::property_tree::ptree price_history_data )
-    {
-        priceHistoryData = price_history_data;
-        initVariables();
-    }
-
-    std::vector< Candle > PriceHistory::getCandleVector()
-    {
-        return candleVector;
-    }
-
-    std::string PriceHistory::getCandleDataVariable( std::string variable )
-    {
-        return candleData[ variable ];
-    }
-
-    std::string PriceHistory::getPriceHistoryVariable( std::string variable )
-    {
-        return priceHistoryVariables[variable];
     }
 
     /* =============== OptionChain Class =============== */
@@ -473,5 +376,42 @@ namespace tda
     std::string OptionChain::getOptionChainDataVariable( std::string variable )
     {
         return optionChainMap[ variable ];
+    }
+
+    /* =============== Account Class =============== */
+
+    void Account::initVariables()
+    {
+        for ( auto& account_it: accountData )
+        {
+            if ( account_it.first == "positions" )
+            {
+                for ( auto& positions_it: account_it.second )
+                {
+                    
+                }
+            }
+            else if ( account_it.first == "currentBalances" )
+            {
+                currentBalanceMap[ account_it.first ] = account_it.second.get_value<std::string>();
+            }
+            else
+            {
+                accountInfoMap[ account_it.first ] = account_it.second.get_value<std::string>();
+            }
+
+            std::cout << account_it.first << " ::: " << account_it.second.get_value<std::string>() << std::endl;
+        }
+    }
+
+    Account::Account( boost::property_tree::ptree account_data )
+    {
+        accountData = account_data;
+        initVariables();
+    }
+
+    std::string Account::getAccountVariable( std::string variable )
+    {
+        return accountInfoMap[ variable ];
     }
 }
