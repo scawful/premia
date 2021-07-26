@@ -225,7 +225,7 @@ static bool ImGui_ImplSDL2_Init(SDL_Window* window)
 
 bool ImGui_ImplSDL2_InitForPremia(SDL_Window* window)
 {
-    return ImGui_ImplSDL2_InitForPremia(window);
+    return ImGui_ImplSDL2_Init(window);
 }
 
 bool ImGui_ImplSDL2_InitForOpenGL(SDL_Window* window, void* sdl_gl_context)

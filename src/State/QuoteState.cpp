@@ -202,7 +202,6 @@ void QuoteState::handleEvents( Manager* premia )
 {
     int wheel = 0;
     SDL_Event event;
-    SDL_Color fontColor = { 255, 255, 255 };
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -225,6 +224,8 @@ void QuoteState::handleEvents( Manager* premia )
                     default:
                         break;
                 }
+                break;
+
             case SDL_TEXTINPUT:
                 io.AddInputCharactersUTF8(event.text.text);
                 break;
@@ -237,6 +238,7 @@ void QuoteState::handleEvents( Manager* premia )
                 io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
                 io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
                 io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
+                break;
             }
 
             case SDL_WINDOWEVENT:
@@ -288,7 +290,7 @@ void QuoteState::update( Manager* game )
         return;
     }
 
-    static bool new_quote_bool = false;
+    //static bool new_quote_bool = false;
 
     ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
 

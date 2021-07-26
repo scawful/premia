@@ -20,6 +20,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+#include <boost/make_shared.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -29,10 +30,10 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
-//#include <ql/quantlib.hpp>
-#include <ql/option.hpp>
-#include <ql/instruments/stock.hpp>
-#include <ql/quotes/all.hpp>
+// #include <ql/quantlib.hpp>
+// #include <ql/option.hpp>
+// #include <ql/instruments/stock.hpp>
+// #include <ql/quotes/all.hpp>
 
 #include <curl/curl.h>
 
