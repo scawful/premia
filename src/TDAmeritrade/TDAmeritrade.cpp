@@ -213,6 +213,7 @@ namespace tda
             SDL_Log("%s", json_parser_error.what() );
         }
 
+        jsonFile.close();
         std::remove(output_file_name.c_str());
 
         return propertyTree;
@@ -240,22 +241,26 @@ namespace tda
 
     boost::shared_ptr<tda::Quote> TDAmeritrade::createQuote( std::string ticker )
     {
+        set_retrieval_type( QUOTE );
         std::string url = this->_base_url;
         string_replace(url, "{ticker}", ticker);
-
-        std::time_t now = std::time(0);
-        std::string output_file_name = ticker + "_" + std::to_string(now) + ".json";
-
-        download_file(url, output_file_name);
-
-        std::ifstream jsonFile(output_file_name);
-
-        boost::property_tree::ptree propertyTree;
-        read_json(jsonFile, propertyTree);
-
+        boost::property_tree::ptree propertyTree = createPropertyTree( ticker, url );
         boost::shared_ptr<Quote> new_quote_data = boost::make_shared<Quote>( propertyTree );
 
-        std::remove(output_file_name.c_str());
+        // std::time_t now = std::time(0);
+        // std::string output_file_name = ticker + "_" + std::to_string(now) + ".json";
+
+        // download_file(url, output_file_name);
+
+        // std::ifstream jsonFile(output_file_name);
+
+        // boost::property_tree::ptree propertyTree;
+        // read_json(jsonFile, propertyTree);
+
+        // boost::shared_ptr<Quote> new_quote_data = boost::make_shared<Quote>( propertyTree );
+
+        // jsonFile.close();
+        // std::remove(output_file_name.c_str());
 
         return new_quote_data;
     }
@@ -304,6 +309,11 @@ namespace tda
         {
             std::remove(output_file_name.c_str());
         }
+    }
+
+    std::string TDAmeritrade::getBaseUrl()
+    {
+        return this->_base_url;
     }
 
     /* =============== OptionChain Class =============== */

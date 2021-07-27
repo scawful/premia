@@ -3,6 +3,7 @@
 #include "QuoteState.hpp"
 #include "OptionState.hpp"
 #include "DemoState.hpp"
+#include "Layout/Menu.hpp"
 
 StartState StartState::m_StartState;
 
@@ -19,56 +20,6 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     // quotes["IWM"] = tda_data_interface->createQuote( "IWM" );
     // quotes["VXX"] = tda_data_interface->createQuote( "VXX" );
 
-    //premiaLogo.loadFromFile( pRenderer, "C:/Users/starw/Code/premia/assets/sigma.png" );
-
-    SDL_Color fontColor = { 255, 255, 255, 255 };
-    titleFont = TTF_OpenFont( "C:/Users/starw/Code/premia/assets/arial.ttf", 64 );
-    menuFont = TTF_OpenFont( "C:/Users/starw/Code/premia/assets/arial.ttf", 36 );
-    priceFont = TTF_OpenFont ( "C:/Users/starw/Code/premia/assets/arial.ttf", 24 );
-    if ( menuFont == NULL || priceFont == NULL || titleFont == NULL )
-    {
-        SDL_Log( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
-    }
-    else
-    {
-        // if ( !testTexture.loadFromRenderedText( pRenderer, menuFont, newData.ticker, fontColor ) )
-        // {
-        //     SDL_Log("Failed to render text texture!\n");
-        // }
-
-        // titleTexture.loadFromRenderedText( pRenderer, titleFont, "Premia Pro", fontColor );
-        // subtitleTexture.loadFromRenderedText( pRenderer, menuFont, "Risk Parity Analysis and Trading Program", fontColor );
-
-        // SDL_Color green_color = {0, 255, 0, 0};
-        // textures["POWERED"].loadFromRenderedText( pRenderer, priceFont, "powerered by ", fontColor );
-        // textures["TDA_SHILL"].loadFromRenderedText( pRenderer, priceFont, "TD Ameritrade", green_color );
-
-        // std::map<std::string, PTexture>::iterator it;
-        // for (it = textures.begin(); it != textures.end(); it++)
-        // {
-        //     it->second.setRenderer( pRenderer );
-        //     it->second.setFontColor( fontColor );
-        // }
-
-        // std::string spy_last_price = "SPY: $" + quotes["SPY"]->getQuoteVariable("lastPrice");
-        // textures["SPY_LAST_PRICE"].loadFromRenderedText( pRenderer, priceFont, spy_last_price, fontColor );
-
-        // std::string qqq_last_price = "QQQ: $" + quotes["QQQ"]->getQuoteVariable("lastPrice");
-        // textures["QQQ_LAST_PRICE"].loadFromRenderedText( pRenderer, priceFont, qqq_last_price, fontColor );
-
-        // std::string dia_last_price = "DIA: $" + quotes["DIA"]->getQuoteVariable("lastPrice");
-        // textures["DIA_LAST_PRICE"].loadFromRenderedText( pRenderer, priceFont, dia_last_price, fontColor );
-
-        // std::string tlt_last_price = "TLT: $" + quotes["TLT"]->getQuoteVariable("lastPrice");
-        // textures["TLT_LAST_PRICE"].loadFromRenderedText( pRenderer, priceFont, tlt_last_price, fontColor );
-
-        // std::string iwm_last_price = "IWM: $" + quotes["IWM"]->getQuoteVariable("lastPrice");
-        // textures["IWM_LAST_PRICE"].loadFromRenderedText( pRenderer, priceFont, iwm_last_price, fontColor );
-
-        // std::string vxx_last_price = "VXX: $" + quotes["VXX"]->getQuoteVariable("lastPrice");
-        // textures["VXX_LAST_PRICE"].loadFromRenderedText( pRenderer, priceFont, vxx_last_price, fontColor );
-    }
-
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
@@ -78,24 +29,6 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 
 void StartState::cleanup()
 {
-    TTF_CloseFont( titleFont );
-    titleFont = NULL;
-
-    TTF_CloseFont( menuFont );
-    menuFont = NULL;
-
-    TTF_CloseFont( priceFont );
-    priceFont = NULL;
-
-    // titleTexture.free();
-    // subtitleTexture.free();
-
-    // std::map<std::string, PTexture>::iterator it;
-    // for (it = textures.begin(); it != textures.end(); it++)
-    // {
-    //     it->second.free();
-    // }
-
     SDL_Log("StartState Cleanup\n");
 }
 
@@ -190,20 +123,79 @@ void StartState::handleEvents( Manager* premia )
 
 }
 
-void StartState::update( Manager* game )
+void StartState::update( Manager* premia )
 {
-    ImGui::NewFrame();
-    ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
-    
-    std::string title_string = "Premia Pro";
-    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
+    draw_imgui_menu( premia, "Home" );
+
+    // ImGui::Text("SPY: $%s", quotes["SPY"]->getQuoteVariable("lastPrice").c_str() );
+    // ImGui::Text("QQQ: $%s", quotes["QQQ"]->getQuoteVariable("lastPrice").c_str() );
+    // ImGui::Text("DIA: $%s", quotes["DIA"]->getQuoteVariable("lastPrice").c_str() );
+    // ImGui::Text("TLT: $%s", quotes["TLT"]->getQuoteVariable("lastPrice").c_str() );
+    // ImGui::Text("IWM: $%s", quotes["IWM"]->getQuoteVariable("lastPrice").c_str() );
+    // ImGui::Text("VXX: $%s", quotes["VXX"]->getQuoteVariable("lastPrice").c_str() );
+
+    ImGui::Text("Order Entry");
+
+    // Place Order Button ---------------------------------------------------------------------------------
+    if (ImGui::Button("Quick Order", ImVec2(120, 30)))
+        ImGui::OpenPopup("Quick Order");
+
+    // Always center this window when appearing
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Quick Order", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        // Early out if the window is collapsed, as an optimization.
-        ImGui::End();
-        return;
+        static std::string new_ticker = "";
+        static bool active_instrument = false;
+        static char buf[64] = "";
+        ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
+        ImGui::SameLine(); 
+        if ( ImGui::Button("Search") )
+        {
+            if ( buf != "" )
+            {
+                new_ticker = std::string(buf);
+                std::cout << "new ticker " << new_ticker << std::endl;
+                quotes[ new_ticker ] = tda_data_interface->createQuote( new_ticker );
+                active_instrument = true;
+            }
+            else
+            {
+                active_instrument = false;
+            }
+        }
+
+        if ( active_instrument )
+        {
+            static int n = 0;
+            ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
+
+            ImGui::Text("%s - %s", quotes[new_ticker]->getQuoteVariable("symbol").c_str(), quotes[new_ticker]->getQuoteVariable("description").c_str() );
+            ImGui::Text("Bid: %s - Size: %s", quotes[new_ticker]->getQuoteVariable("bidPrice").c_str(), quotes[new_ticker]->getQuoteVariable("bidSize").c_str() );
+            ImGui::Text("Ask: %s - Size: %s", quotes[new_ticker]->getQuoteVariable("askPrice").c_str(), quotes[new_ticker]->getQuoteVariable("askSize").c_str() );
+            ImGui::Separator();
+
+            static float order_quantity = 10.f;
+            ImGui::InputFloat("Quanitity", &order_quantity, 10.f);
+
+            double security_cost = 0.0;
+            std::string bidPrice = quotes[new_ticker]->getQuoteVariable("bidPrice");
+            security_cost = std::stod( bidPrice );
+            security_cost *= order_quantity;
+            ImGui::Text("Cost: %d", security_cost );
+        }
+
+        ImGui::Separator();
+        ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
+
+        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+        ImGui::EndPopup();
     }
+
 
     ImGui::End();    
 
@@ -212,22 +204,15 @@ void StartState::update( Manager* game )
 
 void StartState::draw( Manager* game )
 {
+    // fill window bounds
+    int w = 1920, h = 1080;
+    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_Rect f = {0, 0, 1920, 1080};
+    SDL_RenderFillRect( this->pRenderer, &f );
+
     ImGui::Render();
     ImGuiSDL::Render(ImGui::GetDrawData());
 
-    // titleTexture.render(pRenderer, (SCREEN_WIDTH  - titleTexture.getWidth()) / 2, 10);
-    // subtitleTexture.render(pRenderer, (SCREEN_WIDTH - subtitleTexture.getWidth()) / 2, 75);
-    // textures["POWERED"].render(pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) - 50, 125);
-    // textures["TDA_SHILL"].render(pRenderer, ((SCREEN_WIDTH - textures["POWERED"].getWidth()) / 2) + textures["TDA_SHILL"].getWidth() - 50, 125);
-
-    // textures["SPY_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["SPY_LAST_PRICE"].getWidth()) / 2) - 160, 400);
-    // textures["QQQ_LAST_PRICE"].render( pRenderer, (SCREEN_WIDTH - textures["QQQ_LAST_PRICE"].getWidth()) / 2, 400 );
-    // textures["DIA_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["DIA_LAST_PRICE"].getWidth()) / 2) + 160, 400 );
-    // textures["TLT_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["TLT_LAST_PRICE"].getWidth()) / 2) - 160, 425 );
-    // textures["IWM_LAST_PRICE"].render( pRenderer, (SCREEN_WIDTH - textures["IWM_LAST_PRICE"].getWidth()) / 2, 425 );
-    // textures["VXX_LAST_PRICE"].render( pRenderer, ((SCREEN_WIDTH - textures["VXX_LAST_PRICE"].getWidth()) / 2) + 156, 425 );
-
-    //SDL_Rect rect = { 0, 0, 100, 100 };
-    //premiaLogo.render( pRenderer, 0, 0, &rect );
     SDL_RenderPresent(pRenderer);
 }

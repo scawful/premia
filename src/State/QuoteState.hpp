@@ -17,11 +17,14 @@ private:
     boost::shared_ptr<tda::Quote> quoteData;
     boost::shared_ptr<tda::PriceHistory> priceHistoryData;
 
+    std::unordered_map< std::string, boost::shared_ptr<tda::Quote> > quotes;
+
     std::vector< tda::Candle > candleVector;
     std::vector< int > volumeVector;
 
     // Functions
     void initCandleArrays();
+    void setDetailedQuote( std::string ticker );
 
 protected:
     QuoteState() { }

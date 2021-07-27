@@ -128,6 +128,8 @@ namespace tda
         boost::shared_ptr<tda::OptionChain> createOptionChain( std::string ticker );
         boost::shared_ptr<tda::Account> createAccount( std::string account_num );
         void retrieveQuoteData( std::string ticker, bool keep_file );
+
+        std::string getBaseUrl();
     };
 
 

@@ -2,6 +2,7 @@
 #include "QuoteState.hpp"
 #include "StartState.hpp"
 #include "OptionState.hpp"
+#include "Layout/Menu.hpp"
 
 QuoteState QuoteState::m_QuoteState;
 
@@ -25,6 +26,22 @@ void QuoteState::initCandleArrays()
         closes[i] = candleVector[i].openClose.second;
     }
 
+}
+
+void QuoteState::setDetailedQuote( std::string ticker )
+{
+    boost::shared_ptr<tda::Quote> detailedQuotePtr = tda_data_interface->createQuote( ticker );
+    std::cout << tda_data_interface->getBaseUrl() << std::endl;
+    detailed_quote = "Exchange: " + detailedQuotePtr->getQuoteVariable("exchangeName") +
+                                 "\nBid: $" + detailedQuotePtr->getQuoteVariable("bidPrice") + " - Size: " + detailedQuotePtr->getQuoteVariable("bidSize") +
+                                 "\nAsk: $" + detailedQuotePtr->getQuoteVariable("askPrice") + " - Size: " + detailedQuotePtr->getQuoteVariable("askSize") +
+                                 "\nOpen: $" + detailedQuotePtr->getQuoteVariable("openPrice") +
+                                 "\nClose: $" + detailedQuotePtr->getQuoteVariable("closePrice") +
+                                 "\n52 Week High: $" + detailedQuotePtr->getQuoteVariable("52WkHigh") +
+                                 "\n52 Week Low: $" + detailedQuotePtr->getQuoteVariable("52WkLow") +
+                                 "\nTotal Volume: " + detailedQuotePtr->getQuoteVariable("totalVolume");
+
+    title_string = detailedQuotePtr->getQuoteVariable("symbol") + " - " + detailedQuotePtr->getQuoteVariable("description");
 }
 
 void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
@@ -276,100 +293,27 @@ void QuoteState::handleEvents( Manager* premia )
     io.MouseWheel = static_cast<float>(wheel);
 }
 
-void QuoteState::update( Manager* game )
+void QuoteState::update( Manager* premia )
 {    
-    ImGui::NewFrame();
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
-    
-    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
-    {
-        // Early out if the window is collapsed, as an optimization.
-        ImGui::End();
-        return;
-    }
-
-    //static bool new_quote_bool = false;
-
-    ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
-
-    // Menu Bar
-    if (ImGui::BeginMenuBar())
-    {
-        if (ImGui::BeginMenu("File"))
-        {
-            if ( ImGui::BeginMenu("New Instrument") )
-            {
-                if ( ImGui::MenuItem("SPY") )
-                    setQuote("SPY");
-
-                if ( ImGui::MenuItem("QQQ") )
-                    setQuote("QQQ");
-
-                if ( ImGui::MenuItem("DIA") )
-                    setQuote("DIA");
-
-                if ( ImGui::MenuItem("TLT") )
-                    setQuote("TLT");
-
-                if ( ImGui::MenuItem("VXX") )
-                    setQuote("VXX");
-                
-                ImGui::EndMenu();
-            }
-
-            ImGui::MenuItem("Save");
-            ImGui::MenuItem("Save As..");
-            
-            ImGui::Separator();
-            if (ImGui::BeginMenu("Options"))
-            {
-                static bool enabled = true;
-                ImGui::MenuItem("Enabled", "", &enabled);
-                ImGui::BeginChild("child", ImVec2(0, 60), true);
-                for (int i = 0; i < 10; i++)
-                    ImGui::Text("Scrolling Text %d", i);
-                ImGui::EndChild();
-                static float f = 0.5f;
-                static int n = 0;
-                ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-                ImGui::InputFloat("Input", &f, 0.1f);
-                ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-                ImGui::EndMenu();
-            }
-
-            ImGui::MenuItem("Quit", "CMD + Q");
-
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Trade"))
-        {
-            ImGui::MenuItem("Main menu bar");
-            ImGui::EndMenu();
-        }
-        if ( ImGui::BeginMenu("Analyze"))
-        {
-            ImGui::MenuItem("Risk Contribution");
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Research"))
-        {
-            ImGui::MenuItem("research menu bar");
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Tools"))
-        {
-            ImGui::MenuItem("tools menu bar");
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
+    draw_imgui_menu( premia, title_string );
 
     static char buf[64] = "";
     ImGui::Text("Symbol: ");
     ImGui::SameLine(); ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
-    ImGui::SameLine(); ImGui::Button("Apply");
+    ImGui::SameLine(); 
+    if ( ImGui::Button("Search") )
+    {
+        if ( buf != "" )
+        {
+            quoteData.reset();
+            priceHistoryData.reset();
+            quoteData = tda_data_interface->createQuote( buf );
+            priceHistoryData = tda_data_interface->createPriceHistory( buf );
+            candleVector = priceHistoryData->getCandleVector();
+            setDetailedQuote( buf );
+            ticker_symbol = buf;
+        }
+    }
 
     ImGui::Text( "%s", detailed_quote.c_str() );
     ImGui::Spacing();
@@ -418,11 +362,13 @@ void QuoteState::update( Manager* game )
 
     ImPlot::GetStyle().UseLocalTime = true;
     ImPlot::SetNextPlotFormatY("$%.2f");
-    ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 130, 180);
+    ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 
+                                boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkLow")), 
+                                boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkHigh")), ImGuiCond_Once);
 
     if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL,ImVec2(-1,0),0,
                             ImPlotAxisFlags_Time,
-                            ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit)) 
+                            ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
     {
         createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
         ImPlot::EndPlot();
