@@ -10,8 +10,6 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     this->pWindow = pWindow;
     this->tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
 
-    premiaLogo.loadFromFile( pRenderer, "../assets/sigma.png" );
-
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
@@ -20,7 +18,6 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 
 void DemoState::cleanup()
 {
-
     SDL_Log("DemoState Cleanup\n");
 }
 
