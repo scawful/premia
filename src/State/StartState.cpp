@@ -59,12 +59,6 @@ void StartState::handleEvents( Manager* premia )
                     case SDLK_ESCAPE:
                         premia->quit();
                         break;
-                    case SDLK_LEFT:
-                        premia->change( OptionState::instance() );
-                        break;
-                    case SDLK_RIGHT:
-                        premia->change( QuoteState::instance() );
-                        break;
                     case SDLK_DOWN:
                         premia->change( DemoState::instance() );
                         break;
@@ -189,7 +183,7 @@ void StartState::update( Manager* premia )
         ImGui::Separator();
         ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
 
-        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+        if (ImGui::Button("Confirm", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
