@@ -122,7 +122,7 @@ namespace tda
         }
     }
 
-    void TDAmeritrade::post_account_auth( std::string filename )
+    void TDAmeritrade::post_account_auth( std::string url, std::string filename )
     {
         CURL *curl;
         FILE *fp;
@@ -135,12 +135,16 @@ namespace tda
             std::string auth_bearer = "Authorization: Bearer " + _access_token;
             headers = curl_slist_append(headers, auth_bearer.c_str() );
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-            
+
             fp = fopen( filename.c_str(), "wb" );
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
-            res = curl_easy_perform();
+            res = curl_easy_perform(curl);
+
+            curl_easy_cleanup(curl);
+            fclose(fp);
         }
     }
 
@@ -149,21 +153,22 @@ namespace tda
         switch ( type )
         {
             case QUOTE:
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
+                _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
                 break;
             case PRICE_HISTORY:
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
+                _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
                 break;
             case OPTION_CHAIN:
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}";
+                _base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}";
                 break;
             default:
                 break;
         }
 
-        this->_period_type = DAY;
-        this->_frequency_type = MINUTE;
-        this->_col_name = "Open";
+        _period_type = DAY;
+        _frequency_type = MINUTE;
+        _col_name = "Open";
+        _access_token_expiration = std::time(0);
     }
 
     void TDAmeritrade::get_access_token()
@@ -171,11 +176,12 @@ namespace tda
         std::time_t now = std::time(0);
         std::string access_token_file_name = "access_token_" + std::to_string(now) + ".json";
         post_access_token( _refresh_token, access_token_file_name );
-        std::ifstream jsonFile( access_token_file_name, std::ios::in | std::ios::binary );
+        
         boost::property_tree::ptree propertyTree;
+        std::ifstream jsonFile( access_token_file_name, std::ios::in | std::ios::binary );
 
         try {
-            read_json(jsonFile, propertyTree);
+            read_json( jsonFile, propertyTree );
         }
         catch ( std::exception& json_parser_error ) {
             SDL_Log("%s", json_parser_error.what() );
@@ -361,9 +367,27 @@ namespace tda
 
         std::time_t now = std::time(0);
         std::string account_filename = account_num + "_" + std::to_string(now) + ".json";
-        post_account_auth( account_filename );
+
+        if ( now > _access_token_expiration )
+        {
+            get_access_token();
+        }
+
+        post_account_auth( account_url, account_filename );
+        std::ifstream jsonFile( account_filename, std::ios::in | std::ios::binary );
 
         boost::property_tree::ptree propertyTree;
+        
+        try {
+            read_json( jsonFile, propertyTree );
+        }
+        catch ( std::exception& json_parser_error ) {
+            SDL_Log("%s", json_parser_error.what() );
+        }
+
+        jsonFile.close();
+        std::remove(account_filename.c_str());
+
         boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( propertyTree );
         return new_account_data;
     }

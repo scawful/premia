@@ -70,7 +70,7 @@ namespace tda
         // curl functions
         void download_file(std::string url, std::string filename);
         void post_access_token( std::string refresh_token, std::string filename );
-        void post_account_auth( std::string filename );
+        void post_account_auth( std::string url, std::string filename );
 
     public:
         TDAmeritrade( RetrievalType type );
