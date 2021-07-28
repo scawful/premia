@@ -7,29 +7,10 @@
 #include "Data/Quote.hpp"
 #include "Data/PriceHistory.hpp"
 #include "Data/OptionChain.hpp"
+#include "Data/Account.hpp"
 
 namespace tda
 {
-    // ================ Account Class Header ================ //
-
-    class Account
-    {
-    private:
-        boost::property_tree::ptree accountData;
-
-        std::unordered_map<std::string, std::string> accountInfoMap;
-        std::unordered_map<std::string, std::string> positionsInfoMap;
-        
-        std::unordered_map<std::string, std::string> currentBalanceMap;        
-
-        void initVariables();
-
-    public:
-        Account( boost::property_tree::ptree account_data );
-
-        std::string getAccountVariable( std::string variable );
-    };
-
     // API Enumerators
 
     enum PeriodType 
@@ -72,7 +53,12 @@ namespace tda
         std::string _base_url;
         std::string _col_name;
         std::string _current_ticker;
+        std::string _access_token;
+        std::string _refresh_token;
+        std::string _consumer_key;
+        std::time_t _access_token_expiration;
 
+        // string manipulation 
         std::string get_api_interval_value(int value);
         std::string get_api_frequency_type(int value);
         std::string get_api_period_amount(int value);
@@ -80,10 +66,16 @@ namespace tda
         std::string timestamp_from_string(std::string date);
         bool string_replace(std::string& str, const std::string from, const std::string to);
         std::string build_url(std::string ticker, std::string start_date, std::string end_date);
+
+        // curl functions
         void download_file(std::string url, std::string filename);
+        void post_access_token( std::string refresh_token, std::string filename );
+        void post_account_auth( std::string filename );
 
     public:
         TDAmeritrade( RetrievalType type );
+
+        void get_access_token();
 
         void set_retrieval_type( RetrievalType type );
         void set_period_type( PeriodType interval );
@@ -104,7 +96,6 @@ namespace tda
         boost::shared_ptr<tda::PriceHistory> createPriceHistory( std::string ticker );
         boost::shared_ptr<tda::OptionChain> createOptionChain( std::string ticker );
         boost::shared_ptr<tda::Account> createAccount( std::string account_num );
-        void retrieveQuoteData( std::string ticker, bool keep_file );
 
         std::string getBaseUrl();
     };
