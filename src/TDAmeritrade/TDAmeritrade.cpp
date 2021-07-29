@@ -89,22 +89,37 @@ namespace tda
         CURL *curl;
         FILE *fp;
         CURLcode res;
-        
+
+        res = curl_global_init(CURL_GLOBAL_ALL);
         curl = curl_easy_init();
+
         if (curl)
         {
-            // set the headers for the request
-            struct curl_slist *headers = NULL;
-            headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            // welcome to verbosity 
+            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
             // set the url to receive the POST
             curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
-                        
-            std::string data_post = "grant_type=refresh_token&refresh_token=" + refresh_token + 
-                                    "&client_id=" + TDA_API_KEY;
 
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post);
+            // specify we want to post 
+            curl_easy_setopt(curl, CURLOPT_HTTPPOST, TRUE);
+
+            // set the headers for the request
+            struct curl_slist *headers = NULL;
+            headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+            res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+            // chunked request for http1.1/200 ok 
+            struct curl_slist *chunk = NULL;
+            chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
+            res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+
+            // specify post data, have to url encode the refresh token
+            std::string easy_escape = curl_easy_escape(curl, REFRESH_TOKEN.c_str(), REFRESH_TOKEN.length());
+            std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+            
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
 
             // open the file to download access token
             fp = fopen(filename.c_str(), "wb");
@@ -113,13 +128,21 @@ namespace tda
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
+            // specify the user agent
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+
             // run the operations
             res = curl_easy_perform(curl);
+
+            if( res != CURLE_OK )
+                fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 
             // cleanup yeah yeah 
             curl_easy_cleanup(curl);
             fclose(fp);
         }
+
+        curl_global_cleanup();
     }
 
     void TDAmeritrade::post_account_auth( std::string url, std::string filename )
@@ -168,7 +191,9 @@ namespace tda
         _period_type = DAY;
         _frequency_type = MINUTE;
         _col_name = "Open";
-        _access_token_expiration = std::time(0);
+        _refresh_token = REFRESH_TOKEN;
+        _access_token = "nope";
+        get_access_token();
     }
 
     void TDAmeritrade::get_access_token()
@@ -188,7 +213,7 @@ namespace tda
         }
 
         jsonFile.close();
-        std::remove(access_token_file_name.c_str());
+        //std::remove(access_token_file_name.c_str());
 
         for ( auto& access_it: propertyTree )
         {
@@ -202,6 +227,8 @@ namespace tda
                 _access_token_expiration = now + access_it.second.get_value<std::time_t>();
             }
         }
+
+        SDL_Log("Access Token: %s", _access_token.c_str() );
 
     }
 
@@ -388,7 +415,8 @@ namespace tda
         jsonFile.close();
         std::remove(account_filename.c_str());
 
-        boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( propertyTree );
+        boost::shared_ptr<tda::Account> new_account_data;
+        //boost::make_shared<tda::Account>( propertyTree );
         return new_account_data;
     }
 
