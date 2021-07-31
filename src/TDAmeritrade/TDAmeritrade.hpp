@@ -48,6 +48,7 @@ namespace tda
     private:
         int _period;
         int _frequency;
+        bool _access_token_found;
         PeriodType _period_type;
         FrequencyType _frequency_type;
         std::string _base_url;
@@ -56,6 +57,7 @@ namespace tda
         std::string _access_token;
         std::string _refresh_token;
         std::string _consumer_key;
+        std::string _access_token_filename;
         std::time_t _access_token_expiration;
 
         // string manipulation 
@@ -72,10 +74,14 @@ namespace tda
         void post_access_token( std::string refresh_token, std::string filename );
         void post_account_auth( std::string url, std::string filename );
 
+        // access token 
+        void get_access_token( bool keep_file );
+        void log_expiration_time();
+        bool check_access_token();
+        bool check_access_token_expiration();
+
     public:
         TDAmeritrade( RetrievalType type );
-
-        void get_access_token();
 
         void set_retrieval_type( RetrievalType type );
         void set_period_type( PeriodType interval );

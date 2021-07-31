@@ -115,9 +115,9 @@ namespace tda
             res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
             // specify post data, have to url encode the refresh token
-            std::string easy_escape = curl_easy_escape(curl, REFRESH_TOKEN.c_str(), REFRESH_TOKEN.length());
+            std::string easy_escape = curl_easy_escape(curl, _refresh_token.c_str(), _refresh_token.length());
             std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
-            
+
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
             curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
 
@@ -171,6 +171,127 @@ namespace tda
         }
     }
 
+    // CREATE ACCESS TOKEN FILE 
+    void TDAmeritrade::get_access_token( bool keep_file )
+    {
+        std::time_t now = std::time(0);
+        _access_token_filename = "access_token_" + std::to_string(now) + ".json";
+        post_access_token( _refresh_token, _access_token_filename );
+        
+        boost::property_tree::ptree propertyTree;
+        std::ifstream jsonFile( _access_token_filename, std::ios::in | std::ios::binary );
+
+        try {
+            read_json( jsonFile, propertyTree );
+        }
+        catch ( std::exception& json_parser_error ) {
+            SDL_Log("%s", json_parser_error.what() );
+        }
+
+        jsonFile.close();
+        if ( !keep_file )
+            std::remove( _access_token_filename.c_str());
+
+        for ( auto& access_it: propertyTree )
+        {
+            if ( access_it.first == "access_token" )
+            {
+                _access_token = access_it.second.get_value<std::string>();
+            }
+            else if ( access_it.first == "expires_in" )
+            {
+                _access_token_expiration = std::time(0) + access_it.second.get_value<std::time_t>();
+            }
+        }
+
+        SDL_Log("Access Token: %s", _access_token.c_str() );
+    }
+
+    // SET TIME OF EXPIRATION TO A FILE 
+    void TDAmeritrade::log_expiration_time()
+    {
+        std::string expiration_filename = "exp_" + _access_token_filename;
+        std::fstream fp( expiration_filename, std::ios::ate|std::ios::app );
+
+        std::string expiration_time = boost::lexical_cast<std::string>(_access_token_expiration);
+
+        fp << expiration_time;
+
+        fp.close();
+    }
+
+    // CHECK EXISTING ACCESS TOKEN FILE AND STORE IF FOUND 
+    bool TDAmeritrade::check_access_token()
+    {
+        for ( const auto& file: std::filesystem::directory_iterator("./") )
+        {
+            std::string filename = file.path().string();
+
+            std::size_t found_file = filename.find("access_token");
+
+            if ( found_file != std::string::npos )
+            {
+                boost::property_tree::ptree property_tree;
+                std::ifstream json_file( filename, std::ios::in );
+
+                try {
+                    read_json( json_file, property_tree );
+                }
+                catch ( std::exception& json_parser_error ) {
+                    SDL_Log("%s", json_parser_error.what() );
+                }
+
+                json_file.close();
+
+                for ( auto& access_it: property_tree )
+                {
+                    if ( access_it.first == "access_token" )
+                    {
+                        _access_token = access_it.second.get_value<std::string>();
+                    }
+                }
+
+                if ( _access_token != "nope" )
+                    SDL_Log("Valid access token found %s", _access_token.c_str() );
+                else
+                    return false;
+
+                std::fstream expiration_file( "exp_" + _access_token_filename, std::ios::in );
+                while( expiration_file >> _access_token_expiration )
+                {
+                    SDL_Log("%ld", _access_token_expiration );
+                }
+                expiration_file.close();
+
+                SDL_Log("Expiration %ld", _access_token_expiration);
+
+                return true;
+            }
+        }
+        SDL_Log("Valid access token not found.");
+
+        return false;
+    }
+
+    // VERIFY WHETHER THE CURRENT ACCESS TOKEN HAS EXPIRED 
+    bool TDAmeritrade::check_access_token_expiration()
+    {
+        std::time_t now = std::time(0);
+
+        if ( now > _access_token_expiration )
+        {
+            // token has expired.
+            SDL_Log("Access token has expired! Expiration at %ld", _access_token_expiration );
+            return true;
+        }
+
+        std::time_t time_left = now - _access_token_expiration;
+
+        // token has not expired.
+        SDL_Log("Access token has not yet expired. T - %ld remains.", time_left );
+        return false;
+    }
+
     TDAmeritrade::TDAmeritrade( RetrievalType type )
     {
         switch ( type )
@@ -193,43 +314,15 @@ namespace tda
         _col_name = "Open";
         _refresh_token = REFRESH_TOKEN;
         _access_token = "nope";
-        get_access_token();
-    }
 
-    void TDAmeritrade::get_access_token()
-    {
-        std::time_t now = std::time(0);
-        std::string access_token_file_name = "access_token_" + std::to_string(now) + ".json";
-        post_access_token( _refresh_token, access_token_file_name );
-        
-        boost::property_tree::ptree propertyTree;
-        std::ifstream jsonFile( access_token_file_name, std::ios::in | std::ios::binary );
-
-        try {
-            read_json( jsonFile, propertyTree );
-        }
-        catch ( std::exception& json_parser_error ) {
-            SDL_Log("%s", json_parser_error.what() );
-        }
-
-        jsonFile.close();
-        //std::remove(access_token_file_name.c_str());
-
-        for ( auto& access_it: propertyTree )
+        if ( !check_access_token() )
         {
-            if ( access_it.first == "access_token" )
-            {
-                _access_token = access_it.second.get_value<std::string>();
-            }
-            else if ( access_it.first == "expires_in" )
-            {
-                now = std::time(0);
-                _access_token_expiration = now + access_it.second.get_value<std::time_t>();
-            }
+            get_access_token( true );
+            log_expiration_time();
+            SDL_Log("Expiration: %ld", _access_token_expiration );
         }
 
-        SDL_Log("Access Token: %s", _access_token.c_str() );
-
+        check_access_token_expiration();
     }
 
     void TDAmeritrade::set_retrieval_type( RetrievalType type )
@@ -397,7 +490,7 @@ namespace tda
 
         if ( now > _access_token_expiration )
         {
-            get_access_token();
+            get_access_token( true );
         }
 
         post_account_auth( account_url, account_filename );
