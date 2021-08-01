@@ -15,6 +15,7 @@
 #include <exception>
 #include <ctime>
 #include <sstream>
+#include <filesystem>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
