@@ -3,11 +3,12 @@
 
 #include "../core.hpp"
 #include "../apikey.hpp"
-#include "Data/PricingStructures.hpp"
-#include "Data/Quote.hpp"
-#include "Data/PriceHistory.hpp"
-#include "Data/OptionChain.hpp"
-#include "Data/Account.hpp"
+#include "TDAmeritrade/PricingStructures.hpp"
+#include "TDAmeritrade/Account.hpp"
+#include "TDAmeritrade/Quote.hpp"
+#include "TDAmeritrade/PriceHistory.hpp"
+#include "TDAmeritrade/OptionChain.hpp"
+
 
 namespace tda
 {

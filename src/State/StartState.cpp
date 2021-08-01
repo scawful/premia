@@ -11,7 +11,8 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 {
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
-    this->tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
+    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
+    account_data = tda_data_interface->createAccount( "497912311" );
 
     // quotes["SPY"] = tda_data_interface->createQuote( "SPY" );
     // quotes["QQQ"] = tda_data_interface->createQuote( "QQQ" );
@@ -190,8 +191,28 @@ void StartState::update( Manager* premia )
         ImGui::EndPopup();
     }
 
+    ImGui::Text( account_data->get_account_variable("accountId").c_str() );
+
+    for ( int i = 0; i < account_data->get_position_vector_size(); i++ )
+    {
+        for ( auto& position_it : account_data->get_position( i ) )
+        {
+            if ( position_it.first == "instrument" )
+            {
+                for ( auto& instrument_it: account_data->get_position_instrument( i ) )
+                {
+                    ImGui::Text("%s :: %s", instrument_it.first.c_str(), instrument_it.second.c_str() );
+                }
+            }
+            else
+            {
+                ImGui::Text("%s :: %s", position_it.first.c_str(), position_it.second.c_str() );
+            }
+        }
+    }
 
     ImGui::End();    
+
 
     SDL_RenderClear(this->pRenderer);
 }

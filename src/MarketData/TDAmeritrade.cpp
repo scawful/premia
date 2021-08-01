@@ -63,6 +63,7 @@ namespace tda
         return url;
     }
 
+    // SIMPLE CURL DOWNLOAD, NO PARAMETERS OR AUTHORIZATION REQUIRED 
     void TDAmeritrade::download_file(std::string url, std::string filename)
     {
         CURL *curl;
@@ -84,6 +85,7 @@ namespace tda
         }
     }
 
+    // POSTS REFRESH TOKEN PARAMETERS AND GETS ACCESS TOKEN 
     void TDAmeritrade::post_access_token( std::string refresh_token, std::string filename )
     {
         CURL *curl;
@@ -145,6 +147,7 @@ namespace tda
         curl_global_cleanup();
     }
 
+    // DOWNLOADS FILE FROM TDA API USING AUTHORIZATION BEARER 
     void TDAmeritrade::post_account_auth( std::string url, std::string filename )
     {
         CURL *curl;
@@ -488,9 +491,11 @@ namespace tda
         std::time_t now = std::time(0);
         std::string account_filename = account_num + "_" + std::to_string(now) + ".json";
 
+        
         if ( now > _access_token_expiration )
         {
-            get_access_token( true );
+            SDL_Log("Get Access Token Triggered");
+            //get_access_token( true );
         }
 
         post_account_auth( account_url, account_filename );
@@ -508,8 +513,7 @@ namespace tda
         jsonFile.close();
         std::remove(account_filename.c_str());
 
-        boost::shared_ptr<tda::Account> new_account_data;
-        //boost::make_shared<tda::Account>( propertyTree );
+        boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( propertyTree );
         return new_account_data;
     }
 

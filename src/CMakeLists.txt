@@ -46,7 +46,12 @@ target_compile_definitions(ImGui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SD
 # add the executable
 # MACOSX_BUNDLE ${MAC_ICON}
 add_executable(Premia Premia.cpp 
-                    TDAmeritrade/TDAmeritrade.cpp TDAmeritrade/Data/Quote.cpp TDAmeritrade/Data/PriceHistory.cpp TDAmeritrade/Data/OptionChain.cpp
+                    MarketData
+                    MarketData/TDAmeritrade.cpp 
+                    MarketData/TDAmeritrade/Quote.cpp 
+                    MarketData/TDAmeritrade/PriceHistory.cpp 
+                    MarketData/TDAmeritrade/OptionChain.cpp 
+                    MarketData/TDAmeritrade/Account.cpp
                     State/Manager.cpp State/DemoState.cpp
                     State/StartState.cpp State/QuoteState.cpp State/OptionState.cpp
                     State/Layout/Menu.cpp

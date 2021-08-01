@@ -19,6 +19,8 @@ private:
     std::map<std::string, PTexture> textures;
     std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
+
+    boost::shared_ptr<tda::Account> account_data;
     
 protected:
     StartState() { }
