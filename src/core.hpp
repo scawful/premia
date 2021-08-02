@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <string_view>
+#include <array>
 #include <cmath>
 #include <random>
 #include <map>
@@ -16,6 +18,7 @@
 #include <ctime>
 #include <sstream>
 #include <filesystem>
+
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -30,6 +33,10 @@
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
 
 // #include <ql/quantlib.hpp>
 // #include <ql/option.hpp>

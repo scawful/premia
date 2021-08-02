@@ -14,6 +14,9 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
     account_data = tda_data_interface->createAccount( "497912311" );
 
+    cbp_data_interface = boost::make_shared<cbp::CoinbasePro>();
+    cbp_data_interface->list_accounts();
+
     // quotes["SPY"] = tda_data_interface->createQuote( "SPY" );
     // quotes["QQQ"] = tda_data_interface->createQuote( "QQQ" );
     // quotes["DIA"] = tda_data_interface->createQuote( "DIA" );

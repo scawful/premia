@@ -31,6 +31,8 @@ find_package(SDL_ttf REQUIRED)
 # find the curl library
 find_package(CURL REQUIRED)
 
+find_package(OpenSSL REQUIRED)
+
 # ImGui library --------------------------------------------------------------------------------------------
 # Set where the ImGui files are stored
 set(IMGUI_PATH  "${CMAKE_SOURCE_DIR}/Libraries/imgui")
@@ -47,6 +49,8 @@ target_compile_definitions(ImGui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SD
 # MACOSX_BUNDLE ${MAC_ICON}
 add_executable(Premia Premia.cpp 
                     MarketData
+                    MarketData/CoinbasePro.cpp
+                    MarketData/CoinbasePro/Account.cpp
                     MarketData/TDAmeritrade.cpp 
                     MarketData/TDAmeritrade/Quote.cpp 
                     MarketData/TDAmeritrade/PriceHistory.cpp 
@@ -72,7 +76,7 @@ include_directories("../assets")
 # set_property(TARGET quantlib PROPERTY IMPORTED_LOCATION ${QL_LIBRARY})
 
 target_link_libraries(Premia SDL2main SDL2 SDL_image SDL_ttf -l:libimm32.a
-                             curl
+                             curl OpenSSL::SSL
                              ${BOOST_LIBRARIES} 
                              ${OPENGL_LIBRARIES}
                              ImGui )
