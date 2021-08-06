@@ -51,6 +51,7 @@ add_executable(Premia Premia.cpp
                     MarketData
                     MarketData/CoinbasePro.cpp
                     MarketData/CoinbasePro/Account.cpp
+                    MarketData/CoinbasePro/Client.cpp
                     MarketData/TDAmeritrade.cpp 
                     MarketData/TDAmeritrade/Quote.cpp 
                     MarketData/TDAmeritrade/PriceHistory.cpp 
