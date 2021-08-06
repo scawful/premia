@@ -3,17 +3,23 @@
 Details
 --------
 - Description: Risk parity anaylsis and trading program
-- Platform: macOS, GNU/Linux
-- Toolchain: clang
-- Dependencies: SDL2, QuantLib, ImGui, ImGuiSDL, ImPlot
-- API: TDAmeritrade
+- Platform: Windows, macOS, GNU/Linux
+- Toolchain: mingw-w64, clang
+- Dependencies: Boost, SDL2, OpenSSL, QuantLib, ImGui, ImGuiSDL, ImPlot
+- API: TDAmeritrade, Coinbase Pro
 
-API KEY
+API KEYS
 --------
 
-This application makes use of TDAmeritrade API which gives a custom api key. This key gives you access to trading on behalf of the account associated with it, which is not something I'd like to make publicly accessible. So to use this application you'll have to set that up. I won't include instructions on how to do that, at least for now, since the application isn't very useful in its state. But if you were to try to use it and could get it figured out yourself you can add the file 
+This program requires API keys for both TDAmeritrade and Coinbase Pro to gain access to all features. As of right now, there is no gui based input for these values, so I have them stored in an untracked header file. If you'd like to use this program, you must create: apikey.hpp
 
-apikey.hpp
+`static std::string TDA_API_KEY = "<INSERT-API-KEY>";` with your TDAmeritrade API key
 
-and include the statement `static std::string TDA_API_KEY = "<INSERT-API-KEY>";` with your TDAmeritrade API key
+`static std::string REFRESH_TOKEN = "<INSERT-REFRESH-TOKEN";` optional refresh token
+
+`static std::string CBP_KEY = "<INSERT-CBP-KEY>";`
+
+`static std::string CBP_SECRET = "<INSERT-CBP-SECRET-KEY>";`
+
+`static std::string CBP_PASSPHRASE = "<INSERT-CBP-PASSPHRASE>";`
 
