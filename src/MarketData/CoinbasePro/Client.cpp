@@ -6,36 +6,46 @@ namespace cbp
     // NOT MY CODE 
     // https://stackoverflow.com/questions/5288076/base64-encoding-and-decoding-with-openssl
     // just testing bc omfg base64 sucks 
-    namespace 
+
+    auto EncodeBase64(const std::string& to_encode) -> std::string 
     {
-        struct BIOFreeAll { void operator()(BIO* p) { BIO_free_all(p); } };
+        /// @sa https://www.openssl.org/docs/manmaster/man3/EVP_EncodeBlock.html
+
+        const auto predicted_len = 4 * ((to_encode.length() + 2) / 3);  // predict output size
+
+        const auto output_buffer{std::make_unique<char[]>(predicted_len + 1)};
+
+        const std::vector<unsigned char> vec_chars{to_encode.begin(), to_encode.end()};  // convert to_encode into uchar container
+
+        const auto output_len = EVP_EncodeBlock(reinterpret_cast<unsigned char*>(output_buffer.get()), vec_chars.data(), static_cast<int>(vec_chars.size()));
+
+        if (predicted_len != static_cast<unsigned long>(output_len)) {
+            throw std::runtime_error("EncodeBase64 error");
+        }
+
+        return output_buffer.get();
     }
 
-    std::string Base64Encode(const std::vector<unsigned char>& binary)
+    
+    auto DecodeBase64(const std::string& to_decode) -> std::string 
     {
-        std::unique_ptr<BIO,BIOFreeAll> b64(BIO_new(BIO_f_base64()));
-        BIO_set_flags(b64.get(), BIO_FLAGS_BASE64_NO_NL);
-        BIO* sink = BIO_new(BIO_s_mem());
-        BIO_push(b64.get(), sink);
-        BIO_write(b64.get(), binary.data(), binary.size());
-        BIO_flush(b64.get());
-        const char* encoded;
-        const long len = BIO_get_mem_data(sink, &encoded);
-        return std::string(encoded, len);
+        /// @sa https://www.openssl.org/docs/manmaster/man3/EVP_DecodeBlock.html
+
+        const auto predicted_len = 3 * to_decode.length() / 4;  // predict output size
+
+        const auto output_buffer{std::make_unique<char[]>(predicted_len + 1)};
+
+        const std::vector<unsigned char> vec_chars{to_decode.begin(), to_decode.end()};  // convert to_decode into uchar container
+
+        const auto output_len = EVP_DecodeBlock(reinterpret_cast<unsigned char*>(output_buffer.get()), vec_chars.data(), static_cast<int>(vec_chars.size()));
+
+        if (predicted_len != static_cast<unsigned long>(output_len)) {
+            throw std::runtime_error("DecodeBase64 error");
+        }
+
+        return output_buffer.get();
     }
 
-    std::vector<unsigned char> Base64Decode(const char* encoded)
-    {
-        std::unique_ptr<BIO,BIOFreeAll> b64(BIO_new(BIO_f_base64()));
-        BIO_set_flags(b64.get(), BIO_FLAGS_BASE64_NO_NL);
-        BIO* source = BIO_new_mem_buf(encoded, -1); // read-only source
-        BIO_push(b64.get(), source);
-        const int maxlen = strlen(encoded) / 4 * 3 + 1;
-        std::vector<unsigned char> decoded(maxlen);
-        const int len = BIO_read(b64.get(), decoded.data(), maxlen);
-        decoded.resize(len);
-        return decoded;
-    }
     // END OF NOT MY CODE 
 
     std::string Client::get_server_time()
@@ -134,48 +144,37 @@ namespace cbp
 
             SDL_Log("%s", _message.c_str() );
 
-            // base 64 decode the secret key 
-            // const std::vector<unsigned char> decoded_key = Base64Decode( _secret_key.data() );
-            // char *hmac_key = _secret_key.data();
-            // int key_len = strlen(hmac_key);
+            // base64 decode the secret key 
+            std::string decoded_key = DecodeBase64( _secret_key.data() );
+            char *hmac_key = strdup( decoded_key.c_str() );
+            int key_len = strlen(hmac_key);
 
-            // const auto *data = (const unsigned char *) strdup( _message.c_str() );
-            // int data_len = strlen((char *) hmac_key);
+            const auto *data = (const unsigned char *) strdup( _message.c_str() );
+            int data_len = strlen((char *) _message.c_str() );
 
-            // base64 decode the CoinbasePro secret key
-            const auto pl = 3 * _secret_key.length() / 4;
-            auto hmac_key = reinterpret_cast<unsigned char *>( calloc( pl + 1, 1 ) );
-            const auto hmac_output_length = EVP_DecodeBlock(hmac_key, reinterpret_cast<const unsigned char *>( _secret_key.c_str() ), _secret_key.length() );
-            if ( pl != hmac_output_length ) 
-            { 
-                std::cerr << "Whoops, decode predicted " << pl << " but we got " << hmac_output_length << "\n"; 
-            }
+            unsigned char *md = nullptr;
+            unsigned int md_len = -1;
 
-            // base64 encoded HMAC sha256
-            HMAC
+            // HMAC sha256
+            md = HMAC
             (
                 EVP_sha256(),
                 hmac_key,
-                static_cast<int>( hmac_output_length ),
-                reinterpret_cast<unsigned char const*>( _message.data() ),
-                static_cast<int>( _message.size() ),
-                _hash.data(),
-                &_hash_length
+                static_cast<int>( key_len ),
+                reinterpret_cast<unsigned char const*>( data ),
+                static_cast<int>( data_len ),
+                md,
+                &md_len
             );
 
+            // base64 encode the hmac signature data 
+            const char *pre_encode_signature_c = strdup(reinterpret_cast<const char *>(md));
+            std::string pre_encode_signature( pre_encode_signature_c );
+            std::string post_encode_signature = EncodeBase64( pre_encode_signature );
+
             free( hmac_key );
-
-            // const char *pre_encode_signature_c = strdup( reinterpret_cast<const char *>( _hash.data() ));
-            // const std::vector<unsigned char> binary(pre_encode_signature_c, pre_encode_signature_c+strlen(pre_encode_signature_c));
-            // std::string post_encode_signature = Base64Encode( binary );
-
-            const auto pl2 = 4 * ( ( _hash_length + 2 ) / 3);
-            auto b64_encode = reinterpret_cast<char*>( calloc( pl2 + 1, 1 ) );
-            const auto ol2 = EVP_EncodeBlock( reinterpret_cast<unsigned char *>(b64_encode), _hash.data(), _hash_length );
-            std::string post_encode_signature = boost::lexical_cast<std::string>(b64_encode, ol2);
-            free( b64_encode );
-
-            boost::replace_all(post_encode_signature, "\n", "");
+            free( (char *) data );
+            free( (char *) pre_encode_signature_c );
 
             // add the signature to the header
             std::string access_sign = "CB-ACCESS-SIGN: " + post_encode_signature;
@@ -202,10 +201,6 @@ namespace cbp
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
             res = curl_easy_perform(curl);
-
-            // free( hmac_key );
-            // free( (char *) data );
-            // free( (char *) pre_encode_signature_c );
 
             curl_easy_cleanup(curl);
             fclose(fp);
