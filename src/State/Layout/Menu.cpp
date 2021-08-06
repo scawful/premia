@@ -4,7 +4,7 @@
 #include "../StartState.hpp"
 // #include "../PortfolioState.hpp"
 
-void draw_imgui_menu( Manager *premia, std::string title_string )
+void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_data_interface, std::string title_string )
 {
     ImGui::NewFrame();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -37,7 +37,10 @@ void draw_imgui_menu( Manager *premia, std::string title_string )
                 premia->change( StartState::instance() );
             }
 
-            ImGui::MenuItem("Authenticate");
+            if ( ImGui::MenuItem("Authenticate") )
+            {
+                tda_data_interface->manual_authentication();
+            }
 
             
             ImGui::Separator();

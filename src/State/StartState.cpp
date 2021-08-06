@@ -123,7 +123,7 @@ void StartState::handleEvents( Manager* premia )
 
 void StartState::update( Manager* premia )
 {
-    draw_imgui_menu( premia, "Home" );
+    draw_imgui_menu( premia, tda_data_interface, "Home" );
 
     // ImGui::Text("SPY: $%s", quotes["SPY"]->getQuoteVariable("lastPrice").c_str() );
     // ImGui::Text("QQQ: $%s", quotes["QQQ"]->getQuoteVariable("lastPrice").c_str() );

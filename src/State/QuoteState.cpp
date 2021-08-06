@@ -295,7 +295,7 @@ void QuoteState::handleEvents( Manager* premia )
 
 void QuoteState::update( Manager* premia )
 {    
-    draw_imgui_menu( premia, title_string );
+    draw_imgui_menu( premia, tda_data_interface, title_string );
 
     static char buf[64] = "";
     ImGui::Text("Symbol: ");

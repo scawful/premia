@@ -4,6 +4,6 @@
 #include "../../core.hpp"
 #include "../Manager.hpp"
 
-void draw_imgui_menu( Manager *premia, std::string title_string );
+void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_data_interface, std::string title_string );
 
 #endif
