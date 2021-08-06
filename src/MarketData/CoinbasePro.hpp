@@ -4,12 +4,14 @@
 #include "../core.hpp"
 #include "../apikey.hpp"
 #include "CoinbasePro/Account.hpp"
+#include "CoinbasePro/Client.hpp"
 
 namespace cbp
 {
     class CoinbasePro
     {
     private:
+        boost::shared_ptr<Client> http_client;
         std::time_t _timestamp;
         std::string _message;
         std::string _body;

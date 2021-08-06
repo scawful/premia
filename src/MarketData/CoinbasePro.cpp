@@ -34,28 +34,34 @@ namespace cbp
 
             // base64 decode the CoinbasePro secret key
             const auto pl = 3 * CBP_SECRET.length() / 4;
-            auto output = reinterpret_cast<unsigned char *>( calloc( pl + 1, 1 ) );
-            const auto ol = EVP_DecodeBlock(output, reinterpret_cast<const unsigned char *>( CBP_SECRET.c_str() ), CBP_SECRET.length() );
-            if ( pl != ol ) 
+            auto hmac_key = reinterpret_cast<unsigned char *>( calloc( pl + 1, 1 ) );
+            const auto hmac_output_length = EVP_DecodeBlock(hmac_key, reinterpret_cast<const unsigned char *>( CBP_SECRET.c_str() ), CBP_SECRET.length() );
+            if ( pl != hmac_output_length ) 
             { 
-                std::cerr << "Whoops, decode predicted " << pl << " but we got " << ol << "\n"; 
+                std::cerr << "Whoops, decode predicted " << pl << " but we got " << hmac_output_length << "\n"; 
             }
 
             // base64 encoded HMAC sha256
             HMAC
             (
                 EVP_sha256(),
-                output,
-                static_cast<int>( CBP_SECRET.length() ),
+                hmac_key,
+                static_cast<int>( hmac_output_length ),
                 reinterpret_cast<unsigned char const*>( _message.data() ),
                 static_cast<int>( _message.size() ),
                 _hash.data(),
                 &_hash_length
             );
 
-            free( output );
+            free( hmac_key );
 
-            _access_signature = std::string{ reinterpret_cast<char const*>( _hash.data()), _hash_length };
+            const auto pl2 = 4 * ( ( _hash_length + 2 ) / 3);
+            auto b64_encode = reinterpret_cast<char*>( calloc( pl2 + 1, 1 ) );
+            const auto ol2 = EVP_EncodeBlock( reinterpret_cast<unsigned char *>(b64_encode), _hash.data(), _hash_length );
+            _access_signature = boost::lexical_cast<std::string>(b64_encode, ol2);
+            free( b64_encode );
+
+            //_access_signature = std::string{ reinterpret_cast<char const*>( _hash.data()), _hash_length };
 
             // add the signature to the header
             std::string access_sign = "CB-ACCESS-SIGN: " + _access_signature;
@@ -71,6 +77,9 @@ namespace cbp
             std::string passphrase = "CB-ACCESS-PASSPHRASE: " + CBP_PASSPHRASE;
             headers = curl_slist_append( headers, passphrase.c_str() );
             res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+            // specify the user agent
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
 
             fp = fopen( filename.c_str(), "wb" );
 
@@ -88,6 +97,7 @@ namespace cbp
 
     CoinbasePro::CoinbasePro()
     {
+        http_client = boost::make_shared<Client>(CBP_KEY, CBP_SECRET, CBP_PASSPHRASE, true );
         _endpoint_url = "https://api.pro.coinbase.com";
     }
 
@@ -100,8 +110,8 @@ namespace cbp
     {
         std::time_t now = std::time(0);
         std::string output_filename = "cbp_accounts_" + std::to_string(now) + ".json";
-
-        get_account_data( output_filename );
+        http_client->send_request( output_filename, "/accounts" );
+        //get_account_data( output_filename );
 
         std::ifstream json_file( output_filename, std::ios::in | std::ios::binary );
 
