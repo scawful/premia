@@ -4,7 +4,8 @@
 #define Manager_hpp
 
 #include "../core.hpp"
-#include "../TDAmeritrade.hpp"
+#include "../MarketData/TDAmeritrade.hpp"
+#include "../MarketData/CoinbasePro.hpp"
 #include "../Graphics/Texture.hpp"
 
 class State;

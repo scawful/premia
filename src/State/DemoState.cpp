@@ -10,8 +10,6 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     this->pWindow = pWindow;
     this->tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
 
-    premiaLogo.loadFromFile( pRenderer, "../assets/sigma.png" );
-
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
@@ -20,7 +18,6 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 
 void DemoState::cleanup()
 {
-
     SDL_Log("DemoState Cleanup\n");
 }
 
@@ -38,7 +35,6 @@ void DemoState::handleEvents( Manager* premia )
 {
     int wheel = 0;
     SDL_Event event;
-    SDL_Color fontColor = { 255, 255, 255 };
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -58,6 +54,8 @@ void DemoState::handleEvents( Manager* premia )
                     default:
                         break;
                 }
+                break;
+
             case SDL_KEYUP:
             {
                 int key = event.key.keysym.scancode;
@@ -66,7 +64,8 @@ void DemoState::handleEvents( Manager* premia )
                 io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
                 io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
                 io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
-            }
+                break;
+            } 
             
             case SDL_WINDOWEVENT:
                 switch ( event.window.event ) 

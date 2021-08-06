@@ -44,7 +44,6 @@ void OptionState::handleEvents( Manager* premia )
 {
     int wheel = 0;
     SDL_Event event;
-    SDL_Color fontColor = { 255, 255, 255 };
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -67,6 +66,7 @@ void OptionState::handleEvents( Manager* premia )
                     default:
                         break;
                 }
+                break;
 
             case SDL_WINDOWEVENT:
                 switch ( event.window.event ) 
@@ -214,7 +214,7 @@ void OptionState::update( Manager* game )
         }
         ImGui::EndTable();
     }
-    ImGui::TreePop();
+    //ImGui::TreePop();
 
     for ( int i = 0; i < optionsDateTimeObj[current_item].strikePriceObj.size(); i++ )
     {

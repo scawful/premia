@@ -16,19 +16,12 @@ private:
     TTF_Font *menuFont = NULL;
     TTF_Font *priceFont = NULL;
 
-    PTexture testTexture;
-    PTexture priceTexture;
-    PTexture dateTexture;
-    PTexture titleTexture;
-    PTexture subtitleTexture;
-    PTexture spyLastPrice;
-    PTexture qqqLastPrice;
-    PTexture diaLastPrice;
-    PTexture premiaLogo;
-
     std::map<std::string, PTexture> textures;
     std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
+    boost::shared_ptr<cbp::CoinbasePro> cbp_data_interface;
+
+    boost::shared_ptr<tda::Account> account_data;
     
 protected:
     StartState() { }

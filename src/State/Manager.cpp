@@ -54,6 +54,7 @@ void Manager::init(int width, int height)
 
         }
     }
+    ImGui::CreateContext();
     ImGui_ImplSDL2_InitForPremia( pWindow );
 }
 
