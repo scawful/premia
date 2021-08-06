@@ -522,4 +522,10 @@ namespace tda
         return this->_base_url;
     }
 
+    void TDAmeritrade::manual_authentication()
+    {
+        get_access_token( true );
+        log_expiration_time();
+    }
+
 }

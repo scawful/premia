@@ -105,6 +105,7 @@ namespace tda
         boost::shared_ptr<tda::Account> createAccount( std::string account_num );
 
         std::string getBaseUrl();
+        void manual_authentication();
     };
 
 
