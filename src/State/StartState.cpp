@@ -15,7 +15,7 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     account_data = tda_data_interface->createAccount( "497912311" );
 
     cbp_data_interface = boost::make_shared<cbp::CoinbasePro>();
-    cbp_data_interface->list_accounts();
+    cbp_account_data = cbp_data_interface->list_accounts();
 
     // quotes["SPY"] = tda_data_interface->createQuote( "SPY" );
     // quotes["QQQ"] = tda_data_interface->createQuote( "QQQ" );
@@ -213,6 +213,12 @@ void StartState::update( Manager* premia )
             }
         }
     }
+
+    for ( auto& crypto_position_it: cbp_account_data->get_position("BTC") )
+    {
+        ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
+    }
+
 
     ImGui::End();    
 

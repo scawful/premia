@@ -22,6 +22,7 @@ private:
     boost::shared_ptr<cbp::CoinbasePro> cbp_data_interface;
 
     boost::shared_ptr<tda::Account> account_data;
+    boost::shared_ptr<cbp::Account> cbp_account_data;
     
 protected:
     StartState() { }
