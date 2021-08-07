@@ -60,7 +60,6 @@ add_executable(Premia Premia.cpp
                     State/Manager.cpp State/DemoState.cpp
                     State/StartState.cpp State/QuoteState.cpp State/OptionState.cpp
                     State/Layout/Menu.cpp
-                    Graphics/Texture.cpp
                     Libraries/imgui/imgui.cpp
                     Libraries/imgui/imgui_demo.cpp
                     Libraries/imgui/imgui_draw.cpp

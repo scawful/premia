@@ -13,9 +13,6 @@ private:
     SDL_Renderer *pRenderer = NULL;
     SDL_Texture *pTexture = NULL;
     
-    PTexture premiaLogo;
-
-    std::map<std::string, PTexture> textures;
     std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
     

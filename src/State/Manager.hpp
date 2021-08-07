@@ -6,7 +6,6 @@
 #include "../core.hpp"
 #include "../MarketData/TDAmeritrade.hpp"
 #include "../MarketData/CoinbasePro.hpp"
-#include "../Graphics/Texture.hpp"
 
 class State;
 
