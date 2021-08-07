@@ -135,14 +135,14 @@ void StartState::update( Manager* premia )
     ImGui::Text("Order Entry");
 
     // Place Order Button ---------------------------------------------------------------------------------
-    if (ImGui::Button("Quick Order", ImVec2(120, 30)))
+    if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
         ImGui::OpenPopup("Quick Order");
 
     // Always center this window when appearing
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Quick Order", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    if ( ImGui::BeginPopupModal("Quick Order", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
     {
         static std::string new_ticker = "";
         static bool active_instrument = false;
@@ -194,8 +194,17 @@ void StartState::update( Manager* premia )
         ImGui::EndPopup();
     }
 
-    ImGui::Text( account_data->get_account_variable("accountId").c_str() );
+    ImGui::Text("TDAmeritrade Portfolio Information");
+    ImGui::Separator();
+    ImGui::Text( "Account ID: %s", account_data->get_account_variable("accountId").c_str() );
+    ImGui::Text( "Net Liq: %s", account_data->get_balance_variable("liquidationValue").c_str() );
+    ImGui::Text( "Available Funds: %s", account_data->get_balance_variable("availableFunds").c_str() );
+    ImGui::Text( "Cash: %s", account_data->get_balance_variable("cashBalance").c_str() );
 
+    ImGui::Separator();
+    ImGui::Text("Positions");
+    ImGui::Separator();
+    
     for ( int i = 0; i < account_data->get_position_vector_size(); i++ )
     {
         for ( auto& position_it : account_data->get_position( i ) )
@@ -209,11 +218,14 @@ void StartState::update( Manager* premia )
             }
             else
             {
-                ImGui::Text("%s :: %s", position_it.first.c_str(), position_it.second.c_str() );
+                if ( position_it.first != "cusip" )
+                    ImGui::Text("%s :: %s", position_it.first.c_str(), position_it.second.c_str() );
             }
         }
     }
 
+    ImGui::Text("Coinbase Pro Accounts");
+    ImGui::Separator();
     for ( auto& crypto_position_it: cbp_account_data->get_position("BTC") )
     {
         ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
