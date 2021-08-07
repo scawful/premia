@@ -70,6 +70,11 @@ std::string tda::Account::get_account_variable( std::string variable )
     return account_info[ variable ];
 }
 
+std::string tda::Account::get_balance_variable( std::string variable )
+{
+    return current_balances[ variable ];
+}
+
 std::unordered_map<std::string, std::string> tda::Account::get_position( int index )
 {
     return positions_vector[ index ];

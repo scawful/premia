@@ -28,6 +28,7 @@ namespace tda
 
         size_t get_position_vector_size();
         std::string get_account_variable( std::string variable );
+        std::string get_balance_variable( std::string variable );
         std::unordered_map<std::string, std::string> get_position( int index );
         std::unordered_map<std::string, std::string> get_position_instrument( int index );
     };
