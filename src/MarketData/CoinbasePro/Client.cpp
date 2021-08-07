@@ -54,6 +54,7 @@ namespace cbp
         CURLcode res;
         FILE *fp;
         std::string server_time;
+        std::string filename = "time_request.json";
 
         curl = curl_easy_init();
         if ( curl )
@@ -68,7 +69,7 @@ namespace cbp
 
             std::string _request_path = _endpoint_url + "/time";
             
-            fp = fopen( "time_request.json", "wb");
+            fp = fopen( filename.c_str(), "wb");
             curl_easy_setopt(curl, CURLOPT_URL, _request_path.c_str());
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
@@ -100,6 +101,8 @@ namespace cbp
         }
 
         server_time = server_time.substr(0, server_time.find('.') );
+
+        std::remove( filename.c_str() );
 
         return server_time;
     }
@@ -172,6 +175,7 @@ namespace cbp
             std::string pre_encode_signature( pre_encode_signature_c );
             std::string post_encode_signature = EncodeBase64( pre_encode_signature );
 
+            // free data related to encoding signature 
             free( hmac_key );
             free( (char *) data );
             free( (char *) pre_encode_signature_c );

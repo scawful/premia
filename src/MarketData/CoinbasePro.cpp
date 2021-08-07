@@ -30,6 +30,7 @@ namespace cbp
         }
 
         json_file.close();
+        std::remove( output_filename.c_str() );
 
         boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( property_tree );
         return new_account_data;
