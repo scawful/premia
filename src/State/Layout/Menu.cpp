@@ -6,11 +6,11 @@
 
 void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_data_interface, std::string title_string )
 {
+    static bool about = false;
     ImGui::NewFrame();
-    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("C:\\Users\\starw\\Code\\premia\\assets\\SourceSansPro-Black.ttf", 12.0f );
-    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always );
     
     if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
     {
@@ -63,7 +63,7 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
                 ImGui::EndMenu();
             }
 
-            if ( ImGui::MenuItem("Quit", "CTRL + Q") )
+            if ( ImGui::MenuItem("Quit", "ESC") )
             {
                 premia->quit();
             }
@@ -94,6 +94,7 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
 
             ImGui::EndMenu();
         }
+
         if (ImGui::BeginMenu("Trade"))
         {
             if ( ImGui::MenuItem("Place Order") )
@@ -120,6 +121,7 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
 
             ImGui::EndMenu();
         }
+
         if ( ImGui::BeginMenu("Analyze"))
         {
             if ( ImGui::MenuItem("Instrument Quote") )
@@ -134,17 +136,45 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
 
             ImGui::EndMenu();
         }
+
         if (ImGui::BeginMenu("Research"))
         {
             ImGui::MenuItem("research menu bar");
             ImGui::EndMenu();
         }
+        
         if (ImGui::BeginMenu("Tools"))
         {
             ImGui::MenuItem("tools menu bar");
             ImGui::EndMenu();
         }
+
+        if ( ImGui::BeginMenu("Help") )
+        {
+            if ( ImGui::MenuItem("About") )
+                about = true;
+
+            ImGui::EndMenu();
+        }
+
+
         ImGui::EndMenuBar();
+    }
+
+    if ( about )
+        ImGui::OpenPopup("About");
+
+    if ( ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
+    {
+        ImGui::Text("Premia Version 0.01");
+        ImGui::Text("Written by: Justin Scofield (scawful)");
+        ImGui::Text("Dependencies: SDL2, SDL_image, SDL_ttf, OpenGL");
+        ImGui::Text("\t\t\t  Boost, OpenSSL, libcURL, QuantLib");
+        ImGui::Text("\t\t\t  ImGui, ImGuiSDL, ImPlot");
+        ImGui::Text("API: TDAmeritrade, Coinbase Pro");
+
+        if ( ImGui::Button("Close", ImVec2(120, 0)) ) { about = false; ImGui::CloseCurrentPopup(); }
+        ImGui::EndPopup();
     }
 
 }
