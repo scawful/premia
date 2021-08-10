@@ -2,6 +2,7 @@
 #ifndef core_hpp
 #define core_hpp
 
+// C++ Standard Library
 #include <stdio.h>
 #include <cstdlib>
 #include <iostream>
@@ -18,12 +19,23 @@
 #include <ctime>
 #include <sstream>
 #include <filesystem>
+#include <functional>
+#include <memory>
 
-
+// SDL2
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+// Boost 
+#include <boost/beast.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/ssl.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/beast/websocket.hpp>
+#include <boost/beast/websocket/ssl.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -34,17 +46,22 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
+// OpenSSL
+#include <openssl/ssl.h>
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 
+// QuantLib
 // #include <ql/quantlib.hpp>
 // #include <ql/option.hpp>
 // #include <ql/instruments/stock.hpp>
 // #include <ql/quotes/all.hpp>
 
+// libcURL
 #include <curl/curl.h>
 
+// ImGui, ImGuiSDL, ImPlot
 #include "Libraries/imgui/imgui.h"
 #include "Libraries/imgui/imgui_sdl.h"
 #include "Libraries/imgui/imgui_impl_sdl.h"
