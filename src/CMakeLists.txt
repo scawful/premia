@@ -1,18 +1,19 @@
-#Cmake version
+# cmake version
 cmake_minimum_required(VERSION 3.10)
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set the project name
 project(Premia VERSION 1.0)
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-# boost library
+
+# Boost library --------------------------------------------------------------------------------------------
 set(Boost_USE_STATIC_LIBS ON)
+
 # look for package
 set(BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM "iostreams thread system filesystem") #required by gnuplot-iostream
 separate_arguments(BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM)
@@ -23,15 +24,24 @@ find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM})
 # find_package(Boost_system REQUIRED)
 include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )
 
-# find the sdl libraries
+
+# SDL libraries --------------------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
 find_package(SDL_image REQUIRED)
 find_package(SDL_ttf REQUIRED)
 
-# find the curl library
+
+# cURL library --------------------------------------------------------------------------------------------
 find_package(CURL REQUIRED)
 
+
+# OpenSSL library --------------------------------------------------------------------------------------------
 find_package(OpenSSL REQUIRED)
+
+
+# QuantLib --------------------------------------------------------------------------------------------
+find_package(QuantLib REQUIRED)
+
 
 # ImGui library --------------------------------------------------------------------------------------------
 # Set where the ImGui files are stored
@@ -53,6 +63,7 @@ add_executable(Premia Premia.cpp
                     MarketData/CoinbasePro/Account.cpp
                     MarketData/CoinbasePro/Client.cpp
                     MarketData/TDAmeritrade.cpp 
+                    MarketData/TDAmeritrade/Session.cpp
                     MarketData/TDAmeritrade/Quote.cpp 
                     MarketData/TDAmeritrade/PriceHistory.cpp 
                     MarketData/TDAmeritrade/OptionChain.cpp 
@@ -76,10 +87,8 @@ include_directories("../assets")
 # set_property(TARGET quantlib PROPERTY IMPORTED_LOCATION ${QL_LIBRARY})
 
 target_link_libraries(Premia SDL2main SDL2 SDL_image SDL_ttf -l:libimm32.a
-                             curl OpenSSL::SSL
-                             ${BOOST_LIBRARIES} 
-                             ${OPENGL_LIBRARIES}
-                             ImGui )
+                             curl OpenSSL::SSL ImGui ws2_32
+                             ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} )
 
 set (source "${CMAKE_SOURCE_DIR}/assets")
 set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")
