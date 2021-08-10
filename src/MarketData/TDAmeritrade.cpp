@@ -174,6 +174,68 @@ namespace tda
         }
     }
 
+    std::string TDAmeritrade::get_user_principals_response()
+    {
+        CURL *curl;
+        FILE *fp;
+        CURLcode res;
+        std::string url = "https://api.tdameritrade.com/v1/userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
+        std::string filename = "user_principals.json";
+        std::string response;
+
+        curl = curl_easy_init();
+        if ( curl ) 
+        {
+            struct curl_slist *headers = NULL;
+            std::string auth_bearer = "Authorization: Bearer " + _access_token;
+            headers = curl_slist_append(headers, auth_bearer.c_str() );
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+            fp = fopen( filename.c_str(), "wb" );
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+
+            res = curl_easy_perform(curl);
+
+            curl_easy_cleanup(curl);
+            fclose(fp);
+        }
+
+        boost::property_tree::ptree property_tree;
+        std::ifstream json_file( filename, std::ios::in | std::ios::binary );
+
+        try {
+            read_json( json_file, property_tree );
+        }
+        catch ( std::exception& json_parser_error ) {
+            SDL_Log("%s", json_parser_error.what() );
+        }
+
+        json_file.close();
+        std::remove( filename.c_str());
+
+        for ( auto& principal_it: property_tree )
+        {
+            if ( principal_it.first == "streamerInfo" )
+            {
+                for ( auto& streamer_it: principal_it.second )
+                {
+                    if ( streamer_it.first == "streamerSocketUrl" )
+                    {
+                        response = streamer_it.second.get_value<std::string>();
+                    }
+                }
+            }
+        }
+
+        // userPrincipalsResponse.streamerInfo.streamerSocketUrl
+        // var tokenTimeStampAsDateObj = new Date(userPrincipalsResponse.streamerInfo.tokenTimestamp);
+        // var tokenTimeStampAsMs = tokenTimeStampAsDateObj.getTime();
+
+        return response;
+    }
+
     // CREATE ACCESS TOKEN FILE 
     void TDAmeritrade::get_access_token( bool keep_file )
     {
@@ -326,6 +388,19 @@ namespace tda
         }
 
         check_access_token_expiration();
+    }
+
+    void TDAmeritrade::start_session()
+    {
+        std::string host = "wss://" + get_user_principals_response() + "/ws";
+        std::string port = "80";
+        std::string text;
+        boost::asio::io_context ioc;
+        boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
+        //load_root_certificates( context );
+        std::make_shared<tda::Session>(ioc, context)->run( host.c_str(), port.c_str(), text.c_str() );
+
+        ioc.run();
     }
 
     void TDAmeritrade::set_retrieval_type( RetrievalType type )

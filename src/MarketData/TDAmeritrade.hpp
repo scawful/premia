@@ -3,6 +3,7 @@
 
 #include "../core.hpp"
 #include "../apikey.hpp"
+#include "TDAmeritrade/Session.hpp"
 #include "TDAmeritrade/PricingStructures.hpp"
 #include "TDAmeritrade/Account.hpp"
 #include "TDAmeritrade/Quote.hpp"
@@ -75,6 +76,9 @@ namespace tda
         void post_access_token( std::string refresh_token, std::string filename );
         void post_account_auth( std::string url, std::string filename );
 
+        // websocket functions
+        std::string get_user_principals_response();
+
         // access token 
         void get_access_token( bool keep_file );
         void log_expiration_time();
@@ -84,6 +88,7 @@ namespace tda
     public:
         TDAmeritrade( RetrievalType type );
 
+        void start_session();
         void set_retrieval_type( RetrievalType type );
         void set_period_type( PeriodType interval );
         void set_col_name( std::string col_name );
