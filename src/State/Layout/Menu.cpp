@@ -42,6 +42,11 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
                 tda_data_interface->manual_authentication();
             }
 
+            if ( ImGui::MenuItem("Start WS Session") )
+            {
+                tda_data_interface->start_session();
+            }
+
             
             ImGui::Separator();
             if (ImGui::BeginMenu("Options"))
