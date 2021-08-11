@@ -48,7 +48,7 @@ void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 {
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
+    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
     ticker_symbol = "TLT";
     setQuote( "TLT" );
 

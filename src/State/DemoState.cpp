@@ -8,7 +8,7 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 {
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
-    this->tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
+    this->tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
 
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);

@@ -11,7 +11,7 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 {
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::QUOTE);
+    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
     account_data = tda_data_interface->createAccount( "497912311" );
 
     cbp_data_interface = boost::make_shared<cbp::CoinbasePro>();
