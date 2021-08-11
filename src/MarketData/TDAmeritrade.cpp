@@ -174,7 +174,7 @@ namespace tda
         }
     }
 
-    std::string TDAmeritrade::get_user_principals_response()
+    boost::property_tree::ptree TDAmeritrade::get_user_principals()
     {
         CURL *curl;
         FILE *fp;
@@ -213,27 +213,39 @@ namespace tda
         }
 
         json_file.close();
-        std::remove( filename.c_str());
+        //std::remove( filename.c_str());
 
-        for ( auto& principal_it: property_tree )
+        return property_tree;
+    }
+
+    boost::property_tree::ptree TDAmeritrade::create_service_request( ServiceType serv_type, std::string keys, std::string fields )
+    {
+        boost::property_tree::ptree requests, parameters, user_principals;
+        user_principals = get_user_principals();
+
+        // gets first account by default, maybe change later 
+        std::unordered_map<std::string, std::string> account_data;
+        BOOST_FOREACH( boost::property_tree::ptree::value_type &v, user_principals.get_child("accounts.") )
         {
-            if ( principal_it.first == "streamerInfo" )
+            for ( auto& acct_it: v.second )
             {
-                for ( auto& streamer_it: principal_it.second )
-                {
-                    if ( streamer_it.first == "streamerSocketUrl" )
-                    {
-                        response = streamer_it.second.get_value<std::string>();
-                    }
-                }
+                account_data[ acct_it.first ] = acct_it.second.get_value<std::string>();
             }
+            break;
         }
 
-        // userPrincipalsResponse.streamerInfo.streamerSocketUrl
-        // var tokenTimeStampAsDateObj = new Date(userPrincipalsResponse.streamerInfo.tokenTimestamp);
-        // var tokenTimeStampAsMs = tokenTimeStampAsDateObj.getTime();
+        requests.put("service", EnumAPIServiceName[ serv_type ]);
+        requests.put("requestid", 1);
+        requests.put("command", "SUBS");
+        requests.put("account", account_data["accountId"] );
+        requests.put("source", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.appId") ));
 
-        return response;
+        parameters.put("keys", keys);
+        parameters.put("fields", fields);
+
+        requests.add_child("parameters", parameters );
+
+        return requests;
     }
 
     // CREATE ACCESS TOKEN FILE 
@@ -388,18 +400,144 @@ namespace tda
         }
 
         check_access_token_expiration();
+        //get_user_principals();
     }
 
     void TDAmeritrade::start_session()
     {
-        std::string host = "wss://" + get_user_principals_response() + "/ws";
-        std::string port = "80";
-        std::string text;
+        boost::property_tree::ptree user_principals, property_tree, credentials, requests, parameters;
+        user_principals = get_user_principals();
+
+        std::string host;
+        try {
+            host = user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
+        }
+        catch ( std::exception& ptree_bad_path ) {
+            SDL_Log("Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what() );
+        }
+        
+        std::string port = "443";
+
+        std::unordered_map<std::string, std::string> account_data;
+        BOOST_FOREACH( boost::property_tree::ptree::value_type &v, user_principals.get_child("accounts.") )
+        {
+            for ( auto& acct_it: v.second )
+            {
+                account_data[ acct_it.first ] = acct_it.second.get_value<std::string>();
+            }
+            break;
+        }
+
+        requests.put("service", "ADMIN");
+        requests.put("requestid", 1);
+        requests.put("command", "LOGIN");
+        requests.put("account", account_data["accountId"] );
+        requests.put("source", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.appId") ));
+
+        // format credentials 
+        // "userid": userPrincipalsResponse.accounts[0].accountId,
+        // "token": userPrincipalsResponse.streamerInfo.token,
+        // "company": userPrincipalsResponse.accounts[0].company,
+        // "segment": userPrincipalsResponse.accounts[0].segment,
+        // "cddomain": userPrincipalsResponse.accounts[0].accountCdDomainId,
+        // "usergroup": userPrincipalsResponse.streamerInfo.userGroup,
+        // "accesslevel": userPrincipalsResponse.streamerInfo.accessLevel,
+        // "authorized": "Y",
+        // "timestamp": tokenTimeStampAsMs,
+        // "appid": userPrincipalsResponse.streamerInfo.appId,
+        // "acl": userPrincipalsResponse.streamerInfo.acl
+
+        credentials.put("company", account_data["company"] );
+        credentials.put("segment", account_data["segment"] );
+        credentials.put("cddomain", account_data["accountCdDomainId"] );
+        credentials.put("userid", account_data["accountId"] );
+        credentials.put("usergroup", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.userGroup") ) );
+        credentials.put("accesslevel", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.accessLevel") ) );
+        credentials.put("authorized", "Y" );
+        credentials.put("acl", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.acl") ) );
+        // credentials.put("token", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.token") ) );
+
+
+        // token timestamp format :: 2021-08-10T14:57:11+0000
+        std::tm token_timestamp = {};
+        std::string original_token_timestamp = user_principals.get<std::string>("streamerInfo.tokenTimestamp");
+
+        // remove 'T' character
+        std::size_t found = original_token_timestamp.find('T');
+        std::string reformatted_token_timestamp = original_token_timestamp.replace(found, 1, " ");
+
+        // remove the UTC +0000 portion, will adjust for this manually 
+        found = reformatted_token_timestamp.find('+');
+        reformatted_token_timestamp = reformatted_token_timestamp.replace(found, 5, " ");
+        SDL_Log("Reformatted Token Timestamp: %s", reformatted_token_timestamp.c_str() );
+
+        // convert string timestamp into time_t
+        std::istringstream ss( reformatted_token_timestamp );
+        ss >> std::get_time( &token_timestamp, "%Y-%m-%d %H:%M:%S" );
+        if ( ss.fail() ) 
+        {
+            SDL_Log("Token timestamp parse failed!");
+        } 
+        else 
+        {
+            // this is disgusting i'm sorry
+            std::time_t token_timestamp_as_sec = std::mktime( &token_timestamp );
+            std::chrono::time_point token_timestamp_point = std::chrono::system_clock::from_time_t( token_timestamp_as_sec );
+            auto duration = token_timestamp_point.time_since_epoch();
+            auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+            millis -= 18000000;
+            credentials.put("timestamp", millis);
+        }
+
+        credentials.put("appid", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.appId") ) );
+
+        // format parameters 
+        std::string credential_str;
+        for ( auto& cred_it: credentials )
+        {
+            credential_str += cred_it.first + "%3D" + cred_it.second.get_value<std::string>() + "%26";
+        }
+        std::size_t end = credential_str.size();
+        credential_str.replace(end - 3, 3, "");
+
+        parameters.put( "token", user_principals.get<std::string>( boost::property_tree::ptree::path_type("streamerInfo.token") ) );
+        parameters.put( "version", "1.0");
+        parameters.put( "credential", credential_str );
+
+        // include in requests
+        requests.add_child( "parameters", parameters );
+
+
+        std::ifstream requests_json( "requests_test.json", std::ios::out );
+        boost::property_tree::write_json( "requests_test.json", requests );
+
+        std::stringstream requests_text;
+        boost::property_tree::write_json( requests_text, requests );
+        std::string login_text = requests_text.str();
+
+        // "requests": [
+        //     {
+        //         "service": "ADMIN",
+        //         "command": "LOGIN",
+        //         "requestid": 0,
+        //         "account": userPrincipalsResponse.accounts[0].accountId,
+        //         "source": userPrincipalsResponse.streamerInfo.appId,
+        //         "parameters": {
+        //             "credential": jsonToQueryString(credentials),
+        //             "token": userPrincipalsResponse.streamerInfo.token,
+        //             "version": "1.0"
+        //         }
+        //     }
+        // ]
+
+        boost::property_tree::write_json( requests_text, create_service_request( QUOTE, "TLT", "0,1,2,3,4,5,6,7,8" ) );
+        std::string request_text = requests_text.str();
+
         boost::asio::io_context ioc;
         boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
         //load_root_certificates( context );
-        std::make_shared<tda::Session>(ioc, context)->run( host.c_str(), port.c_str(), text.c_str() );
-
+        std::make_shared<tda::Session>(ioc, context)->run( host.c_str(), port.c_str(), login_text.c_str(), request_text.c_str() );
+        //std::thread([&ioc] { ioc.run(); }).detach();
         ioc.run();
     }
 
@@ -540,7 +678,7 @@ namespace tda
 
     boost::shared_ptr<tda::Quote> TDAmeritrade::createQuote( std::string ticker )
     {
-        set_retrieval_type( QUOTE );
+        set_retrieval_type( GET_QUOTE );
         std::string url = this->_base_url;
         string_replace(url, "{ticker}", ticker);
 
