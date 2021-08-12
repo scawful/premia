@@ -132,6 +132,9 @@ namespace tda
         std::time_t _access_token_expiration;
         std::vector<std::thread> _ws_threads;
 
+        std::shared_ptr<tda::Session> _websocket_session;
+        std::vector<std::shared_ptr<std::string const>> _request_queue;
+
         // string manipulation 
         std::string get_api_interval_value(int value);
         std::string get_api_frequency_type(int value);
@@ -148,6 +151,8 @@ namespace tda
 
         // websocket functions
         boost::property_tree::ptree get_user_principals();
+        boost::property_tree::ptree create_login_request();
+        boost::property_tree::ptree create_logout_request();
         boost::property_tree::ptree create_service_request( ServiceType serv_type, std::string keys, std::string fields );
 
         // access token 
@@ -160,6 +165,7 @@ namespace tda
         TDAmeritrade( RetrievalType type );
 
         void start_session();
+        void update_session();
         void set_retrieval_type( RetrievalType type );
         void set_period_type( PeriodType interval );
         void set_col_name( std::string col_name );
