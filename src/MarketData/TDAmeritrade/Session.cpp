@@ -18,14 +18,12 @@ namespace tda
     }
 
     void 
-    Session::run( char const* host, char const* port, char const* login_text, char const* request_text )
+    Session::run( char const* host, char const* port )
     {
         _host = host;
-        _text = login_text;
-        _request_text = request_text;
+        _queue_size = _queue.size();
 
         SDL_Log("Session::run( host: %s ) ", _host.c_str() );
-        SDL_Log("Session::run( text ): \n%s", _text.c_str() );
 
         _resolver.async_resolve( host, port, 
                                  beast::bind_front_handler( 
@@ -111,17 +109,6 @@ namespace tda
                         " websocket-client-async-ssl");
             }));
 
-        // Set the request parameters generated from TDA User Principals
-        // auto self = shared_from_this();
-        // _ws.set_option(websocket::stream_base::decorator(
-        //     [self]( websocket::request_type& req )
-        //     {
-        //         for ( auto& req_it: self->_request_tree )
-        //         {
-        //             req.set( req_it.first, req_it.second.get_value<std::string>() );
-        //         }
-        //     }));
-
         // Perform the websocket handshake
         _ws.async_handshake(_host, "/ws",
             beast::bind_front_handler(
@@ -140,7 +127,7 @@ namespace tda
 
         // Send the message
         _ws.async_write(
-            net::buffer(_text),
+            net::buffer( *_queue.front() ),
             beast::bind_front_handler(
                 &Session::on_write,
                 shared_from_this()));
@@ -154,14 +141,46 @@ namespace tda
         if (ec)
             return fail(ec, "write");
 
-        SDL_Log("Session::on-write");
+        SDL_Log("Session::on_write");
+        SDL_Log("Queue Request Stream:\n%s", _queue[0].get()->c_str() );
 
-        // Read a message into our buffer
-        _ws.async_read(
-            _buffer,
-            beast::bind_front_handler(
-                &Session::on_read,
-                shared_from_this()));
+        
+        if ( _logged_in )
+        {
+            // clear request from the queue
+            _queue.erase( _queue.begin() );
+
+            if ( !_queue.empty() )
+            {
+                SDL_Log("Session::on_write( Queue Not Empty )");
+                _ws.async_read(
+                    _buffer,
+                    beast::bind_front_handler(
+                        &Session::on_read,
+                        shared_from_this()));
+            }
+            else
+            {
+                // logout
+                SDL_Log("Session::on_write( Logging out ) ");
+                _logged_in = false;
+                _ws.async_read(
+                    _buffer,
+                    beast::bind_front_handler(
+                        &Session::on_read,
+                        shared_from_this()));
+            }
+        }
+        else
+        {
+            // Read a message into our buffer
+            _ws.async_read(
+                _buffer,
+                beast::bind_front_handler(
+                    &Session::on_read,
+                    shared_from_this()));
+        }
+
     }
 
     void
@@ -176,25 +195,67 @@ namespace tda
 
         SDL_Log("Session::on_read");
 
-        // attempt to login, if fail then close connection 
-        if ( !on_login( ec ) )
+        // check login first
+        // originally checked the boolean but this had a weird logical byproduct on subsequent streams
+        // so now we check the queue size, first request is always login 
+        if ( _queue_size == _queue.size() )
         {
-            // not logged in
+            on_login( ec );
+            _buffer.consume( _buffer.size() );
+        }
+        else if ( !_notified )
+        {
+            on_notify( ec );
+        }
+        else if ( !_subscribed )
+        {
+            on_subscription( ec );
         }
         else
         {
-            _ws.async_write(
-            net::buffer(_request_text),
-            beast::bind_front_handler(
-                &Session::on_write,
-                shared_from_this()));
+            output_buffer();
         }
 
-        // Close the WebSocket connection
-        _ws.async_close(websocket::close_code::normal,
-            beast::bind_front_handler(
-                &Session::on_close,
-                shared_from_this()));
+        if ( _logged_in )
+        {
+            if ( _notified && !_subscribed )
+            {
+                SDL_Log("Notified, but not subscribed!");
+                _ws.async_read(
+                    _buffer,
+                    beast::bind_front_handler(
+                        &Session::on_read,
+                        shared_from_this()));
+            }
+            else if ( _subscribed && _sub_count != 2 )
+            {
+                SDL_Log("Subscribed but not finished");
+                _sub_count++;
+                _ws.async_read(
+                    _buffer,
+                    beast::bind_front_handler(
+                        &Session::on_read,
+                        shared_from_this()));
+            }
+            else
+            {
+                _ws.async_write(
+                    net::buffer( *_queue.front() ),
+                    beast::bind_front_handler(
+                        &Session::on_write,
+                        shared_from_this()));
+            }
+
+        }
+        else
+        {
+            // Close the WebSocket connection
+            _ws.async_close(websocket::close_code::normal,
+                beast::bind_front_handler(
+                    &Session::on_close,
+                    shared_from_this()));
+        }
+
     }
 
     void
@@ -211,29 +272,104 @@ namespace tda
         std::cout << beast::make_printable(_buffer.data()) << std::endl;
     }
 
+    void 
+    Session::send_message( std::shared_ptr<std::string const> const& s )
+    {
+        SDL_Log("Session::send_message");
+
+        _queue.push_back( s );
+
+        if ( _queue.size() > 1 )
+        {
+            SDL_Log("Session::send_message( Already Writing )");
+            return;
+        }
+
+        _ws.async_write(
+            net::buffer( *_queue.front() ),
+                beast::bind_front_handler(
+                    &Session::on_write,
+                    shared_from_this()));
+    }
+
     bool 
     Session::on_login( beast::error_code ec )
     {
-        pt::ptree login_response;
-        std::stringstream buffer_stream;
-        buffer_stream << beast::make_printable( _buffer.data() );
+        std::string response_code;
+        std::string s(buffer_cast<const char*>(_buffer.data()), _buffer.size());
+        SDL_Log("Login Response Stream: \n%s", s.c_str() );
 
-        pt::json_parser::read_json( buffer_stream, login_response );
+        std::size_t found = s.find("code");
+        response_code = s[found + 6];
+        SDL_Log("Code: %s", response_code.c_str() );
 
-        if ( login_response.get<std::string>("response.content.code") == "3" )
+        found = s.find("msg");
+        std::string response_msg = s.substr( found, 4 );
+
+        if ( response_code == "3" )
         {
             // login failed
-            SDL_Log("Session::on_login( msg: %s )", login_response.get<std::string>("response.content.msg").c_str() );
             _logged_in = false;
         }
-        else if ( login_response.get<std::string>("response.content.code") == "0" )
+        else if ( response_code == "0" )
         {
             // login success
-            SDL_Log("Session::on_login( msg: %s )", login_response.get<std::string>("response.content.msg").c_str() );
             _logged_in = true;
         }
 
+        // clear request from stream 
+        _queue.erase( _queue.begin() );
+
         return _logged_in;
+    }
+
+    void 
+    Session::on_logout( beast::error_code ec )
+    {
+        
+    }
+
+    void
+    Session::on_notify( beast::error_code ec )
+    {
+        SDL_Log("Session::on_notify");
+        std::string s(buffer_cast<const char*>(_buffer.data()), _buffer.size());
+        std::size_t found = s.find("notify");
+        SDL_Log("Notify Response Stream: \n%s", s.c_str() );
+        if ( found != std::string::npos )
+        {
+            _notified = true;
+            _buffer.consume( _buffer.size() );
+        }
+
+        // maybe store the heartbeat 
+    }
+
+    void
+    Session::on_subscription( beast::error_code ec )
+    {
+        SDL_Log("Session::on_subscription");
+        std::string sub_code;
+        std::string s(buffer_cast<const char*>(_buffer.data()), _buffer.size());
+        std::size_t found = s.find("code");
+        SDL_Log("SUBS Response Stream: \n%s", s.c_str() );
+        if ( found != std::string::npos )
+        {
+            sub_code = s[found + 6];
+            SDL_Log("SUBS code %s", sub_code.c_str() );
+            if ( sub_code == "0" )
+            {
+                _subscribed = true;
+            }
+            _buffer.consume( _buffer.size() );
+        }
+    }
+
+    void 
+    Session::output_buffer()
+    {
+        std::string s(buffer_cast<const char*>(_buffer.data()), _buffer.size());
+        SDL_Log("Buffer(Response): \n%s", s.c_str() );
     }
 
 
