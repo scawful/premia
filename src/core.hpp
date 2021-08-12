@@ -21,6 +21,8 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
+#include <thread>
+#include <iomanip>
 
 // SDL2
 #include <SDL2/SDL.h>
@@ -44,7 +46,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
+#define BOOST_ASIO_ENABLE_HANDLER_TRACKING
 
 // OpenSSL
 #include <openssl/ssl.h>
