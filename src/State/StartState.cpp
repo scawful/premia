@@ -138,6 +138,15 @@ void StartState::update( Manager* premia )
     if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
         ImGui::OpenPopup("Quick Order");
 
+    ImGui::SameLine();
+    if ( ImGui::Button("Load Responses from WebSocket", ImVec2(220, 30)) )
+    {
+        for ( auto response : tda_data_interface->get_session_responses() )
+        {
+            SDL_Log("Response: %s", response.c_str() );
+        }
+    }
+
     // Always center this window when appearing
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
