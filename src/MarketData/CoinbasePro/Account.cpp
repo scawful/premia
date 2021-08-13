@@ -10,8 +10,6 @@ namespace cbp
             for ( auto& data_it: account_it.second )
             {
                 new_position_data[data_it.first] = data_it.second.get_value<std::string>();
-                
-                SDL_Log("%s", data_it.second.get_value<std::string>().c_str() );
             }
             accounts_vector.push_back( new_position_data );
         }
