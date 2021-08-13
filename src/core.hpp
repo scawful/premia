@@ -23,6 +23,7 @@
 #include <memory>
 #include <thread>
 #include <iomanip>
+#include <mutex>
 
 // SDL2
 #include <SDL2/SDL.h>
