@@ -14,6 +14,9 @@ namespace tda
     void 
     Session::fail( beast::error_code ec, char const* what )
     {
+        if( ec == net::error::operation_aborted || ec == websocket::error::closed )
+            return;
+        
         SDL_Log( "Session::fail( %s: %s )", ec.message().c_str(), what );
     }
 
@@ -144,7 +147,6 @@ namespace tda
         SDL_Log("Session::on_write");
         SDL_Log("Queue Request Stream:\n%s", _queue[0].get()->c_str() );
 
-        
         if ( _logged_in )
         {
             // clear request from the queue
@@ -153,33 +155,20 @@ namespace tda
             if ( !_queue.empty() )
             {
                 SDL_Log("Session::on_write( Queue Not Empty )");
-                _ws.async_read(
-                    _buffer,
-                    beast::bind_front_handler(
-                        &Session::on_read,
-                        shared_from_this()));
             }
             else
             {
                 // logout
                 SDL_Log("Session::on_write( Logging out ) ");
                 _logged_in = false;
-                _ws.async_read(
-                    _buffer,
-                    beast::bind_front_handler(
-                        &Session::on_read,
-                        shared_from_this()));
             }
         }
-        else
-        {
-            // Read a message into our buffer
-            _ws.async_read(
-                _buffer,
-                beast::bind_front_handler(
-                    &Session::on_read,
-                    shared_from_this()));
-        }
+
+        _ws.async_read(
+            _buffer,
+            beast::bind_front_handler(
+                &Session::on_read,
+                shared_from_this()));
 
     }
 
@@ -194,26 +183,22 @@ namespace tda
             return fail(ec, "read");
 
         SDL_Log("Session::on_read");
+        std::string response(buffer_cast<const char*>( _buffer.data()), _buffer.size()); 
+        SDL_Log("Server Response: %s", response.c_str() );
+        _response_stack.push_back( response );
 
         // check login first
         // originally checked the boolean but this had a weird logical byproduct on subsequent streams
         // so now we check the queue size, first request is always login 
-        if ( _queue_size == _queue.size() )
-        {
+        if ( _queue_size == _queue.size() ) {
             on_login( ec );
             _buffer.consume( _buffer.size() );
         }
-        else if ( !_notified )
-        {
+        else if ( !_notified ) {
             on_notify( ec );
         }
-        else if ( !_subscribed )
-        {
+        else if ( !_subscribed ) {
             on_subscription( ec );
-        }
-        else
-        {
-            output_buffer();
         }
 
         if ( _logged_in )
@@ -272,6 +257,7 @@ namespace tda
         std::cout << beast::make_printable(_buffer.data()) << std::endl;
     }
 
+    // sends a message to the queue from the main threads
     void 
     Session::send_message( std::shared_ptr<std::string const> const& s )
     {
@@ -290,6 +276,13 @@ namespace tda
                 beast::bind_front_handler(
                     &Session::on_write,
                     shared_from_this()));
+    }
+
+    // returns the cumulative vector of responses from the server
+    std::vector<std::string const> 
+    Session::receive_response()
+    {
+        return _response_stack;
     }
 
     bool 
@@ -364,13 +357,5 @@ namespace tda
             _buffer.consume( _buffer.size() );
         }
     }
-
-    void 
-    Session::output_buffer()
-    {
-        std::string s(buffer_cast<const char*>(_buffer.data()), _buffer.size());
-        SDL_Log("Buffer(Response): \n%s", s.c_str() );
-    }
-
 
 }
