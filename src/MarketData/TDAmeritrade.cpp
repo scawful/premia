@@ -104,7 +104,7 @@ namespace tda
             curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
 
             // specify we want to post 
-            curl_easy_setopt(curl, CURLOPT_HTTPPOST, TRUE);
+            curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
 
             // set the headers for the request
             struct curl_slist *headers = NULL;
@@ -509,7 +509,7 @@ namespace tda
     {
         switch ( type )
         {
-            case QUOTE:
+            case GET_QUOTE:
                 _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
                 break;
             case PRICE_HISTORY:
@@ -522,6 +522,7 @@ namespace tda
                 break;
         }
 
+        _session_active = false;
         _period_type = DAY;
         _frequency_type = MINUTE;
         _col_name = "Open";
@@ -569,24 +570,37 @@ namespace tda
         boost::property_tree::write_json( logout_text_stream, logout_request );
         std::string logout_text = logout_text_stream.str();
 
+        std::stringstream chart_request_stream;
+        boost::property_tree::write_json( chart_request_stream, create_service_request( CHART_EQUITY, "AAPL", "0,1,2,3,4,5,6,7,8" ) );
+        std::string chart_equity_text = chart_request_stream.str();
+
         _request_queue.push_back( std::make_shared<std::string const>(login_text) );
         _request_queue.push_back( std::make_shared<std::string const>(request_text) );
         _request_queue.push_back( std::make_shared<std::string const>(logout_text) );
 
         boost::asio::io_context ioc;
         boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
-        //load_root_certificates( context );
+
         _websocket_session = std::make_shared<tda::Session>( ioc, context, _request_queue );
         _websocket_session->run( host.c_str(), port.c_str() );
+
         //std::thread([&ioc] { ioc.run(); }).detach();
+        _session_active = true;
         ioc.run();
+
+        //_websocket_session->send_message( std::make_shared<std::string const>(chart_equity_text) );
+    }
+
+    std::vector<std::string const> TDAmeritrade::get_session_responses()
+    {
+        return _websocket_session->receive_response();
     }
 
     void TDAmeritrade::set_retrieval_type( RetrievalType type )
     {
         switch ( type )
         {
-            case QUOTE:
+            case GET_QUOTE:
                 this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
                 break;
             case PRICE_HISTORY:
@@ -780,6 +794,11 @@ namespace tda
     {
         get_access_token( true );
         log_expiration_time();
+    }
+
+    bool TDAmeritrade::is_session_active()
+    {
+        return _session_active;
     }
 
 }

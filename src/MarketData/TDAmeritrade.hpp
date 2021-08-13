@@ -120,6 +120,7 @@ namespace tda
         int _period;
         int _frequency;
         bool _access_token_found;
+        bool _session_active;
         PeriodType _period_type;
         FrequencyType _frequency_type;
         std::string _base_url;
@@ -165,7 +166,9 @@ namespace tda
         TDAmeritrade( RetrievalType type );
 
         void start_session();
-        void update_session();
+        std::vector<std::string const> get_session_responses();
+        
+
         void set_retrieval_type( RetrievalType type );
         void set_period_type( PeriodType interval );
         void set_col_name( std::string col_name );
@@ -188,6 +191,8 @@ namespace tda
 
         std::string getBaseUrl();
         void manual_authentication();
+
+        bool is_session_active();
     };
 
 
