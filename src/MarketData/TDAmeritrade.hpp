@@ -136,14 +136,14 @@ namespace tda
         std::shared_ptr<tda::Session> _websocket_session;
         std::vector<std::shared_ptr<std::string const>> _request_queue;
 
+        boost::asio::io_context ioc;
+
         // string manipulation 
         std::string get_api_interval_value(int value);
         std::string get_api_frequency_type(int value);
         std::string get_api_period_amount(int value);
         std::string get_api_frequency_amount(int value);
-        std::string timestamp_from_string(std::string date);
         bool string_replace(std::string& str, const std::string from, const std::string to);
-        std::string build_url(std::string ticker, std::string start_date, std::string end_date);
 
         // curl functions
         void download_file(std::string url, std::string filename);
@@ -166,7 +166,7 @@ namespace tda
         TDAmeritrade( RetrievalType type );
 
         void start_session();
-        std::vector<std::string const> get_session_responses();
+        std::vector<std::string> get_session_responses();
         
 
         void set_retrieval_type( RetrievalType type );

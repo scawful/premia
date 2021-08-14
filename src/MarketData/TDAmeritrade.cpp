@@ -2,6 +2,7 @@
 
 namespace tda
 {
+    // PRIVATE FUNCTIONS =========================================================================
 
     std::string TDAmeritrade::get_api_interval_value(int value)
     {
@@ -23,24 +24,6 @@ namespace tda
         return EnumAPIFreqAmt[value];
     }
 
-    std::string TDAmeritrade::timestamp_from_string(std::string date)
-    {
-        struct std::tm time = {0,0,0,0,0,0,0,0,0};
-        std::istringstream ss(date);
-        ss >> std::get_time(&time, "%Y-%m-%d");
-        if ( ss.fail() )
-        {
-            std::cerr  << "ERROR: Cannot parse date string (" << date <<"); required format %Y-%m-%d" << std::endl;
-            exit(1);
-        } 
-        time.tm_hour = 0;
-        time.tm_min = 0;
-        time.tm_sec = 0;
-        std::time_t epoch = std::mktime(&time);
-
-        return std::to_string(epoch);
-    }
-
     bool TDAmeritrade::string_replace(std::string& str, const std::string from, const std::string to)
     {
         size_t start = str.find(from);
@@ -51,16 +34,6 @@ namespace tda
 
         str.replace(start, from.length(), to);
         return true;
-    }
-
-    std::string TDAmeritrade::build_url(std::string ticker, std::string start, std::string end)
-    {
-        std::string url = this->_base_url;
-        string_replace(url, "{ticker}", ticker);
-        string_replace(url, "{start_time}", timestamp_from_string(start));
-        string_replace(url, "{end_time}", timestamp_from_string(end));
-        string_replace(url, "{periodType}", get_api_interval_value(this->_period_type));
-        return url;
     }
 
     // SIMPLE CURL DOWNLOAD, NO PARAMETERS OR AUTHORIZATION REQUIRED 
@@ -540,6 +513,8 @@ namespace tda
         //get_user_principals();
     }
 
+    // PUBLIC FUNCTIONS =========================================================================
+
     void TDAmeritrade::start_session()
     {
         std::string host;
@@ -578,20 +553,24 @@ namespace tda
         _request_queue.push_back( std::make_shared<std::string const>(request_text) );
         _request_queue.push_back( std::make_shared<std::string const>(logout_text) );
 
-        boost::asio::io_context ioc;
         boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
 
         _websocket_session = std::make_shared<tda::Session>( ioc, context, _request_queue );
         _websocket_session->run( host.c_str(), port.c_str() );
 
-        //std::thread([&ioc] { ioc.run(); }).detach();
+        SDL_Log("~~~");
         _session_active = true;
-        ioc.run();
+        // std::thread([&ioc] { ioc.run(); }).detach();
+
+        std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
+        session_thread.detach();
+        
+        //ioc.run();
 
         //_websocket_session->send_message( std::make_shared<std::string const>(chart_equity_text) );
     }
 
-    std::vector<std::string const> TDAmeritrade::get_session_responses()
+    std::vector<std::string> TDAmeritrade::get_session_responses()
     {
         return _websocket_session->receive_response();
     }
@@ -636,7 +615,7 @@ namespace tda
         string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
         string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
 
-        if (!ext)
+        if ( !ext )
             string_replace(new_url, "{ext}", "false");
         else
             string_replace(new_url, "{ext}", "true");
