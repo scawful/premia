@@ -279,7 +279,7 @@ namespace tda
     }
 
     // returns the cumulative vector of responses from the server
-    std::vector<std::string const> 
+    std::vector<std::string> 
     Session::receive_response()
     {
         return _response_stack;

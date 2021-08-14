@@ -23,7 +23,7 @@ namespace tda
         beast::flat_buffer _buffer;
         websocket::stream<beast::ssl_stream <beast::tcp_stream>> _ws;
         std::vector<std::shared_ptr<std::string const>> _queue;
-        std::vector<std::string const> _response_stack;
+        std::vector<std::string> _response_stack;
         std::mutex _mutex;
         std::lock_guard<std::mutex> _lock{ _mutex };
         std::string _host;
@@ -53,7 +53,7 @@ namespace tda
         void on_close( beast::error_code ec );
 
         void send_message( std::shared_ptr<std::string const> const& s );
-        std::vector<std::string const> receive_response();
+        std::vector<std::string> receive_response();
 
         bool on_login( beast::error_code ec );
         void on_logout( beast::error_code ec );
