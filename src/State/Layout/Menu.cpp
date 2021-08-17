@@ -2,6 +2,7 @@
 #include "../QuoteState.hpp"
 #include "../OptionState.hpp"
 #include "../StartState.hpp"
+#include "../StreamState.hpp"
 // #include "../PortfolioState.hpp"
 
 void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_data_interface, std::string title_string )
@@ -129,7 +130,13 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
 
         if ( ImGui::BeginMenu("Analyze"))
         {
-            if ( ImGui::MenuItem("Instrument Quote") )
+
+            if ( ImGui::MenuItem("Live Quotes") )
+            {
+                premia->change( StreamState::instance() );
+            }
+
+            if ( ImGui::MenuItem("Static Quotes") )
             {
                 premia->change( QuoteState::instance() );
             }

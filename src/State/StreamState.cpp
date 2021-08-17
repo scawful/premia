@@ -1,0 +1,226 @@
+//  StreamState Class
+#include "StreamState.hpp"
+#include "StartState.hpp"
+#include "OptionState.hpp"
+#include "Layout/Menu.hpp"
+
+StreamState StreamState::m_StreamState;
+
+void StreamState::set_instrument( std::string ticker )
+{
+    ticker_symbol = ticker;
+}
+
+void StreamState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+{
+    this->pRenderer = pRenderer;
+    this->pWindow = pWindow;
+    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
+    title_string = "Live Quotes";
+
+    for ( auto v: request_fields )
+    {
+        v = false;
+    }
+
+    ImGui::CreateContext();
+    ImPlot::CreateContext();
+	ImGuiSDL::Initialize(pRenderer, 782, 543);
+    ImGui::StyleColorsClassic();
+
+}
+
+void StreamState::cleanup()
+{
+    SDL_Log("StreamState Cleanup\n");
+}
+
+void StreamState::pause()
+{
+    SDL_Log("StreamState Pause\n");
+}
+
+void StreamState::resume()
+{
+    SDL_Log("StreamState Resume\n");
+}
+
+void StreamState::handleEvents( Manager* premia )
+{
+    int wheel = 0;
+    SDL_Event event;
+
+    ImGuiIO& io = ImGui::GetIO();
+
+    while ( SDL_PollEvent(&event) ) 
+    {
+        switch ( event.type ) 
+        {
+            case SDL_KEYDOWN:
+                switch ( event.key.keysym.sym )
+                {
+                    case SDLK_ESCAPE:
+                        premia->quit();
+                        break;
+                    case SDLK_LEFT:
+                        premia->change( StartState::instance() );
+                        break;
+                    case SDLK_RIGHT:
+                        premia->change( OptionState::instance() );
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case SDL_TEXTINPUT:
+                io.AddInputCharactersUTF8(event.text.text);
+                break;
+            
+            case SDL_KEYUP:
+            {
+                int key = event.key.keysym.scancode;
+                IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
+                io.KeysDown[key] = (event.type == SDL_KEYDOWN);
+                io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
+                io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
+                io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
+                break;
+            }
+
+            case SDL_WINDOWEVENT:
+                switch ( event.window.event ) 
+                {
+                    case SDL_WINDOWEVENT_CLOSE:   // exit game
+                        premia->quit();
+                        break;
+                    case SDL_WINDOWEVENT_SIZE_CHANGED:
+                        io.DisplaySize.x = static_cast<float>(event.window.data1);
+					    io.DisplaySize.y = static_cast<float>(event.window.data2);
+                        break;
+
+                    default:
+                        break;
+                }
+                break;      
+
+            case SDL_MOUSEWHEEL:
+                wheel = event.wheel.y;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    int mouseX, mouseY;
+    const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+
+    io.DeltaTime = 1.0f / 60.0f;
+    io.MousePos = ImVec2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+    io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
+    io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+    io.MouseWheel = static_cast<float>(wheel);
+}
+
+void StreamState::update( Manager* premia )
+{    
+    draw_imgui_menu( premia, tda_data_interface, title_string );
+
+    ImGui::Text( "LEVEL ONE QUOTE (7:30am – 8pm EST)" );
+    ImGui::SameLine();
+
+    static char buf[64] = "";
+    ImGui::Text("Symbol: ");
+    ImGui::SameLine(); ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
+    ImGui::SameLine(); 
+    if ( ImGui::Button("Search") )
+    {
+        if ( strcmp(buf, "") != 0 )
+        {
+            ticker_symbol = buf;
+        }
+    }
+
+    ImGui::SameLine();
+    if ( ImGui::Button("Customize Fields") )
+    {
+        ImGui::OpenPopup("Fields");
+    }
+
+    if ( ImGui::BeginPopupModal("Fields", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
+    {
+        ImGui::BeginChild("child", ImVec2(0, 60), true);
+        for ( int i = 0; i < 52; i++ )
+        {
+            ImGui::Checkbox(quote_fields[i], &request_fields[i]);
+        }
+        ImGui::EndChild();
+
+        if ( ImGui::Button("Close", ImVec2(120, 0)) ) { ImGui::CloseCurrentPopup(); }
+        ImGui::EndPopup();
+    }
+
+    if ( tda_data_interface->is_session_logged_in() )
+    {
+        if ( ImGui::Button("Logout") )
+        {
+            tda_data_interface->send_logout_request();
+        }
+    }
+    else
+    {
+        if ( ImGui::Button("Login") )
+        {
+            std::string fields = "";
+            for ( int i = 0; i < 53; i++ )
+            {
+                if ( request_fields[i] == true )
+                    fields += std::to_string(i) + ",";
+            }
+            fields.replace(fields.end(), fields.end(), "");
+            tda_data_interface->start_session( ticker_symbol, fields );
+        }
+    }
+
+    ImGui::BulletText("NASDAQ (Quotes and Trades)");
+    ImGui::BulletText("OTCBB (Quotes and Trades)");
+    ImGui::BulletText("Listed (NYSE, AMEX, Pacific Quotes and Trades)");
+    ImGui::BulletText("Pinks (Quotes only)");
+    ImGui::BulletText("Mutual Fund (No quotes)");
+    ImGui::BulletText("Indices (Trades only)");
+    ImGui::BulletText("Indicators");
+    ImGui::Spacing();
+
+    ImPlot::GetStyle().UseLocalTime = true;
+    ImPlot::SetNextPlotFormatY("$%.2f");
+    ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 0, 100, ImGuiCond_Once);
+
+    if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL, ImVec2(-1,0),0,
+                            ImPlotAxisFlags_Time,
+                            ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
+    {
+        //createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
+        ImPlot::EndPlot();
+    }
+
+
+    ImGui::End();
+
+    SDL_RenderClear( this->pRenderer );
+}
+
+void StreamState::draw( Manager* game )
+{
+    // fill window bounds
+    int w = 1920, h = 1080;
+    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_Rect f = {0, 0, 1920, 1080};
+    SDL_RenderFillRect( this->pRenderer, &f );
+
+    ImGui::Render();
+    ImGuiSDL::Render(ImGui::GetDrawData());
+
+    SDL_RenderPresent( this->pRenderer );
+}
