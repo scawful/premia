@@ -166,21 +166,11 @@ namespace tda
         TDAmeritrade( RetrievalType type );
 
         void start_session();
+        void start_session( std::string ticker, std::string fields );
+        void send_session_request( std::string request );
+        void send_logout_request();
+        bool is_session_logged_in();
         std::vector<std::string> get_session_responses();
-        
-
-        void set_retrieval_type( RetrievalType type );
-        void set_period_type( PeriodType interval );
-        void set_col_name( std::string col_name );
-
-        void set_price_history_parameters( std::string ticker, PeriodType ptype, int period_amt, 
-                                           FrequencyType ftype, int freq_amt, bool ext = true );
-        void set_price_history_parameters( std::string ticker, PeriodType ptype, 
-                                           time_t start_date, time_t end_date,
-                                           FrequencyType ftype, int freq_amt, bool ext = true );
-        void set_option_chain_parameters( std::string ticker, std::string contractType, std::string strikeCount,
-                                          bool includeQuotes, std::string strategy, std::string range,
-                                          std::string expMonth, std::string optionType );
 
         boost::property_tree::ptree createPropertyTree( std::string ticker, std::string new_url );
         boost::shared_ptr<tda::Quote> createQuote( std::string ticker );        
@@ -189,6 +179,18 @@ namespace tda
         boost::shared_ptr<tda::OptionChain> createOptionChain( std::string ticker );
         boost::shared_ptr<tda::Account> createAccount( std::string account_num );
 
+        // setters 
+        void set_retrieval_type( RetrievalType type );
+        void set_period_type( PeriodType interval );
+        void set_col_name( std::string col_name );
+
+        void set_price_history_parameters( std::string ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext = true );
+        void set_price_history_parameters( std::string ticker, PeriodType ptype, time_t start_date, time_t end_date, 
+                                           FrequencyType ftype, int freq_amt, bool ext = true );
+        void set_option_chain_parameters( std::string ticker, std::string contractType, std::string strikeCount, bool includeQuotes, 
+                                          std::string strategy, std::string range, std::string expMonth, std::string optionType );
+
+        // auxiliary functions 
         std::string getBaseUrl();
         void manual_authentication();
 

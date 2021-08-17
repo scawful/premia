@@ -560,113 +560,76 @@ namespace tda
 
         SDL_Log("~~~");
         _session_active = true;
-        // std::thread([&ioc] { ioc.run(); }).detach();
 
         std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
         session_thread.detach();
         
-        //ioc.run();
-
         //_websocket_session->send_message( std::make_shared<std::string const>(chart_equity_text) );
+    }
+
+    // LIVE QUOTE SESSION EASY FUNCTION 
+    void TDAmeritrade::start_session( std::string ticker, std::string fields )
+    {
+        std::string host;
+        std::string port = "443";
+        try {
+            host = get_user_principals().get<std::string>("streamerInfo.streamerSocketUrl");
+        }
+        catch ( std::exception& ptree_bad_path ) {
+            SDL_Log("Start_Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what() );
+        }
+
+        pt::ptree login_request = create_login_request();
+
+        std::stringstream login_text_stream;
+        boost::property_tree::write_json( login_text_stream, login_request );
+        std::string login_text = login_text_stream.str();
+
+        std::stringstream requests_text_stream;
+        boost::property_tree::write_json( requests_text_stream, create_service_request( QUOTE, ticker, fields ) );
+        std::string request_text = requests_text_stream.str();
+
+        _request_queue.push_back( std::make_shared<std::string const>(login_text) );
+        _request_queue.push_back( std::make_shared<std::string const>(request_text) );
+
+        boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
+
+        _websocket_session = std::make_shared<tda::Session>( ioc, context, _request_queue );
+        _websocket_session->run( host.c_str(), port.c_str() );
+
+        SDL_Log("~~~");
+        _session_active = true;
+
+        std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
+        session_thread.detach();
+
+    }
+
+    void TDAmeritrade::send_session_request( std::string request )
+    {
+        _websocket_session->send_message( std::make_shared<std::string const>(request) );
+    }
+
+    void TDAmeritrade::send_logout_request()
+    {
+        pt::ptree logout_request = create_logout_request();
+        std::stringstream logout_text_stream;
+        pt::write_json( logout_text_stream, logout_request );
+        std::string logout_text = logout_text_stream.str();
+        _websocket_session->send_message( std::make_shared<std::string const>(logout_text) );
+    }
+
+    bool TDAmeritrade::is_session_logged_in()
+    {
+        if ( _session_active )
+            return _websocket_session->is_logged_in();
+        else 
+            return false;
     }
 
     std::vector<std::string> TDAmeritrade::get_session_responses()
     {
         return _websocket_session->receive_response();
-    }
-
-    void TDAmeritrade::set_retrieval_type( RetrievalType type )
-    {
-        switch ( type )
-        {
-            case GET_QUOTE:
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
-                break;
-            case PRICE_HISTORY:
-                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=ytd&period=1&frequencyType=daily&frequency=1&needExtendedHoursData=true";
-                break;
-            case OPTION_CHAIN:
-                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
-                break;
-            default:
-                break;
-        }
-    }
-
-    void TDAmeritrade::set_period_type( PeriodType periodType )
-    {
-        this->_period_type = periodType;
-    }
-
-    void TDAmeritrade::set_col_name( std::string name )
-    {
-        this->_col_name = name;
-    }
-
-    void TDAmeritrade::set_price_history_parameters( std::string ticker, PeriodType ptype, int period_amt, 
-                                                     FrequencyType ftype, int freq_amt, bool ext )
-    {
-        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
-
-        string_replace(new_url, "{ticker}", ticker);
-        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
-        string_replace(new_url, "{period}", get_api_period_amount(period_amt));
-        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
-        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
-
-        if ( !ext )
-            string_replace(new_url, "{ext}", "false");
-        else
-            string_replace(new_url, "{ext}", "true");
-
-        this->_base_url = new_url;
-        this->_current_ticker = ticker;
-    }
-
-    void TDAmeritrade::set_price_history_parameters( std::string ticker, PeriodType ptype, 
-                                                     time_t start_date, time_t end_date,
-                                                     FrequencyType ftype, int freq_amt, bool ext )
-    {
-        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
-
-        string_replace(new_url, "{ticker}", ticker);
-        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
-        string_replace(new_url, "{startDate}", boost::lexical_cast<std::string>(start_date));
-        string_replace(new_url, "{endDate}", boost::lexical_cast<std::string>(end_date));
-        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
-        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
-
-        if (!ext)
-            string_replace(new_url, "{ext}", "false");
-        else
-            string_replace(new_url, "{ext}", "true");
-
-        this->_base_url = new_url;
-        this->_current_ticker = ticker;
-    }
-
-    void TDAmeritrade::set_option_chain_parameters( std::string ticker, std::string contractType, std::string strikeCount,
-                                                    bool includeQuotes, std::string strategy, std::string range,
-                                                    std::string expMonth, std::string optionType )
-    {
-        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
-
-        string_replace(new_url, "{ticker}", ticker);
-        string_replace(new_url, "{contractType}", contractType);
-        string_replace(new_url, "{strikeCount}", strikeCount);
-        string_replace(new_url, "{strategy}", strategy);
-        string_replace(new_url, "{range}", range);
-        string_replace(new_url, "{expMonth}", expMonth);
-        string_replace(new_url, "{optionType}", optionType);
-
-        if (!includeQuotes)
-            string_replace(new_url, "{includeQuotes}", "FALSE");
-        else
-            string_replace(new_url, "{includeQuotes}", "TRUE");
-
-        this->_base_url = new_url;
-        this->_current_ticker = ticker;
     }
 
     boost::property_tree::ptree TDAmeritrade::createPropertyTree( std::string ticker, std::string new_url )
@@ -763,6 +726,104 @@ namespace tda
         boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( propertyTree );
         return new_account_data;
     }
+
+    // SETTERS ====================================================================
+
+    void TDAmeritrade::set_retrieval_type( RetrievalType type )
+    {
+        switch ( type )
+        {
+            case GET_QUOTE:
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
+                break;
+            case PRICE_HISTORY:
+                //this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=ytd&period=1&frequencyType=daily&frequency=1&needExtendedHoursData=true";
+                break;
+            case OPTION_CHAIN:
+                this->_base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+                break;
+            default:
+                break;
+        }
+    }
+
+    void TDAmeritrade::set_period_type( PeriodType periodType )
+    {
+        this->_period_type = periodType;
+    }
+
+    void TDAmeritrade::set_col_name( std::string name )
+    {
+        this->_col_name = name;
+    }
+
+    void TDAmeritrade::set_price_history_parameters( std::string ticker, PeriodType ptype, int period_amt, 
+                                                     FrequencyType ftype, int freq_amt, bool ext )
+    {
+        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
+        string_replace(new_url, "{ticker}", ticker);
+        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
+        string_replace(new_url, "{period}", get_api_period_amount(period_amt));
+        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
+        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
+
+        if ( !ext )
+            string_replace(new_url, "{ext}", "false");
+        else
+            string_replace(new_url, "{ext}", "true");
+
+        this->_base_url = new_url;
+        this->_current_ticker = ticker;
+    }
+
+    void TDAmeritrade::set_price_history_parameters( std::string ticker, PeriodType ptype, 
+                                                     time_t start_date, time_t end_date,
+                                                     FrequencyType ftype, int freq_amt, bool ext )
+    {
+        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
+        string_replace(new_url, "{ticker}", ticker);
+        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
+        string_replace(new_url, "{startDate}", boost::lexical_cast<std::string>(start_date));
+        string_replace(new_url, "{endDate}", boost::lexical_cast<std::string>(end_date));
+        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
+        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
+
+        if (!ext)
+            string_replace(new_url, "{ext}", "false");
+        else
+            string_replace(new_url, "{ext}", "true");
+
+        this->_base_url = new_url;
+        this->_current_ticker = ticker;
+    }
+
+    void TDAmeritrade::set_option_chain_parameters( std::string ticker, std::string contractType, std::string strikeCount,
+                                                    bool includeQuotes, std::string strategy, std::string range,
+                                                    std::string expMonth, std::string optionType )
+    {
+        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+
+        string_replace(new_url, "{ticker}", ticker);
+        string_replace(new_url, "{contractType}", contractType);
+        string_replace(new_url, "{strikeCount}", strikeCount);
+        string_replace(new_url, "{strategy}", strategy);
+        string_replace(new_url, "{range}", range);
+        string_replace(new_url, "{expMonth}", expMonth);
+        string_replace(new_url, "{optionType}", optionType);
+
+        if (!includeQuotes)
+            string_replace(new_url, "{includeQuotes}", "FALSE");
+        else
+            string_replace(new_url, "{includeQuotes}", "TRUE");
+
+        this->_base_url = new_url;
+        this->_current_ticker = ticker;
+    }
+
+    // AUXILIARY FUNCTIONS ====================================================
 
     std::string TDAmeritrade::getBaseUrl()
     {
