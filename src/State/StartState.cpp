@@ -160,7 +160,7 @@ void StartState::update( Manager* premia )
         ImGui::SameLine(); 
         if ( ImGui::Button("Search") )
         {
-            if ( buf != "" )
+            if ( strcmp(buf, "") != 0 )
             {
                 new_ticker = std::string(buf);
                 std::cout << "new ticker " << new_ticker << std::endl;
@@ -190,7 +190,7 @@ void StartState::update( Manager* premia )
             std::string bidPrice = quotes[new_ticker]->getQuoteVariable("bidPrice");
             security_cost = std::stod( bidPrice );
             security_cost *= order_quantity;
-            ImGui::Text("Cost: %d", security_cost );
+            ImGui::Text("Cost: %lf", security_cost );
         }
 
         ImGui::Separator();
