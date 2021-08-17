@@ -24,8 +24,6 @@ namespace tda
         websocket::stream<beast::ssl_stream <beast::tcp_stream>> _ws;
         std::vector<std::shared_ptr<std::string const>> _queue;
         std::vector<std::string> _response_stack;
-        std::mutex _mutex;
-        std::lock_guard<std::mutex> _lock{ _mutex };
         std::string _host;
         std::size_t _queue_size;
 
@@ -59,6 +57,9 @@ namespace tda
         void on_logout( beast::error_code ec );
         void on_notify( beast::error_code ec );
         void on_subscription( beast::error_code ec );
+
+        bool is_logged_in();
+        bool is_subscribed();
 
     };
 }

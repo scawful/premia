@@ -358,4 +358,16 @@ namespace tda
         }
     }
 
+    bool
+    Session::is_logged_in()
+    {
+        return _logged_in;
+    }
+
+    bool
+    Session::is_subscribed()
+    {
+        return _subscribed;
+    }
+
 }
