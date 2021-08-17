@@ -303,7 +303,7 @@ void QuoteState::update( Manager* premia )
     ImGui::SameLine(); 
     if ( ImGui::Button("Search") )
     {
-        if ( buf != "" )
+        if ( strcmp(buf, "") != 0 )
         {
             quoteData.reset();
             priceHistoryData.reset();
