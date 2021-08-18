@@ -70,6 +70,7 @@ add_executable(Premia Premia.cpp
                     MarketData/TDAmeritrade/Account.cpp
                     State/Manager.cpp State/DemoState.cpp
                     State/StartState.cpp State/QuoteState.cpp State/OptionState.cpp
+                    State/StreamState.cpp
                     State/Layout/Menu.cpp
                     Libraries/imgui/imgui.cpp
                     Libraries/imgui/imgui_demo.cpp
