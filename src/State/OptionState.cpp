@@ -2,6 +2,7 @@
 #include "OptionState.hpp"
 #include "StartState.hpp"
 #include "QuoteState.hpp"
+#include "Layout/Menu.hpp"
 
 OptionState OptionState::m_OptionState;
 static bool select_options[] = {false};
@@ -103,41 +104,13 @@ void OptionState::handleEvents( Manager* premia )
     io.MouseWheel = static_cast<float>(wheel);
 }
 
-void OptionState::update( Manager* game )
+void OptionState::update( Manager* premia )
 {    
-    ImGui::NewFrame();
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
-    
-    if (!ImGui::Begin( "Option Chain", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize ))
-    {
-        // Early out if the window is collapsed, as an optimization.
-        ImGui::End();
-        return;
-    }
+    std::string title_string = "Option Chain: " + optionChainData->getOptionChainDataVariable("symbol");
+    draw_imgui_menu( premia, tda_data_interface, title_string );
 
-    ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
-
-    // Menu Bar
-    if (ImGui::BeginMenuBar())
-    {
-        if (ImGui::BeginMenu("Trade"))
-        {
-            ImGui::MenuItem("Main menu bar");
-            ImGui::EndMenu();
-        }
-        if ( ImGui::BeginMenu("Analyze"))
-        {
-            ImGui::MenuItem("Risk Contribution");
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
-
-    ImGui::Text( "%s", "Instrument Quote" );
+    ImGui::Text( "%s (%s) [B: %s  A: %s]", optionChainData->getOptionChainDataVariable("symbol").c_str(), optionChainData->getUnderlyingDataVariable("markPercentChange").c_str(), optionChainData->getUnderlyingDataVariable("bid").c_str(), optionChainData->getUnderlyingDataVariable("ask").c_str() );
     ImGui::Spacing();
-    ImGui::Text( "%s", optionChainData->getOptionChainDataVariable("symbol").c_str() );
 
     ImGui::SetNextItemWidth( 200.f );
 

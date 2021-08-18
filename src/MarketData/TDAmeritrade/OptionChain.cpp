@@ -42,6 +42,14 @@ void tda::OptionChain::initVariables()
             }
         }
 
+        if ( option_it.first == "underlying" )
+        {
+            for ( auto &underlying_it: option_it.second )
+            {
+                underlyingMap[ underlying_it.first ] = underlying_it.second.get_value<std::string>();
+            }
+        }
+
         optionChainMap[ option_it.first ] = option_it.second.get_value< std::string >();
     }
 }
@@ -70,4 +78,9 @@ std::string tda::OptionChain::getPutVariable( std::string variable )
 std::string tda::OptionChain::getOptionChainDataVariable( std::string variable )
 {
     return optionChainMap[ variable ];
+}
+
+std::string tda::OptionChain::getUnderlyingDataVariable( std::string variable )
+{
+    return underlyingMap[ variable ];
 }
