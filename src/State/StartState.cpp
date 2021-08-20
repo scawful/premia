@@ -12,7 +12,8 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
-    account_data = tda_data_interface->createAccount( "497912311" );
+    // 497912311 236520988
+    account_data = tda_data_interface->createAccount( "236520988" );
 
     cbp_data_interface = boost::make_shared<cbp::CoinbasePro>();
     cbp_account_data = cbp_data_interface->list_accounts();
@@ -21,14 +22,22 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     // quotes["QQQ"] = tda_data_interface->createQuote( "QQQ" );
     // quotes["DIA"] = tda_data_interface->createQuote( "DIA" );
     // quotes["TLT"] = tda_data_interface->createQuote( "TLT" );
-    // quotes["IWM"] = tda_data_interface->createQuote( "IWM" );
-    // quotes["VXX"] = tda_data_interface->createQuote( "VXX" );
+
+    for ( int i = 0; i < account_data->get_position_vector_size(); i++ )
+    {
+        for ( auto& position_it : account_data->get_position( i ) )
+        {
+            if ( position_it.first == "symbol" )
+            {
+                std::string str = position_it.second;
+                positions_vector.push_back( str );
+            }
+        }
+    }
 
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
-
-
 }
 
 void StartState::cleanup()
@@ -125,15 +134,6 @@ void StartState::update( Manager* premia )
 {
     draw_imgui_menu( premia, tda_data_interface, "Home" );
 
-    // ImGui::Text("SPY: $%s", quotes["SPY"]->getQuoteVariable("lastPrice").c_str() );
-    // ImGui::Text("QQQ: $%s", quotes["QQQ"]->getQuoteVariable("lastPrice").c_str() );
-    // ImGui::Text("DIA: $%s", quotes["DIA"]->getQuoteVariable("lastPrice").c_str() );
-    // ImGui::Text("TLT: $%s", quotes["TLT"]->getQuoteVariable("lastPrice").c_str() );
-    // ImGui::Text("IWM: $%s", quotes["IWM"]->getQuoteVariable("lastPrice").c_str() );
-    // ImGui::Text("VXX: $%s", quotes["VXX"]->getQuoteVariable("lastPrice").c_str() );
-
-    ImGui::Text("Order Entry");
-
     // Place Order Button ---------------------------------------------------------------------------------
     if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
         ImGui::OpenPopup("Quick Order");
@@ -207,39 +207,97 @@ void StartState::update( Manager* premia )
     ImGui::Separator();
     ImGui::Text( "Account ID: %s", account_data->get_account_variable("accountId").c_str() );
     ImGui::Text( "Net Liq: %s", account_data->get_balance_variable("liquidationValue").c_str() );
-    ImGui::Text( "Available Funds: %s", account_data->get_balance_variable("availableFunds").c_str() );
+    //ImGui::Text( "Available Funds: %s", account_data->get_balance_variable("availableFunds").c_str() );
     ImGui::Text( "Cash: %s", account_data->get_balance_variable("cashBalance").c_str() );
 
     ImGui::Separator();
     ImGui::Text("Positions");
     ImGui::Separator();
-    
-    for ( int i = 0; i < account_data->get_position_vector_size(); i++ )
+    ImGui::Spacing();
+
+    static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+
+    const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
+    const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
+    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 15);
+
+    if (ImGui::BeginTable("table_scrolly", 7, flags, outer_size))
     {
-        for ( auto& position_it : account_data->get_position( i ) )
+        ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+        ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthStretch );
+        ImGui::TableSetupColumn("P/L Day", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("P/L %", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Average Price",  ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Market Value",  ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Quantity", ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_NoSort );
+        ImGui::TableHeadersRow();
+
+        // Demonstrate using clipper for large vertical lists
+        ImGuiListClipper clipper;
+        clipper.Begin( positions_vector.size() );
+        while (clipper.Step())
         {
-            if ( position_it.first == "instrument" )
+            for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
             {
-                for ( auto& instrument_it: account_data->get_position_instrument( i ) )
+                ImGui::TableNextRow();
+                for (int column = 0; column < 7; column++)
                 {
-                    ImGui::Text("%s :: %s", instrument_it.first.c_str(), instrument_it.second.c_str() );
+                    std::string symbol = positions_vector[row];
+                    ImGui::TableSetColumnIndex(column);
+                    switch( column )
+                    {
+                        case 0:
+                            ImGui::Text("%s", symbol.c_str() );
+                            break;
+                        case 1:
+                            ImGui::Text("%s", account_data->get_position_balances( symbol, "currentDayProfitLoss" ).c_str());
+                            break;
+                        case 2:
+                            ImGui::Text("%s", account_data->get_position_balances( symbol, "currentDayProfitLossPercentage").c_str() );
+                            break;
+                        case 3:
+                            ImGui::Text("%s", account_data->get_position_balances( symbol, "averagePrice" ).c_str());
+                            break;
+                        case 4:
+                            ImGui::Text("%s", account_data->get_position_balances( symbol, "marketValue" ).c_str());
+                            break;
+                        case 5:
+                            ImGui::Text("%s", account_data->get_position_balances( symbol, "longQuantity" ).c_str());
+                            break;
+                        case 6:
+                            ImGui::SmallButton("Buy");
+                            ImGui::SameLine();
+                            ImGui::SmallButton("Sell");
+                            ImGui::SameLine();
+                            ImGui::SmallButton("Q");
+                            break;
+                        default:
+                            ImGui::Text("Hello %d,%d", column, row);
+                            break;
+                    }
                 }
             }
-            else
-            {
-                if ( position_it.first != "cusip" )
-                    ImGui::Text("%s :: %s", position_it.first.c_str(), position_it.second.c_str() );
-            }
         }
+
+        ImGui::EndTable();
     }
 
+    ImGui::Spacing();
+    ImGui::Separator();
     ImGui::Text("Coinbase Pro Accounts");
     ImGui::Separator();
-    for ( auto& crypto_position_it: cbp_account_data->get_position("BTC") )
+    for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
     {
-        ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
+        if ( crypto_position_it.first == "currency" || crypto_position_it.first == "available")
+            ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
     }
-
+    ImGui::Separator();
+    for ( auto& crypto_position_it: cbp_account_data->get_position("ADA") )
+    {
+        if ( crypto_position_it.first == "currency" || crypto_position_it.first == "available")
+            ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
+    }
 
     ImGui::End();    
 

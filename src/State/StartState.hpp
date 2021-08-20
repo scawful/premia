@@ -22,6 +22,8 @@ private:
 
     boost::shared_ptr<tda::Account> account_data;
     boost::shared_ptr<cbp::Account> cbp_account_data;
+
+    std::vector<std::string> positions_vector;
     
 protected:
     StartState() { }
