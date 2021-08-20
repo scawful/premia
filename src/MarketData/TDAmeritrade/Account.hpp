@@ -17,8 +17,17 @@ namespace tda
 
         std::unordered_map<std::string, std::string> account_info;
         std::unordered_map<std::string, std::string> current_balances;  
-        std::vector<std::unordered_map<std::string, std::string>> instrument_vector;      
         std::vector<std::unordered_map<std::string, std::string>> positions_vector;
+
+        struct PositionBalances
+        {
+            std::string symbol;
+            std::unordered_map<std::string, std::string> balances;
+            int longQuantity;
+            int averagePrice;
+            double dayProfitLoss;
+        };
+        std::vector<PositionBalances> position_balances;
         
 
         void initVariables();
@@ -30,7 +39,7 @@ namespace tda
         std::string get_account_variable( std::string variable );
         std::string get_balance_variable( std::string variable );
         std::unordered_map<std::string, std::string> get_position( int index );
-        std::unordered_map<std::string, std::string> get_position_instrument( int index );
+        std::string get_position_balances( std::string symbol, std::string variable );
     };
 
 }
