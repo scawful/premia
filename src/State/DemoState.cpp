@@ -8,12 +8,10 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 {
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
-    this->tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
 
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
-
 }
 
 void DemoState::cleanup()
@@ -46,7 +44,7 @@ void DemoState::handleEvents( Manager* premia )
                 switch ( event.key.keysym.sym )
                 {
                     case SDLK_ESCAPE:
-                        premia->quit();
+                        //premia->quit();
                         break;
                     case SDLK_UP:
                         premia->change( StartState::instance() );
@@ -71,7 +69,7 @@ void DemoState::handleEvents( Manager* premia )
                 switch ( event.window.event ) 
                 {
                     case SDL_WINDOWEVENT_CLOSE:   // exit game
-                        premia->quit();
+                        //premia->quit();
                         break;
                     case SDL_WINDOWEVENT_SIZE_CHANGED:
                         io.DisplaySize.x = static_cast<float>(event.window.data1);
