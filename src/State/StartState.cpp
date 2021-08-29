@@ -18,10 +18,30 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     cbp_data_interface = boost::make_shared<cbp::CoinbasePro>();
     cbp_account_data = cbp_data_interface->list_accounts();
 
-    // quotes["SPY"] = tda_data_interface->createQuote( "SPY" );
-    // quotes["QQQ"] = tda_data_interface->createQuote( "QQQ" );
-    // quotes["DIA"] = tda_data_interface->createQuote( "DIA" );
-    // quotes["TLT"] = tda_data_interface->createQuote( "TLT" );
+    cbp_products["ETH"] = cbp_data_interface->get_product_ticker( "ETH" );
+    cbp_products["ADA"] = cbp_data_interface->get_product_ticker( "ADA" );
+
+    float eth_balance;
+    for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
+    {
+        if ( crypto_position_it.first == "available")
+            eth_balance = boost::lexical_cast<float>(crypto_position_it.second);
+    }
+
+    float ada_balance;
+    for ( auto& crypto_position_it: cbp_account_data->get_position("ADA") )
+    {
+        if ( crypto_position_it.first == "available")
+            ada_balance = boost::lexical_cast<float>(crypto_position_it.second);
+    }
+
+    std::cout << "ETH: " << eth_balance << ", ADA: " << ada_balance << std::endl;
+
+    float deposit_usd = cbp_data_interface->get_deposits();
+    float temp = (eth_balance * cbp_products["ETH"]->get_current_price()) + (ada_balance * cbp_products["ADA"]->get_current_price());
+    std::cout << "Calc " << temp << std::endl;
+    _profit_loss = (temp - deposit_usd) / deposit_usd;
+
 
     for ( int i = 0; i < account_data->get_position_vector_size(); i++ )
     {
@@ -285,7 +305,7 @@ void StartState::update( Manager* premia )
 
     ImGui::Spacing();
     ImGui::Separator();
-    ImGui::Text("Coinbase Pro Accounts");
+    ImGui::Text("Coinbase Pro Accounts || P/L: %.2f", _profit_loss);
     ImGui::Separator();
     for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
     {

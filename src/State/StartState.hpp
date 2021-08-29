@@ -22,9 +22,12 @@ private:
 
     boost::shared_ptr<tda::Account> account_data;
     boost::shared_ptr<cbp::Account> cbp_account_data;
+    std::unordered_map<std::string, boost::shared_ptr<cbp::Product> > cbp_products;
 
     std::vector<std::string> positions_vector;
     
+    float _profit_loss;
+
 protected:
     StartState() { }
 
