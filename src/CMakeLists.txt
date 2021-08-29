@@ -40,7 +40,7 @@ find_package(OpenSSL REQUIRED)
 
 
 # QuantLib --------------------------------------------------------------------------------------------
-find_package(QuantLib REQUIRED)
+# find_package(QuantLib REQUIRED)
 
 
 # ImGui library --------------------------------------------------------------------------------------------
@@ -62,6 +62,7 @@ add_executable(Premia Premia.cpp
                     MarketData/CoinbasePro.cpp
                     MarketData/CoinbasePro/Account.cpp
                     MarketData/CoinbasePro/Client.cpp
+                    MarketData/CoinbasePro/Product.cpp
                     MarketData/TDAmeritrade.cpp 
                     MarketData/TDAmeritrade/Session.cpp
                     MarketData/TDAmeritrade/Quote.cpp 
