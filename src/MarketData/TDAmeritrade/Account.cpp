@@ -15,7 +15,7 @@ void tda::Account::initVariables()
 
                     for ( auto& positions_it: position_list_it.second )
                     {
-                        std::cout << positions_it.first << " ::: " << positions_it.second.get_value<std::string>() << std::endl;
+                        //std::cout << positions_it.first << " ::: " << positions_it.second.get_value<std::string>() << std::endl;
 
                         new_position_balance.balances[ positions_it.first ] = positions_it.second.get_value<std::string>();
             
@@ -24,7 +24,7 @@ void tda::Account::initVariables()
 
                         for ( auto& field_it: positions_it.second )
                         {
-                            std::cout << field_it.first << " :::: " << field_it.second.get_value<std::string>() << std::endl;
+                            //std::cout << field_it.first << " :::: " << field_it.second.get_value<std::string>() << std::endl;
                             if ( field_it.first == "symbol" )
                                 new_position_balance.symbol = field_it.second.get_value<std::string>();
 

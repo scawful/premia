@@ -187,7 +187,6 @@ void OptionState::update( Manager* premia )
         }
         ImGui::EndTable();
     }
-    //ImGui::TreePop();
 
     for ( int i = 0; i < optionsDateTimeObj[current_item].strikePriceObj.size(); i++ )
     {

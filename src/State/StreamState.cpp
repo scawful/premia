@@ -150,7 +150,7 @@ void StreamState::update( Manager* premia )
 
     if ( ImGui::BeginPopupModal("Fields", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
     {
-        ImGui::BeginChild("child", ImVec2(0, 60), true);
+        ImGui::BeginChild("child", ImVec2(200, 120), true);
         for ( int i = 0; i < 52; i++ )
         {
             ImGui::Checkbox(quote_fields[i], &request_fields[i]);
@@ -179,8 +179,16 @@ void StreamState::update( Manager* premia )
                     fields += std::to_string(i) + ",";
             }
             fields.replace(fields.end(), fields.end(), "");
+
+            SDL_Log("Stream ticker %s with fields: %s", ticker_symbol.c_str(), fields.c_str() );
+
             tda_data_interface->start_session( ticker_symbol, fields );
         }
+    }
+    ImGui::SameLine();
+    if ( ImGui::Button("Interrupt Session") )
+    {
+        tda_data_interface->send_interrupt_signal();
     }
 
     ImGui::BulletText("NASDAQ (Quotes and Trades)");
