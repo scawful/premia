@@ -158,9 +158,16 @@ namespace tda
             }
             else
             {
-                // logout
-                SDL_Log("Session::on_write( Logging out ) ");
-                _logged_in = false;
+                if ( _interrupt == false )
+                {
+                    SDL_Log( "Uninterrupted stream");
+                }
+                else
+                {
+                    // logout
+                    SDL_Log("Session::on_write( Logging out ) ");
+                    _logged_in = false;
+                }
             }
         }
 
@@ -212,7 +219,7 @@ namespace tda
                         &Session::on_read,
                         shared_from_this()));
             }
-            else if ( _subscribed && _sub_count != 2 )
+            else if ( _subscribed && !_interrupt )
             {
                 SDL_Log("Subscribed but not finished");
                 _sub_count++;
@@ -328,7 +335,7 @@ namespace tda
         SDL_Log("Session::on_notify");
         std::string s(buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("notify");
-        SDL_Log("Notify Response Stream: \n%s", s.c_str() );
+
         if ( found != std::string::npos )
         {
             _notified = true;
@@ -345,7 +352,7 @@ namespace tda
         std::string sub_code;
         std::string s(buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("code");
-        SDL_Log("SUBS Response Stream: \n%s", s.c_str() );
+
         if ( found != std::string::npos )
         {
             sub_code = s[found + 6];
@@ -356,6 +363,12 @@ namespace tda
             }
             _buffer.consume( _buffer.size() );
         }
+    }
+
+    void 
+    Session::interrupt()
+    {
+        _interrupt = true;
     }
 
     bool

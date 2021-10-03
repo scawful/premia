@@ -16,7 +16,7 @@ namespace tda
     class Session : public std::enable_shared_from_this<Session>
     {
     private:
-        bool _logged_in, _subscribed, _notified;
+        bool _logged_in, _subscribed, _notified, _interrupt;
         unsigned int _sub_count;
         net::io_context _ioc;
         tcp::resolver _resolver;
@@ -38,6 +38,7 @@ namespace tda
             _logged_in = false;
             _subscribed = false;
             _notified = false;
+            _interrupt = false;
             _sub_count = 0;
         }
 
@@ -57,6 +58,8 @@ namespace tda
         void on_logout( beast::error_code ec );
         void on_notify( beast::error_code ec );
         void on_subscription( beast::error_code ec );
+
+        void interrupt();
 
         bool is_logged_in();
         bool is_subscribed();
