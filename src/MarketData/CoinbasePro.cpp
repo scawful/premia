@@ -55,7 +55,7 @@ namespace cbp
         }
 
         json_file.close();
-        //std::remove( output_filename.c_str() );
+        std::remove( output_filename.c_str() );
         boost::shared_ptr<Product> new_product_data = boost::make_shared<Product>( property_tree );
         return new_product_data;
     }
@@ -90,7 +90,6 @@ namespace cbp
                 }
             }
         }
-        std::cout << "Total: " << total_deposits_usd << std::endl;
 
         return total_deposits_usd;
     }
