@@ -147,6 +147,11 @@ namespace tda
         }
     }
 
+    /**
+     * @brief authenticated user principal fields
+     * 
+     * @return boost::property_tree::ptree 
+     */
     boost::property_tree::ptree TDAmeritrade::get_user_principals()
     {
         CURL *curl;
@@ -191,6 +196,11 @@ namespace tda
         return property_tree;
     }
 
+    /**
+     * @brief creates ptree with login request for websocket session
+     * 
+     * @return boost::property_tree::ptree 
+     */
     boost::property_tree::ptree TDAmeritrade::create_login_request()
     {
         boost::property_tree::ptree user_principals, credentials, requests, parameters;
@@ -301,6 +311,11 @@ namespace tda
         return requests;
     }
 
+    /**
+     * @brief create ptree of logoutout request for websocket session
+     * 
+     * @return boost::property_tree::ptree 
+     */
     boost::property_tree::ptree TDAmeritrade::create_logout_request()
     {
         boost::property_tree::ptree user_principals, credentials, requests, parameters;
@@ -597,14 +612,13 @@ namespace tda
         _websocket_session = std::make_shared<tda::Session>( ioc, context, _request_queue );
         _websocket_session->run( host.c_str(), port.c_str() );
 
-        SDL_Log("~~~");
         _session_active = true;
 
         std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
         session_thread.detach();
-
     }
 
+    // 
     void TDAmeritrade::send_session_request( std::string request )
     {
         _websocket_session->send_message( std::make_shared<std::string const>(request) );
@@ -612,11 +626,17 @@ namespace tda
 
     void TDAmeritrade::send_logout_request()
     {
+        _websocket_session->interrupt();
         pt::ptree logout_request = create_logout_request();
         std::stringstream logout_text_stream;
         pt::write_json( logout_text_stream, logout_request );
         std::string logout_text = logout_text_stream.str();
         _websocket_session->send_message( std::make_shared<std::string const>(logout_text) );
+    }
+
+    void TDAmeritrade::send_interrupt_signal()
+    {
+        _websocket_session->interrupt();
     }
 
     bool TDAmeritrade::is_session_logged_in()

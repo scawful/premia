@@ -169,6 +169,7 @@ namespace tda
         void start_session( std::string ticker, std::string fields );
         void send_session_request( std::string request );
         void send_logout_request();
+        void send_interrupt_signal();
         bool is_session_logged_in();
         std::vector<std::string> get_session_responses();
 
