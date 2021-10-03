@@ -3,7 +3,7 @@
 #include "../OptionState.hpp"
 #include "../StartState.hpp"
 #include "../StreamState.hpp"
-// #include "../PortfolioState.hpp"
+#include "../Portfolio/Positions.hpp"
 
 void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_data_interface, std::string title_string )
 {
@@ -79,13 +79,10 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
 
         if (ImGui::BeginMenu("Portfolio"))
         {
-            if ( ImGui::MenuItem("Orders" ) )
-            {
-                // premia->change( OrderState::instance() );
-            }
+
             if ( ImGui::MenuItem("Positions") )
             {
-                // premia->change( PositionsState::instance() );
+                premia->change( Positions::instance() );
             }
 
             if ( ImGui::MenuItem("Balances") )
@@ -93,9 +90,9 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
                 // premia->change( BalancesState::instance() );
             }
 
-            if ( ImGui::MenuItem("Allocation") )
+            if ( ImGui::MenuItem("Orders" ) )
             {
-                // premia->change( AllocationState::instance() );
+                // premia->change( OrderState::instance() );
             }
 
             ImGui::EndMenu();
@@ -124,11 +121,17 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
             {
                 // get order 
             }
+         
+            if ( ImGui::MenuItem("Option Chain") )
+            {
+                premia->change( OptionState::instance() );
+            }
+
 
             ImGui::EndMenu();
         }
 
-        if ( ImGui::BeginMenu("Analyze"))
+        if ( ImGui::BeginMenu("Charts"))
         {
 
             if ( ImGui::MenuItem("Live Quotes") )
@@ -140,18 +143,15 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
             {
                 premia->change( QuoteState::instance() );
             }
-            
-            if ( ImGui::MenuItem("Option Chain") )
-            {
-                premia->change( OptionState::instance() );
-            }
 
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Research"))
+        if (ImGui::BeginMenu("Analyze"))
         {
-            ImGui::MenuItem("research menu bar");
+            ImGui::MenuItem("Money Flows");
+            ImGui::MenuItem("Volatility Cycles");
+
             ImGui::EndMenu();
         }
         

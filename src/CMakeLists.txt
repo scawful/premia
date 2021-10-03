@@ -72,6 +72,7 @@ add_executable(Premia Premia.cpp
                     State/Manager.cpp State/DemoState.cpp
                     State/StartState.cpp State/QuoteState.cpp State/OptionState.cpp
                     State/StreamState.cpp
+                    State/Portfolio/Positions.cpp
                     State/Layout/Menu.cpp
                     Libraries/imgui/imgui.cpp
                     Libraries/imgui/imgui_demo.cpp

@@ -3,6 +3,7 @@
 #include "QuoteState.hpp"
 #include "OptionState.hpp"
 #include "DemoState.hpp"
+#include "Portfolio/Positions.hpp"
 #include "Layout/Menu.hpp"
 
 StartState StartState::m_StartState;
@@ -19,7 +20,8 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     cbp_account_data = cbp_data_interface->list_accounts();
 
     cbp_products["ETH"] = cbp_data_interface->get_product_ticker( "ETH" );
-    cbp_products["ADA"] = cbp_data_interface->get_product_ticker( "ADA" );
+    cbp_products["XTZ"] = cbp_data_interface->get_product_ticker( "XTZ" );
+    cbp_products["USD"] = cbp_data_interface->get_product_ticker( "USD" );
 
     float eth_balance;
     for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
@@ -28,18 +30,20 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
             eth_balance = boost::lexical_cast<float>(crypto_position_it.second);
     }
 
-    float ada_balance;
-    for ( auto& crypto_position_it: cbp_account_data->get_position("ADA") )
+    float xtz_balance;
+    for ( auto& crypto_position_it: cbp_account_data->get_position("XTZ") )
     {
         if ( crypto_position_it.first == "available")
-            ada_balance = boost::lexical_cast<float>(crypto_position_it.second);
+            xtz_balance = boost::lexical_cast<float>(crypto_position_it.second);
     }
 
-    std::cout << "ETH: " << eth_balance << ", ADA: " << ada_balance << std::endl;
+    float usd_balance = boost::lexical_cast<float>(cbp_account_data->get_position("USD")["available"]);
+
+    //std::cout << "ETH: " << eth_balance << ", XTZ: " << xtz_balance << std::endl;
 
     float deposit_usd = cbp_data_interface->get_deposits();
-    float temp = (eth_balance * cbp_products["ETH"]->get_current_price()) + (ada_balance * cbp_products["ADA"]->get_current_price());
-    std::cout << "Calc " << temp << std::endl;
+    float temp = (eth_balance * cbp_products["ETH"]->get_current_price()) + (xtz_balance * cbp_products["XTZ"]->get_current_price()) - usd_balance;
+    //std::cout << "Calc " << temp << std::endl;
     _profit_loss = (temp - deposit_usd) / deposit_usd;
 
 
@@ -313,7 +317,7 @@ void StartState::update( Manager* premia )
             ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
     }
     ImGui::Separator();
-    for ( auto& crypto_position_it: cbp_account_data->get_position("ADA") )
+    for ( auto& crypto_position_it: cbp_account_data->get_position("XTZ") )
     {
         if ( crypto_position_it.first == "currency" || crypto_position_it.first == "available")
             ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
