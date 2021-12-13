@@ -6,13 +6,13 @@
 
 Positions Positions::m_Positions;
 
-void Positions::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+void Positions::load_account( std::string account_num )
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
-    // 497912311 236520988
-    account_data = tda_data_interface->createAccount( "236520988" );
+    account_data = tda_data_interface->createAccount( account_num );
+
+    if ( positions_vector.size() != 0 ) {
+        positions_vector.clear();
+    }
 
     for ( int i = 0; i < account_data->get_position_vector_size(); i++ )
     {
@@ -25,6 +25,23 @@ void Positions::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
             }
         }
     }
+}
+
+void Positions::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+{
+    this->pRenderer = pRenderer;
+    this->pWindow = pWindow;
+    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
+    // 497912311 236520988
+
+    account_ids_std = tda_data_interface->get_all_accounts();
+    for ( std::string const& each_id : account_ids_std )
+    {
+        account_ids.push_back(each_id.c_str());
+    }
+    default_account = account_ids_std.at(0);
+
+    load_account(default_account);
 
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
@@ -125,16 +142,22 @@ void Positions::update( Manager* premia )
 {
     draw_imgui_menu( premia, tda_data_interface, "Home" );
 
+    // Load Account IDs
     static int n = 0;
-    const char *accounts[] = { { "497912311"}, {"236520988" } };
-    ImGui::Combo("Account", &n,  accounts, 2);
-    //ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
+    const char **accounts = account_ids.data();
+    if ( ImGui::Button( "Change Account" ) ) {
+        load_account( accounts[n] );
+    } 
+    ImGui::SameLine();
+    ImGui::Combo("", &n,  accounts, 6); 
+    
 
+    //ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
     ImGui::Text("TDAmeritrade Portfolio Information");
     ImGui::Separator();
     ImGui::Text( "Account ID: %s", account_data->get_account_variable("accountId").c_str() );
     ImGui::Text( "Net Liq: %s", account_data->get_balance_variable("liquidationValue").c_str() );
-    //ImGui::Text( "Available Funds: %s", account_data->get_balance_variable("availableFunds").c_str() );
+    ImGui::Text( "Available Funds: %s", account_data->get_balance_variable("availableFunds").c_str() );
     ImGui::Text( "Cash: %s", account_data->get_balance_variable("cashBalance").c_str() );
 
     ImGui::Separator();

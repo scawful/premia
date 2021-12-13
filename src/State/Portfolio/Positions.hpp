@@ -12,6 +12,10 @@ private:
     SDL_Renderer *pRenderer = NULL;
     SDL_Texture *pTexture = NULL;
 
+    std::vector<std::string> account_ids_std;
+    std::vector<const char*> account_ids;
+    std::string default_account;
+
     std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
     boost::shared_ptr<cbp::CoinbasePro> cbp_data_interface;
@@ -22,6 +26,7 @@ private:
 
     std::vector<std::string> positions_vector;
     
+    void load_account( std::string account_num );
 
 protected:
     Positions() { }
