@@ -455,7 +455,7 @@ namespace tda
                 }
 
                 if ( _access_token != "nope" )
-                    SDL_Log("Valid access token found %s", _access_token.c_str() );
+                    SDL_Log("Found Access Token File!");
                 else
                     return false;
 
@@ -471,7 +471,7 @@ namespace tda
                 return true;
             }
         }
-        SDL_Log("Valid access token not found.");
+        SDL_Log("No Access Token File!");
 
         return false;
     }
@@ -648,6 +648,16 @@ namespace tda
             return _websocket_session->is_logged_in();
         else 
             return false;
+    }
+
+    void TDAmeritrade::clear_session_buffer()
+    {
+        _websocket_session->clear_buffer();
+    }
+
+    void TDAmeritrade::sync_buffer()
+    {
+        _websocket_buffer = _websocket_session->receive_response_ptr();
     }
 
     std::vector<std::string> TDAmeritrade::get_session_responses()

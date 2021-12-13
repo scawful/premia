@@ -135,6 +135,7 @@ namespace tda
         std::vector<std::thread> _ws_threads;
 
         std::shared_ptr<tda::Session> _websocket_session;
+        std::shared_ptr<std::vector<std::string>> _websocket_buffer;
         std::vector<std::shared_ptr<std::string const>> _request_queue;
 
         boost::asio::io_context ioc;
@@ -173,6 +174,8 @@ namespace tda
         void send_logout_request();
         void send_interrupt_signal();
         bool is_session_logged_in();
+        void clear_session_buffer();
+        void sync_buffer();
         std::vector<std::string> get_session_responses();
         std::vector<std::string> get_all_accounts();
 

@@ -156,6 +156,12 @@ void StartState::update( Manager* premia )
         }
     }
 
+    ImGui::SameLine();
+    if ( ImGui::Button("Clear Buffer", ImVec2(220, 30)) )
+    {
+        tda_data_interface->clear_session_buffer();
+    }
+
     // Always center this window when appearing
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
