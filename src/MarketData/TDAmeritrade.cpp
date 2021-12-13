@@ -191,6 +191,8 @@ namespace tda
         }
 
         json_file.close();
+        _user_principals = true;
+        user_principals = property_tree;
         //std::remove( filename.c_str());
 
         return property_tree;
@@ -511,6 +513,7 @@ namespace tda
         }
 
         _session_active = false;
+        _user_principals = false;
         _period_type = DAY;
         _frequency_type = MINUTE;
         _col_name = "Open";
@@ -721,7 +724,6 @@ namespace tda
         std::time_t now = std::time(0);
         std::string account_filename = account_num + "_" + std::to_string(now) + ".json";
 
-        
         if ( now > _access_token_expiration )
         {
             SDL_Log("Get Access Token Triggered");
@@ -841,6 +843,25 @@ namespace tda
 
         this->_base_url = new_url;
         this->_current_ticker = ticker;
+    }
+
+    // @brief: retrieve all account ids under the users principals and store in a vector 
+    std::vector<std::string> TDAmeritrade::get_all_accounts()
+    {
+        std::vector<std::string> accounts;
+        if ( !_user_principals ) {
+            get_user_principals();
+        } 
+                    
+        for ( auto & array : user_principals.get_child("accounts") ) {
+            for ( auto & each_element : array.second ) {
+                if ( each_element.first == "accountId" ) {
+                    accounts.push_back(each_element.second.get_value<std::string>());
+                }
+            }
+        }
+
+        return accounts;
     }
 
     // AUXILIARY FUNCTIONS ====================================================

@@ -121,6 +121,7 @@ namespace tda
         int _frequency;
         bool _access_token_found;
         bool _session_active;
+        bool _user_principals;
         PeriodType _period_type;
         FrequencyType _frequency_type;
         std::string _base_url;
@@ -137,6 +138,7 @@ namespace tda
         std::vector<std::shared_ptr<std::string const>> _request_queue;
 
         boost::asio::io_context ioc;
+        boost::property_tree::ptree user_principals;
 
         // string manipulation 
         std::string get_api_interval_value(int value);
@@ -190,6 +192,8 @@ namespace tda
                                            FrequencyType ftype, int freq_amt, bool ext = true );
         void set_option_chain_parameters( std::string ticker, std::string contractType, std::string strikeCount, bool includeQuotes, 
                                           std::string strategy, std::string range, std::string expMonth, std::string optionType );
+
+        std::vector<std::string> get_all_accounts();
 
         // auxiliary functions 
         std::string getBaseUrl();
