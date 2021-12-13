@@ -12,6 +12,9 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     ImGui::CreateContext();
 	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
+
+    ImPlotContext *ctx = ImPlot::CreateContext();
+    ImPlot::Initialize(ctx);
 }
 
 void DemoState::cleanup()
