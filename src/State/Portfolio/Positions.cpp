@@ -32,15 +32,12 @@ void Positions::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     this->pRenderer = pRenderer;
     this->pWindow = pWindow;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
-    // 497912311 236520988
 
     account_ids_std = tda_data_interface->get_all_accounts();
-    for ( std::string const& each_id : account_ids_std )
-    {
+    for ( std::string const& each_id : account_ids_std ) {
         account_ids.push_back(each_id.c_str());
     }
     default_account = account_ids_std.at(0);
-
     load_account(default_account);
 
     ImGui::CreateContext();
@@ -151,8 +148,7 @@ void Positions::update( Manager* premia )
     ImGui::SameLine();
     ImGui::Combo("", &n,  accounts, 6); 
     
-
-    //ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
+    // ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
     ImGui::Text("TDAmeritrade Portfolio Information");
     ImGui::Separator();
     ImGui::Text( "Account ID: %s", account_data->get_account_variable("accountId").c_str() );
@@ -183,7 +179,6 @@ void Positions::update( Manager* premia )
         ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_NoSort );
         ImGui::TableHeadersRow();
 
-        // Demonstrate using clipper for large vertical lists
         ImGuiListClipper clipper;
         clipper.Begin( positions_vector.size() );
         while (clipper.Step())

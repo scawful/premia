@@ -20,14 +20,9 @@ private:
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
     boost::shared_ptr<cbp::CoinbasePro> cbp_data_interface;
 
-    boost::shared_ptr<tda::Account> account_data;
-    boost::shared_ptr<cbp::Account> cbp_account_data;
-    std::unordered_map<std::string, boost::shared_ptr<cbp::Product> > cbp_products;
-
-    std::vector<std::string> positions_vector;
+    // boost::shared_ptr<cbp::Account> cbp_account_data;
+    // std::unordered_map<std::string, boost::shared_ptr<cbp::Product> > cbp_products;
     
-    float _profit_loss;
-
 protected:
     StartState() { }
 

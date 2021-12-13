@@ -174,6 +174,7 @@ namespace tda
         void send_interrupt_signal();
         bool is_session_logged_in();
         std::vector<std::string> get_session_responses();
+        std::vector<std::string> get_all_accounts();
 
         boost::property_tree::ptree createPropertyTree( std::string ticker, std::string new_url );
         boost::shared_ptr<tda::Quote> createQuote( std::string ticker );        
@@ -193,7 +194,6 @@ namespace tda
         void set_option_chain_parameters( std::string ticker, std::string contractType, std::string strikeCount, bool includeQuotes, 
                                           std::string strategy, std::string range, std::string expMonth, std::string optionType );
 
-        std::vector<std::string> get_all_accounts();
 
         // auxiliary functions 
         std::string getBaseUrl();

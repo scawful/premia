@@ -621,7 +621,7 @@ namespace tda
         session_thread.detach();
     }
 
-    // 
+    // @brief: futile attempt to relay information to the active websocket 
     void TDAmeritrade::send_session_request( std::string request )
     {
         _websocket_session->send_message( std::make_shared<std::string const>(request) );
@@ -653,6 +653,25 @@ namespace tda
     std::vector<std::string> TDAmeritrade::get_session_responses()
     {
         return _websocket_session->receive_response();
+    }
+
+    // @brief: retrieve all account ids under the users principals and store in a vector 
+    std::vector<std::string> TDAmeritrade::get_all_accounts()
+    {
+        std::vector<std::string> accounts;
+        if ( !_user_principals ) {
+            get_user_principals();
+        } 
+                    
+        for ( auto & array : user_principals.get_child("accounts") ) {
+            for ( auto & each_element : array.second ) {
+                if ( each_element.first == "accountId" ) {
+                    accounts.push_back(each_element.second.get_value<std::string>());
+                }
+            }
+        }
+
+        return accounts;
     }
 
     boost::property_tree::ptree TDAmeritrade::createPropertyTree( std::string ticker, std::string new_url )
@@ -843,25 +862,6 @@ namespace tda
 
         this->_base_url = new_url;
         this->_current_ticker = ticker;
-    }
-
-    // @brief: retrieve all account ids under the users principals and store in a vector 
-    std::vector<std::string> TDAmeritrade::get_all_accounts()
-    {
-        std::vector<std::string> accounts;
-        if ( !_user_principals ) {
-            get_user_principals();
-        } 
-                    
-        for ( auto & array : user_principals.get_child("accounts") ) {
-            for ( auto & each_element : array.second ) {
-                if ( each_element.first == "accountId" ) {
-                    accounts.push_back(each_element.second.get_value<std::string>());
-                }
-            }
-        }
-
-        return accounts;
     }
 
     // AUXILIARY FUNCTIONS ====================================================
