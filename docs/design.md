@@ -40,25 +40,30 @@ Premia's main event loop is handled by a virtual state manager defined in the Ma
 	- TODO: Orders (Active, Cancelled, Executed)
 	
 ## Market Data 
-- TDAmeritrade 
-	- Account
-	- Option Chain 
-	- Price History
-		- Uses Candle ADT
-	- Price Structures [ADTs]
-		- Candles
-			- Volume
-			- High and low price
-			- Open and close price
-			- Date and time
-		- Options Contract
-			- Put or Call
-			- Bid, ask, bidSize, askSize
-			- Open, close, high, low
-			- Delta, gamma, theta, vega, rho
-		- Strike Price
-	- Price Quote
-	- Websocket Session
+**TDAmeritrade**
+- Account
+- Option Chain 
+- Price History
+	- Uses Candle ADT
+- Price Structures [ADTs]
+	- Candles
+		- Volume
+		- High and low price
+		- Open and close price
+		- Date and time
+	- Options Contract
+		- Put or Call
+		- Bid, ask, bidSize, askSize
+		- Open, close, high, low
+		- Delta, gamma, theta, vega, rho
+	- Strike Price
+- Price Quote
+- WebSocket Session
+
+**Coinbase Pro**
+- Account
+- Client
+- Product
 
 ## TDAmeritrade Data Interface
 Object that handles communication with TDAmeritrade's Developer API. Present in any state of the program that requires data from the brokerage. 
