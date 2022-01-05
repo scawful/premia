@@ -13,6 +13,11 @@ void tda::Quote::initVariables()
     }
 }
 
+tda::Quote::Quote()
+{
+    
+}
+
 tda::Quote::Quote( boost::property_tree::ptree quote_data )
 {
     quoteData = quote_data;

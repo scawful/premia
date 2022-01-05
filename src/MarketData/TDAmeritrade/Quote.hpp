@@ -14,6 +14,7 @@ namespace tda
         void initVariables();
 
     public:
+        Quote();
         Quote( boost::property_tree::ptree quote_data );
 
         void updateTree( boost::property_tree::ptree quote_data );
