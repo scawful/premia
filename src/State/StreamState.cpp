@@ -14,7 +14,6 @@ void StreamState::set_instrument( std::string ticker )
 void StreamState::init(Manager *premia)
 {
     this->premia = premia;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
     title_string = "Live Quotes";
 
     for ( auto v: request_fields )
@@ -122,7 +121,7 @@ void StreamState::handleEvents()
 
 void StreamState::update()
 {    
-    draw_imgui_menu( premia, tda_data_interface, title_string );
+    draw_imgui_menu( premia, title_string );
 
     ImGui::Text( "LEVEL ONE QUOTE (7:30am – 8pm EST)" );
     ImGui::SameLine();
@@ -158,11 +157,11 @@ void StreamState::update()
         ImGui::EndPopup();
     }
 
-    if ( tda_data_interface->is_session_logged_in() )
+    if ( premia->tda_client.is_session_logged_in() )
     {
         if ( ImGui::Button("Logout") )
         {
-            tda_data_interface->send_logout_request();
+            premia->tda_client.send_logout_request();
         }
     }
     else
@@ -179,13 +178,13 @@ void StreamState::update()
 
             SDL_Log("Stream ticker %s with fields: %s", ticker_symbol.c_str(), fields.c_str() );
 
-            tda_data_interface->start_session( ticker_symbol, fields );
+            premia->tda_client.start_session( ticker_symbol, fields );
         }
     }
     ImGui::SameLine();
     if ( ImGui::Button("Interrupt Session") )
     {
-        tda_data_interface->send_interrupt_signal();
+        premia->tda_client.send_interrupt_signal();
     }
 
     ImGui::BulletText("NASDAQ (Quotes and Trades)");

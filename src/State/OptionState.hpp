@@ -11,8 +11,7 @@ private:
     Manager *premia = NULL;
     TTF_Font *tickerFont = NULL;
 
-    boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
-    boost::shared_ptr<tda::OptionChain> optionChainData;
+    tda::OptionChain optionChainData;
     std::vector<tda::OptionsDateTimeObj> optionsDateTimeObj;
 
 protected:

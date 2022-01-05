@@ -14,6 +14,8 @@ namespace tda
 {
     // API Enumerators
 
+    namespace JSONObject = boost::property_tree;
+
     enum PeriodType
     {
         DAY,
@@ -28,13 +30,6 @@ namespace tda
         DAILY,
         WEEKLY,
         MONTHLY
-    };
-
-    enum RetrievalType
-    {
-        GET_QUOTE,
-        OPTION_CHAIN,
-        PRICE_HISTORY
     };
 
     enum ServiceType
@@ -134,7 +129,7 @@ namespace tda
         std::vector<std::shared_ptr<std::string const>> _request_queue;
 
         boost::asio::io_context ioc;
-        boost::property_tree::ptree user_principals;
+        JSONObject::ptree user_principals;
 
         // string manipulation
         std::string get_api_interval_value(int value);
@@ -149,16 +144,16 @@ namespace tda
         void post_account_auth(std::string url, std::string filename);
 
         // websocket functions
-        boost::property_tree::ptree get_user_principals();
-        boost::property_tree::ptree create_login_request();
-        boost::property_tree::ptree create_logout_request();
-        boost::property_tree::ptree create_service_request(ServiceType serv_type, std::string keys, std::string fields);
+        JSONObject::ptree get_user_principals();
+        JSONObject::ptree create_login_request();
+        JSONObject::ptree create_logout_request();
+        JSONObject::ptree create_service_request(ServiceType serv_type, std::string keys, std::string fields);
 
         // access token
-        void get_access_token(bool keep_file);
+        void request_access_token(bool keep_file);
 
     public:
-        TDAmeritrade(RetrievalType type);
+        TDAmeritrade();
 
         void start_session();
         void start_session(std::string ticker, std::string fields);
@@ -169,23 +164,28 @@ namespace tda
         std::vector<std::string> get_session_responses();
         std::vector<std::string> get_all_accounts();
 
-        boost::property_tree::ptree createPropertyTree(std::string ticker, std::string new_url);
-        boost::shared_ptr<tda::Quote> createQuote(std::string ticker);
-        boost::shared_ptr<tda::PriceHistory> createPriceHistory();
-        boost::shared_ptr<tda::PriceHistory> createPriceHistory(std::string ticker);
-        boost::shared_ptr<tda::OptionChain> createOptionChain(std::string ticker);
-        boost::shared_ptr<tda::Account> createAccount(std::string account_num);
+        JSONObject::ptree createPropertyTree(std::string ticker, std::string new_url);
+
+        Quote createQuote(std::string ticker);
+        
+        PriceHistory createPriceHistory();
+
+
+        PriceHistory createPriceHistory(std::string ticker, PeriodType ptype, int period_amt,
+                                        FrequencyType ftype, int freq_amt, bool ext);
+
+        OptionChain createOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
+                                      bool includeQuotes, std::string strategy, std::string range,
+                                      std::string expMonth, std::string optionType);
+
+        Account createAccount(std::string account_num);
 
         // Modifiers
-        void set_retrieval_type(RetrievalType type);
         void set_period_type(PeriodType interval);
         void set_col_name(std::string col_name);
 
-        void set_price_history_parameters(std::string ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext = true);
         void set_price_history_parameters(std::string ticker, PeriodType ptype, time_t start_date, time_t end_date,
                                           FrequencyType ftype, int freq_amt, bool ext = true);
-        void set_option_chain_parameters(std::string ticker, std::string contractType, std::string strikeCount, bool includeQuotes,
-                                         std::string strategy, std::string range, std::string expMonth, std::string optionType);
 
         // auxiliary functions
         std::string getBaseUrl();

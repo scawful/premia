@@ -12,14 +12,13 @@ private:
 
     std::string detailed_quote, title_string, ticker_symbol;
 
-    boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
-    boost::shared_ptr<tda::Quote> quoteData;
-    boost::shared_ptr<tda::PriceHistory> priceHistoryData;
+    tda::Quote quoteData;
+    tda::PriceHistory priceHistoryData;
 
-    std::unordered_map< std::string, boost::shared_ptr<tda::Quote> > quotes;
+    std::unordered_map< std::string, tda::Quote> quotes;
 
-    std::vector< tda::Candle > candleVector;
-    std::vector< int > volumeVector;
+    std::vector<tda::Candle> candleVector;
+    std::vector<int> volumeVector;
 
     // Functions
     void initCandleArrays();

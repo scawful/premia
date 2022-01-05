@@ -12,9 +12,7 @@ class State;
 class Manager
 {
 private:
-    std::vector<State*> states;
-    boost::shared_ptr<tda::TDAmeritrade> tdaDataInterface;
-    
+    std::vector<State*> states;    
     bool m_running;
     
 public:
@@ -34,6 +32,7 @@ public:
     bool running() { return m_running; }
     void quit() { m_running = false; }
     
+    tda::TDAmeritrade tda_client;
     SDL_Renderer *pRenderer = NULL;
     SDL_Window *pWindow = NULL;
     SDL_Surface *screen;

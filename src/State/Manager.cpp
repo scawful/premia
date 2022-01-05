@@ -82,6 +82,7 @@ void Manager::init(int width, int height)
  */
 void Manager::cleanup()
 {
+    // Clear all the states 
     while ( !states.empty() )
     {
         states.back()->cleanup();

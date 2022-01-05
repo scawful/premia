@@ -38,9 +38,7 @@ namespace tda
     {
         size_t start = str.find(from);
         if (start == std::string::npos)
-        {
             return false;
-        }
 
         str.replace(start, from.length(), to);
         return true;
@@ -179,9 +177,9 @@ namespace tda
      * @brief authenticated user principal fields
      * @author @scawful
      *
-     * @return boost::property_tree::ptree
+     * @return JSONObject::ptree
      */
-    boost::property_tree::ptree TDAmeritrade::get_user_principals()
+    JSONObject::ptree TDAmeritrade::get_user_principals()
     {
         CURL *curl;
         FILE *fp;
@@ -209,7 +207,7 @@ namespace tda
             fclose(fp);
         }
 
-        boost::property_tree::ptree property_tree;
+        JSONObject::ptree property_tree;
         std::ifstream json_file(filename, std::ios::in | std::ios::binary);
 
         try
@@ -233,15 +231,15 @@ namespace tda
      * @brief creates ptree with login request for websocket session
      * @author @scawful
      *
-     * @return boost::property_tree::ptree
+     * @return JSONObject::ptree
      */
-    boost::property_tree::ptree TDAmeritrade::create_login_request()
+    JSONObject::ptree TDAmeritrade::create_login_request()
     {
-        boost::property_tree::ptree user_principals, credentials, requests, parameters;
+        JSONObject::ptree user_principals, credentials, requests, parameters;
         user_principals = get_user_principals();
 
         std::unordered_map<std::string, std::string> account_data;
-        BOOST_FOREACH (boost::property_tree::ptree::value_type &v, user_principals.get_child("accounts."))
+        BOOST_FOREACH (JSONObject::ptree::value_type &v, user_principals.get_child("accounts."))
         {
             for (auto &acct_it : v.second)
             {
@@ -254,7 +252,7 @@ namespace tda
         requests.put("requestid", 1);
         requests.put("command", "LOGIN");
         requests.put("account", account_data["accountId"]);
-        requests.put("source", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.appId")));
+        requests.put("source", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
 
         // format credentials
         // "userid": userPrincipalsResponse.accounts[0].accountId,
@@ -273,10 +271,10 @@ namespace tda
         credentials.put("segment", account_data["segment"]);
         credentials.put("cddomain", account_data["accountCdDomainId"]);
         credentials.put("userid", account_data["accountId"]);
-        credentials.put("usergroup", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.userGroup")));
-        credentials.put("accesslevel", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.accessLevel")));
+        credentials.put("usergroup", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.userGroup")));
+        credentials.put("accesslevel", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.accessLevel")));
         credentials.put("authorized", "Y");
-        credentials.put("acl", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.acl")));
+        credentials.put("acl", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.acl")));
 
         // token timestamp format :: 2021-08-10T14:57:11+0000
         std::tm token_timestamp = {};
@@ -309,7 +307,7 @@ namespace tda
             credentials.put("timestamp", millis);
         }
 
-        credentials.put("appid", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.appId")));
+        credentials.put("appid", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
 
         // format parameters
         std::string credential_str;
@@ -320,7 +318,7 @@ namespace tda
         std::size_t end = credential_str.size();
         credential_str.replace(end - 3, 3, "");
 
-        parameters.put("token", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.token")));
+        parameters.put("token", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.token")));
         parameters.put("version", "1.0");
         parameters.put("credential", credential_str);
 
@@ -349,15 +347,15 @@ namespace tda
      * @brief create ptree of logout request for websocket session
      * @author @scawful
      *
-     * @return boost::property_tree::ptree
+     * @return JSONObject::ptree
      */
-    boost::property_tree::ptree TDAmeritrade::create_logout_request()
+    JSONObject::ptree TDAmeritrade::create_logout_request()
     {
-        boost::property_tree::ptree user_principals, credentials, requests, parameters;
+        JSONObject::ptree user_principals, credentials, requests, parameters;
         user_principals = get_user_principals();
 
         std::unordered_map<std::string, std::string> account_data;
-        BOOST_FOREACH (boost::property_tree::ptree::value_type &v, user_principals.get_child("accounts."))
+        BOOST_FOREACH (JSONObject::ptree::value_type &v, user_principals.get_child("accounts."))
         {
             for (auto &acct_it : v.second)
             {
@@ -370,7 +368,7 @@ namespace tda
         requests.put("requestid", 1);
         requests.put("command", "LOGOUT");
         requests.put("account", account_data["accountId"]);
-        requests.put("source", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.appId")));
+        requests.put("source", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
 
         requests.add_child("parameters", parameters);
 
@@ -384,16 +382,16 @@ namespace tda
      * @param serv_type
      * @param keys
      * @param fields
-     * @return boost::property_tree::ptree
+     * @return JSONObject::ptree
      */
-    boost::property_tree::ptree TDAmeritrade::create_service_request(ServiceType serv_type, std::string keys, std::string fields)
+    JSONObject::ptree TDAmeritrade::create_service_request(ServiceType serv_type, std::string keys, std::string fields)
     {
-        boost::property_tree::ptree requests, parameters, user_principals;
+        JSONObject::ptree requests, parameters, user_principals;
         user_principals = get_user_principals();
 
         // gets first account by default, maybe change later
         std::unordered_map<std::string, std::string> account_data;
-        BOOST_FOREACH (boost::property_tree::ptree::value_type &v, user_principals.get_child("accounts."))
+        BOOST_FOREACH (JSONObject::ptree::value_type &v, user_principals.get_child("accounts."))
         {
             for (auto &acct_it : v.second)
             {
@@ -406,7 +404,7 @@ namespace tda
         requests.put("requestid", 1);
         requests.put("command", "SUBS");
         requests.put("account", account_data["accountId"]);
-        requests.put("source", user_principals.get<std::string>(boost::property_tree::ptree::path_type("streamerInfo.appId")));
+        requests.put("source", user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
 
         parameters.put("keys", keys);
         parameters.put("fields", fields);
@@ -422,12 +420,12 @@ namespace tda
      *
      * @param keep_file
      */
-    void TDAmeritrade::get_access_token(bool keep_file)
+    void TDAmeritrade::request_access_token(bool keep_file)
     {
         std::time_t now = std::time(0);
         post_access_token(_refresh_token);
 
-        boost::property_tree::ptree propertyTree;
+        JSONObject::ptree propertyTree;
         std::ifstream jsonFile("access_token.json", std::ios::in | std::ios::binary);
 
         try
@@ -452,6 +450,8 @@ namespace tda
         }
     }
 
+    // PUBLIC FUNCTIONS =========================================================================
+
     /**
      * @brief Construct a new TDAmeritrade::TDAmeritrade object
      * @author @scawful
@@ -460,22 +460,22 @@ namespace tda
      * 
      * @param type 
      */
-    TDAmeritrade::TDAmeritrade(RetrievalType type)
+    TDAmeritrade::TDAmeritrade()
     {
-        switch (type)
-        {
-        case GET_QUOTE:
-            _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
-            break;
-        case PRICE_HISTORY:
-            _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-            break;
-        case OPTION_CHAIN:
-            _base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}";
-            break;
-        default:
-            break;
-        }
+        // switch (type)
+        // {
+        // case GET_QUOTE:
+        //     _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
+        //     break;
+        // case PRICE_HISTORY:
+        //     _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
+        //     break;
+        // case OPTION_CHAIN:
+        //     _base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}";
+        //     break;
+        // default:
+        //     break;
+        // }
 
         _session_active = false;
         _user_principals = false;
@@ -485,10 +485,8 @@ namespace tda
         _refresh_token = REFRESH_TOKEN;
         _access_token = "nope";
 
-        get_access_token(false);
+        request_access_token(false);
     }
-
-    // PUBLIC FUNCTIONS =========================================================================
 
     /**
      * @brief Start a WebSocket session
@@ -508,27 +506,27 @@ namespace tda
             SDL_Log("Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what());
         }
 
-        boost::property_tree::ptree login_request = create_login_request();
-        boost::property_tree::ptree logout_request = create_logout_request();
+        JSONObject::ptree login_request = create_login_request();
+        JSONObject::ptree logout_request = create_logout_request();
 
         // for testing
         std::ifstream requests_json("requests_test.json", std::ios::out);
-        boost::property_tree::write_json("requests_test.json", login_request);
+        JSONObject::write_json("requests_test.json", login_request);
 
         std::stringstream login_text_stream;
-        boost::property_tree::write_json(login_text_stream, login_request);
+        JSONObject::write_json(login_text_stream, login_request);
         std::string login_text = login_text_stream.str();
 
         std::stringstream requests_text_stream;
-        boost::property_tree::write_json(requests_text_stream, create_service_request(QUOTE, "TLT", "0,1,2,3,4,5,6,7,8"));
+        JSONObject::write_json(requests_text_stream, create_service_request(QUOTE, "TLT", "0,1,2,3,4,5,6,7,8"));
         std::string request_text = requests_text_stream.str();
 
         std::stringstream logout_text_stream;
-        boost::property_tree::write_json(logout_text_stream, logout_request);
+        JSONObject::write_json(logout_text_stream, logout_request);
         std::string logout_text = logout_text_stream.str();
 
         std::stringstream chart_request_stream;
-        boost::property_tree::write_json(chart_request_stream, create_service_request(CHART_EQUITY, "AAPL", "0,1,2,3,4,5,6,7,8"));
+        JSONObject::write_json(chart_request_stream, create_service_request(CHART_EQUITY, "AAPL", "0,1,2,3,4,5,6,7,8"));
         std::string chart_equity_text = chart_request_stream.str();
 
         _request_queue.push_back(std::make_shared<std::string const>(login_text));
@@ -572,11 +570,11 @@ namespace tda
         pt::ptree login_request = create_login_request();
 
         std::stringstream login_text_stream;
-        boost::property_tree::write_json(login_text_stream, login_request);
+        JSONObject::write_json(login_text_stream, login_request);
         std::string login_text = login_text_stream.str();
 
         std::stringstream requests_text_stream;
-        boost::property_tree::write_json(requests_text_stream, create_service_request(QUOTE, ticker, fields));
+        JSONObject::write_json(requests_text_stream, create_service_request(QUOTE, ticker, fields));
         std::string request_text = requests_text_stream.str();
 
         _request_queue.push_back(std::make_shared<std::string const>(login_text));
@@ -684,20 +682,20 @@ namespace tda
     }
 
     /**
-     * @brief Creat a boost::property_tree that holds json information downloaded from a file 
+     * @brief Creat a JSONObject that holds json information downloaded from a file 
      * @author @scawful
      * 
      * @param ticker 
      * @param new_url 
-     * @return boost::property_tree::ptree 
+     * @return JSONObject::ptree 
      */
-    boost::property_tree::ptree TDAmeritrade::createPropertyTree(std::string ticker, std::string new_url)
+    JSONObject::ptree TDAmeritrade::createPropertyTree(std::string ticker, std::string new_url)
     {
         std::time_t now = std::time(0);
         std::string output_file_name = this->_current_ticker + "_" + std::to_string(now) + ".json";
         download_file(new_url, output_file_name);
         std::ifstream jsonFile(output_file_name, std::ios::in | std::ios::binary);
-        boost::property_tree::ptree propertyTree;
+        JSONObject::ptree propertyTree;
 
         try
         {
@@ -720,12 +718,11 @@ namespace tda
      * 
      * @return boost::shared_ptr<tda::PriceHistory> 
      */
-    boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory()
+    PriceHistory TDAmeritrade::createPriceHistory()
     {
-        boost::property_tree::ptree propertyTree = createPropertyTree(this->_current_ticker, this->_base_url);
-        boost::shared_ptr<PriceHistory> new_price_history_data = boost::make_shared<PriceHistory>(propertyTree);
-
-        return new_price_history_data;
+        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
+        JSONObject::ptree propertyTree = createPropertyTree(this->_current_ticker, url);
+        return PriceHistory(propertyTree);
     }
 
     /**
@@ -735,16 +732,24 @@ namespace tda
      * @param ticker 
      * @return boost::shared_ptr<tda::PriceHistory> 
      */
-    boost::shared_ptr<tda::PriceHistory> TDAmeritrade::createPriceHistory(std::string ticker)
+    PriceHistory TDAmeritrade::createPriceHistory(std::string ticker, PeriodType ptype, int period_amt,
+                                                  FrequencyType ftype, int freq_amt, bool ext)
     {
-        set_retrieval_type(PRICE_HISTORY);
-        std::string url = this->_base_url;
+        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
         string_replace(url, "{ticker}", ticker);
+        string_replace(url, "{periodType}", get_api_interval_value(ptype));
+        string_replace(url, "{period}", get_api_period_amount(period_amt));
+        string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
+        string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
 
-        boost::property_tree::ptree propertyTree = createPropertyTree(ticker, url);
-        boost::shared_ptr<PriceHistory> new_price_history_data = boost::make_shared<PriceHistory>(propertyTree);
+        if (!ext)
+            string_replace(url, "{ext}", "false");
+        else
+            string_replace(url, "{ext}", "true");
 
-        return new_price_history_data;
+        JSONObject::ptree propertyTree = createPropertyTree(ticker, url);
+        return PriceHistory(propertyTree);
     }
 
     /**
@@ -754,16 +759,13 @@ namespace tda
      * @param ticker 
      * @return boost::shared_ptr<tda::Quote> 
      */
-    boost::shared_ptr<tda::Quote> TDAmeritrade::createQuote(std::string ticker)
+    Quote TDAmeritrade::createQuote(std::string ticker)
     {
-        set_retrieval_type(GET_QUOTE);
-        std::string url = this->_base_url;
+        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
         string_replace(url, "{ticker}", ticker);
 
-        boost::property_tree::ptree propertyTree = createPropertyTree(ticker, url);
-        boost::shared_ptr<Quote> new_quote_data = boost::make_shared<Quote>(propertyTree);
-
-        return new_quote_data;
+        JSONObject::ptree propertyTree = createPropertyTree(ticker, url);
+        return Quote(propertyTree);
     }
 
     /**
@@ -773,12 +775,27 @@ namespace tda
      * @param ticker 
      * @return boost::shared_ptr<tda::OptionChain> 
      */
-    boost::shared_ptr<tda::OptionChain> TDAmeritrade::createOptionChain(std::string ticker)
+    OptionChain TDAmeritrade::createOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
+                                                                        bool includeQuotes, std::string strategy, std::string range,
+                                                                        std::string expMonth, std::string optionType)
     {
-        // set_retrieval_type( OPTION_CHAIN );
-        boost::property_tree::ptree propertyTree = createPropertyTree(ticker, this->_base_url);
-        boost::shared_ptr<OptionChain> new_option_chain_data = boost::make_shared<OptionChain>(propertyTree);
-        return new_option_chain_data;
+        std::string url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+
+        string_replace(url, "{ticker}", ticker);
+        string_replace(url, "{contractType}", contractType);
+        string_replace(url, "{strikeCount}", strikeCount);
+        string_replace(url, "{strategy}", strategy);
+        string_replace(url, "{range}", range);
+        string_replace(url, "{expMonth}", expMonth);
+        string_replace(url, "{optionType}", optionType);
+
+        if (!includeQuotes)
+            string_replace(url, "{includeQuotes}", "FALSE");
+        else
+            string_replace(url, "{includeQuotes}", "TRUE");
+
+        JSONObject::ptree propertyTree = createPropertyTree(ticker, url);
+        return OptionChain(propertyTree);
     }
 
     /**
@@ -788,7 +805,7 @@ namespace tda
      * @param account_num 
      * @return boost::shared_ptr<tda::Account> 
      */
-    boost::shared_ptr<tda::Account> TDAmeritrade::createAccount(std::string account_num)
+    Account TDAmeritrade::createAccount(std::string account_num)
     {
         std::string account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
         string_replace(account_url, "{accountNum}", account_num);
@@ -799,7 +816,7 @@ namespace tda
         post_account_auth(account_url, account_filename);
         std::ifstream jsonFile(account_filename, std::ios::in | std::ios::binary);
 
-        boost::property_tree::ptree propertyTree;
+        JSONObject::ptree propertyTree;
 
         try
         {
@@ -812,36 +829,7 @@ namespace tda
 
         jsonFile.close();
         std::remove(account_filename.c_str());
-
-        boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>(propertyTree);
-        return new_account_data;
-    }
-
-    /**
-     * @brief Set the current data retrieval type
-     * @author @scawful
-     * 
-     * @todo change this please
-     * 
-     * @param type 
-     */
-    void TDAmeritrade::set_retrieval_type(RetrievalType type)
-    {
-        switch (type)
-        {
-        case GET_QUOTE:
-            this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
-            break;
-        case PRICE_HISTORY:
-            // this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-            this->_base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType=ytd&period=1&frequencyType=daily&frequency=1&needExtendedHoursData=true";
-            break;
-        case OPTION_CHAIN:
-            this->_base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
-            break;
-        default:
-            break;
-        }
+        return Account(propertyTree);
     }
 
     /**
@@ -866,37 +854,6 @@ namespace tda
         this->_col_name = name;
     }
 
-    /**
-     * @brief Set the parameters for price history retrieval
-     * @author @scawful
-     * 
-     * @param ticker 
-     * @param ptype 
-     * @param period_amt 
-     * @param ftype 
-     * @param freq_amt 
-     * @param ext 
-     */
-    void TDAmeritrade::set_price_history_parameters(std::string ticker, PeriodType ptype, int period_amt,
-                                                    FrequencyType ftype, int freq_amt, bool ext)
-    {
-        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
-
-        string_replace(new_url, "{ticker}", ticker);
-        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
-        string_replace(new_url, "{period}", get_api_period_amount(period_amt));
-        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
-        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
-
-        if (!ext)
-            string_replace(new_url, "{ext}", "false");
-        else
-            string_replace(new_url, "{ext}", "true");
-
-        this->_base_url = new_url;
-        this->_current_ticker = ticker;
-    }
-
     void TDAmeritrade::set_price_history_parameters(std::string ticker, PeriodType ptype,
                                                     time_t start_date, time_t end_date,
                                                     FrequencyType ftype, int freq_amt, bool ext)
@@ -914,42 +871,6 @@ namespace tda
             string_replace(new_url, "{ext}", "false");
         else
             string_replace(new_url, "{ext}", "true");
-
-        this->_base_url = new_url;
-        this->_current_ticker = ticker;
-    }
-
-    /**
-     * @brief Set the parameters for option chain data 
-     * @author @scawful
-     * 
-     * @param ticker 
-     * @param contractType 
-     * @param strikeCount 
-     * @param includeQuotes 
-     * @param strategy 
-     * @param range 
-     * @param expMonth 
-     * @param optionType 
-     */
-    void TDAmeritrade::set_option_chain_parameters(std::string ticker, std::string contractType, std::string strikeCount,
-                                                   bool includeQuotes, std::string strategy, std::string range,
-                                                   std::string expMonth, std::string optionType)
-    {
-        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
-
-        string_replace(new_url, "{ticker}", ticker);
-        string_replace(new_url, "{contractType}", contractType);
-        string_replace(new_url, "{strikeCount}", strikeCount);
-        string_replace(new_url, "{strategy}", strategy);
-        string_replace(new_url, "{range}", range);
-        string_replace(new_url, "{expMonth}", expMonth);
-        string_replace(new_url, "{optionType}", optionType);
-
-        if (!includeQuotes)
-            string_replace(new_url, "{includeQuotes}", "FALSE");
-        else
-            string_replace(new_url, "{includeQuotes}", "TRUE");
 
         this->_base_url = new_url;
         this->_current_ticker = ticker;

@@ -12,8 +12,6 @@ private:
 
     std::string title_string, ticker_symbol;
 
-    boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
-
     bool request_fields[53];
     const char *quote_fields[53] = { "Symbol", "Bid Price", "Ask Price", "Last Price", "Bid Size",
     "Ask Size", "Ask ID", "Bid ID", "Total Volume", "Last Size", "Trade Time", "Quote Time",

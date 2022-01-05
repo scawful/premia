@@ -8,15 +8,15 @@ Positions Positions::m_Positions;
 
 void Positions::load_account( std::string account_num )
 {
-    account_data = tda_data_interface->createAccount( account_num );
+    account_data = premia->tda_client.createAccount( account_num );
 
     if ( positions_vector.size() != 0 ) {
         positions_vector.clear();
     }
 
-    for ( int i = 0; i < account_data->get_position_vector_size(); i++ )
+    for ( int i = 0; i < account_data.get_position_vector_size(); i++ )
     {
-        for ( auto& position_it : account_data->get_position( i ) )
+        for ( auto& position_it : account_data.get_position( i ) )
         {
             if ( position_it.first == "symbol" )
             {
@@ -30,9 +30,7 @@ void Positions::load_account( std::string account_num )
 void Positions::init(Manager *premia)
 {
     this->premia = premia;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
-
-    account_ids_std = tda_data_interface->get_all_accounts();
+    account_ids_std = premia->tda_client.get_all_accounts();
     for ( std::string const& each_id : account_ids_std ) {
         account_ids.push_back(each_id.c_str());
     }
@@ -135,7 +133,7 @@ void Positions::handleEvents()
 
 void Positions::update()
 {
-    draw_imgui_menu( premia, tda_data_interface, "Home" );
+    draw_imgui_menu( premia, "Home" );
 
     // Load Account IDs
     static int n = 0;
@@ -149,10 +147,10 @@ void Positions::update()
     // ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
     ImGui::Text("TDAmeritrade Portfolio Information");
     ImGui::Separator();
-    ImGui::Text( "Account ID: %s", account_data->get_account_variable("accountId").c_str() );
-    ImGui::Text( "Net Liq: %s", account_data->get_balance_variable("liquidationValue").c_str() );
-    ImGui::Text( "Available Funds: %s", account_data->get_balance_variable("availableFunds").c_str() );
-    ImGui::Text( "Cash: %s", account_data->get_balance_variable("cashBalance").c_str() );
+    ImGui::Text( "Account ID: %s", account_data.get_account_variable("accountId").c_str() );
+    ImGui::Text( "Net Liq: %s", account_data.get_balance_variable("liquidationValue").c_str() );
+    ImGui::Text( "Available Funds: %s", account_data.get_balance_variable("availableFunds").c_str() );
+    ImGui::Text( "Cash: %s", account_data.get_balance_variable("cashBalance").c_str() );
 
     ImGui::Separator();
     ImGui::Text("Positions");
@@ -194,19 +192,19 @@ void Positions::update()
                             ImGui::Text("%s", symbol.c_str() );
                             break;
                         case 1:
-                            ImGui::Text("%s", account_data->get_position_balances( symbol, "currentDayProfitLoss" ).c_str());
+                            ImGui::Text("%s", account_data.get_position_balances( symbol, "currentDayProfitLoss" ).c_str());
                             break;
                         case 2:
-                            ImGui::Text("%s", account_data->get_position_balances( symbol, "currentDayProfitLossPercentage").c_str() );
+                            ImGui::Text("%s", account_data.get_position_balances( symbol, "currentDayProfitLossPercentage").c_str() );
                             break;
                         case 3:
-                            ImGui::Text("%s", account_data->get_position_balances( symbol, "averagePrice" ).c_str());
+                            ImGui::Text("%s", account_data.get_position_balances( symbol, "averagePrice" ).c_str());
                             break;
                         case 4:
-                            ImGui::Text("%s", account_data->get_position_balances( symbol, "marketValue" ).c_str());
+                            ImGui::Text("%s", account_data.get_position_balances( symbol, "marketValue" ).c_str());
                             break;
                         case 5:
-                            ImGui::Text("%s", account_data->get_position_balances( symbol, "longQuantity" ).c_str());
+                            ImGui::Text("%s", account_data.get_position_balances( symbol, "longQuantity" ).c_str());
                             break;
                         case 6:
                             ImGui::SmallButton("Buy");
@@ -236,10 +234,10 @@ void Positions::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( premia->pWindow, &w, &h );
+    SDL_SetRenderDrawColor(premia->pRenderer, 55, 55, 55, 0);
+    SDL_GetWindowSize(premia->pWindow, &w, &h);
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( premia->pRenderer, &f );
+    SDL_RenderFillRect(premia->pRenderer, &f);
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());

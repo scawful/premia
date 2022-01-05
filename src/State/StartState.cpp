@@ -11,8 +11,6 @@ StartState StartState::m_StartState;
 void StartState::init(Manager *premia)
 {
     this->premia = premia;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
-
     ImGui::StyleColorsClassic();
 }
 
@@ -108,7 +106,7 @@ void StartState::handleEvents()
 
 void StartState::update()
 {
-    draw_imgui_menu( premia, tda_data_interface, "Home" );
+    draw_imgui_menu( premia, "Home" );
 
     // Place Order Button ---------------------------------------------------------------------------------
     if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
@@ -117,7 +115,7 @@ void StartState::update()
     ImGui::SameLine();
     if ( ImGui::Button("Load Responses from WebSocket", ImVec2(220, 30)) )
     {
-        for ( auto response : tda_data_interface->get_session_responses() )
+        for ( auto response : premia->tda_client.get_session_responses() )
         {
             SDL_Log("Response: %s", response.c_str() );
         }
@@ -140,7 +138,7 @@ void StartState::update()
             {
                 new_ticker = std::string(buf);
                 std::cout << "new ticker " << new_ticker << std::endl;
-                quotes[ new_ticker ] = tda_data_interface->createQuote( new_ticker );
+                quotes[ new_ticker ] = premia->tda_client.createQuote( new_ticker );
                 active_instrument = true;
             }
             else
@@ -154,16 +152,16 @@ void StartState::update()
             static int n = 0;
             ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
 
-            ImGui::Text("%s - %s", quotes[new_ticker]->getQuoteVariable("symbol").c_str(), quotes[new_ticker]->getQuoteVariable("description").c_str() );
-            ImGui::Text("Bid: %s - Size: %s", quotes[new_ticker]->getQuoteVariable("bidPrice").c_str(), quotes[new_ticker]->getQuoteVariable("bidSize").c_str() );
-            ImGui::Text("Ask: %s - Size: %s", quotes[new_ticker]->getQuoteVariable("askPrice").c_str(), quotes[new_ticker]->getQuoteVariable("askSize").c_str() );
+            ImGui::Text("%s - %s", quotes[new_ticker].getQuoteVariable("symbol").c_str(), quotes[new_ticker].getQuoteVariable("description").c_str() );
+            ImGui::Text("Bid: %s - Size: %s", quotes[new_ticker].getQuoteVariable("bidPrice").c_str(), quotes[new_ticker].getQuoteVariable("bidSize").c_str() );
+            ImGui::Text("Ask: %s - Size: %s", quotes[new_ticker].getQuoteVariable("askPrice").c_str(), quotes[new_ticker].getQuoteVariable("askSize").c_str() );
             ImGui::Separator();
 
             static float order_quantity = 10.f;
             ImGui::InputFloat("Quanitity", &order_quantity, 10.f);
 
             double security_cost = 0.0;
-            std::string bidPrice = quotes[new_ticker]->getQuoteVariable("bidPrice");
+            std::string bidPrice = quotes[new_ticker].getQuoteVariable("bidPrice");
             security_cost = std::stod( bidPrice );
             security_cost *= order_quantity;
             ImGui::Text("Cost: %lf", security_cost );

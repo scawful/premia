@@ -15,8 +15,7 @@ private:
     TTF_Font *menuFont = NULL;
     TTF_Font *priceFont = NULL;
 
-    std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
-    boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
+    std::map<std::string, tda::Quote > quotes;
 
 protected:
     StartState() { }

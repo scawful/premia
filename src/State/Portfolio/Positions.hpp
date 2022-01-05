@@ -15,13 +15,13 @@ private:
     std::vector<const char*> account_ids;
     std::string default_account;
 
-    std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
-    boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
-    boost::shared_ptr<cbp::CoinbasePro> cbp_data_interface;
+    std::map<std::string, tda::Quote> quotes;
+    // boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
+    // boost::shared_ptr<cbp::CoinbasePro> cbp_data_interface;
 
-    boost::shared_ptr<tda::Account> account_data;
-    boost::shared_ptr<cbp::Account> cbp_account_data;
-    std::unordered_map<std::string, boost::shared_ptr<cbp::Product> > cbp_products;
+    tda::Account account_data;
+    // boost::shared_ptr<cbp::Account> cbp_account_data;
+    // std::unordered_map<std::string, boost::shared_ptr<cbp::Product> > cbp_products;
 
     std::vector<std::string> positions_vector;
     

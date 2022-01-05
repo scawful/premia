@@ -30,26 +30,24 @@ void QuoteState::initCandleArrays()
 
 void QuoteState::setDetailedQuote( std::string ticker )
 {
-    boost::shared_ptr<tda::Quote> detailedQuotePtr = tda_data_interface->createQuote( ticker );
-    std::cout << tda_data_interface->getBaseUrl() << std::endl;
-    detailed_quote = "Exchange: " + detailedQuotePtr->getQuoteVariable("exchangeName") +
-                                 "\nBid: $" + detailedQuotePtr->getQuoteVariable("bidPrice") + " - Size: " + detailedQuotePtr->getQuoteVariable("bidSize") +
-                                 "\nAsk: $" + detailedQuotePtr->getQuoteVariable("askPrice") + " - Size: " + detailedQuotePtr->getQuoteVariable("askSize") +
-                                 "\nOpen: $" + detailedQuotePtr->getQuoteVariable("openPrice") +
-                                 "\nClose: $" + detailedQuotePtr->getQuoteVariable("closePrice") +
-                                 "\n52 Week High: $" + detailedQuotePtr->getQuoteVariable("52WkHigh") +
-                                 "\n52 Week Low: $" + detailedQuotePtr->getQuoteVariable("52WkLow") +
-                                 "\nTotal Volume: " + detailedQuotePtr->getQuoteVariable("totalVolume");
+    tda::Quote quote = premia->tda_client.createQuote( ticker );
+    std::cout << premia->tda_client.getBaseUrl() << std::endl;
+    detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
+                                 "\nBid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
+                                 "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
+                                 "\nOpen: $" + quote.getQuoteVariable("openPrice") +
+                                 "\nClose: $" + quote.getQuoteVariable("closePrice") +
+                                 "\n52 Week High: $" + quote.getQuoteVariable("52WkHigh") +
+                                 "\n52 Week Low: $" + quote.getQuoteVariable("52WkLow") +
+                                 "\nTotal Volume: " + quote.getQuoteVariable("totalVolume");
 
-    title_string = detailedQuotePtr->getQuoteVariable("symbol") + " - " + detailedQuotePtr->getQuoteVariable("description");
+    title_string = quote.getQuoteVariable("symbol") + " - " + quote.getQuoteVariable("description");
 }
 
 void QuoteState::init(Manager *premia)
 {
     this->premia = premia;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
-    ticker_symbol = "TLT";
-    setQuote( "TLT" );
+    setQuote("TLT");
 
     ImGui::CreateContext();
     ImPlot::CreateContext();
@@ -78,23 +76,23 @@ void QuoteState::resume()
 
 void QuoteState::setQuote( std::string ticker )
 {
-    quoteData = tda_data_interface->createQuote( ticker );
-    priceHistoryData = tda_data_interface->createPriceHistory( ticker );
+    quoteData = premia->tda_client.createQuote( ticker );
+    priceHistoryData = premia->tda_client.createPriceHistory( ticker, tda::PeriodType::YEAR, 1, tda::FrequencyType::DAILY, 1, true );
 
-    detailed_quote = "Exchange: " + quoteData->getQuoteVariable("exchangeName") +
-                                 "\nBid: $" + quoteData->getQuoteVariable("bidPrice") + " - Size: " + quoteData->getQuoteVariable("bidSize") +
-                                 "\nAsk: $" + quoteData->getQuoteVariable("askPrice") + " - Size: " + quoteData->getQuoteVariable("askSize") +
-                                 "\nOpen: $" + quoteData->getQuoteVariable("openPrice") +
-                                 "\nClose: $" + quoteData->getQuoteVariable("closePrice") +
-                                 "\n52 Week High: $" + quoteData->getQuoteVariable("52WkHigh") +
-                                 "\n52 Week Low: $" + quoteData->getQuoteVariable("52WkLow") +
-                                 "\nTotal Volume: " + quoteData->getQuoteVariable("totalVolume");
+    detailed_quote = "Exchange: " + quoteData.getQuoteVariable("exchangeName") +
+                                 "\nBid: $" + quoteData.getQuoteVariable("bidPrice") + " - Size: " + quoteData.getQuoteVariable("bidSize") +
+                                 "\nAsk: $" + quoteData.getQuoteVariable("askPrice") + " - Size: " + quoteData.getQuoteVariable("askSize") +
+                                 "\nOpen: $" + quoteData.getQuoteVariable("openPrice") +
+                                 "\nClose: $" + quoteData.getQuoteVariable("closePrice") +
+                                 "\n52 Week High: $" + quoteData.getQuoteVariable("52WkHigh") +
+                                 "\n52 Week Low: $" + quoteData.getQuoteVariable("52WkLow") +
+                                 "\nTotal Volume: " + quoteData.getQuoteVariable("totalVolume");
 
-    title_string = quoteData->getQuoteVariable("symbol") + " - " + quoteData->getQuoteVariable("description");
+    title_string = quoteData.getQuoteVariable("symbol") + " - " + quoteData.getQuoteVariable("description");
 
     ticker_symbol = ticker;
 
-    candleVector = priceHistoryData->getCandleVector();
+    candleVector = priceHistoryData.getCandleVector();
 
     // for ( auto& vector_it: candleVector )
     // {
@@ -185,7 +183,7 @@ void QuoteState::createCandleChart( float width_percent, int count, ImVec4 bullC
     }
 
     // begin plot item
-    if ( ImPlot::BeginItem( priceHistoryData->getPriceHistoryVariable("symbol").c_str() ) ) 
+    if ( ImPlot::BeginItem( priceHistoryData.getPriceHistoryVariable("symbol").c_str() ) ) 
     {
         // override legend icon color
         ImPlot::GetCurrentItem()->Color = IM_COL32(64,64,64,255);
@@ -293,8 +291,9 @@ void QuoteState::handleEvents()
 
 void QuoteState::update()
 {    
-    draw_imgui_menu( premia, tda_data_interface, title_string );
+    draw_imgui_menu( premia, title_string );
 
+    static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
     static char buf[64] = "";
     ImGui::Text("Symbol: ");
     ImGui::SameLine(); ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
@@ -303,11 +302,12 @@ void QuoteState::update()
     {
         if ( strcmp(buf, "") != 0 )
         {
-            quoteData.reset();
-            priceHistoryData.reset();
-            quoteData = tda_data_interface->createQuote( buf );
-            priceHistoryData = tda_data_interface->createPriceHistory( buf );
-            candleVector = priceHistoryData->getCandleVector();
+            // quoteData.reset();
+            // priceHistoryData.reset();
+            quoteData = premia->tda_client.createQuote( buf );
+            priceHistoryData = premia->tda_client.createPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
+                                                                 tda::FrequencyType(frequency_type), frequency_amount, true);
+            candleVector = priceHistoryData.getCandleVector();
             setDetailedQuote( buf );
             ticker_symbol = buf;
         }
@@ -318,7 +318,6 @@ void QuoteState::update()
 
     // ====== implot chart ======= //
 
-    static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
     static bool tooltip = false;
     // ImGui::Checkbox("Show Tooltip", &tooltip);
     // ImGui::SameLine();
@@ -342,10 +341,9 @@ void QuoteState::update()
     if ( ImGui::Button("Apply") ) 
     {
         std::cout << "Change chart settings!" << std::endl;
-        tda_data_interface->set_price_history_parameters( ticker_symbol, tda::PeriodType(period_type), period_amount, 
-                                                          tda::FrequencyType(frequency_type), frequency_amount );
-        priceHistoryData = tda_data_interface->createPriceHistory();
-        candleVector = priceHistoryData->getCandleVector();
+        priceHistoryData = premia->tda_client.createPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount, 
+                                                                 tda::FrequencyType(frequency_type), frequency_amount, true);
+        candleVector = priceHistoryData.getCandleVector();
     }  
 
     if (ImGui::BeginPopupContextItem())

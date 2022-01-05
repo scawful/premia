@@ -5,7 +5,7 @@
 #include "../StreamState.hpp"
 #include "../Portfolio/Positions.hpp"
 
-void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_data_interface, std::string title_string )
+void draw_imgui_menu( Manager *premia, std::string title_string )
 {
     static bool about = false;
     ImGui::NewFrame();
@@ -40,12 +40,12 @@ void draw_imgui_menu( Manager *premia, boost::shared_ptr<tda::TDAmeritrade> tda_
 
             if ( ImGui::MenuItem("Authenticate") )
             {
-                tda_data_interface->manual_authentication();
+                // premia->tda_client->manual_authentication();
             }
 
             if ( ImGui::MenuItem("Start WS Session") )
             {
-                tda_data_interface->start_session();
+                premia->tda_client.start_session();
             }
 
             

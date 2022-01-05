@@ -11,10 +11,8 @@ static int last_select = 0;
 void OptionState::init(Manager *premia)
 {
     this->premia = premia;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::OPTION_CHAIN);
-    tda_data_interface->set_option_chain_parameters( "TLT", "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
-    optionChainData = tda_data_interface->createOptionChain( "TLT" );
-    optionsDateTimeObj = optionChainData->getOptionsDateTimeObj();
+    optionChainData = premia->tda_client.createOptionChain( "TLT", "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
+    optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
 
     ImGui::CreateContext();
     ImPlot::CreateContext();
@@ -103,10 +101,10 @@ void OptionState::handleEvents()
 
 void OptionState::update()
 {    
-    std::string title_string = "Option Chain: " + optionChainData->getOptionChainDataVariable("symbol");
-    draw_imgui_menu( premia, tda_data_interface, title_string );
+    std::string title_string = "Option Chain: " + optionChainData.getOptionChainDataVariable("symbol");
+    draw_imgui_menu( premia, title_string );
 
-    ImGui::Text( "%s (%s) [B: %s  A: %s]", optionChainData->getOptionChainDataVariable("symbol").c_str(), optionChainData->getUnderlyingDataVariable("markPercentChange").c_str(), optionChainData->getUnderlyingDataVariable("bid").c_str(), optionChainData->getUnderlyingDataVariable("ask").c_str() );
+    ImGui::Text( "%s (%s) [B: %s  A: %s]", optionChainData.getOptionChainDataVariable("symbol").c_str(), optionChainData.getUnderlyingDataVariable("markPercentChange").c_str(), optionChainData.getUnderlyingDataVariable("bid").c_str(), optionChainData.getUnderlyingDataVariable("ask").c_str() );
     ImGui::Spacing();
 
     ImGui::SetNextItemWidth( 200.f );

@@ -11,10 +11,7 @@ private:
     
     Manager *premia = NULL;
     SDL_Texture *pTexture = NULL;
-    
-    std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
-    boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
-    
+        
 protected:
     DemoState() { }
 
