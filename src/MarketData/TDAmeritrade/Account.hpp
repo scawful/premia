@@ -33,6 +33,7 @@ namespace tda
         void initVariables();
 
     public:
+        Account();
         Account( boost::property_tree::ptree account_data );
 
         size_t get_position_vector_size();
