@@ -55,7 +55,13 @@ void Manager::init(int width, int height)
         }
     }
     ImGui::CreateContext();
-    ImGui_ImplSDL2_InitForPremia( pWindow );
+
+    ImGui_ImplSDL2_InitForSDLRenderer(pWindow);
+    ImGui_ImplSDLRenderer_Init(pRenderer);
+
+    ImGui_ImplSDLRenderer_NewFrame();
+    ImGui_ImplSDL2_NewFrame(pWindow);
+    ImGui::NewFrame();
 }
 
 void Manager::cleanup()
@@ -66,7 +72,9 @@ void Manager::cleanup()
         states.pop_back();
     }
 
-    ImGuiSDL::Deinitialize();
+    // Shut down SDL renderer 
+    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 
