@@ -2,10 +2,10 @@
 
 Details
 --------
-- Description: Risk parity anaylsis and trading program
+- Description: Risk Parity Anaylsis and Trading Client
 - Platform: Windows, macOS, GNU/Linux
 - Toolchain: mingw-w64, clang
-- Dependencies: Boost, SDL2, OpenSSL, QuantLib, ImGui, ImGuiSDL, ImPlot
+- Dependencies: Boost, SDL2, OpenSSL, QuantLib, ImGui, ImPlot
 - API: TDAmeritrade, Coinbase Pro
 
 API KEYS
