@@ -1,8 +1,10 @@
 #include "PriceHistory.hpp"
 
+using namespace tda;
+
 /* =============== PriceHistory Class =============== */
 
-void tda::PriceHistory::initVariables()
+void PriceHistory::initVariables()
 {
     for ( auto& history_it: priceHistoryData )
     {
@@ -60,23 +62,28 @@ void tda::PriceHistory::initVariables()
     }
 }
 
-tda::PriceHistory::PriceHistory( boost::property_tree::ptree price_history_data )
+PriceHistory::PriceHistory() 
+{
+    
+}
+
+PriceHistory::PriceHistory( boost::property_tree::ptree price_history_data )
 {
     priceHistoryData = price_history_data;
     initVariables();
 }
 
-std::vector< tda::Candle > tda::PriceHistory::getCandleVector()
+std::vector< tda::Candle > PriceHistory::getCandleVector()
 {
     return candleVector;
 }
 
-std::string tda::PriceHistory::getCandleDataVariable( std::string variable )
+std::string PriceHistory::getCandleDataVariable( std::string variable )
 {
     return candleData[ variable ];
 }
 
-std::string tda::PriceHistory::getPriceHistoryVariable( std::string variable )
+std::string PriceHistory::getPriceHistoryVariable( std::string variable )
 {
     return priceHistoryVariables[variable];
 }
