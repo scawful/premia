@@ -54,6 +54,11 @@ void tda::OptionChain::initVariables()
     }
 }
 
+tda::OptionChain::OptionChain()
+{
+    
+}
+
 tda::OptionChain::OptionChain( boost::property_tree::ptree option_chain_data )
 {
     optionChainData = option_chain_data;
