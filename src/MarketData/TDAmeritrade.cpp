@@ -462,25 +462,14 @@ namespace tda
      */
     TDAmeritrade::TDAmeritrade()
     {
-        // switch (type)
-        // {
         // case GET_QUOTE:
         //     _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
-        //     break;
         // case PRICE_HISTORY:
         //     _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-        //     break;
         // case OPTION_CHAIN:
         //     _base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}";
-        //     break;
-        // default:
-        //     break;
-        // }
-
         _session_active = false;
         _user_principals = false;
-        _period_type = DAY;
-        _frequency_type = MINUTE;
         _col_name = "Open";
         _refresh_token = REFRESH_TOKEN;
         _access_token = "nope";
@@ -830,17 +819,6 @@ namespace tda
         jsonFile.close();
         std::remove(account_filename.c_str());
         return Account(propertyTree);
-    }
-
-    /**
-     * @brief Set the current time period 
-     * @author @scawful
-     * 
-     * @param periodType 
-     */
-    void TDAmeritrade::set_period_type(PeriodType periodType)
-    {
-        this->_period_type = periodType;
     }
 
     /**

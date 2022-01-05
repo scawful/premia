@@ -115,8 +115,6 @@ namespace tda
         bool _access_token_found;
         bool _session_active;
         bool _user_principals;
-        PeriodType _period_type;
-        FrequencyType _frequency_type;
         std::string _base_url;
         std::string _col_name;
         std::string _current_ticker;
@@ -181,7 +179,6 @@ namespace tda
         Account createAccount(std::string account_num);
 
         // Modifiers
-        void set_period_type(PeriodType interval);
         void set_col_name(std::string col_name);
 
         void set_price_history_parameters(std::string ticker, PeriodType ptype, time_t start_date, time_t end_date,
