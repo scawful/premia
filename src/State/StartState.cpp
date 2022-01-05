@@ -14,38 +14,8 @@ void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     this->pWindow = pWindow;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
 
-    // cbp_data_interface = boost::make_shared<cbp::CoinbasePro>();
-    // cbp_account_data = cbp_data_interface->list_accounts();
-
-    // cbp_products["ETH"] = cbp_data_interface->get_product_ticker( "ETH" );
-    // cbp_products["XTZ"] = cbp_data_interface->get_product_ticker( "XTZ" );
-    // cbp_products["USD"] = cbp_data_interface->get_product_ticker( "USD" );
-
-    // float eth_balance;
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
-    // {
-    //     if ( crypto_position_it.first == "available")
-    //         eth_balance = boost::lexical_cast<float>(crypto_position_it.second);
-    // }
-
-    // float xtz_balance;
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("XTZ") )
-    // {
-    //     if ( crypto_position_it.first == "available")
-    //         xtz_balance = boost::lexical_cast<float>(crypto_position_it.second);
-    // }
-
-    // float usd_balance = boost::lexical_cast<float>(cbp_account_data->get_position("USD")["available"]);
-
-    // //std::cout << "ETH: " << eth_balance << ", XTZ: " << xtz_balance << std::endl;
-
-    // float deposit_usd = cbp_data_interface->get_deposits();
-    // float temp = (eth_balance * cbp_products["ETH"]->get_current_price()) + (xtz_balance * cbp_products["XTZ"]->get_current_price()) - usd_balance;
-    // //std::cout << "Calc " << temp << std::endl;
-    // _profit_loss = (temp - deposit_usd) / deposit_usd;
-
-    ImGui::CreateContext();
-	ImGuiSDL::Initialize(pRenderer, 782, 543);
+    //ImGui::CreateContext();
+	// ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
 }
 
@@ -212,23 +182,6 @@ void StartState::update( Manager* premia )
         ImGui::EndPopup();
     }
 
-    
-    // ImGui::Spacing();
-    // ImGui::Separator();
-    // ImGui::Text("Coinbase Pro Accounts || P/L: %.2f", _profit_loss);
-    // ImGui::Separator();
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
-    // {
-    //     if ( crypto_position_it.first == "currency" || crypto_position_it.first == "available")
-    //         ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
-    // }
-    // ImGui::Separator();
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("XTZ") )
-    // {
-    //     if ( crypto_position_it.first == "currency" || crypto_position_it.first == "available")
-    //         ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
-    // }
-
     ImGui::End();    
     SDL_RenderClear(this->pRenderer);
 }
@@ -243,7 +196,7 @@ void StartState::draw( Manager* game )
     SDL_RenderFillRect( this->pRenderer, &f );
 
     ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 
     SDL_RenderPresent(pRenderer);
 }

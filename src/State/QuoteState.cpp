@@ -54,7 +54,6 @@ void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 
     ImGui::CreateContext();
     ImPlot::CreateContext();
-	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
 
     for ( int i = 0; i < candleVector.size(); i++ )
@@ -360,19 +359,19 @@ void QuoteState::update( Manager* premia )
     }
 
 
-    ImPlot::GetStyle().UseLocalTime = true;
-    ImPlot::SetNextPlotFormatY("$%.2f");
-    ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 
-                                boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkLow")), 
-                                boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkHigh")), ImGuiCond_Once);
+    // ImPlot::GetStyle().UseLocalTime = true;
+    // ImPlot::SetNextPlotFormatY("$%.2f");
+    // ImPlot::SetNextAxesLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 
+    //                             boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkLow")), 
+    //                             boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkHigh")), ImGuiCond_Once);
 
-    if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL,ImVec2(-1,0),0,
-                            ImPlotAxisFlags_Time,
-                            ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
-    {
-        createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
-        ImPlot::EndPlot();
-    }
+    // if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL,ImVec2(-1,0),0,
+    //                         ImPlotAxisFlags_Time,
+    //                         ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
+    // {
+    //     createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
+    //     ImPlot::EndPlot();
+    // }
 
     //ImGui::PlotHistogram("Volume", volumeVector, volumeVector.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
@@ -565,7 +564,7 @@ void QuoteState::draw( Manager* game )
     SDL_RenderFillRect( this->pRenderer, &f );
 
     ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 
     SDL_RenderPresent( this->pRenderer );
 }

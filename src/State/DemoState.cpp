@@ -10,7 +10,6 @@ void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     this->pWindow = pWindow;
 
     ImGui::CreateContext();
-	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
 }
 
@@ -126,7 +125,6 @@ void DemoState::draw( Manager* game )
     SDL_RenderFillRect( pRenderer, &f );
 
     ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
-
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(pRenderer);
 }

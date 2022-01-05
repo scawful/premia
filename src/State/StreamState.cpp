@@ -25,9 +25,7 @@ void StreamState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 
     ImGui::CreateContext();
     ImPlot::CreateContext();
-	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
-
 }
 
 void StreamState::cleanup()
@@ -200,17 +198,17 @@ void StreamState::update( Manager* premia )
     ImGui::BulletText("Indicators");
     ImGui::Spacing();
 
-    ImPlot::GetStyle().UseLocalTime = true;
-    ImPlot::SetNextPlotFormatY("$%.2f");
-    ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 0, 100, ImGuiCond_Once);
+    // ImPlot::GetStyle().UseLocalTime = true;
+    // ImPlot::SetNextPlotFormatY("$%.2f");
+    // ImPlot::SetNextAxesLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 0, 100, ImGuiCond_Once);
 
-    if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL, ImVec2(-1,0),0,
-                            ImPlotAxisFlags_Time,
-                            ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
-    {
-        //createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
-        ImPlot::EndPlot();
-    }
+    // if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL, ImVec2(-1,0),0,
+    //                         ImPlotAxisFlags_Time,
+    //                         ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
+    // {
+    //     //createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
+    //     ImPlot::EndPlot();
+    // }
 
 
     ImGui::End();
@@ -228,7 +226,6 @@ void StreamState::draw( Manager* game )
     SDL_RenderFillRect( this->pRenderer, &f );
 
     ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
-
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent( this->pRenderer );
 }

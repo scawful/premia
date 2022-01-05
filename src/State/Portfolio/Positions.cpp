@@ -41,7 +41,6 @@ void Positions::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
     load_account(default_account);
 
     ImGui::CreateContext();
-	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
 }
 
@@ -244,7 +243,6 @@ void Positions::draw( Manager* game )
     SDL_RenderFillRect( this->pRenderer, &f );
 
     ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
-
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(pRenderer);
 }
