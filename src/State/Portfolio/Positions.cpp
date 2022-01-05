@@ -27,10 +27,9 @@ void Positions::load_account( std::string account_num )
     }
 }
 
-void Positions::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+void Positions::init(Manager *premia)
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
+    this->premia = premia;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
 
     account_ids_std = tda_data_interface->get_all_accounts();
@@ -59,7 +58,7 @@ void Positions::resume()
     SDL_Log("Positions Resume\n");
 }
 
-void Positions::handleEvents( Manager* premia )
+void Positions::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -134,7 +133,7 @@ void Positions::handleEvents( Manager* premia )
 
 }
 
-void Positions::update( Manager* premia )
+void Positions::update()
 {
     draw_imgui_menu( premia, tda_data_interface, "Home" );
 
@@ -230,19 +229,19 @@ void Positions::update( Manager* premia )
     ImGui::Spacing();
     ImGui::Separator();
 
-    SDL_RenderClear(this->pRenderer);
+    SDL_RenderClear(premia->pRenderer);
 }
 
-void Positions::draw( Manager* game )
+void Positions::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( this->pRenderer, &f );
+    SDL_RenderFillRect( premia->pRenderer, &f );
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent(pRenderer);
+    SDL_RenderPresent(premia->pRenderer);
 }

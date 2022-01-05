@@ -11,10 +11,9 @@ void StreamState::set_instrument( std::string ticker )
     ticker_symbol = ticker;
 }
 
-void StreamState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+void StreamState::init(Manager *premia)
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
+    this->premia = premia;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
     title_string = "Live Quotes";
 
@@ -43,7 +42,7 @@ void StreamState::resume()
     SDL_Log("StreamState Resume\n");
 }
 
-void StreamState::handleEvents( Manager* premia )
+void StreamState::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -121,7 +120,7 @@ void StreamState::handleEvents( Manager* premia )
     io.MouseWheel = static_cast<float>(wheel);
 }
 
-void StreamState::update( Manager* premia )
+void StreamState::update()
 {    
     draw_imgui_menu( premia, tda_data_interface, title_string );
 
@@ -213,19 +212,19 @@ void StreamState::update( Manager* premia )
 
     ImGui::End();
 
-    SDL_RenderClear( this->pRenderer );
+    SDL_RenderClear( premia->pRenderer );
 }
 
-void StreamState::draw( Manager* game )
+void StreamState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( this->pRenderer, &f );
+    SDL_RenderFillRect( premia->pRenderer, &f );
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent( this->pRenderer );
+    SDL_RenderPresent( premia->pRenderer );
 }

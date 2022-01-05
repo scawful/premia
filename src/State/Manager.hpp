@@ -13,15 +13,16 @@ class Manager
 {
 private:
     std::vector<State*> states;
+    boost::shared_ptr<tda::TDAmeritrade> tdaDataInterface;
     
     bool m_running;
     
 public:
-    void init( int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT );
+    void init(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT);
     void cleanup();
     
-    void change( State *state );
-    void push( State *state );
+    void change(State *state);
+    void push(State *state);
     void pop();
     
     void updateDelta();

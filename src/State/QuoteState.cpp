@@ -44,10 +44,9 @@ void QuoteState::setDetailedQuote( std::string ticker )
     title_string = detailedQuotePtr->getQuoteVariable("symbol") + " - " + detailedQuotePtr->getQuoteVariable("description");
 }
 
-void QuoteState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+void QuoteState::init(Manager *premia)
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
+    this->premia = premia;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
     ticker_symbol = "TLT";
     setQuote( "TLT" );
@@ -214,7 +213,7 @@ void QuoteState::createCandleChart( float width_percent, int count, ImVec4 bullC
     }
 }
 
-void QuoteState::handleEvents( Manager* premia )
+void QuoteState::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -292,7 +291,7 @@ void QuoteState::handleEvents( Manager* premia )
     io.MouseWheel = static_cast<float>(wheel);
 }
 
-void QuoteState::update( Manager* premia )
+void QuoteState::update()
 {    
     draw_imgui_menu( premia, tda_data_interface, title_string );
 
@@ -551,20 +550,20 @@ void QuoteState::update( Manager* premia )
 
     ImGui::End();
 
-    SDL_RenderClear( this->pRenderer );
+    SDL_RenderClear( premia->pRenderer );
 }
 
-void QuoteState::draw( Manager* game )
+void QuoteState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( this->pRenderer, &f );
+    SDL_RenderFillRect( premia->pRenderer, &f );
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 
-    SDL_RenderPresent( this->pRenderer );
+    SDL_RenderPresent( premia->pRenderer );
 }

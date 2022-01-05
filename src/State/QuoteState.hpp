@@ -8,8 +8,7 @@ class QuoteState : public State
 private:
     static QuoteState m_QuoteState;
 
-    SDL_Window *pWindow = NULL;
-    SDL_Renderer *pRenderer = NULL;
+    Manager *premia = NULL;
 
     std::string detailed_quote, title_string, ticker_symbol;
 
@@ -30,7 +29,7 @@ protected:
     QuoteState() { }
 
 public:
-    void init( SDL_Renderer *pRenderer, SDL_Window *pWindow );
+    void init(Manager *premia);
     void cleanup();
 
     void pause();
@@ -39,9 +38,9 @@ public:
     void setQuote( std::string ticker );
     void createCandleChart( float width_percent, int count, ImVec4 bullCol, ImVec4 bearCol, bool tooltip );
 
-    void handleEvents( Manager* premia );
-    void update( Manager* premia );
-    void draw( Manager* premia );
+    void handleEvents();
+    void update();
+    void draw();
 
     static QuoteState* instance()
     {

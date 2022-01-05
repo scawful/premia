@@ -7,15 +7,15 @@
 class State
 {
 public:
-    virtual void init( SDL_Renderer *pRenderer, SDL_Window *pWindow ) = 0;
+    virtual void init( Manager *premia ) = 0;
     virtual void cleanup() = 0;
     
     virtual void pause() = 0;
     virtual void resume() = 0;
     
-    virtual void handleEvents( Manager *premia ) = 0;
-    virtual void update( Manager *premia ) = 0;
-    virtual void draw( Manager *premia ) = 0;
+    virtual void handleEvents() = 0;
+    virtual void update() = 0;
+    virtual void draw() = 0;
     
     void changeState( Manager *premia, State *state )
     {

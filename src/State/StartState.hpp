@@ -8,9 +8,8 @@ class StartState : public State
 {
 private:
     static StartState m_StartState;
-    
-    SDL_Window *pWindow = NULL;
-    SDL_Renderer *pRenderer = NULL;
+
+    Manager *premia = NULL;
     SDL_Texture *pTexture = NULL;
     TTF_Font *titleFont = NULL;
     TTF_Font *menuFont = NULL;
@@ -18,24 +17,20 @@ private:
 
     std::map<std::string, boost::shared_ptr<tda::Quote> > quotes;
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
-    boost::shared_ptr<cbp::CoinbasePro> cbp_data_interface;
 
-    // boost::shared_ptr<cbp::Account> cbp_account_data;
-    // std::unordered_map<std::string, boost::shared_ptr<cbp::Product> > cbp_products;
-    
 protected:
     StartState() { }
 
 public:
-    void init( SDL_Renderer *zRenderer, SDL_Window *pWindow );
+    void init(Manager *premia);
     void cleanup();
 
     void pause();
     void resume();
 
-    void handleEvents( Manager* premia );
-    void update( Manager* premia );
-    void draw( Manager* premia );
+    void handleEvents();
+    void update();
+    void draw();
 
     static StartState* instance()
     {

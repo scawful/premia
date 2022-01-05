@@ -8,8 +8,7 @@ class OptionState : public State
 private:
     static OptionState m_OptionState;
 
-    SDL_Window *pWindow = NULL;
-    SDL_Renderer *pRenderer = NULL;
+    Manager *premia = NULL;
     TTF_Font *tickerFont = NULL;
 
     boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
@@ -20,15 +19,15 @@ protected:
     OptionState() { }
 
 public:
-    void init( SDL_Renderer *pRenderer, SDL_Window *pWindow );
+    void init(Manager *premia);
     void cleanup();
 
     void pause();
     void resume();
 
-    void handleEvents( Manager* premia );
-    void update( Manager* premia );
-    void draw( Manager* premia );
+    void handleEvents();
+    void update();
+    void draw();
 
     static OptionState* instance()
     {

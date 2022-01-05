@@ -8,10 +8,9 @@ OptionState OptionState::m_OptionState;
 static bool select_options[] = {false};
 static int last_select = 0;
 
-void OptionState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+void OptionState::init(Manager *premia)
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
+    this->premia = premia;
     tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::OPTION_CHAIN);
     tda_data_interface->set_option_chain_parameters( "TLT", "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
     optionChainData = tda_data_interface->createOptionChain( "TLT" );
@@ -39,7 +38,7 @@ void OptionState::resume()
     SDL_Log("OptionState Resume\n");
 }
 
-void OptionState::handleEvents( Manager* premia )
+void OptionState::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -102,7 +101,7 @@ void OptionState::handleEvents( Manager* premia )
     io.MouseWheel = static_cast<float>(wheel);
 }
 
-void OptionState::update( Manager* premia )
+void OptionState::update()
 {    
     std::string title_string = "Option Chain: " + optionChainData->getOptionChainDataVariable("symbol");
     draw_imgui_menu( premia, tda_data_interface, title_string );
@@ -209,20 +208,20 @@ void OptionState::update( Manager* premia )
 
     ImGui::End();
 
-    SDL_RenderClear( this->pRenderer );
+    SDL_RenderClear( premia->pRenderer );
 }
 
-void OptionState::draw( Manager* game )
+void OptionState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( this->pRenderer, &f );
+    SDL_RenderFillRect( premia->pRenderer, &f );
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     
-    SDL_RenderPresent( this->pRenderer );
+    SDL_RenderPresent( premia->pRenderer );
 }

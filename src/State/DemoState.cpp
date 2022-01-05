@@ -4,11 +4,9 @@
 
 DemoState DemoState::m_DemoState;
 
-void DemoState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+void DemoState::init(Manager *premia)
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
-
+    this->premia = premia;
     ImGui::CreateContext();
     ImGui::StyleColorsClassic();
 }
@@ -28,7 +26,7 @@ void DemoState::resume()
     SDL_Log("DemoState Resume\n");
 }
 
-void DemoState::handleEvents( Manager* premia )
+void DemoState::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -103,7 +101,7 @@ void DemoState::handleEvents( Manager* premia )
 
 }
 
-void DemoState::update( Manager* game )
+void DemoState::update()
 {
     ImGui::NewFrame();
     ImGui::SetNextWindowPos(ImVec2(200, 200));
@@ -112,19 +110,19 @@ void DemoState::update( Manager* game )
     ImGui::ShowDemoWindow();
     ImPlot::ShowDemoWindow();
     
-    SDL_RenderClear(this->pRenderer);
+    SDL_RenderClear(premia->pRenderer);
 }
 
-void DemoState::draw( Manager* game )
+void DemoState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( pRenderer, 0, 0, 0, 0 );
-    SDL_GetWindowSize( pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->pRenderer, 0, 0, 0, 0 );
+    SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = { 0, 0, 1920, 1080 };
-    SDL_RenderFillRect( pRenderer, &f );
+    SDL_RenderFillRect( premia->pRenderer, &f );
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent(pRenderer);
+    SDL_RenderPresent(premia->pRenderer);
 }

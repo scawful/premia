@@ -8,8 +8,7 @@ class Positions : public State
 private:
     static Positions m_Positions;
     
-    SDL_Window *pWindow = NULL;
-    SDL_Renderer *pRenderer = NULL;
+    Manager *premia = NULL;
     SDL_Texture *pTexture = NULL;
 
     std::vector<std::string> account_ids_std;
@@ -32,15 +31,15 @@ protected:
     Positions() { }
 
 public:
-    void init( SDL_Renderer *zRenderer, SDL_Window *pWindow );
+    void init( Manager* premia );
     void cleanup();
 
     void pause();
     void resume();
 
-    void handleEvents( Manager* premia );
-    void update( Manager* premia );
-    void draw( Manager* premia );
+    void handleEvents();
+    void update();
+    void draw();
 
     static Positions* instance()
     {
