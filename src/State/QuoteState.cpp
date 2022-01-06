@@ -356,19 +356,17 @@ void QuoteState::update()
     }
 
 
-    // ImPlot::GetStyle().UseLocalTime = true;
+    ImPlot::GetStyle().UseLocalTime = true;
     // ImPlot::SetNextPlotFormatY("$%.2f");
-    // ImPlot::SetNextAxesLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 
-    //                             boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkLow")), 
-    //                             boost::lexical_cast<double>(quoteData->getQuoteVariable("52WkHigh")), ImGuiCond_Once);
-
-    // if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL,ImVec2(-1,0),0,
-    //                         ImPlotAxisFlags_Time,
-    //                         ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
-    // {
-    //     createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
-    //     ImPlot::EndPlot();
-    // }
+    if (ImPlot::BeginPlot("Candlestick Chart",ImVec2(-1,0),0)) 
+    {
+        ImPlot::SetupAxes("Date","Price");
+        ImPlot::SetupAxesLimits(0,100,
+                                boost::lexical_cast<double>(quoteData.getQuoteVariable("52WkLow")), 
+                                boost::lexical_cast<double>(quoteData.getQuoteVariable("52WkHigh")));
+        createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
+        ImPlot::EndPlot();
+    }
 
     //ImGui::PlotHistogram("Volume", volumeVector, volumeVector.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
