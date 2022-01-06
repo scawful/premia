@@ -64,6 +64,7 @@ void Manager::init(int width, int height)
 
     // Create the ImGui context 
     ImGui::CreateContext();
+    ImPlot::CreateContext();
 
     // Initialize ImGui for SDL 
     ImGui_ImplSDL2_InitForSDLRenderer(pWindow);

@@ -8,6 +8,7 @@ void DemoState::init(Manager *premia)
 {
     this->premia = premia;
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGui::StyleColorsClassic();
 }
 
