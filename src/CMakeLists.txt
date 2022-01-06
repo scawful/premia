@@ -95,11 +95,17 @@ add_executable(Premia Premia.cpp
                     MarketData/TDAmeritrade/PriceHistory.cpp 
                     MarketData/TDAmeritrade/OptionChain.cpp 
                     MarketData/TDAmeritrade/Account.cpp
-                    State/Manager.cpp State/DemoState.cpp
-                    State/StartState.cpp State/QuoteState.cpp State/OptionState.cpp
+                    State/Manager.cpp 
+                    State/DemoState.cpp
+                    State/StartState.cpp 
+                    State/QuoteState.cpp 
+                    State/OptionState.cpp
                     State/StreamState.cpp
                     State/Portfolio/Positions.cpp
                     State/Layout/Menu.cpp
+                    State/Frames/MenuFrame.cpp
+                    State/Frames/CandleChartFrame.cpp
+                    State/Frames/LinePlotFrame.cpp
                     ${IMGUI_PATH}/imgui.cpp
                     ${IMGUI_PATH}/imgui_demo.cpp
                     ${IMGUI_PATH}/imgui_draw.cpp
