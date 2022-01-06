@@ -4,7 +4,6 @@
 #include "OptionState.hpp"
 #include "DemoState.hpp"
 #include "Portfolio/Positions.hpp"
-#include "Layout/Menu.hpp"
 
 StartState StartState::m_StartState;
 

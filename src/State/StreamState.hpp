@@ -2,6 +2,7 @@
 #define StreamState_hpp
 
 #include "State.hpp"
+#include "Frames/MenuFrame.hpp"
 
 class StreamState : public State
 {
@@ -9,6 +10,7 @@ private:
     static StreamState m_StreamState;
 
     Manager *premia;
+    MenuFrame mainMenu;
 
     std::string title_string, ticker_symbol;
 

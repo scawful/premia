@@ -2,6 +2,7 @@
 #define Positions_hpp
 
 #include "../State.hpp"
+#include "../Frames/MenuFrame.hpp"
 
 class Positions : public State
 {
@@ -9,6 +10,7 @@ private:
     static Positions m_Positions;
     
     Manager *premia = NULL;
+    MenuFrame mainMenu;
     SDL_Texture *pTexture = NULL;
 
     std::vector<std::string> account_ids_std;

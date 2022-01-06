@@ -2,6 +2,7 @@
 #define QuoteState_hpp
 
 #include "State.hpp"
+#include "Frames/MenuFrame.hpp"
 
 class QuoteState : public State
 {
@@ -9,6 +10,7 @@ private:
     static QuoteState m_QuoteState;
 
     Manager *premia = NULL;
+    MenuFrame mainMenu;
 
     std::string detailed_quote, title_string, ticker_symbol;
 

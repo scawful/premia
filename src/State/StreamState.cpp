@@ -2,7 +2,6 @@
 #include "StreamState.hpp"
 #include "StartState.hpp"
 #include "OptionState.hpp"
-#include "Layout/Menu.hpp"
 
 StreamState StreamState::m_StreamState;
 
@@ -15,6 +14,8 @@ void StreamState::init(Manager *premia)
 {
     this->premia = premia;
     title_string = "Live Quotes";
+    mainMenu.import_manager(premia);
+    mainMenu.set_title(title_string);
 
     for ( auto v: request_fields )
     {
@@ -121,7 +122,7 @@ void StreamState::handleEvents()
 
 void StreamState::update()
 {    
-    draw_imgui_menu( premia, title_string );
+    mainMenu.update();
 
     ImGui::Text( "LEVEL ONE QUOTE (7:30am – 8pm EST)" );
     ImGui::SameLine();

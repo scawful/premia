@@ -102,7 +102,6 @@ add_executable(Premia Premia.cpp
                     State/OptionState.cpp
                     State/StreamState.cpp
                     State/Portfolio/Positions.cpp
-                    State/Layout/Menu.cpp
                     State/Frames/MenuFrame.cpp
                     State/Frames/CandleChartFrame.cpp
                     State/Frames/LinePlotFrame.cpp

@@ -2,7 +2,6 @@
 #include "OptionState.hpp"
 #include "StartState.hpp"
 #include "QuoteState.hpp"
-#include "Layout/Menu.hpp"
 
 OptionState OptionState::m_OptionState;
 static bool select_options[] = {false};
@@ -11,6 +10,7 @@ static int last_select = 0;
 void OptionState::init(Manager *premia)
 {
     this->premia = premia;
+    mainMenu.import_manager(premia);
     optionChainData = premia->tda_client.createOptionChain( "TLT", "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
     optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
 
@@ -102,7 +102,8 @@ void OptionState::handleEvents()
 void OptionState::update()
 {    
     std::string title_string = "Option Chain: " + optionChainData.getOptionChainDataVariable("symbol");
-    draw_imgui_menu( premia, title_string );
+    mainMenu.set_title(title_string);
+    mainMenu.update();
 
     ImGui::Text( "%s (%s) [B: %s  A: %s]", optionChainData.getOptionChainDataVariable("symbol").c_str(), optionChainData.getUnderlyingDataVariable("markPercentChange").c_str(), optionChainData.getUnderlyingDataVariable("bid").c_str(), optionChainData.getUnderlyingDataVariable("ask").c_str() );
     ImGui::Spacing();

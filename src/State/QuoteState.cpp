@@ -2,7 +2,6 @@
 #include "QuoteState.hpp"
 #include "StartState.hpp"
 #include "OptionState.hpp"
-#include "Layout/Menu.hpp"
 
 QuoteState QuoteState::m_QuoteState;
 
@@ -48,6 +47,7 @@ void QuoteState::init(Manager *premia)
 {
     this->premia = premia;
     setQuote("TLT");
+    mainMenu.import_manager(premia);
 
     ImGui::CreateContext();
     ImPlot::CreateContext();
@@ -291,8 +291,7 @@ void QuoteState::handleEvents()
 
 void QuoteState::update()
 {    
-    draw_imgui_menu( premia, title_string );
-
+    mainMenu.update();
     static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
     static char buf[64] = "";
     ImGui::Text("Symbol: ");

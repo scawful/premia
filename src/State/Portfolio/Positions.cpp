@@ -2,7 +2,6 @@
 #include "../QuoteState.hpp"
 #include "../OptionState.hpp"
 #include "../DemoState.hpp"
-#include "../Layout/Menu.hpp"
 
 Positions Positions::m_Positions;
 
@@ -30,6 +29,7 @@ void Positions::load_account( std::string account_num )
 void Positions::init(Manager *premia)
 {
     this->premia = premia;
+    mainMenu.import_manager(premia);
     account_ids_std = premia->tda_client.get_all_accounts();
     for ( std::string const& each_id : account_ids_std ) {
         account_ids.push_back(each_id.c_str());
@@ -133,7 +133,7 @@ void Positions::handleEvents()
 
 void Positions::update()
 {
-    draw_imgui_menu( premia, "Home" );
+    mainMenu.update();
 
     // Load Account IDs
     static int n = 0;

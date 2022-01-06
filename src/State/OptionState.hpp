@@ -2,6 +2,7 @@
 #define OptionState_hpp
 
 #include "State.hpp"
+#include "Frames/MenuFrame.hpp"
 
 class OptionState : public State
 {
@@ -10,6 +11,7 @@ private:
 
     Manager *premia = NULL;
     TTF_Font *tickerFont = NULL;
+    MenuFrame mainMenu;
 
     tda::OptionChain optionChainData;
     std::vector<tda::OptionsDateTimeObj> optionsDateTimeObj;
