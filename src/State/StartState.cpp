@@ -11,6 +11,8 @@ StartState StartState::m_StartState;
 void StartState::init(Manager *premia)
 {
     this->premia = premia;
+    this->title_string = "Home";
+    mainMenu.import_manager(premia);
     ImGui::StyleColorsClassic();
 }
 
@@ -106,7 +108,9 @@ void StartState::handleEvents()
 
 void StartState::update()
 {
-    draw_imgui_menu( premia, "Home" );
+    // draw_imgui_menu( premia, "Home" );
+    mainMenu.set_title(title_string);
+    mainMenu.update();
 
     // Place Order Button ---------------------------------------------------------------------------------
     if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
@@ -176,6 +180,8 @@ void StartState::update()
         if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
         ImGui::EndPopup();
     }
+
+    linePlot.update();
 
     ImGui::End();    
     SDL_RenderClear(premia->pRenderer);

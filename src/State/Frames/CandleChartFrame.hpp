@@ -2,17 +2,16 @@
 #define ChartFrame_hpp
 
 #include "../../core.hpp"
-#include "Frame.hpp"
 
-class ChartFrame : public Frame 
+class CandleChartFrame
 {
 private:
 
 public:
-    ChartFrame();
+    CandleChartFrame();
 
     void update();
     void render();
-}
+};
 
 #endif

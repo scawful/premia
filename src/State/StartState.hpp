@@ -3,6 +3,8 @@
 #define StartState_hpp
 
 #include "State.hpp"
+#include "Frames/MenuFrame.hpp"
+#include "Frames/LinePlotFrame.hpp"
 
 class StartState : public State
 {
@@ -15,7 +17,12 @@ private:
     TTF_Font *menuFont = NULL;
     TTF_Font *priceFont = NULL;
 
-    std::map<std::string, tda::Quote > quotes;
+    std::string title_string;
+
+    MenuFrame mainMenu;
+    LinePlotFrame linePlot;
+
+    std::map<std::string, tda::Quote> quotes;
 
 protected:
     StartState() { }
