@@ -1,13 +1,18 @@
 #ifndef LoginFrame_hpp
 #define LoginFrame_hpp
 
-#include "../../core.hpp"
-#include "../Manager.hpp"
+#include "Frame.hpp"
 
-class LoginFrame 
+class LoginFrame : public Frame
 {
 private:
     bool isLoggedIn;
+    bool ibkr_doConnect;
+    unsigned attempt = 0;
+    std::string connectOptions;
+    std::string host;
+    int port;
+    int clientId;
 
 public:
     LoginFrame();
