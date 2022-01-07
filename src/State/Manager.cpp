@@ -73,7 +73,6 @@ void Manager::init(int width, int height)
     // Build a new ImGui frame
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame(pWindow);
-    ImGui::NewFrame();
 }
 
 /**
