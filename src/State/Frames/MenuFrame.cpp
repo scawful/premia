@@ -3,7 +3,6 @@
 #include "../OptionState.hpp"
 #include "../StartState.hpp"
 #include "../StreamState.hpp"
-#include "../Portfolio/Positions.hpp"
 
 MenuFrame::MenuFrame()
 {
@@ -26,7 +25,7 @@ void MenuFrame::update()
     ImGui::NewFrame();
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always );
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.75, io.DisplaySize.y * 0.75), ImGuiCond_Always );
     
     if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
     {
@@ -97,7 +96,7 @@ void MenuFrame::update()
 
             if ( ImGui::MenuItem("Positions") )
             {
-                premia->change( Positions::instance() );
+                // premia->change( Positions::instance() );
             }
 
             if ( ImGui::MenuItem("Balances") )
