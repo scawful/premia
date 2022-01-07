@@ -1,105 +1,22 @@
-//  OptionState Class
-#include "OptionState.hpp"
-#include "StartState.hpp"
+#include "OptionChainFrame.hpp"
 
-OptionState OptionState::m_OptionState;
 static bool select_options[] = {false};
 static int last_select = 0;
 
-void OptionState::init(Manager *premia)
+OptionChainFrame::OptionChainFrame() : Frame()
 {
-    this->premia = premia;
-    mainMenu.import_manager(premia);
-    optionChainData = premia->tda_client.createOptionChain( "TLT", "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
+
+}
+
+void OptionChainFrame::init_chain(std::string ticker)
+{
+    optionChainData = premia->tda_client.createOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
     optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
-
-    ImGui::CreateContext();
-    ImPlot::CreateContext();
-    ImGui::StyleColorsClassic();
 }
 
-void OptionState::cleanup()
+void OptionChainFrame::update()
 {
-    TTF_CloseFont( tickerFont );
-
-    SDL_Log("OptionState Cleanup\n");
-}
-
-void OptionState::pause()
-{
-    SDL_Log("OptionState Pause\n");
-}
-
-void OptionState::resume()
-{
-    SDL_Log("OptionState Resume\n");
-}
-
-void OptionState::handleEvents()
-{
-    int wheel = 0;
-    SDL_Event event;
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    while ( SDL_PollEvent(&event) ) 
-    {
-        switch ( event.type ) 
-        {
-            case SDL_KEYDOWN:
-                switch ( event.key.keysym.sym )
-                {
-                    case SDLK_ESCAPE:
-                        premia->quit();
-                        break;
-                    case SDLK_RIGHT:
-                        premia->change( StartState::instance() );
-                        break;
-                    default:
-                        break;
-                }
-                break;
-
-            case SDL_WINDOWEVENT:
-                switch ( event.window.event ) 
-                {
-                    case SDL_WINDOWEVENT_CLOSE:   // exit game
-                        premia->quit();
-                        break;
-                    case SDL_WINDOWEVENT_SIZE_CHANGED:
-                        io.DisplaySize.x = static_cast<float>(event.window.data1);
-					    io.DisplaySize.y = static_cast<float>(event.window.data2);
-                        break;
-
-                    default:
-                        break;
-                }
-                break;      
-
-            case SDL_MOUSEWHEEL:
-                wheel = event.wheel.y;
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    int mouseX, mouseY;
-    const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
-
-    io.DeltaTime = 1.0f / 60.0f;
-    io.MousePos = ImVec2(static_cast<float>(mouseX), static_cast<float>(mouseY));
-    io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
-    io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
-    io.MouseWheel = static_cast<float>(wheel);
-}
-
-void OptionState::update()
-{    
     std::string title_string = "Option Chain: " + optionChainData.getOptionChainDataVariable("symbol");
-    mainMenu.set_title(title_string);
-    mainMenu.update();
 
     ImGui::Text( "%s (%s) [B: %s  A: %s]", optionChainData.getOptionChainDataVariable("symbol").c_str(), optionChainData.getUnderlyingDataVariable("markPercentChange").c_str(), optionChainData.getUnderlyingDataVariable("bid").c_str(), optionChainData.getUnderlyingDataVariable("ask").c_str() );
     ImGui::Spacing();
@@ -200,23 +117,4 @@ void OptionState::update()
     }
 
     ImGui::Text("Last: %d", last_select );
-
-    ImGui::End();
-
-    SDL_RenderClear( premia->pRenderer );
-}
-
-void OptionState::draw()
-{
-    // fill window bounds
-    int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( premia->pWindow, &w, &h );
-    SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( premia->pRenderer, &f );
-
-    ImGui::Render();
-    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    
-    SDL_RenderPresent( premia->pRenderer );
 }

@@ -1,5 +1,4 @@
 #include "MenuFrame.hpp"
-#include "../OptionState.hpp"
 #include "../StartState.hpp"
 #include "../StreamState.hpp"
 
@@ -137,7 +136,7 @@ void MenuFrame::update()
          
             if ( ImGui::MenuItem("Option Chain") )
             {
-                premia->change( OptionState::instance() );
+                // premia->change( OptionState::instance() );
             }
 
 

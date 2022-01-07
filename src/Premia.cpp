@@ -1,6 +1,5 @@
 #define SDL_MAIN_HANDLED
 #include "State/StartState.hpp"
-#include "State/OptionState.hpp"
 
 int main(int argc, char *argv[])
 {

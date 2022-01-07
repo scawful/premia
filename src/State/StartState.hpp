@@ -10,6 +10,7 @@
 #include "Frames/OrderFrame.hpp"
 #include "Frames/PositionsFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
+#include "Frames/OptionChainFrame.hpp"
 
 class StartState : public State
 {
@@ -31,6 +32,7 @@ private:
     PositionsFrame positionsFrame;
     WatchlistFrame watchlistFrame;
     CandleChartFrame candleChart;
+    OptionChainFrame optionChain;
     LinePlotFrame linePlot;
 
     std::map<std::string, tda::Quote> quotes;

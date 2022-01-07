@@ -98,7 +98,6 @@ add_executable(Premia Premia.cpp
                     State/Manager.cpp 
                     State/DemoState.cpp
                     State/StartState.cpp 
-                    State/OptionState.cpp
                     State/StreamState.cpp
                     State/Frames/MenuFrame.cpp
                     State/Frames/CandleChartFrame.cpp
@@ -107,6 +106,7 @@ add_executable(Premia Premia.cpp
                     State/Frames/WatchlistFrame.cpp
                     State/Frames/OrderFrame.cpp
                     State/Frames/PositionsFrame.cpp
+                    State/Frames/OptionChainFrame.cpp
                     ${IMGUI_PATH}/imgui.cpp
                     ${IMGUI_PATH}/imgui_demo.cpp
                     ${IMGUI_PATH}/imgui_draw.cpp

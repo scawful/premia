@@ -1,6 +1,5 @@
 //  StartState Class
 #include "StartState.hpp"
-#include "OptionState.hpp"
 #include "DemoState.hpp"
 
 StartState StartState::m_StartState;
@@ -18,6 +17,8 @@ void StartState::init(Manager *premia)
     mainMenu.import_manager(premia);
     positionsFrame.import_manager(premia);
     candleChart.import_manager(premia);
+    optionChain.import_manager(premia);
+    optionChain.init_chain("TLT");
     positionsFrame.init_positions();
     candleChart.init_instrument("TLT");
     ImGui::StyleColorsClassic();
@@ -217,6 +218,7 @@ void StartState::update()
     linePlot.update();
     positionsFrame.update();
     candleChart.update();
+    optionChain.update();
 
     ImGui::End();    
 
