@@ -101,10 +101,13 @@ add_executable(Premia Premia.cpp
                     State/QuoteState.cpp 
                     State/OptionState.cpp
                     State/StreamState.cpp
-                    State/Portfolio/Positions.cpp
                     State/Frames/MenuFrame.cpp
                     State/Frames/CandleChartFrame.cpp
                     State/Frames/LinePlotFrame.cpp
+                    State/Frames/LoginFrame.cpp
+                    State/Frames/WatchlistFrame.cpp
+                    State/Frames/OrderFrame.cpp
+                    State/Frames/PositionsFrame.cpp
                     ${IMGUI_PATH}/imgui.cpp
                     ${IMGUI_PATH}/imgui_demo.cpp
                     ${IMGUI_PATH}/imgui_draw.cpp
