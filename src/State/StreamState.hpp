@@ -2,18 +2,17 @@
 #define StreamState_hpp
 
 #include "State.hpp"
+#include "Frames/MenuFrame.hpp"
 
 class StreamState : public State
 {
 private:
     static StreamState m_StreamState;
 
-    SDL_Window *pWindow = NULL;
-    SDL_Renderer *pRenderer = NULL;
+    Manager *premia;
+    MenuFrame mainMenu;
 
     std::string title_string, ticker_symbol;
-
-    boost::shared_ptr<tda::TDAmeritrade> tda_data_interface;
 
     bool request_fields[53];
     const char *quote_fields[53] = { "Symbol", "Bid Price", "Ask Price", "Last Price", "Bid Size",
@@ -32,16 +31,16 @@ protected:
     StreamState() { }
 
 public:
-    void init( SDL_Renderer *pRenderer, SDL_Window *pWindow );
+    void init(Manager *premia);
     void cleanup();
 
     void pause();
     void resume();
 
 
-    void handleEvents( Manager* premia );
-    void update( Manager* premia );
-    void draw( Manager* premia );
+    void handleEvents();
+    void update();
+    void draw();
 
     static StreamState* instance()
     {

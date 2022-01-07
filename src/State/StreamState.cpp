@@ -1,8 +1,6 @@
 //  StreamState Class
 #include "StreamState.hpp"
 #include "StartState.hpp"
-#include "OptionState.hpp"
-#include "Layout/Menu.hpp"
 
 StreamState StreamState::m_StreamState;
 
@@ -11,12 +9,12 @@ void StreamState::set_instrument( std::string ticker )
     ticker_symbol = ticker;
 }
 
-void StreamState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+void StreamState::init(Manager *premia)
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
+    this->premia = premia;
     title_string = "Live Quotes";
+    mainMenu.import_manager(premia);
+    mainMenu.set_title(title_string);
 
     for ( auto v: request_fields )
     {
@@ -25,9 +23,7 @@ void StreamState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
 
     ImGui::CreateContext();
     ImPlot::CreateContext();
-	ImGuiSDL::Initialize(pRenderer, 782, 543);
     ImGui::StyleColorsClassic();
-
 }
 
 void StreamState::cleanup()
@@ -45,7 +41,7 @@ void StreamState::resume()
     SDL_Log("StreamState Resume\n");
 }
 
-void StreamState::handleEvents( Manager* premia )
+void StreamState::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -64,9 +60,6 @@ void StreamState::handleEvents( Manager* premia )
                         break;
                     case SDLK_LEFT:
                         premia->change( StartState::instance() );
-                        break;
-                    case SDLK_RIGHT:
-                        premia->change( OptionState::instance() );
                         break;
                     default:
                         break;
@@ -123,9 +116,9 @@ void StreamState::handleEvents( Manager* premia )
     io.MouseWheel = static_cast<float>(wheel);
 }
 
-void StreamState::update( Manager* premia )
+void StreamState::update()
 {    
-    draw_imgui_menu( premia, tda_data_interface, title_string );
+    mainMenu.update();
 
     ImGui::Text( "LEVEL ONE QUOTE (7:30am – 8pm EST)" );
     ImGui::SameLine();
@@ -161,11 +154,11 @@ void StreamState::update( Manager* premia )
         ImGui::EndPopup();
     }
 
-    if ( tda_data_interface->is_session_logged_in() )
+    if ( premia->tda_client.is_session_logged_in() )
     {
         if ( ImGui::Button("Logout") )
         {
-            tda_data_interface->send_logout_request();
+            premia->tda_client.send_logout_request();
         }
     }
     else
@@ -182,13 +175,13 @@ void StreamState::update( Manager* premia )
 
             SDL_Log("Stream ticker %s with fields: %s", ticker_symbol.c_str(), fields.c_str() );
 
-            tda_data_interface->start_session( ticker_symbol, fields );
+            premia->tda_client.start_session( ticker_symbol, fields );
         }
     }
     ImGui::SameLine();
     if ( ImGui::Button("Interrupt Session") )
     {
-        tda_data_interface->send_interrupt_signal();
+        premia->tda_client.send_interrupt_signal();
     }
 
     ImGui::BulletText("NASDAQ (Quotes and Trades)");
@@ -200,35 +193,34 @@ void StreamState::update( Manager* premia )
     ImGui::BulletText("Indicators");
     ImGui::Spacing();
 
-    ImPlot::GetStyle().UseLocalTime = true;
-    ImPlot::SetNextPlotFormatY("$%.2f");
-    ImPlot::SetNextPlotLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 0, 100, ImGuiCond_Once);
+    // ImPlot::GetStyle().UseLocalTime = true;
+    // ImPlot::SetNextPlotFormatY("$%.2f");
+    // ImPlot::SetNextAxesLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 0, 100, ImGuiCond_Once);
 
-    if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL, ImVec2(-1,0),0,
-                            ImPlotAxisFlags_Time,
-                            ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
-    {
-        //createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
-        ImPlot::EndPlot();
-    }
+    // if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL, ImVec2(-1,0),0,
+    //                         ImPlotAxisFlags_Time,
+    //                         ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
+    // {
+    //     //createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
+    //     ImPlot::EndPlot();
+    // }
 
 
     ImGui::End();
 
-    SDL_RenderClear( this->pRenderer );
+    SDL_RenderClear( premia->pRenderer );
 }
 
-void StreamState::draw( Manager* game )
+void StreamState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( this->pRenderer, &f );
+    SDL_RenderFillRect( premia->pRenderer, &f );
 
     ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
-
-    SDL_RenderPresent( this->pRenderer );
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+    SDL_RenderPresent( premia->pRenderer );
 }

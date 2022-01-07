@@ -20,6 +20,7 @@ namespace tda
         void initVariables();
 
     public:
+        OptionChain();
         OptionChain( boost::property_tree::ptree option_chain_data );
 
         std::vector<OptionsDateTimeObj> getOptionsDateTimeObj();

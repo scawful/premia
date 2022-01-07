@@ -10,6 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(Premia VERSION 1.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+# include-ception
+include_directories(include)
 
 # Boost library --------------------------------------------------------------------------------------------
 set(Boost_USE_STATIC_LIBS ON)
@@ -36,16 +38,33 @@ find_package(CURL REQUIRED)
 
 
 # OpenSSL library --------------------------------------------------------------------------------------------
+if(APPLE)
+    set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1k/include")
+    set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1k/lib/libcrypto.dylib")
+    set(OPENSSL_SSL_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1k/lib/libssl.dylib")
+endif()
 find_package(OpenSSL REQUIRED)
-
+if(OPENSSL_FOUND)
+    if(APPLE)
+        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1k/include)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1k/lib/libssl.dylib)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1k/lib/libcrypto.dylib)
+        message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
+    else()
+        include_directories(${OPENSSL_INCLUDE_DIR})
+        list(APPEND LIB_LIST ${OPENSSL_LIBRARIES})
+        message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
+    endif()
+endif()
 
 # QuantLib --------------------------------------------------------------------------------------------
-# find_package(QuantLib REQUIRED)
+#find_package(QuantLib REQUIRED)
 
 
 # ImGui library --------------------------------------------------------------------------------------------
 # Set where the ImGui files are stored
-set(IMGUI_PATH  "${CMAKE_SOURCE_DIR}/Libraries/imgui")
+# set(IMGUI_PATH  "${CMAKE_SOURCE_DIR}/Libraries/imgui")
+set(IMGUI_PATH  "../include/imgui")
     
 # Compile as static library 
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
@@ -54,6 +73,19 @@ target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 
 target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
 target_compile_definitions(ImGui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  GL_GLEXT_PROTOTYPES=1)
+
+# ImPlot library --------------------------------------------------------------------------------------------
+set(IMPLOT_PATH "../include/implot")
+
+file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
+add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
+target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
+
+# ibkr api library --------------------------------------------------------------------------------------------
+set(IBKR_PATH "../include/twsapi")
+file(GLOB IBKR_SOURCES ${IBKR_PATH}/*.cpp)
+add_library("IBKR" SHARED ${IBKR_SOURCES})
+target_include_directories("IBKR" PUBLIC ${IBKR_PATH})
 
 # add the executable
 # MACOSX_BUNDLE ${MAC_ICON}
@@ -69,29 +101,47 @@ add_executable(Premia Premia.cpp
                     MarketData/TDAmeritrade/PriceHistory.cpp 
                     MarketData/TDAmeritrade/OptionChain.cpp 
                     MarketData/TDAmeritrade/Account.cpp
-                    State/Manager.cpp State/DemoState.cpp
-                    State/StartState.cpp State/QuoteState.cpp State/OptionState.cpp
+                    MarketData/InteractiveBrokers.cpp
+                    MarketData/InteractiveBrokers/AccountSummaryTags.cpp
+                    MarketData/InteractiveBrokers/AvailableAlgoParams.cpp
+                    MarketData/InteractiveBrokers/ContractSamples.cpp
+                    MarketData/InteractiveBrokers/OrderSamples.cpp 
+                    MarketData/InteractiveBrokers/ScannerSubscriptionSamples.cpp
+                    MarketData/InteractiveBrokers/Utils.cpp
+                    State/Manager.cpp 
+                    State/DemoState.cpp
+                    State/StartState.cpp 
                     State/StreamState.cpp
-                    State/Portfolio/Positions.cpp
-                    State/Layout/Menu.cpp
-                    Libraries/imgui/imgui.cpp
-                    Libraries/imgui/imgui_demo.cpp
-                    Libraries/imgui/imgui_draw.cpp
-                    Libraries/imgui/imgui_widgets.cpp
-                    Libraries/imgui/imgui_impl_sdl.cpp
-                    Libraries/imgui/imgui_sdl.cpp
-                    Libraries/imgui/implot.cpp
-                    Libraries/imgui/implot_items.cpp
-                    Libraries/imgui/implot_demo.cpp )
+                    State/Frames/MenuFrame.cpp
+                    State/Frames/CandleChartFrame.cpp
+                    State/Frames/LinePlotFrame.cpp
+                    State/Frames/LoginFrame.cpp
+                    State/Frames/WatchlistFrame.cpp
+                    State/Frames/OrderFrame.cpp
+                    State/Frames/PositionsFrame.cpp
+                    State/Frames/OptionChainFrame.cpp
+                    State/Frames/ConsoleFrame.cpp
+                    ${IMGUI_PATH}/imgui.cpp
+                    ${IMGUI_PATH}/imgui_demo.cpp
+                    ${IMGUI_PATH}/imgui_draw.cpp
+                    ${IMGUI_PATH}/imgui_widgets.cpp
+                    ${IMGUI_PATH}/backends/imgui_impl_sdl.cpp
+                    ${IMGUI_PATH}/backends/imgui_impl_sdlrenderer.cpp
+                    ${IMPLOT_PATH}/implot.cpp
+                    ${IMPLOT_PATH}/implot_items.cpp
+                    ${IMPLOT_PATH}/implot_demo.cpp )
 include_directories("../assets")
 
 #quantlib library --------------------------------------------------------------------------------------------
 # add_library(quantlib STATIC IMPORTED)
 # set_property(TARGET quantlib PROPERTY IMPORTED_LOCATION ${QL_LIBRARY})
 
-target_link_libraries(Premia SDL2main SDL2 SDL_image SDL_ttf -l:libimm32.a
-                             curl OpenSSL::SSL ImGui ws2_32
-                             ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} )
+target_link_libraries(Premia ${SDL2_LIBRARIES} 
+                             ${SDL_IMAGE_LIBRARIES} 
+                             ${SDL_TTF_LIBRARIES}
+                             curl OpenSSL::SSL ImGui ImPlot IBKR
+                             ${BOOST_LIBRARIES} 
+                             ${OPENGL_LIBRARIES} )
 
 set (source "${CMAKE_SOURCE_DIR}/assets")
 set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")

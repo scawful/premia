@@ -2,6 +2,13 @@
 #include "Manager.hpp"
 #include "State.hpp"
 
+/**
+ * @brief Initialize SDL components with ImGui backend
+ * @author @scawful
+ * 
+ * @param width 
+ * @param height 
+ */
 void Manager::init(int width, int height)
 {
     m_running = true;
@@ -54,19 +61,37 @@ void Manager::init(int width, int height)
 
         }
     }
+
+    // Create the ImGui context 
     ImGui::CreateContext();
-    ImGui_ImplSDL2_InitForPremia( pWindow );
+    ImPlot::CreateContext();
+
+    // Initialize ImGui for SDL 
+    ImGui_ImplSDL2_InitForSDLRenderer(pWindow);
+    ImGui_ImplSDLRenderer_Init(pRenderer);
+
+    // Build a new ImGui frame
+    ImGui_ImplSDLRenderer_NewFrame();
+    ImGui_ImplSDL2_NewFrame(pWindow);
 }
 
+/**
+ * @brief Cleanup state data, ImGui context, ImPlot context, and SDL data
+ * @author @scawful
+ * 
+ */
 void Manager::cleanup()
 {
+    // Clear all the states 
     while ( !states.empty() )
     {
         states.back()->cleanup();
         states.pop_back();
     }
 
-    ImGuiSDL::Deinitialize();
+    // Shut down SDL renderer 
+    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 
@@ -82,6 +107,12 @@ void Manager::cleanup()
     SDL_Quit();
 }
 
+/**
+ * @brief Change the current state handled by the Manager
+ * @author @scawful
+ * 
+ * @param state 
+ */
 void Manager::change( State* state )
 {
     // cleanup the current state
@@ -93,9 +124,15 @@ void Manager::change( State* state )
 
     // store and init the new state
     states.push_back(state);
-    states.back()->init( this->pRenderer, this->pWindow );
+    states.back()->init( this );
 }
 
+/**
+ * @brief Push a new state to the stack
+ * @author @scawful
+ * 
+ * @param state 
+ */
 void Manager::push( State* state )
 {
     // pause current state
@@ -105,9 +142,14 @@ void Manager::push( State* state )
 
     // store and init the new state
     states.push_back(state);
-    states.back()->init( this->pRenderer, this->pWindow );
+    states.back()->init( this );
 }
 
+/**
+ * @brief Pop a state off of the stack
+ * @author @scawful
+ * 
+ */
 void Manager::pop()
 {
     // cleanup the current state
@@ -122,20 +164,35 @@ void Manager::pop()
     }
 }
 
+/**
+ * @brief Handle any events in the current state
+ * @author @scawful
+ * 
+ */
 void Manager::handleEvents()
 {
     // let the state handle events
-    states.back()->handleEvents(this);
+    states.back()->handleEvents();
 }
 
+/**
+ * @brief Update the current state
+ * @author @scawful
+ * 
+ */
 void Manager::update()
 {
     // let the state update the game
-    states.back()->update(this);
+    states.back()->update();
 }
 
+/**
+ * @brief Draw the contents of the current state
+ * @author @scawful
+ * 
+ */
 void Manager::draw()
 {
     // let the state draw the screen
-    states.back()->draw(this);
+    states.back()->draw();
 }

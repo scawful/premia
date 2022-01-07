@@ -1,70 +1,65 @@
 //  StartState Class
 #include "StartState.hpp"
-#include "QuoteState.hpp"
-#include "OptionState.hpp"
 #include "DemoState.hpp"
-#include "Portfolio/Positions.hpp"
-#include "Layout/Menu.hpp"
 
 StartState StartState::m_StartState;
 
-void StartState::init( SDL_Renderer *pRenderer, SDL_Window *pWindow )
+/**
+ * @brief Initialize the StartStates variables 
+ * @author @scawful
+ * 
+ * @param premia 
+ */
+void StartState::init(Manager *premia)
 {
-    this->pRenderer = pRenderer;
-    this->pWindow = pWindow;
-    tda_data_interface = boost::make_shared<tda::TDAmeritrade>(tda::GET_QUOTE);
-
-    // cbp_data_interface = boost::make_shared<cbp::CoinbasePro>();
-    // cbp_account_data = cbp_data_interface->list_accounts();
-
-    // cbp_products["ETH"] = cbp_data_interface->get_product_ticker( "ETH" );
-    // cbp_products["XTZ"] = cbp_data_interface->get_product_ticker( "XTZ" );
-    // cbp_products["USD"] = cbp_data_interface->get_product_ticker( "USD" );
-
-    // float eth_balance;
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
-    // {
-    //     if ( crypto_position_it.first == "available")
-    //         eth_balance = boost::lexical_cast<float>(crypto_position_it.second);
-    // }
-
-    // float xtz_balance;
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("XTZ") )
-    // {
-    //     if ( crypto_position_it.first == "available")
-    //         xtz_balance = boost::lexical_cast<float>(crypto_position_it.second);
-    // }
-
-    // float usd_balance = boost::lexical_cast<float>(cbp_account_data->get_position("USD")["available"]);
-
-    // //std::cout << "ETH: " << eth_balance << ", XTZ: " << xtz_balance << std::endl;
-
-    // float deposit_usd = cbp_data_interface->get_deposits();
-    // float temp = (eth_balance * cbp_products["ETH"]->get_current_price()) + (xtz_balance * cbp_products["XTZ"]->get_current_price()) - usd_balance;
-    // //std::cout << "Calc " << temp << std::endl;
-    // _profit_loss = (temp - deposit_usd) / deposit_usd;
-
-    ImGui::CreateContext();
-	ImGuiSDL::Initialize(pRenderer, 782, 543);
+    this->premia = premia;
+    this->title_string = "Home";
+    mainMenu.import_manager(premia);
+    positionsFrame.import_manager(premia);
+    candleChart.import_manager(premia);
+    optionChain.import_manager(premia);
+    optionChain.init_chain("TLT");
+    positionsFrame.init_positions();
+    candleChart.init_instrument("TLT");
     ImGui::StyleColorsClassic();
 }
 
+/**
+ * @brief Cleanup any allocated resources
+ * @author @scawful
+ * 
+ */
 void StartState::cleanup()
 {
     SDL_Log("StartState Cleanup\n");
 }
 
+/**
+ * @brief Pause the runtime loop of the state
+ * @author @scawful
+ * 
+ */
 void StartState::pause()
 {
     SDL_Log("StartState Pause\n");
 }
 
+/**
+ * @brief Resume the runtime loop of the state
+ * @author @scawful
+ * 
+ */
 void StartState::resume()
 {
     SDL_Log("StartState Resume\n");
 }
 
-void StartState::handleEvents( Manager* premia )
+/**
+ * @brief Handle input/output events via keyboard and mouse 
+ * @author @scawful
+ * 
+ */
+void StartState::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -84,6 +79,10 @@ void StartState::handleEvents( Manager* premia )
                     case SDLK_DOWN:
                         premia->change( DemoState::instance() );
                         break;
+                    case SDLK_RETURN:
+                    case SDLK_BACKSPACE:
+                        io.KeysDown[event.key.keysym.scancode] = (event.type == SDL_KEYDOWN);
+                        break;
                     default:
                         break;
                 }
@@ -94,9 +93,11 @@ void StartState::handleEvents( Manager* premia )
                 int key = event.key.keysym.scancode;
                 IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
                 io.KeysDown[key] = (event.type == SDL_KEYDOWN);
+                io.KeyMap[key] = io.KeysDown[key];
                 io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
                 io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
                 io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
+                io.KeySuper = ((SDL_GetModState() & KMOD_GUI) != 0);
                 break;
             }
             
@@ -139,9 +140,17 @@ void StartState::handleEvents( Manager* premia )
 
 }
 
-void StartState::update( Manager* premia )
+/**
+ * @brief Update the contents of the StartState
+ *        Construct GUI elements
+ * @author @scawful
+ * 
+ */
+void StartState::update()
 {
-    draw_imgui_menu( premia, tda_data_interface, "Home" );
+    mainMenu.set_title(title_string);
+    mainMenu.update();
+    loginFrame.update();
 
     // Place Order Button ---------------------------------------------------------------------------------
     if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
@@ -150,7 +159,7 @@ void StartState::update( Manager* premia )
     ImGui::SameLine();
     if ( ImGui::Button("Load Responses from WebSocket", ImVec2(220, 30)) )
     {
-        for ( auto response : tda_data_interface->get_session_responses() )
+        for ( auto response : premia->tda_client.get_session_responses() )
         {
             SDL_Log("Response: %s", response.c_str() );
         }
@@ -179,7 +188,7 @@ void StartState::update( Manager* premia )
             {
                 new_ticker = std::string(buf);
                 std::cout << "new ticker " << new_ticker << std::endl;
-                quotes[ new_ticker ] = tda_data_interface->createQuote( new_ticker );
+                quotes[ new_ticker ] = premia->tda_client.createQuote( new_ticker );
                 active_instrument = true;
             }
             else
@@ -193,16 +202,16 @@ void StartState::update( Manager* premia )
             static int n = 0;
             ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
 
-            ImGui::Text("%s - %s", quotes[new_ticker]->getQuoteVariable("symbol").c_str(), quotes[new_ticker]->getQuoteVariable("description").c_str() );
-            ImGui::Text("Bid: %s - Size: %s", quotes[new_ticker]->getQuoteVariable("bidPrice").c_str(), quotes[new_ticker]->getQuoteVariable("bidSize").c_str() );
-            ImGui::Text("Ask: %s - Size: %s", quotes[new_ticker]->getQuoteVariable("askPrice").c_str(), quotes[new_ticker]->getQuoteVariable("askSize").c_str() );
+            ImGui::Text("%s - %s", quotes[new_ticker].getQuoteVariable("symbol").c_str(), quotes[new_ticker].getQuoteVariable("description").c_str() );
+            ImGui::Text("Bid: %s - Size: %s", quotes[new_ticker].getQuoteVariable("bidPrice").c_str(), quotes[new_ticker].getQuoteVariable("bidSize").c_str() );
+            ImGui::Text("Ask: %s - Size: %s", quotes[new_ticker].getQuoteVariable("askPrice").c_str(), quotes[new_ticker].getQuoteVariable("askSize").c_str() );
             ImGui::Separator();
 
             static float order_quantity = 10.f;
             ImGui::InputFloat("Quanitity", &order_quantity, 10.f);
 
             double security_cost = 0.0;
-            std::string bidPrice = quotes[new_ticker]->getQuoteVariable("bidPrice");
+            std::string bidPrice = quotes[new_ticker].getQuoteVariable("bidPrice");
             security_cost = std::stod( bidPrice );
             security_cost *= order_quantity;
             ImGui::Text("Cost: %lf", security_cost );
@@ -218,38 +227,31 @@ void StartState::update( Manager* premia )
         ImGui::EndPopup();
     }
 
-    
-    // ImGui::Spacing();
-    // ImGui::Separator();
-    // ImGui::Text("Coinbase Pro Accounts || P/L: %.2f", _profit_loss);
-    // ImGui::Separator();
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("ETH") )
-    // {
-    //     if ( crypto_position_it.first == "currency" || crypto_position_it.first == "available")
-    //         ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
-    // }
-    // ImGui::Separator();
-    // for ( auto& crypto_position_it: cbp_account_data->get_position("XTZ") )
-    // {
-    //     if ( crypto_position_it.first == "currency" || crypto_position_it.first == "available")
-    //         ImGui::Text("%s - %s", crypto_position_it.first.c_str(), crypto_position_it.second.c_str() );
-    // }
+    linePlot.update();
+    positionsFrame.update();
+    candleChart.update();
+    optionChain.update();
 
     ImGui::End();    
-    SDL_RenderClear(this->pRenderer);
+
+    watchlistFrame.update();
+    console.update();
+    orderFrame.update();
+    
+    SDL_RenderClear(premia->pRenderer);
 }
 
-void StartState::draw( Manager* game )
+void StartState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( this->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( this->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
+    SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( this->pRenderer, &f );
+    SDL_RenderFillRect( premia->pRenderer, &f );
 
     ImGui::Render();
-    ImGuiSDL::Render(ImGui::GetDrawData());
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 
-    SDL_RenderPresent(pRenderer);
+    SDL_RenderPresent(premia->pRenderer);
 }

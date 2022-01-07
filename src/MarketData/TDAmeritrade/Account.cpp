@@ -52,6 +52,11 @@ void tda::Account::initVariables()
 
 }
 
+tda::Account::Account()
+{
+    
+}
+
 tda::Account::Account( boost::property_tree::ptree account_data )
 {
     accountData = account_data;

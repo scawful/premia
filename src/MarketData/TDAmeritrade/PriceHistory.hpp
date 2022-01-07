@@ -17,7 +17,8 @@ namespace tda
         void initVariables();
             
     public:
-        PriceHistory( boost::property_tree::ptree price_history_data );
+        PriceHistory();
+        PriceHistory(boost::property_tree::ptree price_history_data);
 
         std::vector< tda::Candle > getCandleVector();
         std::string getCandleDataVariable( std::string variable );

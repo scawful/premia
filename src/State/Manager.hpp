@@ -6,22 +6,22 @@
 #include "../core.hpp"
 #include "../MarketData/TDAmeritrade.hpp"
 #include "../MarketData/CoinbasePro.hpp"
+#include "../MarketData/InteractiveBrokers.hpp"
 
 class State;
 
 class Manager
 {
 private:
-    std::vector<State*> states;
-    
+    std::vector<State*> states;    
     bool m_running;
     
 public:
-    void init( int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT );
+    void init(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT);
     void cleanup();
     
-    void change( State *state );
-    void push( State *state );
+    void change(State *state);
+    void push(State *state);
     void pop();
     
     void updateDelta();
@@ -33,6 +33,8 @@ public:
     bool running() { return m_running; }
     void quit() { m_running = false; }
     
+    tda::TDAmeritrade tda_client;
+    InteractiveBrokers ibkr_client;
     SDL_Renderer *pRenderer = NULL;
     SDL_Window *pWindow = NULL;
     SDL_Surface *screen;
