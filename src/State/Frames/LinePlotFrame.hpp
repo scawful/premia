@@ -10,12 +10,18 @@ private:
     bool show_fills;
     float fill_ref;
     int shade_mode;
-    double xs1[101], ys1[101], ys2[101], ys3[101];
+    double *x;
+    double *y;
+
+    std::vector<double> numDays;
+    std::vector<double> balances;
+    std::vector<std::string> dates;
 
     void initData();
 
 public:
     LinePlotFrame();
+    ~LinePlotFrame();
 
     void update();
     void render();

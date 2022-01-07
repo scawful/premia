@@ -1,18 +1,28 @@
 #include "LinePlotFrame.hpp"
 
-template <typename T>
-inline T RandomRange(T min, T max) {
-    T scale = rand() / (T) RAND_MAX;
-    return min + scale * ( max - min );
-}
-
 void LinePlotFrame::initData()
 {
-    for (int i = 0; i < 101; ++i) {
-        xs1[i] = (float)i;
-        ys1[i] = RandomRange(400.0,450.0);
-        ys2[i] = RandomRange(275.0,350.0);
-        ys3[i] = RandomRange(150.0,225.0);
+    std::ifstream fileInput("../assets/chart.csv");
+
+    if (!fileInput.good()) {
+        SDL_Log("file not opened");
+    }
+
+    int i = 0;
+    std::string temp, word, line;
+    if(fileInput.good())
+    {
+        while(std::getline(fileInput, line))
+        {
+            // Create a stringstream from line
+            std::stringstream ss(line);
+            std::getline(ss, word, ',');
+            std::getline(ss, word);
+            i++;
+            this->x[i] = i;
+            this->y[i] = boost::lexical_cast<double>(word); 
+        }
+
     }
 }
 
@@ -22,7 +32,15 @@ LinePlotFrame::LinePlotFrame()
     this->show_fills = true;
     this->fill_ref = 0;
     this->shade_mode = 0;
+    this->x = new double[365];
+    this->y = new double[365];
     this->initData();
+}
+
+LinePlotFrame::~LinePlotFrame()
+{
+    delete [] x;
+    delete [] y;
 }
 
 void LinePlotFrame::update() 
@@ -46,20 +64,16 @@ void LinePlotFrame::update()
         }
     }
 
-    if (ImPlot::BeginPlot("Stock Prices")) {
-        ImPlot::SetupAxes("Days","Price");
-        ImPlot::SetupAxesLimits(0,100,0,500);
+    if (ImPlot::BeginPlot("Equity Curve")) {
+        ImPlot::SetupAxes("Date","Price");
+        ImPlot::SetupAxesLimits(0,1000,0,6000);
         if (show_fills) {
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.25f);
-            ImPlot::PlotShaded("Stock 1", xs1, ys1, 101, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
-            ImPlot::PlotShaded("Stock 2", xs1, ys2, 101, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
-            ImPlot::PlotShaded("Stock 3", xs1, ys3, 101, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
+            ImPlot::PlotShaded("TDAmeritrade", x, y, 234, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
             ImPlot::PopStyleVar();
         }
         if (show_lines) {
-            ImPlot::PlotLine("Stock 1", xs1, ys1, 101);
-            ImPlot::PlotLine("Stock 2", xs1, ys2, 101);
-            ImPlot::PlotLine("Stock 3", xs1, ys3, 101);
+            ImPlot::PlotLine("TDAmeritrade", x, y, 234);
         }
         ImPlot::EndPlot();
     }
