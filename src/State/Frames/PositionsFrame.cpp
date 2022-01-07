@@ -46,7 +46,7 @@ void PositionsFrame::update()
         load_account( accounts[n] );
     } 
     ImGui::SameLine();
-    ImGui::Combo("", &n,  accounts, 6); 
+    ImGui::Combo("Accounts", &n,  accounts, 6); 
     
     // ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
     ImGui::Text("TDAmeritrade Portfolio Information");
