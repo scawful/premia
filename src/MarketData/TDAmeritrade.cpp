@@ -434,58 +434,8 @@ namespace tda
         }
         catch (std::exception &json_parser_error)
         {
-<<<<<<< HEAD
-            std::string filename = file.path().string();
-
-            std::size_t found_file = filename.find("access_token");
-
-            if ( found_file != std::string::npos )
-            {
-                boost::property_tree::ptree property_tree;
-                std::ifstream json_file( filename, std::ios::in );
-
-                try {
-                    read_json( json_file, property_tree );
-                }
-                catch ( std::exception& json_parser_error ) {
-                    SDL_Log("%s", json_parser_error.what() );
-                }
-
-                json_file.close();
-
-                for ( auto& access_it: property_tree )
-                {
-                    if ( access_it.first == "access_token" )
-                    {
-                        _access_token = access_it.second.get_value<std::string>();
-                    }
-                }
-
-                if ( _access_token != "nope" )
-                    SDL_Log("Found Access Token File!");
-                else
-                    return false;
-
-                std::fstream expiration_file( "exp_" + _access_token_filename, std::ios::in );
-                while( expiration_file >> _access_token_expiration )
-                {
-                    SDL_Log("%ld", _access_token_expiration );
-                }
-                expiration_file.close();
-
-                SDL_Log("Expiration %ld", _access_token_expiration);
-
-                return true;
-            }
-        }
-        SDL_Log("No Access Token File!");
-
-        return false;
-    }
-=======
             SDL_Log("%s", json_parser_error.what());
         }
->>>>>>> be88204eec58c14f2645d702398f5f956e4a81d6
 
         jsonFile.close();
         if (!keep_file)
