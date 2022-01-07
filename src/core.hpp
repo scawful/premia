@@ -72,7 +72,7 @@
 #include "../include/implot/implot.h"
 #include "../include/implot/implot_internal.h"
 
-#define SCREEN_WIDTH 782
-#define SCREEN_HEIGHT 543
+#define SCREEN_WIDTH 1080
+#define SCREEN_HEIGHT 720
 
 #endif
