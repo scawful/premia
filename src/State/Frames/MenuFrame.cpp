@@ -1,5 +1,4 @@
 #include "MenuFrame.hpp"
-#include "../QuoteState.hpp"
 #include "../OptionState.hpp"
 #include "../StartState.hpp"
 #include "../StreamState.hpp"
@@ -155,7 +154,7 @@ void MenuFrame::update()
 
             if ( ImGui::MenuItem("Static Quotes") )
             {
-                premia->change( QuoteState::instance() );
+                // premia->change( QuoteState::instance() );
             }
 
             ImGui::EndMenu();

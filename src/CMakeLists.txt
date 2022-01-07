@@ -98,7 +98,6 @@ add_executable(Premia Premia.cpp
                     State/Manager.cpp 
                     State/DemoState.cpp
                     State/StartState.cpp 
-                    State/QuoteState.cpp 
                     State/OptionState.cpp
                     State/StreamState.cpp
                     State/Frames/MenuFrame.cpp

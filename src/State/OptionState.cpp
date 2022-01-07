@@ -1,7 +1,6 @@
 //  OptionState Class
 #include "OptionState.hpp"
 #include "StartState.hpp"
-#include "QuoteState.hpp"
 
 OptionState OptionState::m_OptionState;
 static bool select_options[] = {false};
@@ -52,9 +51,6 @@ void OptionState::handleEvents()
                 {
                     case SDLK_ESCAPE:
                         premia->quit();
-                        break;
-                    case SDLK_LEFT:
-                        premia->change( QuoteState::instance() );
                         break;
                     case SDLK_RIGHT:
                         premia->change( StartState::instance() );
