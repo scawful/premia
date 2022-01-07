@@ -79,6 +79,10 @@ void StartState::handleEvents()
                     case SDLK_DOWN:
                         premia->change( DemoState::instance() );
                         break;
+                    case SDLK_RETURN:
+                    case SDLK_BACKSPACE:
+                        io.KeysDown[event.key.keysym.scancode] = (event.type == SDL_KEYDOWN);
+                        break;
                     default:
                         break;
                 }
@@ -89,9 +93,11 @@ void StartState::handleEvents()
                 int key = event.key.keysym.scancode;
                 IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
                 io.KeysDown[key] = (event.type == SDL_KEYDOWN);
+                io.KeyMap[key] = io.KeysDown[key];
                 io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
                 io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
                 io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
+                io.KeySuper = ((SDL_GetModState() & KMOD_GUI) != 0);
                 break;
             }
             
@@ -223,6 +229,7 @@ void StartState::update()
     ImGui::End();    
 
     watchlistFrame.update();
+    console.update();
     orderFrame.update();
     
     SDL_RenderClear(premia->pRenderer);

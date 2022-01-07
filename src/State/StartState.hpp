@@ -11,6 +11,7 @@
 #include "Frames/PositionsFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
 #include "Frames/OptionChainFrame.hpp"
+#include "Frames/ConsoleFrame.hpp"
 
 class StartState : public State
 {
@@ -34,6 +35,7 @@ private:
     CandleChartFrame candleChart;
     OptionChainFrame optionChain;
     LinePlotFrame linePlot;
+    ConsoleFrame console;
 
     std::map<std::string, tda::Quote> quotes;
 
