@@ -74,7 +74,7 @@ InteractiveBrokers::~InteractiveBrokers()
 bool InteractiveBrokers::connect(const char *host, int port, int clientId)
 {
     // trying to connect
-    //printf( "Connecting to %s:%d clientId:%d\n", !( host && *host) ? "127.0.0.1" : host, port, clientId);
+    printf( "Connecting to %s:%d clientId:%d\n", !( host && *host) ? "127.0.0.1" : host, port, clientId);
     
     //! [connect]
     bool result = client_socket->eConnect( host, port, clientId, extra_auth);
@@ -87,8 +87,7 @@ bool InteractiveBrokers::connect(const char *host, int port, int clientId)
         //! [ereader]
     }
     else
-        printf("Cannot Connect");
-        //printf( "Cannot connect to %s:%d clientId:%d\n", client_socket->host().c_str(), client_socket->port(), clientId);
+        printf( "Cannot connect to %s:%d clientId:%d\n", client_socket->host().c_str(), client_socket->port(), clientId);
 
     return result;
 }
@@ -115,6 +114,15 @@ void InteractiveBrokers::processMessages()
     time_t now = time(NULL);
 
     switch (client_state) {
+        case ST_REQHEADTIMESTAMP_ACK:
+        case ST_REQHISTOGRAMDATA_ACK:
+        case ST_REROUTECFD_ACK:
+        case ST_CONNECT:
+        case ST_CANCELORDER:
+        case ST_CANCELORDER_ACK:
+        case ST_MARKETRULE_ACK:
+        case ST_CONTFUT_ACK:
+            break;
         case ST_PNLSINGLE:
             pnlSingleOperation();
             break;
@@ -1470,7 +1478,7 @@ void InteractiveBrokers::orderStatus(OrderId orderId, const std::string& status,
 
 //! [openorder]
 void InteractiveBrokers::openOrder( OrderId orderId, const Contract& contract, const Order& order, const OrderState& orderState) {
-    printf( "OpenOrder. PermId: %ld, ClientId: %ld, OrderId: %ld, Account: %s, Symbol: %s, SecType: %s, Exchange: %s:, Action: %s, OrderType:%s, TotalQty: %g, CashQty: %g, "
+    printf( "OpenOrder. PermId: %d, ClientId: %ld, OrderId: %ld, Account: %s, Symbol: %s, SecType: %s, Exchange: %s:, Action: %s, OrderType:%s, TotalQty: %g, CashQty: %g, "
     "LmtPrice: %g, AuxPrice: %g, Status: %s\n", 
         order.permId, order.clientId, orderId, order.account.c_str(), contract.symbol.c_str(), contract.secType.c_str(), contract.exchange.c_str(), 
         order.action.c_str(), order.orderType.c_str(), order.totalQuantity, order.cashQty == UNSET_DOUBLE ? 0 : order.cashQty, order.lmtPrice, order.auxPrice, orderState.status.c_str());
@@ -2071,7 +2079,7 @@ void InteractiveBrokers::orderBound(long long orderId, int apiClientId, int apiO
 
 //! [completedorder]
 void InteractiveBrokers::completedOrder(const Contract& contract, const Order& order, const OrderState& orderState) {
-    printf( "CompletedOrder. PermId: %ld, ParentPermId: %lld, Account: %s, Symbol: %s, SecType: %s, Exchange: %s:, Action: %s, OrderType: %s, TotalQty: %g, CashQty: %g, FilledQty: %g, "
+    printf( "CompletedOrder. PermId: %d, ParentPermId: %lld, Account: %s, Symbol: %s, SecType: %s, Exchange: %s:, Action: %s, OrderType: %s, TotalQty: %g, CashQty: %g, FilledQty: %g, "
         "LmtPrice: %g, AuxPrice: %g, Status: %s, CompletedTime: %s, CompletedStatus: %s\n", 
         order.permId, order.parentPermId == UNSET_LONG ? 0 : order.parentPermId, order.account.c_str(), contract.symbol.c_str(), contract.secType.c_str(), contract.exchange.c_str(), 
         order.action.c_str(), order.orderType.c_str(), order.totalQuantity, order.cashQty == UNSET_DOUBLE ? 0 : order.cashQty, order.filledQuantity, 
