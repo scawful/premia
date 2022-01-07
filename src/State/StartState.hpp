@@ -4,13 +4,18 @@
 
 #include "State.hpp"
 #include "Frames/MenuFrame.hpp"
+#include "Frames/LoginFrame.hpp"
 #include "Frames/LinePlotFrame.hpp"
+#include "Frames/WatchlistFrame.hpp"
+#include "Frames/OrderFrame.hpp"
+#include "Frames/PositionsFrame.hpp"
 
 class StartState : public State
 {
 private:
     static StartState m_StartState;
 
+    bool is_logged_in = false;
     Manager *premia = NULL;
     SDL_Texture *pTexture = NULL;
     TTF_Font *titleFont = NULL;
@@ -20,6 +25,10 @@ private:
     std::string title_string;
 
     MenuFrame mainMenu;
+    LoginFrame loginFrame;
+    OrderFrame orderFrame;
+    PositionsFrame positionsFrame;
+    WatchlistFrame watchlistFrame;
     LinePlotFrame linePlot;
 
     std::map<std::string, tda::Quote> quotes;

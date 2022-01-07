@@ -3,33 +3,60 @@
 #include "QuoteState.hpp"
 #include "OptionState.hpp"
 #include "DemoState.hpp"
-#include "Portfolio/Positions.hpp"
 
 StartState StartState::m_StartState;
 
+/**
+ * @brief Initialize the StartStates variables 
+ * @author @scawful
+ * 
+ * @param premia 
+ */
 void StartState::init(Manager *premia)
 {
     this->premia = premia;
     this->title_string = "Home";
     mainMenu.import_manager(premia);
+    positionsFrame.import_manager(premia);
+    positionsFrame.init_positions();
     ImGui::StyleColorsClassic();
 }
 
+/**
+ * @brief Cleanup any allocated resources
+ * @author @scawful
+ * 
+ */
 void StartState::cleanup()
 {
     SDL_Log("StartState Cleanup\n");
 }
 
+/**
+ * @brief Pause the runtime loop of the state
+ * @author @scawful
+ * 
+ */
 void StartState::pause()
 {
     SDL_Log("StartState Pause\n");
 }
 
+/**
+ * @brief Resume the runtime loop of the state
+ * @author @scawful
+ * 
+ */
 void StartState::resume()
 {
     SDL_Log("StartState Resume\n");
 }
 
+/**
+ * @brief Handle input/output events via keyboard and mouse 
+ * @author @scawful
+ * 
+ */
 void StartState::handleEvents()
 {
     int wheel = 0;
@@ -105,11 +132,17 @@ void StartState::handleEvents()
 
 }
 
+/**
+ * @brief Update the contents of the StartState
+ *        Construct GUI elements
+ * @author @scawful
+ * 
+ */
 void StartState::update()
 {
-    // draw_imgui_menu( premia, "Home" );
     mainMenu.set_title(title_string);
     mainMenu.update();
+    loginFrame.update();
 
     // Place Order Button ---------------------------------------------------------------------------------
     if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
@@ -181,8 +214,13 @@ void StartState::update()
     }
 
     linePlot.update();
+    positionsFrame.update();
 
     ImGui::End();    
+
+    watchlistFrame.update();
+    orderFrame.update();
+    
     SDL_RenderClear(premia->pRenderer);
 }
 
