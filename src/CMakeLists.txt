@@ -81,6 +81,12 @@ file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp)
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
+# ibkr api library --------------------------------------------------------------------------------------------
+set(IBKR_PATH "../include/twsapi")
+file(GLOB IBKR_SOURCES ${IBKR_PATH}/*.cpp)
+add_library("IBKR" SHARED ${IBKR_SOURCES})
+target_include_directories("IBKR" PUBLIC ${IBKR_PATH})
+
 # add the executable
 # MACOSX_BUNDLE ${MAC_ICON}
 add_executable(Premia Premia.cpp 
@@ -95,6 +101,13 @@ add_executable(Premia Premia.cpp
                     MarketData/TDAmeritrade/PriceHistory.cpp 
                     MarketData/TDAmeritrade/OptionChain.cpp 
                     MarketData/TDAmeritrade/Account.cpp
+                    MarketData/InteractiveBrokers.cpp
+                    MarketData/InteractiveBrokers/AccountSummaryTags.cpp
+                    MarketData/InteractiveBrokers/AvailableAlgoParams.cpp
+                    MarketData/InteractiveBrokers/ContractSamples.cpp
+                    MarketData/InteractiveBrokers/OrderSamples.cpp 
+                    MarketData/InteractiveBrokers/ScannerSubscriptionSamples.cpp
+                    MarketData/InteractiveBrokers/Utils.cpp
                     State/Manager.cpp 
                     State/DemoState.cpp
                     State/StartState.cpp 
@@ -125,7 +138,7 @@ include_directories("../assets")
 target_link_libraries(Premia ${SDL2_LIBRARIES} 
                              ${SDL_IMAGE_LIBRARIES} 
                              ${SDL_TTF_LIBRARIES}
-                             curl OpenSSL::SSL ImGui ImPlot
+                             curl OpenSSL::SSL ImGui ImPlot IBKR
                              ${BOOST_LIBRARIES} 
                              ${OPENGL_LIBRARIES} )
 
