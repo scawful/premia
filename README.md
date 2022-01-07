@@ -5,8 +5,8 @@ Details
 - Description: Risk Parity Anaylsis and Trading Client
 - Platform: Windows, macOS, GNU/Linux
 - Toolchain: mingw-w64, clang
-- Dependencies: Boost, SDL2, OpenSSL, QuantLib, ImGui, ImPlot
-- API: TDAmeritrade, Coinbase Pro
+- Dependencies: Boost, SDL2, OpenSSL, QuantLib, ImGui, ImPlot, TWS API
+- Supported API: TDAmeritrade, InteractiveBrokers, Coinbase Pro
 
 API KEYS
 --------
