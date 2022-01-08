@@ -1,9 +1,9 @@
-#ifndef PositionsFrame_hpp
-#define PositionsFrame_hpp
+#ifndef PortfolioFrame_hpp
+#define PortfolioFrame_hpp
 
 #include "Frame.hpp"
 
-class PositionsFrame : public Frame
+class PortfolioFrame : public Frame
 {
 private:
     std::vector<std::string> account_ids_std;
@@ -15,9 +15,12 @@ private:
     tda::Account account_data;
     std::vector<std::string> positions_vector;
 
+    void draw_positions();
+    void draw_balances();
+    void draw_orders();
 
 public:
-    PositionsFrame();
+    PortfolioFrame();
     
     void init_positions();
     void load_account( std::string account );
