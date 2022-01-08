@@ -66,7 +66,7 @@ void LinePlotFrame::update()
 
     if (ImPlot::BeginPlot("Equity Curve")) {
         ImPlot::SetupAxes("Date","Price");
-        ImPlot::SetupAxesLimits(0,1000,0,6000);
+        //ImPlot::SetupAxesLimits(0,1000,0,6000);
         if (show_fills) {
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.25f);
             ImPlot::PlotShaded("TDAmeritrade", x, y, 234, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
