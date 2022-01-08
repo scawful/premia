@@ -10,6 +10,9 @@ void DemoState::init(Manager *premia)
     ImGui::CreateContext();
     ImPlot::CreateContext();
     ImGui::StyleColorsClassic();
+
+    ImPlotContext *ctx = ImPlot::CreateContext();
+    ImPlot::Initialize(ctx);
 }
 
 void DemoState::cleanup()

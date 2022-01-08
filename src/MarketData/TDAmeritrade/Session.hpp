@@ -53,6 +53,7 @@ namespace tda
 
         void send_message( std::shared_ptr<std::string const> const& s );
         std::vector<std::string> receive_response();
+        std::shared_ptr<std::vector<std::string>> receive_response_ptr();
 
         bool on_login( beast::error_code ec );
         void on_logout( beast::error_code ec );
@@ -60,6 +61,7 @@ namespace tda
         void on_subscription( beast::error_code ec );
 
         void interrupt();
+        void clear_buffer();
 
         bool is_logged_in();
         bool is_subscribed();

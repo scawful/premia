@@ -631,12 +631,25 @@ namespace tda
             return false;
     }
 
+<<<<<<< HEAD
+    void TDAmeritrade::clear_session_buffer()
+    {
+        _websocket_session->clear_buffer();
+    }
+
+    void TDAmeritrade::sync_buffer()
+    {
+        _websocket_buffer = _websocket_session->receive_response_ptr();
+    }
+
+=======
     /**
      * @brief Get a list of all the responses logged in the WebSocket session
      * @author @scawful
      * 
      * @return std::vector<std::string> 
      */
+>>>>>>> be88204eec58c14f2645d702398f5f956e4a81d6
     std::vector<std::string> TDAmeritrade::get_session_responses()
     {
         return _websocket_session->receive_response();

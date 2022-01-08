@@ -145,7 +145,7 @@ namespace tda
             return fail(ec, "write");
 
         SDL_Log("Session::on_write");
-        SDL_Log("Queue Request Stream:\n%s", _queue[0].get()->c_str() );
+        // SDL_Log("Queue Request Stream:\n%s", _queue[0].get()->c_str() );
 
         if ( _logged_in )
         {
@@ -292,6 +292,12 @@ namespace tda
         return _response_stack;
     }
 
+    std::shared_ptr<std::vector<std::string>> 
+    Session::receive_response_ptr()
+    {
+        return std::make_shared<std::vector<std::string>>(_response_stack);
+    }
+
     bool 
     Session::on_login( beast::error_code ec )
     {
@@ -369,6 +375,12 @@ namespace tda
     Session::interrupt()
     {
         _interrupt = true;
+    }
+
+    void 
+    Session::clear_buffer()
+    {
+        _buffer.clear();
     }
 
     bool
