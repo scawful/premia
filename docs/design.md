@@ -2,10 +2,27 @@
 # Software Design Plan
 
 ### Overview
-- Stock trading client using TDAmeritrade API
+- Stock trading client with support for multiple brokerages API 
+    - TDAmeritrade
+    - InteractiveBrokers
+    - CoinbasePro
 - Primary function is analyzing risk of portfolio 
 - Support for making buy and sell orders
 - Real time quotes and historical charts
+
+## Frames
+Frames have been added as an alternative to States. The purpose of a frame is to display GUI elements and provide abstractions for importing the data from the client to those GUI elements. This will reduce the need for multiple states and encourage more modular design within each individual state. Whereas before Quotes, Options, Portfolio, etc were all their own state, now they will be Frames within a State.
+
+StartState
+    - CandleChartFrame
+    - LinePlotFrame
+    - PositionsFrame
+    - ConsoleFrame
+    - OrderFrame
+    - WatchlistFrame
+
+StreamState
+    - Any number of CandleChartFrames
 
 ## Structure
 Premia's main event loop is handled by a virtual state manager defined in the Manager class and implemented using the State virtual class. 
@@ -65,12 +82,15 @@ Premia's main event loop is handled by a virtual state manager defined in the Ma
 - Client
 - Product
 
-## TDAmeritrade Data Interface
+## TDAmeritrade Client
 Object that handles communication with TDAmeritrade's Developer API. Present in any state of the program that requires data from the brokerage. 
 -	RESTful requests like GET and POST 
 -	WebSocket session threading and data sharing
 -	Authenticating with access token and refresh key
 -	Creating shared pointers of pricing data structures 
+
+## InteractiveBrokers Client
+Object based on code provided by InteractiveBrokers for their TWS API. 
 
 ## Dependencies
 	- SDL2.0
