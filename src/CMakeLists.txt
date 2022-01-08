@@ -101,6 +101,8 @@ add_executable(Premia Premia.cpp
                     MarketData/TDAmeritrade/PriceHistory.cpp 
                     MarketData/TDAmeritrade/OptionChain.cpp 
                     MarketData/TDAmeritrade/Account.cpp
+                    MarketData/TDAmeritrade/Watchlist.cpp
+                    MarketData/TDAmeritrade/Parser.cpp
                     MarketData/InteractiveBrokers.cpp
                     MarketData/InteractiveBrokers/AccountSummaryTags.cpp
                     MarketData/InteractiveBrokers/AvailableAlgoParams.cpp
@@ -117,8 +119,7 @@ add_executable(Premia Premia.cpp
                     State/Frames/LinePlotFrame.cpp
                     State/Frames/LoginFrame.cpp
                     State/Frames/WatchlistFrame.cpp
-                    State/Frames/OrderFrame.cpp
-                    State/Frames/PositionsFrame.cpp
+                    State/Frames/PortfolioFrame.cpp
                     State/Frames/OptionChainFrame.cpp
                     State/Frames/ConsoleFrame.cpp
                     ${IMGUI_PATH}/imgui.cpp
