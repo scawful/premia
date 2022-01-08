@@ -14,13 +14,17 @@ void StartState::init(Manager *premia)
 {
     this->premia = premia;
     this->title_string = "Home";
+
     mainMenu.import_manager(premia);
-    positionsFrame.import_manager(premia);
+    portfolioFrame.import_manager(premia);
     candleChart.import_manager(premia);
     optionChain.import_manager(premia);
+    watchlistFrame.import_manager(premia);
+    watchlistFrame.init_watchlists();
     optionChain.init_chain("TLT");
-    positionsFrame.init_positions();
+    portfolioFrame.init_positions();
     candleChart.init_instrument("TLT");
+    
     ImGui::StyleColorsClassic();
 }
 
@@ -155,21 +159,6 @@ void StartState::update()
     if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
         ImGui::OpenPopup("Quick Order");
 
-    ImGui::SameLine();
-    if ( ImGui::Button("Load Responses from WebSocket", ImVec2(220, 30)) )
-    {
-        for ( auto response : premia->tda_client.get_session_responses() )
-        {
-            SDL_Log("Response: %s", response.c_str() );
-        }
-    }
-
-    ImGui::SameLine();
-    if ( ImGui::Button("Clear Buffer", ImVec2(220, 30)) )
-    {
-        tda_data_interface->clear_session_buffer();
-    }
-
     // Always center this window when appearing
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -229,12 +218,11 @@ void StartState::update()
     linePlot.update();
     candleChart.update();
     optionChain.update();
-
     ImGui::End();    
 
     watchlistFrame.update();
     console.update();
-    positionsFrame.update();
+    portfolioFrame.update();
     
     SDL_RenderClear(premia->pRenderer);
 }
@@ -247,9 +235,7 @@ void StartState::draw()
     SDL_GetWindowSize( premia->pWindow, &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
     SDL_RenderFillRect( premia->pRenderer, &f );
-
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-
     SDL_RenderPresent(premia->pRenderer);
 }

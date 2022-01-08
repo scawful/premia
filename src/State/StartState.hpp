@@ -7,8 +7,7 @@
 #include "Frames/LoginFrame.hpp"
 #include "Frames/LinePlotFrame.hpp"
 #include "Frames/WatchlistFrame.hpp"
-#include "Frames/OrderFrame.hpp"
-#include "Frames/PositionsFrame.hpp"
+#include "Frames/PortfolioFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
 #include "Frames/OptionChainFrame.hpp"
 #include "Frames/ConsoleFrame.hpp"
@@ -29,8 +28,7 @@ private:
 
     MenuFrame mainMenu;
     LoginFrame loginFrame;
-    OrderFrame orderFrame;
-    PositionsFrame positionsFrame;
+    PortfolioFrame portfolioFrame;
     WatchlistFrame watchlistFrame;
     CandleChartFrame candleChart;
     OptionChainFrame optionChain;
