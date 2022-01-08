@@ -3,6 +3,8 @@
 
 #include "../core.hpp"
 #include "../apikey.hpp"
+#include "TDAmeritrade/Parser.hpp"
+#include "TDAmeritrade/Watchlist.hpp"
 #include "TDAmeritrade/Session.hpp"
 #include "TDAmeritrade/PricingStructures.hpp"
 #include "TDAmeritrade/Account.hpp"
@@ -115,13 +117,14 @@ namespace tda
         bool _access_token_found;
         bool _session_active;
         bool _user_principals;
-        std::string _base_url;
         std::string _col_name;
         std::string _current_ticker;
         std::string _access_token;
         std::string _refresh_token;
         std::string _consumer_key;
         std::vector<std::thread> _ws_threads;
+
+        Parser parser;
 
         std::shared_ptr<tda::Session> _websocket_session;
         std::shared_ptr<std::vector<std::string>> _websocket_buffer;
@@ -166,24 +169,20 @@ namespace tda
         std::vector<std::string> get_all_accounts();
 
         JSONObject::ptree createPropertyTree(std::string ticker, std::string new_url);
+        Quote             createQuote(std::string ticker);
+        PriceHistory      createPriceHistory();
+        PriceHistory      createPriceHistory(std::string ticker, PeriodType ptype, int period_amt,
+                                             FrequencyType ftype, int freq_amt, bool ext);
 
-        Quote createQuote(std::string ticker);
-        
-        PriceHistory createPriceHistory();
+        OptionChain       createOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
+                                            bool includeQuotes, std::string strategy, std::string range,
+                                            std::string expMonth, std::string optionType);
+        Account           createAccount(std::string account_num);
 
-
-        PriceHistory createPriceHistory(std::string ticker, PeriodType ptype, int period_amt,
-                                        FrequencyType ftype, int freq_amt, bool ext);
-
-        OptionChain createOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
-                                      bool includeQuotes, std::string strategy, std::string range,
-                                      std::string expMonth, std::string optionType);
-
-        Account createAccount(std::string account_num);
+        std::vector<Watchlist> retrieveWatchlistsByAccount(std::string account_num);
 
         // Modifiers
         void set_col_name(std::string col_name);
-
         void set_price_history_parameters(std::string ticker, PeriodType ptype, time_t start_date, time_t end_date,
                                           FrequencyType ftype, int freq_amt, bool ext = true);
 

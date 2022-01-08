@@ -91,7 +91,7 @@ namespace tda
         if (curl)
         {
             // welcome to verbosity
-            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+            // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
             // set the url to receive the POST
             curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
@@ -631,25 +631,12 @@ namespace tda
             return false;
     }
 
-<<<<<<< HEAD
-    void TDAmeritrade::clear_session_buffer()
-    {
-        _websocket_session->clear_buffer();
-    }
-
-    void TDAmeritrade::sync_buffer()
-    {
-        _websocket_buffer = _websocket_session->receive_response_ptr();
-    }
-
-=======
     /**
      * @brief Get a list of all the responses logged in the WebSocket session
      * @author @scawful
      * 
      * @return std::vector<std::string> 
      */
->>>>>>> be88204eec58c14f2645d702398f5f956e4a81d6
     std::vector<std::string> TDAmeritrade::get_session_responses()
     {
         return _websocket_session->receive_response();
@@ -834,6 +821,31 @@ namespace tda
         return Account(propertyTree);
     }
 
+    std::vector<Watchlist> TDAmeritrade::retrieveWatchlistsByAccount(std::string account_num)
+    {
+        std::string url = "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
+        string_replace(url, "{accountNum}", account_num);
+        std::time_t now = std::time(0);
+        std::string account_filename = account_num + "_" + std::to_string(now) + ".json";
+
+        post_account_auth(url, account_filename);
+        std::ifstream jsonFile(account_filename, std::ios::in | std::ios::binary);
+
+        JSONObject::ptree propertyTree;
+        try
+        {
+            read_json(jsonFile, propertyTree);
+        }
+        catch (std::exception &json_parser_error)
+        {
+            SDL_Log("%s", json_parser_error.what());
+        }
+
+        jsonFile.close();
+        std::remove(account_filename.c_str());
+        return parser.parse_watchlist_data(propertyTree);
+    }
+
     /**
      * @brief Set the column name? idk
      * @author @scawful
@@ -863,16 +875,10 @@ namespace tda
         else
             string_replace(new_url, "{ext}", "true");
 
-        this->_base_url = new_url;
         this->_current_ticker = ticker;
     }
 
     // AUXILIARY FUNCTIONS ====================================================
-
-    std::string TDAmeritrade::getBaseUrl()
-    {
-        return this->_base_url;
-    }
 
     bool TDAmeritrade::is_session_active()
     {
