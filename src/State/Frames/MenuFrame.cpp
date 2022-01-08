@@ -89,27 +89,6 @@ void MenuFrame::update()
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Portfolio"))
-        {
-
-            if ( ImGui::MenuItem("Positions") )
-            {
-                // premia->change( Positions::instance() );
-            }
-
-            if ( ImGui::MenuItem("Balances") )
-            {
-                // premia->change( BalancesState::instance() );
-            }
-
-            if ( ImGui::MenuItem("Orders" ) )
-            {
-                // premia->change( OrderState::instance() );
-            }
-
-            ImGui::EndMenu();
-        }
-
         if (ImGui::BeginMenu("Trade"))
         {
             if ( ImGui::MenuItem("Place Order") )
