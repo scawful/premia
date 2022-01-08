@@ -76,9 +76,8 @@ void StartState::handleEvents()
                     case SDLK_ESCAPE:
                         premia->quit();
                         break;
+                    case SDLK_UP:
                     case SDLK_DOWN:
-                        premia->change( DemoState::instance() );
-                        break;
                     case SDLK_RETURN:
                     case SDLK_BACKSPACE:
                         io.KeysDown[event.key.keysym.scancode] = (event.type == SDL_KEYDOWN);
@@ -222,7 +221,6 @@ void StartState::update()
     }
 
     linePlot.update();
-    positionsFrame.update();
     candleChart.update();
     optionChain.update();
 
@@ -230,7 +228,7 @@ void StartState::update()
 
     watchlistFrame.update();
     console.update();
-    orderFrame.update();
+    positionsFrame.update();
     
     SDL_RenderClear(premia->pRenderer);
 }

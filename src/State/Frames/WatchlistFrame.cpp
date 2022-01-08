@@ -10,7 +10,7 @@ void WatchlistFrame::update()
 {
     ImGuiIO& io = ImGui::GetIO();
     ImGui::SetNextWindowPos( ImVec2(io.DisplaySize.x * 0.75, 0) );
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y * 0.75), ImGuiCond_Always );
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y * 0.70), ImGuiCond_Always );
     
     if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove ))
     {

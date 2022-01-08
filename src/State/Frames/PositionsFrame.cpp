@@ -39,6 +39,15 @@ void PositionsFrame::load_account( std::string account_num )
 
 void PositionsFrame::update() 
 {
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::SetNextWindowPos( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70) );
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30), ImGuiCond_Always );
+
+    if (!ImGui::Begin("Portfolio")) {
+        ImGui::End();
+        return;
+    }    
+
      // Load Account IDs
     static int n = 0;
     const char **accounts = account_ids.data();
@@ -67,16 +76,15 @@ void PositionsFrame::update()
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
     ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 15);
 
-    if (ImGui::BeginTable("table_scrolly", 7, flags, outer_size))
+    if (ImGui::BeginTable("table_scrolly", 6, flags, outer_size))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
         ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthStretch );
         ImGui::TableSetupColumn("P/L Day", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
         ImGui::TableSetupColumn("P/L %", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
-        ImGui::TableSetupColumn("Average Price",  ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
-        ImGui::TableSetupColumn("Market Value",  ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Avg Price",  ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Mkt Value",  ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
         ImGui::TableSetupColumn("Quantity", ImGuiTableColumnFlags_WidthFixed );
-        ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_NoSort );
         ImGui::TableHeadersRow();
 
         ImGuiListClipper clipper;
@@ -86,7 +94,7 @@ void PositionsFrame::update()
             for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
             {
                 ImGui::TableNextRow();
-                for (int column = 0; column < 7; column++)
+                for (int column = 0; column < 6; column++)
                 {
                     std::string symbol = positions_vector[row];
                     ImGui::TableSetColumnIndex(column);
@@ -110,13 +118,6 @@ void PositionsFrame::update()
                         case 5:
                             ImGui::Text("%s", account_data.get_position_balances( symbol, "longQuantity" ).c_str());
                             break;
-                        case 6:
-                            ImGui::SmallButton("Buy");
-                            ImGui::SameLine();
-                            ImGui::SmallButton("Sell");
-                            ImGui::SameLine();
-                            ImGui::SmallButton("Q");
-                            break;
                         default:
                             ImGui::Text("Hello %d,%d", column, row);
                             break;
@@ -130,5 +131,5 @@ void PositionsFrame::update()
 
     ImGui::Spacing();
     ImGui::Separator();
-
+    ImGui::End();
 }

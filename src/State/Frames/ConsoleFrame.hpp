@@ -16,6 +16,7 @@ private:
     bool                  ScrollToBottom;
     std::string           title;
     bool                  p_open = true;
+    bool                  copy_to_clipboard = false;
 
     void clearLog();
     void addLog(const char* fmt, ...);

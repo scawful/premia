@@ -60,6 +60,10 @@ void ConsoleFrame::executeCommand(const char* command_line)
         for (int i = first > 0 ? first : 0; i < History.Size; i++)
             addLog("%3d: %s\n", i, History[i]);
     }
+    else if (Stricmp(command_line, "SESSION") == 0)
+    {
+        addLog("Starting WebSocket session...");
+    }
     else
     {
         addLog("Unknown command: '%s'\n", command_line);
@@ -189,6 +193,7 @@ ConsoleFrame::ConsoleFrame() : Frame()
     Commands.push_back("HISTORY");
     Commands.push_back("CLEAR");
     Commands.push_back("CLASSIFY");
+    Commands.push_back("SESSION");
     AutoScroll = true;
     ScrollToBottom = false;
     addLog("Welcome to Premia!"); 
@@ -206,8 +211,8 @@ ConsoleFrame::~ConsoleFrame()
 void ConsoleFrame::update() 
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos( ImVec2(0, io.DisplaySize.y * 0.75) );
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.25), ImGuiCond_Always );
+    ImGui::SetNextWindowPos( ImVec2(0, io.DisplaySize.y * 0.70) );
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30), ImGuiCond_Always );
     if (!ImGui::Begin(title.c_str(), &p_open))
     {
         ImGui::End();
@@ -226,17 +231,7 @@ void ConsoleFrame::update()
 
     ImGui::TextWrapped("Enter 'HELP' for help. TAB key for autocomplete, UP/DOWN key for history");
 
-    // TODO: display items starting from the bottom
-
-    if (ImGui::SmallButton("Add Debug Text"))  { addLog("%d some text", Items.Size); addLog("some more text"); addLog("display very important message here!"); }
-    ImGui::SameLine();
-    if (ImGui::SmallButton("Add Debug Error")) { addLog("[error] something went wrong"); }
-    ImGui::SameLine();
-    if (ImGui::SmallButton("clearLog"))           { clearLog(); }
-    ImGui::SameLine();
-    bool copy_to_clipboard = ImGui::SmallButton("Copy");
-    //static float t = 0.0f; if (ImGui::GetTime() - t > 0.02f) { t = ImGui::GetTime(); addLog("Spam %f", t); }
-
+    //if (ImGui::SmallButton("Add Debug Error")) { addLog("[error] something went wrong"); }
     ImGui::Separator();
 
     // Options menu
@@ -330,6 +325,10 @@ void ConsoleFrame::update()
         strcpy(s, "");
         reclaim_focus = true;
     }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Clear"))           { clearLog(); }
+    ImGui::SameLine();
+    copy_to_clipboard = ImGui::SmallButton("Copy");
 
     // Auto-focus on window apparition
     ImGui::SetItemDefaultFocus();

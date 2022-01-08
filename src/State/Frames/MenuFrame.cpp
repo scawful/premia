@@ -23,7 +23,7 @@ void MenuFrame::update()
     ImGui::NewFrame();
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.75, io.DisplaySize.y * 0.75), ImGuiCond_Always );
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.75, io.DisplaySize.y * 0.70), ImGuiCond_Always );
     
     if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
     {
