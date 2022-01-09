@@ -122,6 +122,7 @@ add_executable(Premia Premia.cpp
                     State/Frames/PortfolioFrame.cpp
                     State/Frames/OptionChainFrame.cpp
                     State/Frames/ConsoleFrame.cpp
+                    State/Frames/TradingFrame.cpp
                     ${IMGUI_PATH}/imgui.cpp
                     ${IMGUI_PATH}/imgui_demo.cpp
                     ${IMGUI_PATH}/imgui_draw.cpp
