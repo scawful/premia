@@ -11,6 +11,7 @@
 #include "Frames/CandleChartFrame.hpp"
 #include "Frames/OptionChainFrame.hpp"
 #include "Frames/ConsoleFrame.hpp"
+#include "Frames/TradingFrame.hpp"
 
 class StartState : public State
 {
@@ -26,14 +27,17 @@ private:
 
     std::string title_string;
 
+    MenuFrame::SubFrame current_frame;
+
     MenuFrame mainMenu;
+    ConsoleFrame console;
     LoginFrame loginFrame;
+    LinePlotFrame linePlot;
     PortfolioFrame portfolioFrame;
     WatchlistFrame watchlistFrame;
     CandleChartFrame candleChart;
     OptionChainFrame optionChain;
-    LinePlotFrame linePlot;
-    ConsoleFrame console;
+    TradingFrame tradingFrame;
 
     std::map<std::string, tda::Quote> quotes;
 
