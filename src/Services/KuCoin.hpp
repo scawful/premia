@@ -6,6 +6,7 @@
 #include "KuCoin/Parser.hpp"
 #include "KuCoin/Client.hpp"
 #include "KuCoin/Account.hpp"
+#include "KuCoin/MarginAccount.hpp"
 
 namespace kc
 {
@@ -13,11 +14,13 @@ namespace kc
     {
     private:
         Client client;
+        Parser parser;
 
     public:
         KuCoin();
 
         Account list_accounts();
+        MarginAccount get_margin_account();
     };
 }
 
