@@ -64,7 +64,8 @@ void LinePlotFrame::update()
         }
     }
 
-    if (ImPlot::BeginPlot("Equity Curve")) {
+    ImGuiIO& io = ImGui::GetIO();
+    if (ImPlot::BeginPlot("Equity Curve", ImVec2(io.DisplaySize.x * 0.73, io.DisplaySize.y * 0.59))) {
         ImPlot::SetupAxes("Date","Price");
         //ImPlot::SetupAxesLimits(0,1000,0,6000);
         if (show_fills) {
