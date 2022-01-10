@@ -29,9 +29,10 @@ void StartState::init(Manager *premia)
 
     mainMenu.import_manager(premia);
     portfolioFrame.import_manager(premia);
-    candleChart.import_manager(premia, &tda_logged_in);
-    optionChain.import_manager(premia, &tda_logged_in);
-    watchlistFrame.import_manager(premia, &tda_logged_in);
+    loginFrame.import_manager(premia, &protected_mode, &tda_logged_in);
+    candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
+    optionChain.import_manager(premia, &protected_mode, &tda_logged_in);
+    watchlistFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     tda_login();
     
     ImGui::StyleColorsClassic();

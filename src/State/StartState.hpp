@@ -18,6 +18,7 @@ class StartState : public State
 private:
     static StartState m_StartState;
 
+    bool protected_mode = true;
     bool tda_logged_in = false;
 
     Manager *premia = NULL;

@@ -14,8 +14,11 @@ LoginFrame::LoginFrame() : Frame()
 
 void LoginFrame::update() 
 {
-
-    ImGui::Text("Welcome to Premia!");
+    if (*public_mode) {
+        ImGui::Text("Welcome to Premia! [Public Mode]");
+    } else {
+        ImGui::Text("Welcome to Premia! [Private Mode]");
+    }
     ImGui::Text("Select your broker/exchange API to use account features like trading and portfolio analysis.");
 
     static char host_char[128] = "127.0.0.1";
@@ -26,13 +29,11 @@ void LoginFrame::update()
         {
             if (ImGui::BeginTabItem("TDAmeritrade"))
             {
-                ImGui::Text("By default, Premia comes with its own protected development key.");
-                ImGui::Text("Upon inserting your own API key, the program will be released from protected mode and restarted");
                 static char api_key[128] = "";
                 static char refresh_token[128] = "";
                 ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
                 ImGui::InputText("Refresh Token", refresh_token, IM_ARRAYSIZE(refresh_token));
-                ImGui::Button("Authenticate");
+                ImGui::Button("Login");
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("InteractiveBrokers"))
@@ -62,6 +63,13 @@ void LoginFrame::update()
             }
             if (ImGui::BeginTabItem("KuCoin"))
             {
+                static char api_key[128] = "";
+                static char key_version[128] = "";
+                static char passphrase[128] = "";
+                ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
+                ImGui::InputText("Key Version", key_version, IM_ARRAYSIZE(key_version));
+                ImGui::InputText("Passphrase", passphrase, IM_ARRAYSIZE(passphrase));
+                ImGui::Button("Login");
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
