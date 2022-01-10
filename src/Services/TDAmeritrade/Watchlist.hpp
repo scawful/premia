@@ -7,8 +7,7 @@ namespace tda
 {
     class Watchlist 
     {
-    private:
-
+    public:
         struct WatchlistInstrument {
             std::string symbol;
             std::string description;
@@ -33,6 +32,7 @@ namespace tda
             }
         };
 
+    private:
         std::vector<WatchlistInstrument> instruments;
         std::unordered_map<std::string, std::string> variables;
 
