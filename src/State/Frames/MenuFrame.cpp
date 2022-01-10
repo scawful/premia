@@ -340,15 +340,61 @@ void MenuFrame::update()
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Style Editor"))
-            {
-                draw_style_editor();
-                ImGui::EndMenu();
-            }
-
             if ( ImGui::MenuItem("Quit", "ESC") )
             {
                 premia->quit();
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem("Undo", "CTRL + Z"))
+            {
+
+            }
+            if (ImGui::MenuItem("Redo", "CTRL + Y"))
+            {
+
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Cut", "CTRL + X"))
+            {
+
+            }            
+            if (ImGui::MenuItem("Copy", "CTRL + C"))
+            {
+
+            }            
+            if (ImGui::MenuItem("Paste", "CTRL + V"))
+            {
+
+            }
+            ImGui::Separator();
+            if (ImGui::BeginMenu("Style"))
+            {
+                draw_style_editor(); 
+                ImGui::EndMenu();       
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("View"))
+        {                
+            if ( ImGui::MenuItem("Equity Curve") )
+            {
+                current_frame = SubFrame::LINE_PLOT;
+            }
+
+            if (ImGui::MenuItem("Candlestick Chart"))
+            {
+                current_frame = SubFrame::CANDLE_CHART;
+            }
+         
+            if ( ImGui::MenuItem("Option Chain") )
+            {
+                current_frame = SubFrame::OPTION_CHAIN;
             }
 
             ImGui::EndMenu();
@@ -377,25 +423,27 @@ void MenuFrame::update()
             {
                 // get order 
             }
-         
-            if ( ImGui::MenuItem("Option Chain") )
-            {
-                current_frame = SubFrame::OPTION_CHAIN;
-            }
 
-            ImGui::EndMenu();
-        }
+            ImGui::Separator();
 
-        if ( ImGui::BeginMenu("Charts"))
-        {
-            if ( ImGui::MenuItem("Candlestick") )
+            if ( ImGui::BeginMenu("Margin") )
             {
-                current_frame = SubFrame::CANDLE_CHART;
-            }
+                if (ImGui::MenuItem("Borrow"))
+                {
 
-            if ( ImGui::MenuItem("Equity Curve") )
-            {
-                current_frame = SubFrame::LINE_PLOT;
+                }
+                if (ImGui::MenuItem("Repay"))
+                {
+
+                }
+                if (ImGui::MenuItem("Lend"))
+                {
+
+                }
+                ImGui::Separator();
+                static bool enabled = false;
+                ImGui::MenuItem("Auto-lend", "", &enabled);
+                ImGui::EndMenu();
             }
 
             ImGui::EndMenu();
@@ -404,6 +452,8 @@ void MenuFrame::update()
         if (ImGui::BeginMenu("Analyze"))
         {
             ImGui::MenuItem("Tail Risk");
+            ImGui::MenuItem("Benchmark");
+            ImGui::MenuItem("Fundamental");
             ImGui::EndMenu();
         }
         
