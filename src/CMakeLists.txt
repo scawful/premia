@@ -90,26 +90,26 @@ target_include_directories("IBKR" PUBLIC ${IBKR_PATH})
 # add the executable
 # MACOSX_BUNDLE ${MAC_ICON}
 add_executable(Premia Premia.cpp 
-                    MarketData
-                    MarketData/CoinbasePro.cpp
-                    MarketData/CoinbasePro/Account.cpp
-                    MarketData/CoinbasePro/Client.cpp
-                    MarketData/CoinbasePro/Product.cpp
-                    MarketData/TDAmeritrade.cpp 
-                    MarketData/TDAmeritrade/Session.cpp
-                    MarketData/TDAmeritrade/Quote.cpp 
-                    MarketData/TDAmeritrade/PriceHistory.cpp 
-                    MarketData/TDAmeritrade/OptionChain.cpp 
-                    MarketData/TDAmeritrade/Account.cpp
-                    MarketData/TDAmeritrade/Watchlist.cpp
-                    MarketData/TDAmeritrade/Parser.cpp
-                    MarketData/InteractiveBrokers.cpp
-                    MarketData/InteractiveBrokers/AccountSummaryTags.cpp
-                    MarketData/InteractiveBrokers/AvailableAlgoParams.cpp
-                    MarketData/InteractiveBrokers/ContractSamples.cpp
-                    MarketData/InteractiveBrokers/OrderSamples.cpp 
-                    MarketData/InteractiveBrokers/ScannerSubscriptionSamples.cpp
-                    MarketData/InteractiveBrokers/Utils.cpp
+                    Services
+                    Services/CoinbasePro.cpp
+                    Services/CoinbasePro/Account.cpp
+                    Services/CoinbasePro/Client.cpp
+                    Services/CoinbasePro/Product.cpp
+                    Services/TDAmeritrade.cpp 
+                    Services/TDAmeritrade/Session.cpp
+                    Services/TDAmeritrade/Quote.cpp 
+                    Services/TDAmeritrade/PriceHistory.cpp 
+                    Services/TDAmeritrade/OptionChain.cpp 
+                    Services/TDAmeritrade/Account.cpp
+                    Services/TDAmeritrade/Watchlist.cpp
+                    Services/TDAmeritrade/Parser.cpp
+                    Services/InteractiveBrokers.cpp
+                    Services/InteractiveBrokers/AccountSummaryTags.cpp
+                    Services/InteractiveBrokers/AvailableAlgoParams.cpp
+                    Services/InteractiveBrokers/ContractSamples.cpp
+                    Services/InteractiveBrokers/OrderSamples.cpp 
+                    Services/InteractiveBrokers/ScannerSubscriptionSamples.cpp
+                    Services/InteractiveBrokers/Utils.cpp
                     State/Manager.cpp 
                     State/DemoState.cpp
                     State/StartState.cpp 
