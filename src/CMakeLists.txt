@@ -95,6 +95,10 @@ add_executable(Premia Premia.cpp
                     Services/CoinbasePro/Account.cpp
                     Services/CoinbasePro/Client.cpp
                     Services/CoinbasePro/Product.cpp
+                    Services/KuCoin.cpp
+                    Services/KuCoin/Parser.cpp
+                    Services/KuCoin/Account.cpp
+                    Services/KuCoin/Client.cpp
                     Services/TDAmeritrade.cpp 
                     Services/TDAmeritrade/Session.cpp
                     Services/TDAmeritrade/Quote.cpp 
@@ -129,6 +133,7 @@ add_executable(Premia Premia.cpp
                     ${IMGUI_PATH}/imgui_widgets.cpp
                     ${IMGUI_PATH}/backends/imgui_impl_sdl.cpp
                     ${IMGUI_PATH}/backends/imgui_impl_sdlrenderer.cpp
+                    ${IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp
                     ${IMPLOT_PATH}/implot.cpp
                     ${IMPLOT_PATH}/implot_items.cpp
                     ${IMPLOT_PATH}/implot_demo.cpp )
