@@ -12,6 +12,7 @@ private:
     std::vector<const char*> watchlist_names_char;
 
     void draw_watchlist_table();
+    void draw_custom_watchlist_table();
 
 public:
     WatchlistFrame();
