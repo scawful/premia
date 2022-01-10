@@ -28,7 +28,7 @@ void StartState::init(Manager *premia)
     this->title_string = "Home";
 
     mainMenu.import_manager(premia);
-    portfolioFrame.import_manager(premia);
+    portfolioFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     loginFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
     optionChain.import_manager(premia, &protected_mode, &tda_logged_in);
@@ -182,6 +182,11 @@ void StartState::update()
             break;
         default:
             break;
+    }
+
+    if ( ImGui::Button("KuCoin Test") )
+    {
+        premia->kucoin_interface.list_accounts();
     }
 
     ImGui::End();    
