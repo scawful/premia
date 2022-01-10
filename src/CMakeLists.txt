@@ -99,6 +99,7 @@ add_executable(Premia Premia.cpp
                     Services/KuCoin/Parser.cpp
                     Services/KuCoin/Account.cpp
                     Services/KuCoin/Client.cpp
+                    Services/KuCoin/MarginAccount.cpp
                     Services/TDAmeritrade.cpp 
                     Services/TDAmeritrade/Session.cpp
                     Services/TDAmeritrade/Quote.cpp 
