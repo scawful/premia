@@ -29,6 +29,7 @@ void LoginFrame::update()
         {
             if (ImGui::BeginTabItem("TDAmeritrade"))
             {
+                ImGui::Spacing();
                 static char api_key[128] = "";
                 static char refresh_token[128] = "";
                 ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
@@ -52,6 +53,7 @@ void LoginFrame::update()
             }
             if (ImGui::BeginTabItem("CoinbasePro"))
             {
+                ImGui::Spacing();
                 static char api_key[128] = "";
                 static char secret_key[128] = "";
                 static char passphrase[128] = "";
@@ -63,6 +65,7 @@ void LoginFrame::update()
             }
             if (ImGui::BeginTabItem("KuCoin"))
             {
+                ImGui::Spacing();
                 static char api_key[128] = "";
                 static char key_version[128] = "";
                 static char passphrase[128] = "";
@@ -74,7 +77,6 @@ void LoginFrame::update()
             }
             ImGui::EndTabBar();
         }
-        ImGui::Separator();
     }
 
     if (ibkr_doConnect) 
