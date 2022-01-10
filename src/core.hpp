@@ -69,6 +69,7 @@
 #include "../include/imgui/imgui.h"
 #include "../include/imgui/backends/imgui_impl_sdl.h"
 #include "../include/imgui/backends/imgui_impl_sdlrenderer.h"
+#include "../include/imgui/misc/cpp/imgui_stdlib.h"
 #include "../include/implot/implot.h"
 #include "../include/implot/implot_internal.h"
 
