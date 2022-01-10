@@ -5,6 +5,18 @@
 StartState StartState::m_StartState;
 
 /**
+ * @brief 
+ * 
+ */
+void StartState::tda_login()
+{
+    optionChain.init_chain("TLT");
+    candleChart.init_instrument("TLT");
+    portfolioFrame.init_positions();
+    watchlistFrame.init_watchlists();
+}
+
+/**
  * @brief Initialize the StartStates variables 
  * @author @scawful
  * 
@@ -17,13 +29,10 @@ void StartState::init(Manager *premia)
 
     mainMenu.import_manager(premia);
     portfolioFrame.import_manager(premia);
-    candleChart.import_manager(premia);
-    optionChain.import_manager(premia);
-    watchlistFrame.import_manager(premia);
-    watchlistFrame.init_watchlists();
-    optionChain.init_chain("TLT");
-    portfolioFrame.init_positions();
-    candleChart.init_instrument("TLT");
+    candleChart.import_manager(premia, &tda_logged_in);
+    optionChain.import_manager(premia, &tda_logged_in);
+    watchlistFrame.import_manager(premia, &tda_logged_in);
+    tda_login();
     
     ImGui::StyleColorsClassic();
 }
@@ -183,6 +192,11 @@ void StartState::update()
     SDL_RenderClear(premia->pRenderer);
 }
 
+/**
+ * @brief Render to the screen
+ * @author @scawful 
+ * 
+ */
 void StartState::draw()
 {
     // fill window bounds

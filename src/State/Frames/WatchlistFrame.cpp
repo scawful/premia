@@ -88,7 +88,11 @@ void WatchlistFrame::update()
         return;
     }
 
-    draw_watchlist_table();
+    if (*tda_logged_in) {
+        draw_watchlist_table();
+    } else {
+        ImGui::Text("Not Logged In");
+    }
 
     ImGui::End();
 }

@@ -9,6 +9,8 @@ private:
     tda::OptionChain optionChainData;
     std::vector<tda::OptionsDateTimeObj> optionsDateTimeObj;
 
+    void draw_option_chain();
+
 public:
     OptionChainFrame();
 

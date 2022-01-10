@@ -14,6 +14,10 @@ LoginFrame::LoginFrame() : Frame()
 
 void LoginFrame::update() 
 {
+
+    ImGui::Text("Welcome to Premia!");
+    ImGui::Text("Select your broker/exchange API to use account features like trading and portfolio analysis.");
+
     static char host_char[128] = "127.0.0.1";
     if (!isLoggedIn)
     {
@@ -22,8 +26,12 @@ void LoginFrame::update()
         {
             if (ImGui::BeginTabItem("TDAmeritrade"))
             {
-                static char str0[128] = "";
-                ImGui::InputText("Refresh Token", str0, IM_ARRAYSIZE(str0));
+                ImGui::Text("By default, Premia comes with its own protected development key.");
+                ImGui::Text("Upon inserting your own API key, the program will be released from protected mode and restarted");
+                static char api_key[128] = "";
+                static char refresh_token[128] = "";
+                ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
+                ImGui::InputText("Refresh Token", refresh_token, IM_ARRAYSIZE(refresh_token));
                 ImGui::Button("Authenticate");
                 ImGui::EndTabItem();
             }
@@ -43,7 +51,17 @@ void LoginFrame::update()
             }
             if (ImGui::BeginTabItem("CoinbasePro"))
             {
-                ImGui::Text("This is the Cucumber tab!\nblah blah blah blah blah");
+                static char api_key[128] = "";
+                static char secret_key[128] = "";
+                static char passphrase[128] = "";
+                ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
+                ImGui::InputText("Secret Key", secret_key, IM_ARRAYSIZE(secret_key));
+                ImGui::InputText("Passphrase", passphrase, IM_ARRAYSIZE(passphrase));
+                ImGui::Button("Login");
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("KuCoin"))
+            {
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();

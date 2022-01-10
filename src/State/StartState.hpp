@@ -18,17 +18,11 @@ class StartState : public State
 private:
     static StartState m_StartState;
 
-    bool is_logged_in = false;
-    Manager *premia = NULL;
-    SDL_Texture *pTexture = NULL;
-    TTF_Font *titleFont = NULL;
-    TTF_Font *menuFont = NULL;
-    TTF_Font *priceFont = NULL;
+    bool tda_logged_in = false;
 
-    std::string title_string;
+    Manager *premia = NULL;
 
     MenuFrame::SubFrame current_frame;
-
     MenuFrame mainMenu;
     ConsoleFrame console;
     LoginFrame loginFrame;
@@ -39,7 +33,10 @@ private:
     OptionChainFrame optionChain;
     TradingFrame tradingFrame;
 
+    std::string title_string;
     std::map<std::string, tda::Quote> quotes;
+
+    void tda_login();
 
 protected:
     StartState() { }
