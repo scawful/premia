@@ -2,6 +2,7 @@
 #define KuCoin_Parser_hpp
 
 #include "../../core.hpp"
+#include "MarginAccount.hpp"
 
 namespace kc
 {
@@ -11,6 +12,8 @@ namespace kc
 
     public:
         Parser();
+
+        MarginAccount parse_margin_account(boost::property_tree::ptree data);
     };
 }
 
