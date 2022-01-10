@@ -1,5 +1,10 @@
 #include "PortfolioFrame.hpp"
 
+/**
+ * @brief Construct the table with the current portfolio positions
+ * @author @scawful
+ * 
+ */
 void PortfolioFrame::draw_positions()
 {
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
@@ -65,6 +70,11 @@ void PortfolioFrame::draw_positions()
     ImGui::Separator();
 }
 
+/**
+ * @brief Draw the current portfolio balances
+ * @author @scawful  
+ * 
+ */
 void PortfolioFrame::draw_balances()
 {    
     ImGui::Text("TDAmeritrade Portfolio Information");
@@ -75,53 +85,8 @@ void PortfolioFrame::draw_balances()
     ImGui::Text( "Cash: %s", account_data.get_balance_variable("cashBalance").c_str() );
 }
 
-PortfolioFrame::PortfolioFrame() : Frame()
+void PortfolioFrame::draw_tabbed_view()
 {
-
-}
-
-void PortfolioFrame::init_positions()
-{
-    account_ids_std = premia->tda_client.get_all_accounts();
-    for ( std::string const& each_id : account_ids_std ) {
-        account_ids.push_back(each_id.c_str());
-    }
-    default_account = account_ids_std.at(0);
-    load_account(default_account);
-}
-
-void PortfolioFrame::load_account( std::string account_num )
-{
-    account_data = premia->tda_client.createAccount( account_num );
-
-    if ( positions_vector.size() != 0 ) {
-        positions_vector.clear();
-    }
-
-    for ( int i = 0; i < account_data.get_position_vector_size(); i++ )
-    {
-        for ( auto& position_it : account_data.get_position( i ) )
-        {
-            if ( position_it.first == "symbol" )
-            {
-                std::string str = position_it.second;
-                positions_vector.push_back( str );
-            }
-        }
-    }
-}
-
-void PortfolioFrame::update() 
-{
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70) );
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30), ImGuiCond_Always );
-
-    if (!ImGui::Begin("Portfolio")) {
-        ImGui::End();
-        return;
-    }    
-    
     // Load Account IDs
     static int n = 0;
     const char **accounts = account_ids.data();
@@ -151,5 +116,82 @@ void PortfolioFrame::update()
         ImGui::EndTabBar();
     }
     ImGui::Spacing();
+}
+
+/**
+ * @brief Construct a new Portfolio Frame:: Portfolio Frame object
+ * @author @scawful 
+ * 
+ */
+PortfolioFrame::PortfolioFrame() : Frame()
+{
+
+}
+
+/**
+ * @brief Load all accounts 
+ * @author @scawful 
+ * 
+ */
+void PortfolioFrame::init_positions()
+{
+    account_ids_std = premia->tda_client.get_all_accounts();
+    for ( std::string const& each_id : account_ids_std ) {
+        account_ids.push_back(each_id.c_str());
+    }
+    default_account = account_ids_std.at(0);
+    load_account(default_account);
+}
+
+/**
+ * @brief Load an individual account 
+ * @author @scawful 
+ * 
+ * @param account_num 
+ */
+void PortfolioFrame::load_account( std::string account_num )
+{
+    account_data = premia->tda_client.createAccount( account_num );
+
+    if ( positions_vector.size() != 0 ) {
+        positions_vector.clear();
+    }
+
+    for ( int i = 0; i < account_data.get_position_vector_size(); i++ )
+    {
+        for ( auto& position_it : account_data.get_position( i ) )
+        {
+            if ( position_it.first == "symbol" )
+            {
+                std::string str = position_it.second;
+                positions_vector.push_back( str );
+            }
+        }
+    }
+}
+
+/**
+ * @brief Update the contents of the PortfolioFrame
+ *        Draw Positions, Balances, or Orders based on current tab
+ * @author @scawful 
+ * 
+ */
+void PortfolioFrame::update() 
+{
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::SetNextWindowPos( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70) );
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30), ImGuiCond_Always );
+
+    if (!ImGui::Begin("Portfolio")) {
+        ImGui::End();
+        return;
+    }    
+    
+    if (*public_mode) {
+        ImGui::Text("No portfolio data in Public Mode");
+    } else {
+        draw_tabbed_view();
+    }
+
     ImGui::End();
 }

@@ -19,6 +19,8 @@ private:
     void draw_balances();
     void draw_orders();
 
+    void draw_tabbed_view();
+
 public:
     PortfolioFrame();
     
