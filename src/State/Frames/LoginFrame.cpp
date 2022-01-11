@@ -35,6 +35,11 @@ void LoginFrame::update()
                 ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
                 ImGui::InputText("Refresh Token", refresh_token, IM_ARRAYSIZE(refresh_token));
                 ImGui::Button("Login");
+                ImGui::SameLine();
+                if (ImGui::Button("Fetch from file")) {
+                    *tda_logged_in = true;
+                    *public_mode = false;
+                }
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("InteractiveBrokers"))
@@ -73,6 +78,12 @@ void LoginFrame::update()
                 ImGui::InputText("Key Version", key_version, IM_ARRAYSIZE(key_version));
                 ImGui::InputText("Passphrase", passphrase, IM_ARRAYSIZE(passphrase));
                 ImGui::Button("Login");
+                if ( ImGui::Button("KuCoin Accounts") ) {
+                    premia->kucoin_interface.list_accounts();
+                }
+                if ( ImGui::Button("KuCoin Margin Account") ) {
+                    premia->kucoin_interface.get_margin_account();
+                }
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
@@ -94,7 +105,7 @@ void LoginFrame::update()
             
             premia->ibkr_client.connect( host, port, clientId );
             
-            while( premia->ibkr_client.isConnected()) {
+            while(premia->ibkr_client.isConnected()) {
                 premia->ibkr_client.processMessages();
             }
             if( attempt >= MAX_ATTEMPTS) {
