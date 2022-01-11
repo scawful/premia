@@ -216,8 +216,6 @@ void CandleChartFrame::update()
     static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
     static char buf[64] = "";
 
-    ImGui::Text("Symbol: ");
-    ImGui::SameLine(); 
     ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
     ImGui::SameLine(); 
     if ( ImGui::Button("Search") )
