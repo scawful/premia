@@ -33,6 +33,7 @@ void StartState::init(Manager *premia)
     candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
     optionChain.import_manager(premia, &protected_mode, &tda_logged_in);
     watchlistFrame.import_manager(premia, &protected_mode, &tda_logged_in);
+    marketOverview.import_manager(premia);
     tda_login();
     
     ImGui::StyleColorsClassic();
@@ -90,6 +91,7 @@ void StartState::handleEvents()
                     case SDLK_ESCAPE:
                         premia->quit();
                         break;
+                    case KMOD_SHIFT:
                     case SDLK_UP:
                     case SDLK_DOWN:
                     case SDLK_RETURN:
@@ -180,13 +182,11 @@ void StartState::update()
         case MenuFrame::SubFrame::TRADING:
             tradingFrame.update();
             break;
+        case MenuFrame::SubFrame::MARKET_OVERVIEW:
+            marketOverview.update();
+            break;
         default:
             break;
-    }
-
-    if ( ImGui::Button("KuCoin Test") )
-    {
-        premia->kucoin_interface.list_accounts();
     }
 
     ImGui::End();    

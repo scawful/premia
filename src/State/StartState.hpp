@@ -12,6 +12,7 @@
 #include "Frames/OptionChainFrame.hpp"
 #include "Frames/ConsoleFrame.hpp"
 #include "Frames/TradingFrame.hpp"
+#include "Frames/MarketOverviewFrame.hpp"
 
 class StartState : public State
 {
@@ -33,6 +34,7 @@ private:
     CandleChartFrame candleChart;
     OptionChainFrame optionChain;
     TradingFrame tradingFrame;
+    MarketOverviewFrame marketOverview;
 
     std::string title_string;
     std::map<std::string, tda::Quote> quotes;
