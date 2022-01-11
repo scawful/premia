@@ -9,10 +9,12 @@ class MenuFrame
 public:
     enum SubFrame {
         LOGIN,
+        MARKET_OVERVIEW,
         LINE_PLOT,
         CANDLE_CHART,
         OPTION_CHAIN,
-        TRADING
+        TRADING,
+        MARKET_MOVERS
     };
 
 private:
@@ -21,6 +23,9 @@ private:
     SubFrame current_frame;
     ImGuiStyle* ref;
 
+    std::unordered_map<std::string, std::string> hot_keys;
+
+    void init_hot_keys();
     void draw_style_editor();
 
 public:

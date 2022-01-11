@@ -16,6 +16,30 @@ static void HelpMarker(const char* desc)
     }
 }
 
+void MenuFrame::init_hot_keys()
+{
+    std::ifstream fileInput("../assets/hotkeys.csv");
+
+    if (!fileInput.good()) {
+        SDL_Log("file not opened");
+    }
+
+    int i = 0;
+    std::string temp, key, val, line;
+    if(fileInput.good())
+    {
+        while(std::getline(fileInput, line))
+        {
+            // Create a stringstream from line
+            std::stringstream ss(line);
+            std::getline(ss, key, ',');
+            
+            std::getline(ss, val);
+            hot_keys[key] = val;
+        }
+    }
+}
+
 void MenuFrame::draw_style_editor()
 {
     ImGuiStyle& style = ImGui::GetStyle();
@@ -264,6 +288,7 @@ void MenuFrame::draw_style_editor()
 MenuFrame::MenuFrame()
 {
     this->current_frame = SubFrame::LOGIN;
+    init_hot_keys();
 }
 
 void MenuFrame::import_manager(Manager *premia) 
@@ -300,43 +325,48 @@ void MenuFrame::update()
     {
         if ( ImGui::BeginMenu( "File" ) )
         {
-            if ( title_string != "Home" )
-            {
-                if ( ImGui::MenuItem("Return Home") )
-                {
+            if ( title_string != "Home" ) {
+                if ( ImGui::MenuItem("Return Home") ) {
                     premia->change( StartState::instance() );
                 }
                 ImGui::Separator();
             }
 
-            if ( ImGui::MenuItem("New Instance", "CTRL + N") )
-            {
+            if ( ImGui::MenuItem("New Instance", "CTRL + N") ) {
                 premia->change( StartState::instance() );
             }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Open Workspace", "CTRL + O")) {
 
-            if ( ImGui::MenuItem("Start WS Session") )
-            {
-                premia->tda_client.start_session();
             }
+            if (ImGui::BeginMenu("Open Recent")) {
+                ImGui::MenuItem("None");
+                ImGui::EndMenu();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Save Workspace", "CTRL + S"))
+            {
 
+            }
             
             ImGui::Separator();
-            if (ImGui::BeginMenu("Options"))
+            if (ImGui::BeginMenu("Preferences"))
             {
                 static bool enabled = true;
                 ImGui::MenuItem("Private Balances", "", &enabled);
+                ImGui::Separator();
 
-                ImGui::BeginChild("child", ImVec2(0, 60), true);
-                for (int i = 0; i < 10; i++)
-                    ImGui::Text("Scrolling Text %d", i);
+                static int n = 0;
+                ImGui::Combo("Default Account", &n, "Yes\0No\0Maybe\0\0");
+                ImGui::Separator();
+
+                ImGui::Text("Hot Keys");
+                ImGui::BeginChild("Hot Keys", ImVec2(0, 100), true);
+                for ( auto & each : hot_keys ) {
+                    ImGui::Text("%s  %s", each.first.c_str(), each.second.c_str());
+                }
                 ImGui::EndChild();
 
-                static float f = 0.5f;
-                static int n = 0;
-                ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-                ImGui::InputFloat("Input", &f, 0.1f);
-
-                ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
                 ImGui::EndMenu();
             }
 
@@ -381,20 +411,24 @@ void MenuFrame::update()
         }
 
         if (ImGui::BeginMenu("View"))
-        {                
-            if ( ImGui::MenuItem("Equity Curve") )
-            {
+        {         
+            if (ImGui::MenuItem("Service Login")) {
+                current_frame = SubFrame::LOGIN;
+            }       
+            if (ImGui::MenuItem("Equity Curve")) {
                 current_frame = SubFrame::LINE_PLOT;
             }
-
-            if (ImGui::MenuItem("Candlestick Chart"))
-            {
+            if (ImGui::MenuItem("Candle Chart")) {
                 current_frame = SubFrame::CANDLE_CHART;
             }
-         
-            if ( ImGui::MenuItem("Option Chain") )
-            {
+            if (ImGui::MenuItem("Option Chain")) {
                 current_frame = SubFrame::OPTION_CHAIN;
+            }
+            if (ImGui::MenuItem("Market Movers")) {
+                current_frame = SubFrame::MARKET_MOVERS;
+            }
+            if (ImGui::MenuItem("Market Overview")) {
+                current_frame = SubFrame::MARKET_OVERVIEW;
             }
 
             ImGui::EndMenu();
@@ -451,20 +485,25 @@ void MenuFrame::update()
 
         if (ImGui::BeginMenu("Analyze"))
         {
-            ImGui::MenuItem("Tail Risk");
-            ImGui::MenuItem("Benchmark");
-            ImGui::MenuItem("Fundamental");
+            ImGui::MenuItem("Risk Profile");
+            ImGui::MenuItem("Fundamentals");
+            ImGui::MenuItem("Economic Data");
+            ImGui::MenuItem("Backtest Positions");
+            ImGui::MenuItem("Probability Analysis");
+            ImGui::MenuItem("Performance Benchmark");
             ImGui::EndMenu();
         }
         
         if (ImGui::BeginMenu("Debug"))
         {
-            if ( ImGui::MenuItem("WebSocket StreamState") )
-            {
-                premia->change( StreamState::instance() );
+            if (ImGui::MenuItem("WebSocket StreamState")) {
+                premia->change(StreamState::instance());
             }
-            if ( ImGui::MenuItem("ImGui/ImPlot Demos")) {
-                premia->change( DemoState::instance() );
+            if (ImGui::MenuItem("ImGui/ImPlot Demos")) {
+                premia->change(DemoState::instance());
+            }      
+            if (ImGui::MenuItem("Start WS Session")) {
+                premia->tda_client.start_session();
             }
             ImGui::EndMenu();
         }
