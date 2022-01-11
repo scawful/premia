@@ -24,7 +24,7 @@ void WatchlistFrame::draw_watchlist_table()
 
     const char **watchlist_names_gui = watchlist_names_char.data();
     ImGui::SameLine();
-    ImGui::Combo("Watchlists", &n,  watchlist_names_gui, watchlist_names.size()); 
+    ImGui::Combo(" ", &n,  watchlist_names_gui, watchlist_names.size()); 
 
     if (ImGui::BeginTable("Watchlist_Table", 3, flags, outer_size))
     {
