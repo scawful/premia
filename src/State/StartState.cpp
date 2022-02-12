@@ -10,8 +10,7 @@ StartState StartState::m_StartState;
  */
 void StartState::tda_login()
 {
-    optionChain.init_chain("TLT");
-    candleChart.init_instrument("TLT");
+    candleChart.init_instrument("SPY"); 
     portfolioFrame.init_positions();
     watchlistFrame.init_watchlists();
 }
