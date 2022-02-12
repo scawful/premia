@@ -77,7 +77,7 @@ void WatchlistFrame::draw_custom_watchlist_table()
 
     const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
-    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * watchlists[n].getNumInstruments());
+    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 10);
 
     static std::string new_instrument = "";
     ImGui::InputText("Add", &new_instrument);
