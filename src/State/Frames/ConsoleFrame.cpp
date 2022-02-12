@@ -219,6 +219,12 @@ void ConsoleFrame::update()
         return;
     }
 
+    if ( premia->tda_client.is_session_active() ) {
+        if ( premia->tda_client.get_session_responses().size() != 0 ) {
+            addLog("%s", premia->tda_client.get_session_responses().front().c_str());
+        }
+    }
+
     // As a specific feature guaranteed by the library, after calling Begin() the last Item represent the title bar.
     // So e.g. IsItemHovered() will return true when hovering the title bar.
     // Here we create a context menu only available from the title bar.
