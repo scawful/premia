@@ -3,6 +3,22 @@
 static bool select_options[] = {false};
 static int last_select = 0;
 
+void OptionChainFrame::draw_search()
+{
+    static char ticker[128] = "";
+    ImGui::InputText("Symbol", ticker, IM_ARRAYSIZE(ticker));
+    if (ImGui::Button("Fetch")) {
+        optionChainData = premia->tda_client.createOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
+        optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
+        std::vector<tda::OptionsDateTimeObj> temp_vec = optionsDateTimeObj;
+        for ( int i = 0; i < temp_vec.size(); i++) 
+        {
+            datetime_array.push_back(temp_vec[i].datetime.data());
+        }
+        isActive = true;
+    }
+}
+
 /**
  * @brief Draw the option chain table 
  * @author @scawful
@@ -18,13 +34,6 @@ void OptionChainFrame::draw_option_chain()
     ImGui::SetNextItemWidth( 200.f );
 
     static int current_item = 0;
-    std::vector<const char*> datetime_array;
-    std::vector<tda::OptionsDateTimeObj> temp_vec = optionsDateTimeObj;
-    for ( int i = 0; i < temp_vec.size(); i++) 
-    {
-        datetime_array.push_back(temp_vec[i].datetime.data());
-    }
-
     ImGui::Combo("Expiration Date", &current_item, datetime_array.data(), datetime_array.size());
 
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingFixedFit;
@@ -155,19 +164,25 @@ void OptionChainFrame::draw_option_chain()
 
 OptionChainFrame::OptionChainFrame() : Frame()
 {
-
+    isActive = false;
 }
 
-void OptionChainFrame::init_chain(std::string ticker)
+void OptionChainFrame::load_data()
 {
-    optionChainData = premia->tda_client.createOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
-    optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
+    static float progress = 0.0f, progress_dir = 1.0f;
+    ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+    ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+    ImGui::Text("Progress Bar");
 }
 
 void OptionChainFrame::update()
 {
     if (*tda_logged_in) {
-        draw_option_chain();
+        if (isActive) {
+            draw_option_chain();
+        } else {
+            draw_search();
+        }
     } else {
         ImGui::Text("Not Logged In");
     }

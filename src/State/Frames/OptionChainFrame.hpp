@@ -8,13 +8,17 @@ class OptionChainFrame : public Frame
 private:
     tda::OptionChain optionChainData;
     std::vector<tda::OptionsDateTimeObj> optionsDateTimeObj;
+    std::vector<const char*> datetime_array;
 
+    bool isActive;
+
+    void draw_search();
     void draw_option_chain();
 
 public:
     OptionChainFrame();
 
-    void init_chain(std::string ticker);
+    void load_data();
     void update();
 };
 
