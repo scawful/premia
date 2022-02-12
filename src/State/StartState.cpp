@@ -27,6 +27,7 @@ void StartState::init(Manager *premia)
     this->title_string = "Home";
 
     mainMenu.import_manager(premia);
+    console.import_manager(premia, &protected_mode, &tda_logged_in);
     portfolioFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     loginFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
