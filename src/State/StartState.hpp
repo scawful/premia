@@ -13,6 +13,7 @@
 #include "Frames/ConsoleFrame.hpp"
 #include "Frames/TradingFrame.hpp"
 #include "Frames/MarketOverviewFrame.hpp"
+#include "Frames/RiskAppetiteFrame.hpp"
 
 class StartState : public State
 {
@@ -35,6 +36,7 @@ private:
     OptionChainFrame optionChain;
     TradingFrame tradingFrame;
     MarketOverviewFrame marketOverview;
+    RiskAppetiteFrame riskAppetite;
 
     std::string title_string;
     std::map<std::string, tda::Quote> quotes;

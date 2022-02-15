@@ -185,6 +185,9 @@ void StartState::update()
         case MenuFrame::SubFrame::MARKET_OVERVIEW:
             marketOverview.update();
             break;
+        case MenuFrame::SubFrame::RISK_APPETITE:
+            riskAppetite.update();
+            break;
         default:
             break;
     }
