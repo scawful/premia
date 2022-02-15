@@ -103,14 +103,14 @@ void LoginFrame::update()
             //     premia->ibkr_client.setConnectOptions(connectOptions);
             // }
             
-            premia->ibkr_client.connect( host, port, clientId );
+            // premia->ibkr_client.connect( host, port, clientId );
             
-            while(premia->ibkr_client.isConnected()) {
-                premia->ibkr_client.processMessages();
-            }
-            if( attempt >= MAX_ATTEMPTS) {
-                break;
-            }
+            // while(premia->ibkr_client.isConnected()) {
+            //     premia->ibkr_client.processMessages();
+            // }
+            // if( attempt >= MAX_ATTEMPTS) {
+            //     break;
+            // }
 
             printf( "Sleeping %u seconds before next attempt\n", SLEEP_TIME);
             std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME));
