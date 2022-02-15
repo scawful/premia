@@ -1,7 +1,6 @@
 #ifndef PriceHistory_hpp
 #define PriceHistory_hpp
 
-#include "../../core.hpp"
 #include "PricingStructures.hpp"
 
 namespace tda 

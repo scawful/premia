@@ -1,7 +1,6 @@
 #ifndef OptionChain_hpp
 #define OptionChain_hpp
 
-#include "../../core.hpp"
 #include "PricingStructures.hpp"
 
 namespace tda

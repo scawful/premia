@@ -4,13 +4,13 @@
 #include "../core.hpp"
 #include "../apikey.hpp"
 #include "TDAmeritrade/Parser.hpp"
-#include "TDAmeritrade/Watchlist.hpp"
 #include "TDAmeritrade/Session.hpp"
-#include "TDAmeritrade/PricingStructures.hpp"
-#include "TDAmeritrade/Account.hpp"
-#include "TDAmeritrade/Quote.hpp"
-#include "TDAmeritrade/PriceHistory.hpp"
-#include "TDAmeritrade/OptionChain.hpp"
+#include "TDAmeritrade/Data/Watchlist.hpp"
+#include "TDAmeritrade/Data/PricingStructures.hpp"
+#include "TDAmeritrade/Data/Account.hpp"
+#include "TDAmeritrade/Data/Quote.hpp"
+#include "TDAmeritrade/Data/PriceHistory.hpp"
+#include "TDAmeritrade/Data/OptionChain.hpp"
 
 namespace tda
 {

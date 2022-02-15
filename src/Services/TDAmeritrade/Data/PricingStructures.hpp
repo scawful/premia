@@ -1,7 +1,7 @@
 #ifndef PricingStructures_hpp
 #define PricingStructures_hpp
 
-#include "../../core.hpp"
+#include "../../../core.hpp"
 
 namespace tda 
 {

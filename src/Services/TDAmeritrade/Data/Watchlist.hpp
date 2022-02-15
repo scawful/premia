@@ -1,7 +1,7 @@
 #ifndef Watchlist_hpp
 #define Watchlist_hpp
 
-#include "../../core.hpp"
+#include "../../../core.hpp"
 
 namespace tda 
 {

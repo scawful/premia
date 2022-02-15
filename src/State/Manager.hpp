@@ -6,7 +6,7 @@
 #include "../core.hpp"
 #include "../Services/TDAmeritrade.hpp"
 #include "../Services/CoinbasePro.hpp"
-#include "../Services/InteractiveBrokers.hpp"
+// #include "../Services/InteractiveBrokers.hpp"
 #include "../Services/KuCoin.hpp"
 
 class State;
@@ -36,7 +36,7 @@ public:
     
     tda::TDAmeritrade tda_client;
     kc::KuCoin kucoin_interface;
-    InteractiveBrokers ibkr_client;
+    // InteractiveBrokers ibkr_client;
     
     SDL_Renderer *pRenderer = NULL;
     SDL_Window *pWindow = NULL;

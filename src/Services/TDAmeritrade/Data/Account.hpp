@@ -1,7 +1,6 @@
 #ifndef Account_hpp
 #define Account_hpp
 
-#include "../../core.hpp"
 #include "PricingStructures.hpp"
 
 namespace tda
