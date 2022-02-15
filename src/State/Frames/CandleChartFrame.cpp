@@ -198,20 +198,10 @@ void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec
 }
 
 /**
- * @brief Construct a new Candle Chart Frame:: Candle Chart Frame object
- * @author @scawful
- * 
- */
-CandleChartFrame::CandleChartFrame()
-{
-
-}
-
-/**
  * @brief 
  * 
  */
-void CandleChartFrame::update() 
+void CandleChartFrame::draw_chart()
 {
     static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
     static char buf[64] = "";
@@ -284,5 +274,28 @@ void CandleChartFrame::update()
                                 boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
         build_candle_chart( 0.25, 218, bullCol, bearCol, tooltip );
         ImPlot::EndPlot();
+    }
+}
+
+/**
+ * @brief Construct a new Candle Chart Frame:: Candle Chart Frame object
+ * @author @scawful
+ * 
+ */
+CandleChartFrame::CandleChartFrame()
+{
+
+}
+
+/**
+ * @brief 
+ * 
+ */
+void CandleChartFrame::update() 
+{
+    if (*tda_logged_in) {
+        draw_chart();
+    } else {
+        ImGui::Text("Empty chart goes here");
     }
 }

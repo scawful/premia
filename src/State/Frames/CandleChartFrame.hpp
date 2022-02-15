@@ -23,6 +23,8 @@ private:
     int binary_search( const double* arr, int l, int r, double x );
     void build_candle_chart( float width_percent, int count, ImVec4 bullCol, ImVec4 bearCol, bool tooltip );
 
+    void draw_chart();
+
 public:
     CandleChartFrame();
 
