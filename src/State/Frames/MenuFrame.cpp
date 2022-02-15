@@ -483,6 +483,15 @@ void MenuFrame::update()
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("Study"))
+        {
+            if (ImGui::MenuItem("RAX: Risk Appetite Index")) {
+                current_frame = SubFrame::RISK_APPETITE;
+            }
+            ImGui::MenuItem("QDX: Quadrant Divergence Index");
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("Analyze"))
         {
             ImGui::MenuItem("Risk Profile");

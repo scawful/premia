@@ -14,6 +14,7 @@ public:
         CANDLE_CHART,
         OPTION_CHAIN,
         TRADING,
+        RISK_APPETITE,
         MARKET_MOVERS
     };
 
