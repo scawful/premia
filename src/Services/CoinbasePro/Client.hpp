@@ -1,5 +1,5 @@
-#ifndef Client_hpp
-#define Client_hpp
+#ifndef CBP_Client_hpp
+#define CBP_Client_hpp
 
 #include "../../core.hpp"
 
