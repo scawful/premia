@@ -33,6 +33,7 @@ void StartState::init(Manager *premia)
     candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
     optionChain.import_manager(premia, &protected_mode, &tda_logged_in);
     watchlistFrame.import_manager(premia, &protected_mode, &tda_logged_in);
+    fundOwnership.import_manager(premia);
     marketOverview.import_manager(premia);
     tda_login();
     
@@ -163,6 +164,18 @@ void StartState::handleEvents()
  */
 void StartState::update()
 {
+    ImGui::NewFrame();
+    ImGui::SetNextWindowPos( ImVec2(0, 0) );
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.75, io.DisplaySize.y * 0.70), ImGuiCond_Always );
+    
+    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
+    {
+        // Early out if the window is collapsed, as an optimization.
+        ImGui::End();
+        return;
+    }
+    
     mainMenu.set_title(title_string);
     mainMenu.update();
     
@@ -187,6 +200,9 @@ void StartState::update()
             break;
         case MenuFrame::SubFrame::RISK_APPETITE:
             riskAppetite.update();
+            break;
+        case MenuFrame::SubFrame::FUND_OWNERSHIP:
+            fundOwnership.update();
             break;
         default:
             break;

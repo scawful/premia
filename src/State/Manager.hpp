@@ -6,6 +6,7 @@
 #include "../core.hpp"
 #include "../Services/TDAmeritrade.hpp"
 #include "../Services/CoinbasePro.hpp"
+#include "../Services/IEXCloud.hpp"
 // #include "../Services/InteractiveBrokers.hpp"
 #include "../Services/KuCoin.hpp"
 
@@ -35,6 +36,7 @@ public:
     void quit() { m_running = false; }
     
     tda::TDAmeritrade tda_client;
+    iex::IEXCloud iex_client;
     kc::KuCoin kucoin_interface;
     // InteractiveBrokers ibkr_client;
     

@@ -14,6 +14,7 @@
 #include "Frames/TradingFrame.hpp"
 #include "Frames/MarketOverviewFrame.hpp"
 #include "Frames/RiskAppetiteFrame.hpp"
+#include "Frames/FundOwnershipFrame.hpp"
 
 class StartState : public State
 {
@@ -37,6 +38,7 @@ private:
     TradingFrame tradingFrame;
     MarketOverviewFrame marketOverview;
     RiskAppetiteFrame riskAppetite;
+    FundOwnershipFrame fundOwnership;
 
     std::string title_string;
     std::map<std::string, tda::Quote> quotes;
