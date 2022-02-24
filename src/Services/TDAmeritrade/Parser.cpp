@@ -5,6 +5,37 @@ tda::Parser::Parser()
     
 }
 
+JSONObject::ptree tda::Parser::read_response(std::string response)
+{
+    std::istringstream json_response(response);
+    JSONObject::ptree property_tree;
+
+    try {
+        read_json(json_response, property_tree);
+    }
+    catch (std::exception &json_parser_error) {
+        SDL_Log("%s", json_parser_error.what());
+    }
+
+    return property_tree;
+}
+
+UserPrincipals tda::Parser::parse_user_principals( boost::property_tree::ptree data )
+{
+    UserPrincipals user_principals;
+
+    std::unordered_map<std::string, std::string> account_data;
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, user_principals.get_child("accounts."))
+    {
+        for (auto &acct_it : v.second)
+        {
+            account_data[acct_it.first] = acct_it.second.get_value<std::string>();
+        }
+        break;
+    }
+    user_principals.set_account_data(account_data);
+}
+
 std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(boost::property_tree::ptree data) 
 {
     std::vector<tda::Watchlist> watchlists;
