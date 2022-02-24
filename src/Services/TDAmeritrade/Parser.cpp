@@ -20,12 +20,12 @@ JSONObject::ptree tda::Parser::read_response(std::string response)
     return property_tree;
 }
 
-UserPrincipals tda::Parser::parse_user_principals( boost::property_tree::ptree data )
+tda::UserPrincipals tda::Parser::parse_user_principals( boost::property_tree::ptree data )
 {
     UserPrincipals user_principals;
 
     std::unordered_map<std::string, std::string> account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, user_principals.get_child("accounts."))
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, data.get_child("accounts."))
     {
         for (auto &acct_it : v.second)
         {
@@ -34,6 +34,8 @@ UserPrincipals tda::Parser::parse_user_principals( boost::property_tree::ptree d
         break;
     }
     user_principals.set_account_data(account_data);
+
+    return user_principals;
 }
 
 std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(boost::property_tree::ptree data) 

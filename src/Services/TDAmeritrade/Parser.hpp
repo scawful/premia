@@ -2,10 +2,10 @@
 #define Parser_hpp
 
 #include "Data/Watchlist.hpp"
-#include "Data/UserPrincipals.hpp"
 #include "Data/Account.hpp"
 #include "Data/OptionChain.hpp"
 #include "Data/PriceHistory.hpp"
+#include "Data/UserPrincipals.hpp"
 
 namespace JSONObject = boost::property_tree;
 
