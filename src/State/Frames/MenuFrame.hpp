@@ -15,6 +15,7 @@ public:
         OPTION_CHAIN,
         TRADING,
         RISK_APPETITE,
+        FUND_OWNERSHIP,
         MARKET_MOVERS
     };
 

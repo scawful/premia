@@ -309,17 +309,7 @@ MenuFrame::SubFrame MenuFrame::get_current_frame()
 void MenuFrame::update()
 {
     static bool about = false;
-    ImGui::NewFrame();
-    ImGui::SetNextWindowPos( ImVec2(0, 0) );
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.75, io.DisplaySize.y * 0.70), ImGuiCond_Always );
-    
-    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
-    {
-        // Early out if the window is collapsed, as an optimization.
-        ImGui::End();
-        return;
-    }
+
 
     if (ImGui::BeginMenuBar())
     {
@@ -494,6 +484,10 @@ void MenuFrame::update()
 
         if (ImGui::BeginMenu("Analyze"))
         {
+            if (ImGui::MenuItem("Fund Ownership") )
+            {
+                current_frame = SubFrame::FUND_OWNERSHIP;
+            }
             ImGui::MenuItem("Risk Profile");
             ImGui::MenuItem("Fundamentals");
             ImGui::MenuItem("Economic Data");
