@@ -7,7 +7,6 @@ class LoginFrame : public Frame
 {
 private:
     bool isLoggedIn;
-    bool ibkr_doConnect;
     unsigned attempt = 0;
     std::string connectOptions;
     std::string host;

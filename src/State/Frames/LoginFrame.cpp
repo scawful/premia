@@ -1,11 +1,7 @@
 #include "LoginFrame.hpp"
 
-const unsigned SLEEP_TIME = 10;
-const unsigned MAX_ATTEMPTS = 50;
-
 LoginFrame::LoginFrame() : Frame()
 {
-    this->ibkr_doConnect = false;
     this->isLoggedIn = false;
     this->clientId = 0;
     this->connectOptions = "";
@@ -42,6 +38,14 @@ void LoginFrame::update()
                 }
                 ImGui::EndTabItem();
             }
+            if (ImGui::BeginTabItem("IEXCloud"))
+            {
+                ImGui::Spacing();
+                static char api_key[128] = "";
+                ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
+                ImGui::Button("Login");
+                ImGui::EndTabItem();
+            }
             if (ImGui::BeginTabItem("CoinbasePro"))
             {
                 ImGui::Spacing();
@@ -74,34 +78,6 @@ void LoginFrame::update()
             }
             ImGui::EndTabBar();
         }
-    }
-
-    if (ibkr_doConnect) 
-    {
-        for (;;) {
-            ++attempt;
-            printf( "Attempt %u of %u\n", attempt, MAX_ATTEMPTS);
-            const char* host = "127.0.0.1";
-            // Run time error will occur (here) if TestCppClient.exe is compiled in debug mode but TwsSocketClient.dll is compiled in Release mode
-            // TwsSocketClient.dll (in Release Mode) is copied by API installer into SysWOW64 folder within Windows directory 
-            
-            // if( connectOptions ) {
-            //     premia->ibkr_client.setConnectOptions(connectOptions);
-            // }
-            
-            // premia->ibkr_client.connect( host, port, clientId );
-            
-            // while(premia->ibkr_client.isConnected()) {
-            //     premia->ibkr_client.processMessages();
-            // }
-            // if( attempt >= MAX_ATTEMPTS) {
-            //     break;
-            // }
-
-            printf( "Sleeping %u seconds before next attempt\n", SLEEP_TIME);
-            std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME));
-	    }
-
     }
 
 }
