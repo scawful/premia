@@ -1,7 +1,7 @@
 #ifndef TradingFrame_hpp
 #define TradingFrame_hpp
 
-#include "Frame.hpp"
+#include "../Frame.hpp"
 
 class TradingFrame : public Frame 
 {

@@ -1,7 +1,7 @@
 #ifndef OptionChainFrame_hpp
 #define OptionChainFrame_hpp
 
-#include "Frame.hpp"
+#include "../Frame.hpp"
 
 class OptionChainFrame : public Frame
 {
