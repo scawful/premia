@@ -1,7 +1,7 @@
 #ifndef FundOwnershipFrame_hpp
 #define FundOwnershipFramee_hpp
 
-#include "Frame.hpp"
+#include "../Frame.hpp"
 
 class FundOwnershipFrame : public Frame
 {
@@ -12,7 +12,6 @@ private:
 public:
 
     FundOwnershipFrame();
-    ~FundOwnershipFrame();
 
     void update();
 };

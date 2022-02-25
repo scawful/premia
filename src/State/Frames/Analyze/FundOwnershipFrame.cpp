@@ -6,11 +6,6 @@ FundOwnershipFrame::FundOwnershipFrame()
     this->data_active = false;   
 }
 
-FundOwnershipFrame::~FundOwnershipFrame() 
-{
-    
-}
-
 void FundOwnershipFrame::update() 
 {
     ImGui::Text("Fund Ownership");

@@ -15,6 +15,8 @@ private:
     std::unordered_map< std::string, tda::Quote> quotes;
     std::string detailed_quote, title_string, ticker_symbol;
 
+    char buf[64] = "";
+
     // Initialization functions
     void init_candles();
     void init_quote_details();

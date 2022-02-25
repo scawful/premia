@@ -203,10 +203,28 @@ void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec
  */
 void CandleChartFrame::draw_chart()
 {
-    static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
-    static char buf[64] = "";
 
-    ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
+}
+
+/**
+ * @brief Construct a new Candle Chart Frame:: Candle Chart Frame object
+ * @author @scawful
+ * 
+ */
+CandleChartFrame::CandleChartFrame()
+{
+
+}
+
+/**
+ * @brief 
+ * 
+ */
+void CandleChartFrame::update() 
+{
+    static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
+
+    ImGui::InputText("Enter symbol", &ticker_symbol, ImGuiInputTextFlags_CharsUppercase);
     ImGui::SameLine(); 
     if ( ImGui::Button("Search") )
     {
@@ -274,28 +292,5 @@ void CandleChartFrame::draw_chart()
                                 boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
         build_candle_chart( 0.25, 218, bullCol, bearCol, tooltip );
         ImPlot::EndPlot();
-    }
-}
-
-/**
- * @brief Construct a new Candle Chart Frame:: Candle Chart Frame object
- * @author @scawful
- * 
- */
-CandleChartFrame::CandleChartFrame()
-{
-
-}
-
-/**
- * @brief 
- * 
- */
-void CandleChartFrame::update() 
-{
-    if (*tda_logged_in) {
-        draw_chart();
-    } else {
-        ImGui::Text("Empty chart goes here");
     }
 }

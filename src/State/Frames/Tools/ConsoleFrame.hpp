@@ -1,7 +1,7 @@
 #ifndef ConsoleFrame_hpp
 #define ConsoleFrame_hpp
 
-#include "Frame.hpp"
+#include "../Frame.hpp"
 
 class ConsoleFrame : public Frame 
 {

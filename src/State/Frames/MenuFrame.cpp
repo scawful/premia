@@ -310,18 +310,10 @@ void MenuFrame::update()
 {
     static bool about = false;
 
-
     if (ImGui::BeginMenuBar())
     {
         if ( ImGui::BeginMenu( "File" ) )
         {
-            if ( title_string != "Home" ) {
-                if ( ImGui::MenuItem("Return Home") ) {
-                    premia->change( StartState::instance() );
-                }
-                ImGui::Separator();
-            }
-
             if ( ImGui::MenuItem("New Instance", "CTRL + N") ) {
                 premia->change( StartState::instance() );
             }
@@ -360,16 +352,14 @@ void MenuFrame::update()
                 ImGui::EndMenu();
             }
 
-            if ( ImGui::MenuItem("Quit", "ESC") )
-            {
+            if ( ImGui::MenuItem("Quit", "ESC") ) {
                 premia->quit();
             }
 
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Edit"))
-        {
+        if (ImGui::BeginMenu("Edit")) {
             if (ImGui::MenuItem("Undo", "CTRL + Z"))
             {
 
@@ -405,15 +395,6 @@ void MenuFrame::update()
             if (ImGui::MenuItem("Service Login")) {
                 current_frame = SubFrame::LOGIN;
             }       
-            if (ImGui::MenuItem("Equity Curve")) {
-                current_frame = SubFrame::LINE_PLOT;
-            }
-            if (ImGui::MenuItem("Candle Chart")) {
-                current_frame = SubFrame::CANDLE_CHART;
-            }
-            if (ImGui::MenuItem("Option Chain")) {
-                current_frame = SubFrame::OPTION_CHAIN;
-            }
             if (ImGui::MenuItem("Market Movers")) {
                 current_frame = SubFrame::MARKET_MOVERS;
             }
@@ -450,6 +431,12 @@ void MenuFrame::update()
 
             ImGui::Separator();
 
+            if (ImGui::MenuItem("Option Chain")) {
+                current_frame = SubFrame::OPTION_CHAIN;
+            }
+
+            ImGui::Separator();
+
             if ( ImGui::BeginMenu("Margin") )
             {
                 if (ImGui::MenuItem("Borrow"))
@@ -473,27 +460,88 @@ void MenuFrame::update()
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Study"))
-        {
-            if (ImGui::MenuItem("RAX: Risk Appetite Index")) {
+        if (ImGui::BeginMenu("Charts")) {
+
+            if (ImGui::MenuItem("Single Chart")) {
+                current_frame = SubFrame::CANDLE_CHART;
+            } 
+
+            if (ImGui::MenuItem("Multi Chart")) {
+
+            }
+            
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Equity Curve")) {
+                current_frame = SubFrame::LINE_PLOT;
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Research"))
+        {   
+            if (ImGui::MenuItem("Daily Treasury Rates")) {
+
+            }
+            if (ImGui::MenuItem("Federal Funds Rate")) {
+
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Consumer Price Index")) {
+
+            }
+            if (ImGui::MenuItem("Industrial Production Index")) {
+
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Unemployment Rate")) {
+
+            }
+            if (ImGui::MenuItem("US Recession Probabilities")) {
+
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Risk Appetite Index")) {
                 current_frame = SubFrame::RISK_APPETITE;
             }
-            ImGui::MenuItem("QDX: Quadrant Divergence Index");
+            ImGui::MenuItem("Quadrant Divergence Index");
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Analyze"))
         {
-            if (ImGui::MenuItem("Fund Ownership") )
-            {
+            ImGui::MenuItem("Financials");
+            if (ImGui::MenuItem("Fund Ownership") ) {
                 current_frame = SubFrame::FUND_OWNERSHIP;
             }
-            ImGui::MenuItem("Risk Profile");
-            ImGui::MenuItem("Fundamentals");
-            ImGui::MenuItem("Economic Data");
-            ImGui::MenuItem("Backtest Positions");
-            ImGui::MenuItem("Probability Analysis");
-            ImGui::MenuItem("Performance Benchmark");
+            ImGui::Separator();
+            if (ImGui::MenuItem("Insider Roster")) {
+
+            }
+            if (ImGui::MenuItem("Insider Summary")) {
+
+            }
+            if (ImGui::MenuItem("Insider Transactions")) {
+                current_frame = SubFrame::INSIDER_TRANSACTIONS;
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Retail Money Funds")) {
+
+            }
+            if (ImGui::MenuItem("Institutional Money Funds")) {
+
+            }
+            if (ImGui::MenuItem("Institutional Ownership")) {
+                current_frame = SubFrame::INSTITUTIONAL_OWNERSHIP;
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Largest Trades")) {
+
+            }
+            if (ImGui::MenuItem("Market Volume (U.S.)")) {
+
+            }
             ImGui::EndMenu();
         }
         

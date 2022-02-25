@@ -42,20 +42,6 @@ void LoginFrame::update()
                 }
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem("InteractiveBrokers"))
-            {
-                if (port <= 0)
-                    port = 7496;
-                
-                ImGui::Text("WARNING: Program will crash without Trader Workstation or Gateway application open.");
-                ImGui::InputText("Host", host_char, IM_ARRAYSIZE(host_char));
-                ImGui::InputInt("Port", &port);
-
-                if (ImGui::Button("Connect")) {
-                    this->ibkr_doConnect = true;
-                }
-                ImGui::EndTabItem();
-            }
             if (ImGui::BeginTabItem("CoinbasePro"))
             {
                 ImGui::Spacing();

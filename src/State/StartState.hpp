@@ -10,11 +10,11 @@
 #include "Frames/PortfolioFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
 #include "Frames/OptionChainFrame.hpp"
-#include "Frames/ConsoleFrame.hpp"
 #include "Frames/TradingFrame.hpp"
 #include "Frames/MarketOverviewFrame.hpp"
-#include "Frames/RiskAppetiteFrame.hpp"
-#include "Frames/FundOwnershipFrame.hpp"
+#include "Frames/Tools/ConsoleFrame.hpp"
+#include "Frames/Analyze/RiskAppetiteFrame.hpp"
+#include "Frames/Analyze/FundOwnershipFrame.hpp"
 
 class StartState : public State
 {

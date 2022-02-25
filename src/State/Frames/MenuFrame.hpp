@@ -16,6 +16,8 @@ public:
         TRADING,
         RISK_APPETITE,
         FUND_OWNERSHIP,
+        INSIDER_TRANSACTIONS,
+        INSTITUTIONAL_OWNERSHIP,
         MARKET_MOVERS
     };
 

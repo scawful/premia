@@ -92,7 +92,6 @@ void StartState::handleEvents()
                     case SDLK_ESCAPE:
                         premia->quit();
                         break;
-                    case KMOD_SHIFT:
                     case SDLK_UP:
                     case SDLK_DOWN:
                     case SDLK_RETURN:
@@ -108,8 +107,7 @@ void StartState::handleEvents()
             {
                 int key = event.key.keysym.scancode;
                 IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
-                io.KeysDown[key] = (event.type == SDL_KEYDOWN);
-                io.KeyMap[key] = io.KeysDown[key];
+                //io.KeysDown[key] = (event.type == SDL_KEYDOWN);
                 io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
                 io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
                 io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
