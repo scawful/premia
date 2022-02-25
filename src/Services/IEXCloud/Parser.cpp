@@ -2,11 +2,35 @@
 
 using namespace iex;
 
-JSONObject::ptree Parser::read_response(std::string response) 
+void Parser::log_response(std::string title, pt::ptree data)
+{
+    std::time_t now = std::time(0);
+    std::string filename = title + boost::lexical_cast<std::string>(now) + ".json"; 
+    std::ofstream file(filename);
+
+    // boost::filesystem::path dir("data");
+
+    // if(!(boost::filesystem::exists(dir))){
+    //     std::cout<<"Doesn't Exists"<<std::endl;
+
+    //     if (boost::filesystem::create_directory(dir))
+    //         std::cout << "....Successfully Created !" << std::endl;
+    // }
+
+    try {
+        write_json(file, data);
+    }
+    catch (std::exception &json_parser_error) {
+        SDL_Log("iex::Parser - %s", json_parser_error.what());
+    }
+
+}
+
+pt::ptree Parser::read_response(std::string response) 
 {
     SDL_Log("%s", response.c_str());
     std::istringstream json_response(response);
-    JSONObject::ptree property_tree;
+    pt::ptree property_tree;
 
     try {
         read_json(json_response, property_tree);
@@ -27,8 +51,9 @@ Parser::Parser()
 std::vector<FundOwnership> Parser::parse_fund_ownership(std::string response)
 {
     std::vector<FundOwnership> funds_array;
-    
-    JSONObject::ptree fund_ownership_json = read_response(response);
+    pt::ptree fund_ownership_json = read_response(response);
+    log_response("fund-ownership", fund_ownership_json);
+
     for ( auto & outer_list : fund_ownership_json )
     {
         int i = 0;
@@ -67,4 +92,10 @@ std::vector<FundOwnership> Parser::parse_fund_ownership(std::string response)
         
     }
     return funds_array;
+}
+
+std::vector<InsiderTransactions> Parser::parse_insider_transactions(std::string response)
+{
+    std::vector<InsiderTransactions> transactions_array;
+    return transactions_array;
 }
