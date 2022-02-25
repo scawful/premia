@@ -14,6 +14,7 @@ namespace iex
         Client client;
         Parser parser;
 
+        void import_existing_data();
 
     public:
         IEXCloud();
