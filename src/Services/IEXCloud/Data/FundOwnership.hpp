@@ -5,15 +5,6 @@
 
 namespace iex
 {
-    // "symbol": "AAPL",
-    // "id": "MUTUAL_FUND_HOLDERS",
-    // "adjHolding": 177998597,
-    // "adjMv": 20036225482,
-    // "entityProperName": "PARNASSUS INCOME FUNDS",
-    // "report_date": 1676849549242,
-    // "reportedHolding": 174277099,
-    // "reportedMv": 19808288329,
-    // "updated": 1615663857444
     class FundOwnership
     {
     private:
