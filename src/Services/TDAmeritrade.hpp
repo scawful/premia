@@ -3,6 +3,7 @@
 
 #include "../core.hpp"
 #include "../apikey.hpp"
+#include "TDAmeritrade/Client.hpp"
 #include "TDAmeritrade/Parser.hpp"
 #include "TDAmeritrade/Session.hpp"
 #include "TDAmeritrade/Data/Watchlist.hpp"
@@ -124,6 +125,7 @@ namespace tda
         std::string _consumer_key;
         std::vector<std::thread> _ws_threads;
 
+        Client client;
         Parser parser;
 
         std::shared_ptr<tda::Session> _websocket_session;
@@ -189,6 +191,9 @@ namespace tda
         // auxiliary functions
         std::string getBaseUrl();
         bool is_session_active();
+
+        // New Model Functions 
+        PriceHistory getPriceHistory(std::string, int mode, int time);
     };
 
 }

@@ -7,7 +7,6 @@
 #include "../Services/TDAmeritrade.hpp"
 #include "../Services/CoinbasePro.hpp"
 #include "../Services/IEXCloud.hpp"
-// #include "../Services/InteractiveBrokers.hpp"
 #include "../Services/KuCoin.hpp"
 
 class State;
@@ -35,10 +34,9 @@ public:
     bool running() { return m_running; }
     void quit() { m_running = false; }
     
-    tda::TDAmeritrade tda_client;
-    iex::IEXCloud iex_client;
+    tda::TDAmeritrade tda_interface;
+    iex::IEXCloud iex_interface;
     kc::KuCoin kucoin_interface;
-    // InteractiveBrokers ibkr_client;
     
     SDL_Renderer *pRenderer = NULL;
     SDL_Window *pWindow = NULL;

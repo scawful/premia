@@ -7,38 +7,32 @@ TradingFrame::TradingFrame() : Frame()
 
 void TradingFrame::update() 
 {
-   // Place Order Button ---------------------------------------------------------------------------------
-    if ( ImGui::Button("Quick Order", ImVec2(120, 30)) )
+    // Place Order Button ---------------------------------------------------------------------------------
+    if (ImGui::Button("Quick Order", ImVec2(120, 30)))
         ImGui::OpenPopup("Quick Order");
 
     // Always center this window when appearing
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if ( ImGui::BeginPopupModal("Quick Order", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
-    {
+    if ( ImGui::BeginPopupModal("Quick Order", NULL, ImGuiWindowFlags_AlwaysAutoResize) ) {
         static std::string new_ticker = "";
         static bool active_instrument = false;
         static char buf[64] = "";
         ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
         ImGui::SameLine(); 
-        if ( ImGui::Button("Search") )
-        {
-            if ( strcmp(buf, "") != 0 )
-            {
+        if ( ImGui::Button("Search") ) {
+            if ( strcmp(buf, "") != 0 ) {
                 new_ticker = std::string(buf);
                 std::cout << "new ticker " << new_ticker << std::endl;
-                quotes[ new_ticker ] = premia->tda_client.createQuote( new_ticker );
+                quotes[ new_ticker ] = premia->tda_interface.createQuote( new_ticker );
                 active_instrument = true;
-            }
-            else
-            {
+            } else {
                 active_instrument = false;
             }
         }
 
-        if ( active_instrument )
-        {
+        if ( active_instrument ) {
             static int n = 0;
             ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
 

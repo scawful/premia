@@ -21,6 +21,7 @@ namespace tda
 
         std::string getQuoteVariable( std::string variable );
 
+        void clear();
     };
 }
 

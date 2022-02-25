@@ -9,10 +9,10 @@
 #include "Frames/WatchlistFrame.hpp"
 #include "Frames/PortfolioFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
-#include "Frames/OptionChainFrame.hpp"
-#include "Frames/TradingFrame.hpp"
 #include "Frames/MarketOverviewFrame.hpp"
+#include "Frames/Trade/TradingFrame.hpp"
 #include "Frames/Tools/ConsoleFrame.hpp"
+#include "Frames/Trade/OptionChainFrame.hpp"
 #include "Frames/Analyze/RiskAppetiteFrame.hpp"
 #include "Frames/Analyze/FundOwnershipFrame.hpp"
 

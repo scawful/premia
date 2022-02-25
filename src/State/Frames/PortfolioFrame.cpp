@@ -135,7 +135,7 @@ PortfolioFrame::PortfolioFrame() : Frame()
  */
 void PortfolioFrame::init_positions()
 {
-    account_ids_std = premia->tda_client.get_all_accounts();
+    account_ids_std = premia->tda_interface.get_all_accounts();
     for ( std::string const& each_id : account_ids_std ) {
         account_ids.push_back(each_id.c_str());
     }
@@ -151,7 +151,7 @@ void PortfolioFrame::init_positions()
  */
 void PortfolioFrame::load_account( std::string account_num )
 {
-    account_data = premia->tda_client.createAccount( account_num );
+    account_data = premia->tda_interface.createAccount( account_num );
 
     if ( positions_vector.size() != 0 ) {
         positions_vector.clear();

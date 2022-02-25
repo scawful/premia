@@ -554,7 +554,7 @@ void MenuFrame::update()
                 premia->change(DemoState::instance());
             }      
             if (ImGui::MenuItem("Start WS Session")) {
-                premia->tda_client.start_session();
+                premia->tda_interface.start_session();
             }
             ImGui::EndMenu();
         }

@@ -36,7 +36,7 @@ void CandleChartFrame::init_candles()
  */
 void CandleChartFrame::init_quote_details()
 {
-    tda::Quote quote = premia->tda_client.createQuote( ticker_symbol );
+    tda::Quote quote = premia->tda_interface.createQuote( ticker_symbol );
     detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
                                  "\nBid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
                                  "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
@@ -57,8 +57,8 @@ void CandleChartFrame::init_quote_details()
  */
 void CandleChartFrame::init_instrument(std::string ticker)
 {
-    quote = premia->tda_client.createQuote( ticker );
-    price_history_data = premia->tda_client.createPriceHistory( ticker, tda::PeriodType::YEAR, 1, tda::FrequencyType::DAILY, 1, true );
+    quote = premia->tda_interface.createQuote( ticker );
+    price_history_data = premia->tda_interface.createPriceHistory( ticker, tda::PeriodType::YEAR, 1, tda::FrequencyType::DAILY, 1, false );
     candles = price_history_data.getCandleVector();
 
     detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
@@ -230,10 +230,10 @@ void CandleChartFrame::update()
     {
         if ( strcmp(buf, "") != 0 )
         {
-            // quoteData.reset();
-            // priceHistoryData.reset();
-            quote = premia->tda_client.createQuote( buf );
-            price_history_data = premia->tda_client.createPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
+            quote.clear();
+            price_history_data.clear();
+            quote = premia->tda_interface.createQuote( buf );
+            price_history_data = premia->tda_interface.createPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
             candles = price_history_data.getCandleVector();
             init_instrument(buf);
@@ -268,7 +268,7 @@ void CandleChartFrame::update()
     if ( ImGui::Button("Apply") ) 
     {
         std::cout << "Change chart settings!" << std::endl;
-        price_history_data = premia->tda_client.createPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount, 
+        price_history_data = premia->tda_interface.createPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount, 
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
         candles = price_history_data.getCandleVector();
     }  
@@ -283,13 +283,12 @@ void CandleChartFrame::update()
 
 
     ImPlot::GetStyle().UseLocalTime = true;
-    // ImPlot::SetNextPlotFormatY("$%.2f");
+    //ImPlot::SetNextPlotFormatY("$%.2f");
     if (ImPlot::BeginPlot("Candlestick Chart",ImVec2(-1,0),0)) 
     {
         ImPlot::SetupAxes("Date","Price");
-        ImPlot::SetupAxesLimits(0,100,
-                                boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
-                                boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
+        ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
+                                       boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
         build_candle_chart( 0.25, 218, bullCol, bearCol, tooltip );
         ImPlot::EndPlot();
     }

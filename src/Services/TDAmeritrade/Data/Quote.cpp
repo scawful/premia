@@ -1,8 +1,8 @@
 #include "Quote.hpp"
 
-/* =============== Quote Class =============== */
+using namespace tda;
 
-void tda::Quote::initVariables()
+void Quote::initVariables()
 {
     for (auto & array_element: quoteData ) 
     {
@@ -13,24 +13,29 @@ void tda::Quote::initVariables()
     }
 }
 
-tda::Quote::Quote()
+Quote::Quote()
 {
     
 }
 
-tda::Quote::Quote( boost::property_tree::ptree quote_data )
+Quote::Quote( boost::property_tree::ptree quote_data )
 {
     quoteData = quote_data;
     initVariables();
 }
 
-void tda::Quote::updateTree( boost::property_tree::ptree quote_data )
+void Quote::updateTree( boost::property_tree::ptree quote_data )
 {
     quoteData = quote_data;
     initVariables();
 }
 
-std::string tda::Quote::getQuoteVariable( std::string variable )
+std::string Quote::getQuoteVariable( std::string variable )
 {
     return quoteVariables[variable];
+}
+
+void Quote::clear()
+{
+    quoteVariables.clear();
 }

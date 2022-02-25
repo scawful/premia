@@ -885,4 +885,32 @@ namespace tda
         return _session_active;
     }
 
+
+    PriceHistory TDAmeritrade::getPriceHistory(std::string ticker, int mode, int time)
+    {
+        PriceHistory price_history;
+        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
+        string_replace(url, "{ticker}", ticker);
+        url += "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
+        if ( mode == 0 ) {
+            // intraday
+        } else if ( mode == 1 ) {
+            // daily 
+            string_replace(url, "{period}", get_api_period_amount(PeriodType::YEAR));
+            string_replace(url, "{periodType}", get_api_interval_value(1));
+
+            string_replace(url, "{frequencyType}", get_api_frequency_type(FrequencyType::DAILY));
+            string_replace(url, "{frequency}", get_api_frequency_amount(1));
+        } else if ( mode == 2 ) {
+            // weekly 
+            string_replace(url, "{frequencyType}", get_api_frequency_type(FrequencyType::WEEKLY));
+            string_replace(url, "{frequency}", get_api_frequency_amount(1));
+        } else if ( mode == 3 ) {
+            // monthly 
+            string_replace(url, "{frequencyType}", get_api_frequency_type(FrequencyType::MONTHLY));
+            string_replace(url, "{frequency}", get_api_frequency_amount(1));
+        }
+    }
+
 }

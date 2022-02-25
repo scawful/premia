@@ -21,7 +21,7 @@ private:
     void init_candles();
     void init_quote_details();
 
-    // CandleChart
+    // Candle Chart
     int binary_search( const double* arr, int l, int r, double x );
     void build_candle_chart( float width_percent, int count, ImVec4 bullCol, ImVec4 bearCol, bool tooltip );
 

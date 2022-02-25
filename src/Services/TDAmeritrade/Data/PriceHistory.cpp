@@ -87,3 +87,9 @@ std::string PriceHistory::getPriceHistoryVariable( std::string variable )
 {
     return priceHistoryVariables[variable];
 }
+
+void PriceHistory::clear()
+{
+    priceHistoryVariables.clear();
+    candleVector.clear();
+}

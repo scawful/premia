@@ -41,6 +41,8 @@ namespace tda
         std::string send_request(std::string endpoint);
         std::string send_authorized_request(std::string endpoint);
 
+        std::string get_price_history(std::string endpoint);
+
         void start_session();
         void send_session_request(std::string request);
         void send_interrupt_signal();

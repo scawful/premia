@@ -1,11 +1,13 @@
 #include "Client.hpp"
 
+using namespace tda;
+
 /**
  * @brief Get User Principals from API endpoint
  *        Parse and store in UserPrincipals object for local use
  * 
  */
-void tda::Client::get_user_principals() 
+void Client::get_user_principals() 
 {
     std::string endpoint = "https://api.tdameritrade.com/v1/userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
     std::string response = send_authorized_request(endpoint);
@@ -13,7 +15,7 @@ void tda::Client::get_user_principals()
     user_principals = parser.parse_user_principals(json_principals);
 }
 
-std::string tda::Client::post_access_token() 
+std::string Client::post_access_token() 
 {
     CURL *curl;
     CURLcode res;
@@ -68,7 +70,7 @@ std::string tda::Client::post_access_token()
     return response;
 }
 
-size_t tda::Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
+size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
 {
     size_t new_length = size * nmemb;
     try {
@@ -84,7 +86,7 @@ size_t tda::Client::json_write_callback(void *contents, size_t size, size_t nmem
  * @brief Construct a new Client:: Client object
  * 
  */
-tda::Client::Client() 
+Client::Client() 
 {
     this->access_token = "";
 }
@@ -93,9 +95,9 @@ tda::Client::Client()
  * @brief 
  * 
  * @param endpoint 
- * @return JSONObject 
+ * @return std::string 
  */
-std::string tda::Client::send_request(std::string endpoint) 
+std::string Client::send_request(std::string endpoint) 
 {
     CURL *curl;
     CURLcode res;
@@ -116,7 +118,7 @@ std::string tda::Client::send_request(std::string endpoint)
     return response;
 }
 
-std::string tda::Client::send_authorized_request(std::string endpoint) 
+std::string Client::send_authorized_request(std::string endpoint) 
 {
     CURL *curl;
     CURLcode res;
@@ -142,17 +144,23 @@ std::string tda::Client::send_authorized_request(std::string endpoint)
     return response;
 }
 
-void tda::Client::start_session() 
+std::string Client::get_price_history(std::string endpoint)
+{
+
+    return send_request(endpoint);
+}
+
+void Client::start_session() 
 {
     
 }
 
-void tda::Client::send_session_request(std::string request) 
+void Client::send_session_request(std::string request) 
 {
     websocket_session->send_message(std::make_shared<std::string const>(request));
 }
 
-void tda::Client::send_interrupt_signal() 
+void Client::send_interrupt_signal() 
 {
     websocket_session->interrupt();
 }

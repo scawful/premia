@@ -5,9 +5,29 @@
 
 namespace tda 
 {
+    // //CandleList:
+    // {
+    // "candles": [
+    //     {
+    //     "close": 0,
+    //     "datetime": 0,
+    //     "high": 0,
+    //     "low": 0,
+    //     "open": 0,
+    //     "volume": 0
+    //     }
+    // ],
+    // "empty": false,
+    // "symbol": "string"
+    // }
     class PriceHistory
     {
     private:
+        std::vector<tda::Candle> minute_candles;
+        std::vector<tda::Candle> daily_candles;
+        std::vector<tda::Candle> weekly_candles;
+        std::vector<tda::Candle> monthly_candles;
+
         boost::property_tree::ptree priceHistoryData;
         std::map<std::string, std::string> priceHistoryVariables;
         std::map<std::string, std::string> candleData;
@@ -22,6 +42,8 @@ namespace tda
         std::vector< tda::Candle > getCandleVector();
         std::string getCandleDataVariable( std::string variable );
         std::string getPriceHistoryVariable( std::string variable );
+
+        void clear();
     };
 }
 
