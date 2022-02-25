@@ -1,6 +1,8 @@
 #include "Client.hpp"
 
-std::string iex::Client::current_endpoint()
+using namespace iex;
+
+std::string Client::current_endpoint()
 {
     if (sandbox_mode)
         return this->sandbox_endpoint;
@@ -8,7 +10,7 @@ std::string iex::Client::current_endpoint()
         return this->base_endpoint;
 }
 
-size_t iex::Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
+size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
 {
     size_t new_length = size * nmemb;
     try {
@@ -20,7 +22,7 @@ size_t iex::Client::json_write_callback(void *contents, size_t size, size_t nmem
     return new_length;
 }
 
-iex::Client::Client() 
+Client::Client() 
 {
     this->base_endpoint = "https://cloud.iexapis.com/";
     this->sandbox_endpoint = "https://sandbox.iexapis.com/stable/";
@@ -34,7 +36,7 @@ iex::Client::Client()
  * @param endpoint 
  * @return std::string 
  */
-std::string iex::Client::send_request(std::string endpoint) 
+std::string Client::send_request(std::string endpoint) 
 {
     CURL *curl;
     CURLcode res;
@@ -61,7 +63,7 @@ std::string iex::Client::send_request(std::string endpoint)
  * @param endpoint 
  * @return std::string 
  */
-std::string iex::Client::send_authorized_request(std::string endpoint) 
+std::string Client::send_authorized_request(std::string endpoint) 
 {
     CURL *curl;
     CURLcode res;
@@ -87,8 +89,14 @@ std::string iex::Client::send_authorized_request(std::string endpoint)
     return response;
 }
 
-std::string iex::Client::get_fund_ownership(std::string symbol)
+std::string Client::get_fund_ownership(std::string symbol)
 {
     std::string endpoint = current_endpoint() + "stock/" + symbol + "/fund-ownership/" + token_parameter;
+    return send_request(endpoint);
+}
+
+std::string Client::get_insider_transactions(std::string symbol)
+{
+    std::string endpoint = current_endpoint() + "stock/" + symbol + "/insider-transactions/" + token_parameter;
     return send_request(endpoint);
 }

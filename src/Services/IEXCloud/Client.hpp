@@ -3,7 +3,6 @@
 
 #include "../../core.hpp"
 #include "../../apikey.hpp"
-#include "Data/FundOwnership.hpp"
 
 namespace iex 
 {
@@ -25,6 +24,7 @@ namespace iex
         std::string send_authorized_request(std::string endpoint);
 
         std::string get_fund_ownership(std::string symbol);
+        std::string get_insider_transactions(std::string symbol);
     };
 }
 
