@@ -314,9 +314,15 @@ void MenuFrame::update()
     {
         if ( ImGui::BeginMenu( "File" ) )
         {
+            if ( ImGui::MenuItem("Premia Home") )
+            {
+                current_frame = MenuFrame::SubFrame::PREMIA_HOME;
+            }
+
             if ( ImGui::MenuItem("New Instance", "CTRL + N") ) {
                 premia->change( StartState::instance() );
             }
+            
             ImGui::Separator();
             if (ImGui::MenuItem("Open Workspace", "CTRL + O")) {
 

@@ -886,6 +886,14 @@ namespace tda
     }
 
 
+    /**
+     * @brief 
+     * 
+     * @param ticker 
+     * @param mode 
+     * @param time 
+     * @return PriceHistory 
+     */
     PriceHistory TDAmeritrade::getPriceHistory(std::string ticker, int mode, int time)
     {
         PriceHistory price_history;

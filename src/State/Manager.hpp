@@ -4,6 +4,7 @@
 #define Manager_hpp
 
 #include "../core.hpp"
+#include "../Services/GenericClient.hpp"
 #include "../Services/TDAmeritrade.hpp"
 #include "../Services/CoinbasePro.hpp"
 #include "../Services/IEXCloud.hpp"
@@ -37,6 +38,7 @@ public:
     tda::TDAmeritrade tda_interface;
     iex::IEXCloud iex_interface;
     kc::KuCoin kucoin_interface;
+    GenericClient client;
     
     SDL_Renderer *pRenderer = NULL;
     SDL_Window *pWindow = NULL;

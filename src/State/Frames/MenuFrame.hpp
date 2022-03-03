@@ -8,6 +8,7 @@ class MenuFrame
 {
 public:
     enum SubFrame {
+        PREMIA_HOME,
         LOGIN,
         MARKET_OVERVIEW,
         LINE_PLOT,

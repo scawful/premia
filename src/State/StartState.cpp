@@ -33,6 +33,7 @@ void StartState::init(Manager *premia)
     candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
     optionChain.import_manager(premia, &protected_mode, &tda_logged_in);
     watchlistFrame.import_manager(premia, &protected_mode, &tda_logged_in);
+    premiaHome.import_manager(premia);
     fundOwnership.import_manager(premia);
     marketOverview.import_manager(premia);
     tda_login();
@@ -177,7 +178,11 @@ void StartState::update()
     mainMenu.set_title(title_string);
     mainMenu.update();
     
-    switch (mainMenu.get_current_frame()) {
+    switch (mainMenu.get_current_frame()) 
+    {
+        case MenuFrame::PREMIA_HOME:
+            premiaHome.update();
+            break;
         case MenuFrame::SubFrame::LOGIN:
             loginFrame.update();
             break;

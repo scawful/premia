@@ -9,6 +9,7 @@
 #include "Frames/WatchlistFrame.hpp"
 #include "Frames/PortfolioFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
+#include "Frames/RiskPremiaFrame.hpp"
 #include "Frames/MarketOverviewFrame.hpp"
 #include "Frames/Trade/TradingFrame.hpp"
 #include "Frames/Tools/ConsoleFrame.hpp"
@@ -39,6 +40,7 @@ private:
     MarketOverviewFrame marketOverview;
     RiskAppetiteFrame riskAppetite;
     FundOwnershipFrame fundOwnership;
+    RiskPremiaFrame premiaHome;
 
     std::string title_string;
     std::map<std::string, tda::Quote> quotes;
