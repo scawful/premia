@@ -76,6 +76,7 @@ void CandleChartFrame::init_instrument(std::string ticker)
     {
         volume.push_back( candles[i].volume );
     }
+    initialized = true;
 }
 
 /**
@@ -213,7 +214,7 @@ void CandleChartFrame::draw_chart()
  */
 CandleChartFrame::CandleChartFrame()
 {
-
+    initialized = false;
 }
 
 /**
@@ -222,6 +223,10 @@ CandleChartFrame::CandleChartFrame()
  */
 void CandleChartFrame::update() 
 {
+    if (!initialized) {
+        init_instrument("SPY");
+    }
+
     static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
 
     ImGui::InputText("Enter symbol", &ticker_symbol, ImGuiInputTextFlags_CharsUppercase);
