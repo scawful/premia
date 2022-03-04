@@ -7,6 +7,15 @@ namespace tda
 {
     // ================ Account Class Header ================ //
 
+    struct PositionBalances
+    {
+        std::string symbol;
+        std::unordered_map<std::string, std::string> balances;
+        int longQuantity;
+        int averagePrice;
+        double dayProfitLoss;
+    };
+
     class Account
     {
     private:
@@ -18,14 +27,6 @@ namespace tda
         std::unordered_map<std::string, std::string> current_balances;  
         std::vector<std::unordered_map<std::string, std::string>> positions_vector;
 
-        struct PositionBalances
-        {
-            std::string symbol;
-            std::unordered_map<std::string, std::string> balances;
-            int longQuantity;
-            int averagePrice;
-            double dayProfitLoss;
-        };
         std::vector<PositionBalances> position_balances;
         
 
@@ -34,6 +35,11 @@ namespace tda
     public:
         Account();
         Account( boost::property_tree::ptree account_data );
+
+        void add_position(std::unordered_map<std::string, std::string> position);
+        void add_balance(PositionBalances balance);
+        void set_account_variable(std::string key, std::string value);
+        void set_balance_variable(std::string key, std::string value);
 
         size_t get_position_vector_size();
         std::string get_account_variable( std::string variable );
