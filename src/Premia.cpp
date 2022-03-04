@@ -1,12 +1,12 @@
 #define SDL_MAIN_HANDLED
-#include "State/StartState.hpp"
+#include "State/PrimaryState.hpp"
 
 int main(int argc, char *argv[])
 {
     Manager premia;
 
     premia.init();
-    premia.change( StartState::instance() );
+    premia.change( PrimaryState::instance() );
     
     while ( premia.running() )
     {
