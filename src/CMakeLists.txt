@@ -2,9 +2,11 @@
 cmake_minimum_required(VERSION 3.10)
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3")
+
 
 # set the project name
 project(Premia VERSION 1.0)
@@ -81,54 +83,44 @@ file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp)
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
-# ibkr api library --------------------------------------------------------------------------------------------
-set(IBKR_PATH "../include/twsapi")
-file(GLOB IBKR_SOURCES ${IBKR_PATH}/*.cpp)
-add_library("IBKR" SHARED ${IBKR_SOURCES})
-target_include_directories("IBKR" PUBLIC ${IBKR_PATH})
-
 # add the executable
-# MACOSX_BUNDLE ${MAC_ICON}
 add_executable(Premia Premia.cpp 
-                    Services
-                    Services/CoinbasePro.cpp
-                    Services/CoinbasePro/Account.cpp
-                    Services/CoinbasePro/Client.cpp
-                    Services/CoinbasePro/Product.cpp
-                    Services/KuCoin.cpp
-                    Services/KuCoin/Parser.cpp
-                    Services/KuCoin/Account.cpp
-                    Services/KuCoin/Client.cpp
-                    Services/KuCoin/MarginAccount.cpp
-                    Services/TDAmeritrade.cpp 
-                    Services/TDAmeritrade/Session.cpp
-                    Services/TDAmeritrade/Quote.cpp 
-                    Services/TDAmeritrade/PriceHistory.cpp 
-                    Services/TDAmeritrade/OptionChain.cpp 
-                    Services/TDAmeritrade/Account.cpp
-                    Services/TDAmeritrade/Watchlist.cpp
-                    Services/TDAmeritrade/Parser.cpp
-                    Services/InteractiveBrokers.cpp
-                    Services/InteractiveBrokers/AccountSummaryTags.cpp
-                    Services/InteractiveBrokers/AvailableAlgoParams.cpp
-                    Services/InteractiveBrokers/ContractSamples.cpp
-                    Services/InteractiveBrokers/OrderSamples.cpp 
-                    Services/InteractiveBrokers/ScannerSubscriptionSamples.cpp
-                    Services/InteractiveBrokers/Utils.cpp
                     State/Manager.cpp 
                     State/DemoState.cpp
-                    State/StartState.cpp 
+                    State/PrimaryState.cpp 
                     State/StreamState.cpp
                     State/Frames/MenuFrame.cpp
                     State/Frames/CandleChartFrame.cpp
                     State/Frames/LinePlotFrame.cpp
                     State/Frames/LoginFrame.cpp
-                    State/Frames/WatchlistFrame.cpp
-                    State/Frames/PortfolioFrame.cpp
-                    State/Frames/OptionChainFrame.cpp
-                    State/Frames/ConsoleFrame.cpp
-                    State/Frames/TradingFrame.cpp
+                    State/Frames/View/WatchlistFrame.cpp
+                    State/Frames/View/PortfolioFrame.cpp
+                    State/Frames/Trade/OptionChainFrame.cpp
+                    State/Frames/Tools/ConsoleFrame.cpp
+                    State/Frames/Trade/TradingFrame.cpp
                     State/Frames/MarketOverviewFrame.cpp 
+                    State/Frames/Analyze/RiskAppetiteFrame.cpp
+                    State/Frames/Analyze/FundOwnershipFrame.cpp
+                    State/Frames/RiskPremiaFrame.cpp
+                    Services
+                    Services/GenericClient.cpp
+                    Services/CoinbasePro/CoinbasePro.cpp
+                    Services/CoinbasePro/Account.cpp
+                    Services/CoinbasePro/Client.cpp
+                    Services/CoinbasePro/Product.cpp
+                    Services/TDAmeritrade.cpp 
+                    Services/TDAmeritrade/Parser.cpp
+                    Services/TDAmeritrade/Session.cpp
+                    Services/TDAmeritrade/Client.cpp
+                    Services/TDAmeritrade/Data/Quote.cpp 
+                    Services/TDAmeritrade/Data/PriceHistory.cpp 
+                    Services/TDAmeritrade/Data/OptionChain.cpp 
+                    Services/TDAmeritrade/Data/Account.cpp
+                    Services/TDAmeritrade/Data/Watchlist.cpp
+                    Services/TDAmeritrade/Data/UserPrincipals.cpp
+                    Services/IEXCloud.cpp
+                    Services/IEXCloud/Client.cpp
+                    Services/IEXCloud/Parser.cpp
                     ${IMGUI_PATH}/imgui.cpp
                     ${IMGUI_PATH}/imgui_demo.cpp
                     ${IMGUI_PATH}/imgui_draw.cpp
@@ -148,7 +140,9 @@ include_directories("../assets")
 target_link_libraries(Premia ${SDL2_LIBRARIES} 
                              ${SDL_IMAGE_LIBRARIES} 
                              ${SDL_TTF_LIBRARIES}
-                             curl OpenSSL::SSL ImGui ImPlot IBKR
+                             curl 
+                             OpenSSL::SSL 
+                             ImGui ImPlot ws2_32
                              ${BOOST_LIBRARIES} 
                              ${OPENGL_LIBRARIES} )
 
