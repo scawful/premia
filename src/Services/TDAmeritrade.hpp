@@ -125,6 +125,7 @@ namespace tda
         std::string _consumer_key;
         std::vector<std::thread> _ws_threads;
 
+        Account current_account;
         Client client;
         Parser parser;
 
@@ -192,6 +193,11 @@ namespace tda
         // New Model Functions 
         PriceHistory getPriceHistory(std::string, int mode, int time);
         Quote getQuote(std::string symbol);
+        Account getAccount(std::string account_id);
+
+        Account getCurrentAccount();
+
+        void fetchAccessToken();
     };
 
 }

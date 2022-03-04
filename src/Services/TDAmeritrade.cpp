@@ -651,17 +651,13 @@ namespace tda
     std::vector<std::string> TDAmeritrade::get_all_accounts()
     {
         std::vector<std::string> accounts;
-        if (!_user_principals)
-        {
+        if (!_user_principals) {
             get_user_principals();
         }
 
-        for (auto &array : user_principals.get_child("accounts"))
-        {
-            for (auto &each_element : array.second)
-            {
-                if (each_element.first == "accountId")
-                {
+        for (auto &array : user_principals.get_child("accounts")) {
+            for (auto &each_element : array.second) {
+                if (each_element.first == "accountId") {
                     accounts.push_back(each_element.second.get_value<std::string>());
                 }
             }
@@ -917,4 +913,20 @@ namespace tda
         return parser.parse_quote(parser.read_response(response));
     }
 
+    Account TDAmeritrade::getAccount(std::string account_id)
+    {
+        std::string response = client.get_account(account_id);
+        this->current_account = parser.parse_account(parser.read_response(response));
+        return current_account;
+    }
+
+    Account TDAmeritrade::getCurrentAccount()
+    {
+        return current_account;
+    }
+
+    void TDAmeritrade::fetchAccessToken()
+    {
+        client.fetch_access_token();
+    }
 }
