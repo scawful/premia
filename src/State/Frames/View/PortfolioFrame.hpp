@@ -1,7 +1,7 @@
 #ifndef PortfolioFrame_hpp
 #define PortfolioFrame_hpp
 
-#include "Frame.hpp"
+#include "../Frame.hpp"
 
 class PortfolioFrame : public Frame
 {

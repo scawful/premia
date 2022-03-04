@@ -1,7 +1,7 @@
 #ifndef WatchlistFrame_hpp
 #define WatchlistFrame_hpp
 
-#include "Frame.hpp"
+#include "../Frame.hpp"
 
 class WatchlistFrame : public Frame
 {

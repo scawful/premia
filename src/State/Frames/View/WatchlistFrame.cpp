@@ -11,6 +11,7 @@ void WatchlistFrame::init_watchlists()
     for (std::string const& str : watchlist_names) {
         watchlist_names_char.push_back(str.data());
     }
+    initialized = true;
 }
 
 void WatchlistFrame::draw_watchlist_table()
@@ -130,6 +131,7 @@ void WatchlistFrame::draw_custom_watchlist_table()
 WatchlistFrame::WatchlistFrame() : Frame()
 {
     this->title_string = "Watchlists";  
+    this->initialized = false;
 }
 
 void WatchlistFrame::update() 
@@ -148,6 +150,9 @@ void WatchlistFrame::update()
     if (*tda_logged_in) {
         draw_watchlist_table();
     } else {
+        if (!initialized) {
+            init_watchlists();
+        }
         draw_custom_watchlist_table();
     }
 

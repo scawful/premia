@@ -125,7 +125,7 @@ void PortfolioFrame::draw_tabbed_view()
  */
 PortfolioFrame::PortfolioFrame() : Frame()
 {
-
+    initialized = false;
 }
 
 /**
@@ -136,11 +136,15 @@ PortfolioFrame::PortfolioFrame() : Frame()
 void PortfolioFrame::init_positions()
 {
     account_ids_std = premia->tda_interface.get_all_accounts();
-    for ( std::string const& each_id : account_ids_std ) {
+    int i = 0;
+    for ( std::string const& each_id : account_ids_std ) 
+    {
         account_ids.push_back(each_id.c_str());
+        i++;
     }
     default_account = account_ids_std.at(0);
     load_account(default_account);
+    initialized = true;
 }
 
 /**
@@ -190,6 +194,9 @@ void PortfolioFrame::update()
     if (*public_mode) {
         ImGui::Text("No portfolio data in Public Mode");
     } else {
+        if (!initialized) {
+            init_positions();
+        }
         draw_tabbed_view();
     }
 
