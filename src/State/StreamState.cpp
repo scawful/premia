@@ -1,6 +1,6 @@
 //  StreamState Class
 #include "StreamState.hpp"
-#include "StartState.hpp"
+#include "PrimaryState.hpp"
 
 StreamState StreamState::m_StreamState;
 
@@ -59,7 +59,7 @@ void StreamState::handleEvents()
                         premia->quit();
                         break;
                     case SDLK_LEFT:
-                        premia->change( StartState::instance() );
+                        premia->change( PrimaryState::instance() );
                         break;
                     default:
                         break;

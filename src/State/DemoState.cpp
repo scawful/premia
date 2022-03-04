@@ -1,6 +1,6 @@
 //  DemoState Class
 #include "DemoState.hpp"
-#include "StartState.hpp"
+#include "PrimaryState.hpp"
 
 DemoState DemoState::m_DemoState;
 
@@ -48,7 +48,7 @@ void DemoState::handleEvents()
                         //premia->quit();
                         break;
                     case SDLK_UP:
-                        premia->change( StartState::instance() );
+                        premia->change( PrimaryState::instance() );
                         break;
                     default:
                         break;

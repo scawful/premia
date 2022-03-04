@@ -6,9 +6,8 @@
 #include "../core.hpp"
 #include "../Services/GenericClient.hpp"
 #include "../Services/TDAmeritrade.hpp"
-#include "../Services/CoinbasePro.hpp"
 #include "../Services/IEXCloud.hpp"
-#include "../Services/KuCoin.hpp"
+#include "../Services/CoinbasePro/CoinbasePro.hpp"
 
 class State;
 
@@ -37,7 +36,6 @@ public:
     
     tda::TDAmeritrade tda_interface;
     iex::IEXCloud iex_interface;
-    kc::KuCoin kucoin_interface;
     GenericClient client;
     
     SDL_Renderer *pRenderer = NULL;
