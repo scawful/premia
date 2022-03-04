@@ -43,7 +43,7 @@ void OptionChainFrame::draw_option_chain()
 
     // When using ScrollX or ScrollY we need to specify a size for our table container!
     // Otherwise by default the table will fit all available space, like a BeginChild() call.
-    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 15);
+    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * optionsDateTimeObj[current_item].strikePriceObj.size());
     if (ImGui::BeginTable("table_scrolly", 16, flags, outer_size))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible

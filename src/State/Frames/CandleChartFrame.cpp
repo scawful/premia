@@ -36,7 +36,7 @@ void CandleChartFrame::init_candles()
  */
 void CandleChartFrame::init_quote_details()
 {
-    tda::Quote quote = premia->tda_interface.createQuote( ticker_symbol );
+    tda::Quote quote = premia->tda_interface.getQuote(ticker_symbol);
     detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
                                  "\nBid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
                                  "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
@@ -57,7 +57,7 @@ void CandleChartFrame::init_quote_details()
  */
 void CandleChartFrame::init_instrument(std::string ticker)
 {
-    quote = premia->tda_interface.createQuote( ticker );
+    quote = premia->tda_interface.getQuote(ticker_symbol);
     price_history_data = premia->tda_interface.createPriceHistory( ticker, tda::PeriodType::YEAR, 1, tda::FrequencyType::DAILY, 1, false );
     candles = price_history_data.getCandleVector();
 
@@ -237,7 +237,8 @@ void CandleChartFrame::update()
         {
             quote.clear();
             price_history_data.clear();
-            quote = premia->tda_interface.createQuote( buf );
+            quote = premia->tda_interface.getQuote(buf);
+            // quote = premia->tda_interface.createQuote( buf );
             price_history_data = premia->tda_interface.createPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
             candles = price_history_data.getCandleVector();

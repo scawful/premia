@@ -15,17 +15,19 @@ void TradingFrame::update()
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if ( ImGui::BeginPopupModal("Quick Order", NULL, ImGuiWindowFlags_AlwaysAutoResize) ) {
+    if ( ImGui::BeginPopupModal("Quick Order", NULL, ImGuiWindowFlags_AlwaysAutoResize) ) 
+    {
         static std::string new_ticker = "";
         static bool active_instrument = false;
         static char buf[64] = "";
         ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
         ImGui::SameLine(); 
-        if ( ImGui::Button("Search") ) {
-            if ( strcmp(buf, "") != 0 ) {
+        if ( ImGui::Button("Search") ) 
+        {
+            if ( strcmp(buf, "") != 0 ) 
+            {
                 new_ticker = std::string(buf);
-                std::cout << "new ticker " << new_ticker << std::endl;
-                quotes[ new_ticker ] = premia->tda_interface.createQuote( new_ticker );
+                quotes[new_ticker] = premia->tda_interface.getQuote(new_ticker);
                 active_instrument = true;
             } else {
                 active_instrument = false;
