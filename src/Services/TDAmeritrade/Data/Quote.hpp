@@ -11,15 +11,30 @@ namespace tda
         boost::property_tree::ptree quoteData;
         std::map<std::string, std::string> quoteVariables;
 
-        void initVariables();
+        std::string symbol;
+        std::string description;
+        double bidPrice, askPrice, lastPrice, openPrice, highPrice, lowPrice, closePrice;
+        double bidSize, askSize, lastSize, bidId, askId, lastId;
+        double netChange, totalVolume;
+        double quoteTimeInLong, tradeTimeInLong;
+        double mark;
+        std::string exchange;
+        std::string exchangeView;
+        bool marginable;
+        bool shortable;
+        double digits;
+        double _52WkHigh, _52WkLow;
+        double peRatio;
+        double divAmount, divYield;
+        std::string divDate;
+        std::string securityStatus;
+        double regularMarketLastPrice, regularMarketLastSize, regularMarketNetChange, regularMarketTradeTimeInLong;
 
     public:
         Quote();
-        Quote( boost::property_tree::ptree quote_data );
 
-        void updateTree( boost::property_tree::ptree quote_data );
-
-        std::string getQuoteVariable( std::string variable );
+        void setQuoteVariable(std::string key, std::string value);
+        std::string getQuoteVariable(std::string variable);
 
         void clear();
     };

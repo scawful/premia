@@ -742,22 +742,6 @@ namespace tda
     }
 
     /**
-     * @brief Create a tda::Quote object from API service data with ticker parameter
-     * @author @scawful
-     * 
-     * @param ticker 
-     * @return boost::shared_ptr<tda::Quote> 
-     */
-    Quote TDAmeritrade::createQuote(std::string ticker)
-    {
-        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
-        string_replace(url, "{ticker}", ticker);
-
-        JSONObject::ptree propertyTree = createPropertyTree(ticker, url);
-        return Quote(propertyTree);
-    }
-
-    /**
      * @brief Create a tda::OptionChain object from API service with ticker parameter
      * @author @scawful
      * 
@@ -919,6 +903,18 @@ namespace tda
             string_replace(url, "{frequencyType}", get_api_frequency_type(FrequencyType::MONTHLY));
             string_replace(url, "{frequency}", get_api_frequency_amount(1));
         }
+    }
+
+    /**
+     * @brief Retrieve Quote object by ticker using client and parser 
+     *
+     * @param symbol
+     * @return FundOwnership
+     */
+    Quote TDAmeritrade::getQuote(std::string symbol)
+    {
+        std::string response = client.get_quote(symbol);
+        return parser.parse_quote(parser.read_response(response));
     }
 
 }

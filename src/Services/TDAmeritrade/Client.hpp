@@ -33,6 +33,7 @@ namespace tda
         void get_user_principals();
         std::string post_access_token();
 
+        bool string_replace(std::string& str, const std::string from, const std::string to);
         static size_t json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s);
 
     public:
@@ -42,6 +43,7 @@ namespace tda
         std::string send_authorized_request(std::string endpoint);
 
         std::string get_price_history(std::string endpoint);
+        std::string get_quote(std::string symbol);
 
         void start_session();
         void send_session_request(std::string request);

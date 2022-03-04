@@ -171,7 +171,6 @@ namespace tda
         std::vector<std::string> get_all_accounts();
 
         JSONObject::ptree createPropertyTree(std::string ticker, std::string new_url);
-        Quote             createQuote(std::string ticker);
         PriceHistory      createPriceHistory();
         PriceHistory      createPriceHistory(std::string ticker, PeriodType ptype, int period_amt,
                                              FrequencyType ftype, int freq_amt, bool ext);
@@ -188,12 +187,11 @@ namespace tda
         void set_price_history_parameters(std::string ticker, PeriodType ptype, time_t start_date, time_t end_date,
                                           FrequencyType ftype, int freq_amt, bool ext = true);
 
-        // auxiliary functions
-        std::string getBaseUrl();
         bool is_session_active();
 
         // New Model Functions 
         PriceHistory getPriceHistory(std::string, int mode, int time);
+        Quote getQuote(std::string symbol);
     };
 
 }

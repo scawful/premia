@@ -1,11 +1,13 @@
 #include "Parser.hpp"
 
-tda::Parser::Parser() 
+using namespace tda;
+
+Parser::Parser() 
 {
     
 }
 
-JSONObject::ptree tda::Parser::read_response(std::string response)
+JSONObject::ptree Parser::read_response(std::string response)
 {
     std::istringstream json_response(response);
     JSONObject::ptree property_tree;
@@ -20,7 +22,27 @@ JSONObject::ptree tda::Parser::read_response(std::string response)
     return property_tree;
 }
 
-tda::UserPrincipals tda::Parser::parse_user_principals( boost::property_tree::ptree data )
+Quote Parser::parse_quote(JSONObject::ptree data)
+{
+    Quote quote;
+
+    for (auto& array_element : data) {
+        for (auto& property : array_element.second) {
+            quote.setQuoteVariable(property.first, property.second.get_value < std::string >());
+        }
+    }
+
+    return quote;
+}
+
+PriceHistory Parser::parse_price_history(boost::property_tree::ptree data)
+{
+    PriceHistory price_history;
+
+    return price_history;
+}
+
+UserPrincipals Parser::parse_user_principals( boost::property_tree::ptree data )
 {
     UserPrincipals user_principals;
 

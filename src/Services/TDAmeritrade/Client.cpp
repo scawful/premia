@@ -70,6 +70,31 @@ std::string Client::post_access_token()
     return response;
 }
 
+/**
+ * @brief Replace a substring within a string with given parameter
+ * @author @scawful
+ *
+ * @param str
+ * @param from
+ * @param to
+ * @return true
+ * @return false
+ */
+bool Client::string_replace(std::string& str, const std::string from, const std::string to)
+{
+    size_t start = str.find(from);
+    if (start == std::string::npos)
+        return false;
+
+    str.replace(start, from.length(), to);
+    return true;
+}
+
+/**
+ *
+ *
+ *
+ */
 size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
 {
     size_t new_length = size * nmemb;
@@ -146,8 +171,14 @@ std::string Client::send_authorized_request(std::string endpoint)
 
 std::string Client::get_price_history(std::string endpoint)
 {
-
     return send_request(endpoint);
+}
+
+std::string Client::get_quote(std::string symbol)
+{
+    std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
+    string_replace(url, "{ticker}", symbol);
+    return send_request(url);
 }
 
 void Client::start_session() 
