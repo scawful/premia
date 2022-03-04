@@ -1,11 +1,11 @@
 #ifndef CoinbasePro_hpp
 #define CoinbasePro_hpp
 
-#include "../core.hpp"
-#include "../apikey.hpp"
-#include "CoinbasePro/Account.hpp"
-#include "CoinbasePro/Client.hpp"
-#include "CoinbasePro/Product.hpp"
+#include "../../core.hpp"
+#include "../../apikey.hpp"
+#include "Account.hpp"
+#include "Client.hpp"
+#include "Product.hpp"
 
 namespace cbp
 {
