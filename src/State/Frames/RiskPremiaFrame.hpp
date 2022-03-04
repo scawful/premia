@@ -15,10 +15,14 @@ private:
     double gxv[3500];
     double date[3500];
 
+    double oneYearDix[400];
+
     double minVix, minGex, minDix, minSpx, minGxv;
     double maxVix, maxGex, maxDix, maxSpx, maxGxv;
 
     void get_spx_gamma_exposure();
+
+    void draw_heatmap();
 
 public:
     RiskPremiaFrame();
