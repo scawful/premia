@@ -22,6 +22,21 @@ JSONObject::ptree Parser::read_response(std::string response)
     return property_tree;
 }
 
+std::string Parser::parse_access_token(std::string response)
+{
+    std::string access_token;
+    std::cout << "==>" << response << std::endl;
+
+    JSONObject::ptree data = read_response(response);
+    for (auto& access_it : data) {
+        if (access_it.first == "access_token")
+        {
+            access_token = access_it.second.get_value<std::string>();
+        }
+    }
+    return access_token;
+}
+
 Quote Parser::parse_quote(JSONObject::ptree data)
 {
     Quote quote;
@@ -60,12 +75,61 @@ UserPrincipals Parser::parse_user_principals( boost::property_tree::ptree data )
     return user_principals;
 }
 
+Account Parser::parse_account(JSONObject::ptree data)
+{
+    Account account;
+    for (auto& class_it : data)
+    {
+        for (auto& account_it : class_it.second)
+        {
+            if (account_it.first == "positions")
+            {
+                for (auto& position_list_it : account_it.second)
+                {
+                    tda::PositionBalances new_position_balance;
+
+                    for (auto& positions_it : position_list_it.second)
+                    {
+                        //std::cout << positions_it.first << " ::: " << positions_it.second.get_value<std::string>() << std::endl;
+
+                        new_position_balance.balances[positions_it.first] = positions_it.second.get_value<std::string>();
+
+                        std::unordered_map<std::string, std::string> pos_field;
+                        std::unordered_map<std::string, std::string> instrument;
+
+                        for (auto& field_it : positions_it.second)
+                        {
+                            //std::cout << field_it.first << " :::: " << field_it.second.get_value<std::string>() << std::endl;
+                            if (field_it.first == "symbol")
+                                new_position_balance.symbol = field_it.second.get_value<std::string>();
+
+                            pos_field[field_it.first] = field_it.second.get_value<std::string>();
+                        }
+
+                        account.add_position(pos_field);
+                    }
+
+                    account.add_balance(new_position_balance);
+                }
+            }
+            else if (account_it.first == "currentBalances") {
+                for (auto& balance_it : account_it.second) {
+                    account.set_balance_variable(balance_it.first, balance_it.second.get_value<std::string>());
+                }
+            }
+            else {
+                account.set_account_variable(account_it.first, account_it.second.get_value<std::string>());
+            }
+        }
+    }
+    return account;
+}
+
 std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(boost::property_tree::ptree data) 
 {
     std::vector<tda::Watchlist> watchlists;
     // JSON Outer Layer 
-    for ( auto & each_data : data ) 
-    {
+    for ( auto & each_data : data ) {
         // Array of Watchlists
         Watchlist watchlist;
         for ( auto & each_watchlist : each_data.second )

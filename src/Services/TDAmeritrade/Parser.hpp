@@ -22,9 +22,12 @@ namespace tda
 
         JSONObject::ptree read_response(std::string response);
 
+        std::string parse_access_token(std::string response);
+
         Quote parse_quote(JSONObject::ptree data);
         PriceHistory parse_price_history(JSONObject::ptree data);
         UserPrincipals parse_user_principals(JSONObject::ptree data);
+        Account parse_account(JSONObject::ptree data);
         std::vector<Watchlist> parse_watchlist_data(JSONObject::ptree data);
     };
 
