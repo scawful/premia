@@ -114,6 +114,7 @@ size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, st
 Client::Client() 
 {
     this->access_token = "";
+    this->refresh_token = REFRESH_TOKEN;
 }
 
 /**
@@ -181,6 +182,14 @@ std::string Client::get_quote(std::string symbol)
     return send_request(url);
 }
 
+std::string Client::get_account(std::string account_id)
+{
+    get_user_principals();
+    std::string account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
+    string_replace(account_url, "{accountNum}", account_id);
+    return send_authorized_request(account_url);
+}
+
 void Client::start_session() 
 {
     
@@ -194,4 +203,9 @@ void Client::send_session_request(std::string request)
 void Client::send_interrupt_signal() 
 {
     websocket_session->interrupt();
+}
+
+void Client::fetch_access_token()
+{
+    this->access_token = parser.parse_access_token(post_access_token());
 }

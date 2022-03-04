@@ -44,11 +44,13 @@ namespace tda
 
         std::string get_price_history(std::string endpoint);
         std::string get_quote(std::string symbol);
+        std::string get_account(std::string account_id);
+
 
         void start_session();
         void send_session_request(std::string request);
         void send_interrupt_signal();
-
+        void fetch_access_token();
     };
 }
 
