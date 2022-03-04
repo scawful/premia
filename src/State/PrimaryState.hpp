@@ -1,13 +1,13 @@
-//  StartState Class Header
-#ifndef StartState_hpp
-#define StartState_hpp
+//  PrimaryState Class Header
+#ifndef PrimaryState_hpp
+#define PrimaryState_hpp
 
 #include "State.hpp"
 #include "Frames/MenuFrame.hpp"
 #include "Frames/LoginFrame.hpp"
 #include "Frames/LinePlotFrame.hpp"
-#include "Frames/WatchlistFrame.hpp"
-#include "Frames/PortfolioFrame.hpp"
+#include "Frames/View/WatchlistFrame.hpp"
+#include "Frames/View/PortfolioFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
 #include "Frames/RiskPremiaFrame.hpp"
 #include "Frames/MarketOverviewFrame.hpp"
@@ -17,16 +17,18 @@
 #include "Frames/Analyze/RiskAppetiteFrame.hpp"
 #include "Frames/Analyze/FundOwnershipFrame.hpp"
 
-class StartState : public State
+class PrimaryState : public State
 {
 private:
-    static StartState m_StartState;
+    static PrimaryState m_PrimaryState;
 
+    Manager* premia = NULL;
+
+    std::string title_string;
     bool protected_mode = true;
     bool tda_logged_in = false;
 
-    Manager *premia = NULL;
-
+    // Frames 
     MenuFrame::SubFrame current_frame;
     MenuFrame mainMenu;
     ConsoleFrame console;
@@ -42,13 +44,9 @@ private:
     FundOwnershipFrame fundOwnership;
     RiskPremiaFrame premiaHome;
 
-    std::string title_string;
-    std::map<std::string, tda::Quote> quotes;
-
-    void tda_login();
 
 protected:
-    StartState() { }
+    PrimaryState() { }
 
 public:
     void init(Manager *premia);
@@ -61,11 +59,11 @@ public:
     void update();
     void draw();
 
-    static StartState* instance()
+    static PrimaryState* instance()
     {
-        return &m_StartState;
+        return &m_PrimaryState;
     }
 
 };
 
-#endif /* StartState_hpp */
+#endif /* PrimaryState_hpp */

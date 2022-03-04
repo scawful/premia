@@ -1,27 +1,16 @@
-//  StartState Class
-#include "StartState.hpp"
+//  PrimaryState Class
+#include "PrimaryState.hpp"
 #include "DemoState.hpp"
 
-StartState StartState::m_StartState;
+PrimaryState PrimaryState::m_PrimaryState;
 
 /**
- * @brief 
- * 
- */
-void StartState::tda_login()
-{
-    candleChart.init_instrument("SPY"); 
-    portfolioFrame.init_positions();
-    watchlistFrame.init_watchlists();
-}
-
-/**
- * @brief Initialize the StartStates variables 
+ * @brief Initialize the PrimaryStates variables 
  * @author @scawful
  * 
  * @param premia 
  */
-void StartState::init(Manager *premia)
+void PrimaryState::init(Manager *premia)
 {
     this->premia = premia;
     this->title_string = "Home";
@@ -36,7 +25,6 @@ void StartState::init(Manager *premia)
     premiaHome.import_manager(premia);
     fundOwnership.import_manager(premia);
     marketOverview.import_manager(premia);
-    tda_login();
     
     ImGui::StyleColorsClassic();
 }
@@ -46,9 +34,9 @@ void StartState::init(Manager *premia)
  * @author @scawful
  * 
  */
-void StartState::cleanup()
+void PrimaryState::cleanup()
 {
-    SDL_Log("StartState Cleanup\n");
+    SDL_Log("PrimaryState Cleanup\n");
 }
 
 /**
@@ -56,9 +44,9 @@ void StartState::cleanup()
  * @author @scawful
  * 
  */
-void StartState::pause()
+void PrimaryState::pause()
 {
-    SDL_Log("StartState Pause\n");
+    SDL_Log("PrimaryState Pause\n");
 }
 
 /**
@@ -66,9 +54,9 @@ void StartState::pause()
  * @author @scawful
  * 
  */
-void StartState::resume()
+void PrimaryState::resume()
 {
-    SDL_Log("StartState Resume\n");
+    SDL_Log("PrimaryState Resume\n");
 }
 
 /**
@@ -76,7 +64,7 @@ void StartState::resume()
  * @author @scawful
  * 
  */
-void StartState::handleEvents()
+void PrimaryState::handleEvents()
 {
     int wheel = 0;
     SDL_Event event;
@@ -156,21 +144,33 @@ void StartState::handleEvents()
 }
 
 /**
- * @brief Update the contents of the StartState
+ * @brief Update the contents of the PrimaryState
  *        Construct GUI elements
  * @author @scawful
  * 
  */
-void StartState::update()
+void PrimaryState::update()
 {
     ImGui::NewFrame();
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.75, io.DisplaySize.y * 0.70), ImGuiCond_Always );
+
+
+    ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
+    if (mainMenu.watchlistView()) {
+        dimensions.x = io.DisplaySize.x * 0.75;
+    }
+    if (mainMenu.consoleView() || mainMenu.portfolioView() ) {
+        dimensions.y = io.DisplaySize.y * 0.70;
+    }
+    ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar;
+    if (!mainMenu.freeMode()) {
+        flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
+    }
     
-    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse ))
-    {
-        // Early out if the window is collapsed, as an optimization.
+    if (!ImGui::Begin(  title_string.c_str(), NULL, flags)) {
         ImGui::End();
         return;
     }
@@ -213,9 +213,19 @@ void StartState::update()
 
     ImGui::End();    
 
-    watchlistFrame.update();
-    console.update();
-    portfolioFrame.update();
+    if (mainMenu.watchlistView()) {
+        watchlistFrame.update();
+    }
+    
+    if (mainMenu.consoleView()) {
+        console.update();
+
+    }
+
+    if (mainMenu.portfolioView()) {
+        portfolioFrame.update();
+    }
+    
     
     SDL_RenderClear(premia->pRenderer);
 }
@@ -225,7 +235,7 @@ void StartState::update()
  * @author @scawful 
  * 
  */
-void StartState::draw()
+void PrimaryState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
