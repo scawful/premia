@@ -211,8 +211,7 @@ ConsoleFrame::~ConsoleFrame()
 void ConsoleFrame::update() 
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos( ImVec2(0, io.DisplaySize.y * 0.70) );
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30), ImGuiCond_Always );
+
     if (!ImGui::Begin(title.c_str(), &p_open))
     {
         ImGui::End();
@@ -225,9 +224,7 @@ void ConsoleFrame::update()
         }
     }
 
-    // As a specific feature guaranteed by the library, after calling Begin() the last Item represent the title bar.
-    // So e.g. IsItemHovered() will return true when hovering the title bar.
-    // Here we create a context menu only available from the title bar.
+
     if (ImGui::BeginPopupContextItem())
     {
         if (ImGui::MenuItem("Close Console"))
@@ -236,8 +233,6 @@ void ConsoleFrame::update()
     }
 
     ImGui::TextWrapped("Enter 'HELP' for help. TAB key for autocomplete, UP/DOWN key for history");
-
-    //if (ImGui::SmallButton("Add Debug Error")) { addLog("[error] something went wrong"); }
     ImGui::Separator();
 
     // Options menu
@@ -332,7 +327,9 @@ void ConsoleFrame::update()
         reclaim_focus = true;
     }
     ImGui::SameLine();
-    if (ImGui::SmallButton("Clear"))           { clearLog(); }
+    if (ImGui::SmallButton("Clear")) { 
+        clearLog(); 
+    }
     ImGui::SameLine();
     copy_to_clipboard = ImGui::SmallButton("Copy");
 

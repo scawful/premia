@@ -593,6 +593,9 @@ void MenuFrame::update()
         
         if (ImGui::BeginMenu("Debug"))
         {
+            if (ImGui::MenuItem("Fetch Access Token", "TDA")) {
+                premia->tda_interface.fetchAccessToken();
+            }
             if (ImGui::MenuItem("WebSocket StreamState")) {
                 premia->change(StreamState::instance());
             }

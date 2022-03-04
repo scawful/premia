@@ -4,13 +4,20 @@ void WatchlistFrame::init_watchlists()
 {
     std::string account_num = premia->tda_interface.get_all_accounts().at(0);
     watchlists = premia->tda_interface.retrieveWatchlistsByAccount(account_num);
-    for ( int i = 0; i < watchlists.size(); i++ )
-    {
+
+    for ( int i = 0; i < watchlists.size(); i++ ) {
         watchlist_names.push_back(watchlists[i].getName());
     }
+
     for (std::string const& str : watchlist_names) {
         watchlist_names_char.push_back(str.data());
     }
+
+    //for (int i = 0; i < watchlists.size(); i++) {
+    //    for (int j = 0; j < watchlists[i].getNumInstruments(); j++) {
+    //        quotes[watchlists[i].getInstrumentSymbol(j)] = premia->tda_interface.getQuote(watchlists[i].getInstrumentSymbol(j));
+    //    }
+    //}
     initialized = true;
 }
 
@@ -27,12 +34,13 @@ void WatchlistFrame::draw_watchlist_table()
     ImGui::SameLine();
     ImGui::Combo(" ", &n,  watchlist_names_gui, watchlist_names.size()); 
 
-    if (ImGui::BeginTable("Watchlist_Table", 3, flags, outer_size))
+    if (ImGui::BeginTable("Watchlist_Table", 4, flags, outer_size))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
         ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthFixed );
-        ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed );
         ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Bid", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Ask", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableHeadersRow();
 
         ImGuiListClipper clipper;
@@ -42,7 +50,7 @@ void WatchlistFrame::draw_watchlist_table()
             for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
             {
                 ImGui::TableNextRow();
-                for (int column = 0; column < 3; column++)
+                for (int column = 0; column < 4; column++)
                 {
                     std::string symbol = watchlists[n].getInstrumentSymbol(row);
                     std::string description = watchlists[n].getInstrumentDescription(row);
@@ -54,10 +62,13 @@ void WatchlistFrame::draw_watchlist_table()
                             ImGui::Text("%s", symbol.c_str() );
                             break;
                         case 1:
-                            ImGui::Text("%s", description.c_str());
+                            ImGui::Text("%s", assetType.c_str() );
                             break;
                         case 2:
-                            ImGui::Text("%s", assetType.c_str() );
+                            ImGui::Text("%s", quotes[symbol].getQuoteVariable("bidPrice").c_str());
+                            break;
+                        case 3:
+                            ImGui::Text("%s", quotes[symbol].getQuoteVariable("askPrice").c_str());
                             break;
                         default:
                             ImGui::Text("Hello %d,%d", column, row);
@@ -137,8 +148,6 @@ WatchlistFrame::WatchlistFrame() : Frame()
 void WatchlistFrame::update() 
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos( ImVec2(io.DisplaySize.x * 0.75, 0) );
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y * 0.70), ImGuiCond_Always );
     
     if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove ))
     {

@@ -15,11 +15,15 @@ private:
     double gxv[3500];
     double date[3500];
 
+    double* positions_pie;
+    char** positions_labels;
+
     double oneYearDix[400];
 
     double minVix, minGex, minDix, minSpx, minGxv;
     double maxVix, maxGex, maxDix, maxSpx, maxGxv;
 
+    void init_pie_chart();
     void get_spx_gamma_exposure();
 
     void draw_heatmap();

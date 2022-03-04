@@ -13,6 +13,22 @@ void reverse_array(double arr[], int start, int end)
     }
 }
 
+void RiskPremiaFrame::init_pie_chart()
+{
+    tda::Account account = premia->tda_interface.getCurrentAccount();
+    int size = account.get_position_vector_size();
+    positions_labels = new char*[size];
+    positions_pie = new double[size];
+    
+    double sum = 0;
+    for (int i = 0; i < size; i++) {
+        std::string symbol = account.get_position(i)["symbol"];
+        positions_pie[i] = stod(account.get_position_balances(symbol, "marketValue"));
+        sum += positions_pie[i];
+        positions_labels[i] = symbol.data();
+    }
+}
+
 void RiskPremiaFrame::get_spx_gamma_exposure()
 {
     std::string data = premia->client.get_spx_gex();

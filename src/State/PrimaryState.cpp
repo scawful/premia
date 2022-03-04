@@ -213,16 +213,37 @@ void PrimaryState::update()
 
     ImGui::End();    
 
-    if (mainMenu.watchlistView()) {
+    if (mainMenu.watchlistView()) 
+    {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.75, 0));
+        ImVec2 size = ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y * 0.70);
+        if (!mainMenu.consoleView() && !mainMenu.portfolioView()) {
+            size = ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y);
+        }
+        ImGui::SetNextWindowSize(size, ImGuiCond_Always);
         watchlistFrame.update();
     }
     
-    if (mainMenu.consoleView()) {
+    if (mainMenu.consoleView()) 
+    {
+        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y * 0.70));
+        ImVec2 size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
+        if (!mainMenu.portfolioView()) {
+            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30);
+        }
+        ImGui::SetNextWindowSize(size, ImGuiCond_Always);
         console.update();
-
     }
 
     if (mainMenu.portfolioView()) {
+        ImVec2 size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
+        ImVec2 pos = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70);
+        if (!mainMenu.consoleView()) {
+            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30);
+            pos = ImVec2(0, io.DisplaySize.y * 0.70);
+        }       
+        ImGui::SetNextWindowPos(pos);
+        ImGui::SetNextWindowSize(size, ImGuiCond_Always);
         portfolioFrame.update();
     }
     

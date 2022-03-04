@@ -155,18 +155,15 @@ void PortfolioFrame::init_positions()
  */
 void PortfolioFrame::load_account( std::string account_num )
 {
-    account_data = premia->tda_interface.createAccount( account_num );
+    account_data = premia->tda_interface.getAccount(account_num);
 
     if ( positions_vector.size() != 0 ) {
         positions_vector.clear();
     }
 
-    for ( int i = 0; i < account_data.get_position_vector_size(); i++ )
-    {
-        for ( auto& position_it : account_data.get_position( i ) )
-        {
-            if ( position_it.first == "symbol" )
-            {
+    for ( int i = 0; i < account_data.get_position_vector_size(); i++ ) {
+        for ( auto& position_it : account_data.get_position( i ) ) {
+            if ( position_it.first == "symbol" ) {
                 std::string str = position_it.second;
                 positions_vector.push_back( str );
             }
@@ -183,8 +180,7 @@ void PortfolioFrame::load_account( std::string account_num )
 void PortfolioFrame::update() 
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70) );
-    ImGui::SetNextWindowSize( ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30), ImGuiCond_Always );
+
 
     if (!ImGui::Begin("Portfolio")) {
         ImGui::End();
