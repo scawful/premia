@@ -28,6 +28,11 @@ private:
     SubFrame current_frame;
     ImGuiStyle* ref;
 
+    bool portfolio_view;
+    bool console_view;
+    bool watchlist_view;
+    bool free_mode;
+
     std::unordered_map<std::string, std::string> hot_keys;
 
     void init_hot_keys();
@@ -35,6 +40,11 @@ private:
 
 public:
     MenuFrame();
+
+    bool portfolioView();
+    bool consoleView();
+    bool watchlistView();
+    bool freeMode();
 
     void import_manager(Manager *premia);
     void set_title(std::string & title_string);

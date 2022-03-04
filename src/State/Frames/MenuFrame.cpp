@@ -1,5 +1,5 @@
 #include "MenuFrame.hpp"
-#include "../StartState.hpp"
+#include "../PrimaryState.hpp"
 #include "../StreamState.hpp"
 #include "../DemoState.hpp"
 
@@ -287,8 +287,30 @@ void MenuFrame::draw_style_editor()
 
 MenuFrame::MenuFrame()
 {
-    this->current_frame = SubFrame::LOGIN;
+    this->current_frame = SubFrame::PREMIA_HOME;
+    this->free_mode = false;
+    this->portfolio_view = true;
+    this->watchlist_view = true;
+    this->console_view = true;
     init_hot_keys();
+}
+
+bool MenuFrame::portfolioView()
+{
+    return portfolio_view;
+}
+bool MenuFrame::consoleView()
+{
+    return console_view;
+}
+bool MenuFrame::watchlistView()
+{
+    return watchlist_view;
+}
+
+bool MenuFrame::freeMode()
+{
+    return free_mode;
 }
 
 void MenuFrame::import_manager(Manager *premia) 
@@ -319,10 +341,9 @@ void MenuFrame::update()
                 current_frame = MenuFrame::SubFrame::PREMIA_HOME;
             }
 
-            if ( ImGui::MenuItem("New Instance", "CTRL + N") ) {
-                premia->change( StartState::instance() );
+            if ( ImGui::MenuItem("New Workspace", "CTRL + N") ) {
+                
             }
-            
             ImGui::Separator();
             if (ImGui::MenuItem("Open Workspace", "CTRL + O")) {
 
@@ -365,6 +386,10 @@ void MenuFrame::update()
             ImGui::EndMenu();
         }
 
+        /*
+        *   Edit Sub Menu
+        * 
+        */
         if (ImGui::BeginMenu("Edit")) {
             if (ImGui::MenuItem("Undo", "CTRL + Z"))
             {
@@ -387,6 +412,10 @@ void MenuFrame::update()
             {
 
             }
+            if (ImGui::MenuItem("Delete", "DEL"))
+            {
+
+            }
             ImGui::Separator();
             if (ImGui::BeginMenu("Style"))
             {
@@ -400,13 +429,26 @@ void MenuFrame::update()
         {         
             if (ImGui::MenuItem("Service Login")) {
                 current_frame = SubFrame::LOGIN;
-            }       
-            if (ImGui::MenuItem("Market Movers")) {
-                current_frame = SubFrame::MARKET_MOVERS;
             }
-            if (ImGui::MenuItem("Market Overview")) {
-                current_frame = SubFrame::MARKET_OVERVIEW;
+            ImGui::Separator();
+            if (ImGui::MenuItem("General Chat")) {
+
             }
+            if (ImGui::MenuItem("Script Editor")) {
+
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Console View", "", & console_view)) {
+
+            }
+            if (ImGui::MenuItem("Portfolio View", "", &portfolio_view)) {
+
+            }
+            if (ImGui::MenuItem("Watchlist View", "", &watchlist_view)) {
+
+            }
+            ImGui::Separator();
+            ImGui::MenuItem("Free Mode", "", &free_mode);
 
             ImGui::EndMenu();
         }
@@ -441,113 +483,111 @@ void MenuFrame::update()
                 current_frame = SubFrame::OPTION_CHAIN;
             }
 
-            ImGui::Separator();
-
-            if ( ImGui::BeginMenu("Margin") )
-            {
-                if (ImGui::MenuItem("Borrow"))
-                {
-
-                }
-                if (ImGui::MenuItem("Repay"))
-                {
-
-                }
-                if (ImGui::MenuItem("Lend"))
-                {
-
-                }
-                ImGui::Separator();
-                static bool enabled = false;
-                ImGui::MenuItem("Auto-lend", "", &enabled);
-                ImGui::EndMenu();
-            }
-
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Charts")) {
+        if (ImGui::BeginMenu("Charts")) 
+        {
+            if (ImGui::MenuItem("Market Overview")) {
+                current_frame = SubFrame::MARKET_OVERVIEW;
+            }
 
-            if (ImGui::MenuItem("Single Chart")) {
+            ImGui::Separator();
+            if (ImGui::MenuItem("Candle Chart")) 
+            {
                 current_frame = SubFrame::CANDLE_CHART;
             } 
 
-            if (ImGui::MenuItem("Multi Chart")) {
-
-            }
-            
-            ImGui::Separator();
-
-            if (ImGui::MenuItem("Equity Curve")) {
+            if (ImGui::MenuItem("Line Chart")) 
+            {
                 current_frame = SubFrame::LINE_PLOT;
             }
+
+            if (ImGui::MenuItem("Bar Chart"))
+            {
+
+            }
+
 
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Research"))
         {   
-            if (ImGui::MenuItem("Daily Treasury Rates")) {
+            if (ImGui::MenuItem("Daily Treasury Rates", "PRO")) {
 
             }
-            if (ImGui::MenuItem("Federal Funds Rate")) {
+            if (ImGui::MenuItem("Federal Funds Rate", "PRO")) {
+
+            }
+            if (ImGui::MenuItem("Unemployment Rate", "PRO")) {
+
+            }
+            if (ImGui::MenuItem("US Recession Probabilities", "PRO")) {
 
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Consumer Price Index")) {
+            if (ImGui::MenuItem("Consumer Price Index", "PRO")) {
 
             }
-            if (ImGui::MenuItem("Industrial Production Index")) {
-
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Unemployment Rate")) {
-
-            }
-            if (ImGui::MenuItem("US Recession Probabilities")) {
+            if (ImGui::MenuItem("Industrial Production Index", "PRO")) {
 
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Risk Appetite Index")) {
                 current_frame = SubFrame::RISK_APPETITE;
             }
-            ImGui::MenuItem("Quadrant Divergence Index");
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Analyze"))
         {
-            ImGui::MenuItem("Financials");
-            if (ImGui::MenuItem("Fund Ownership") ) {
+            ImGui::MenuItem("Fundamentals");
+            if (ImGui::MenuItem("Market Movers")) {
+                current_frame = SubFrame::MARKET_MOVERS;
+            }
+
+            ImGui::Separator();
+            if (ImGui::MenuItem("Insider Roster", "PRO")) {
+
+            }
+            if (ImGui::MenuItem("Insider Summary", "PRO")) {
+
+            }
+            if (ImGui::MenuItem("Insider Transactions", "PRO")) {
+                current_frame = SubFrame::INSIDER_TRANSACTIONS;
+            }
+            if (ImGui::MenuItem("Fund Ownership", "PRO")) {
                 current_frame = SubFrame::FUND_OWNERSHIP;
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Insider Roster")) {
+            if (ImGui::MenuItem("Retail Money Funds", "PRO")) {
 
             }
-            if (ImGui::MenuItem("Insider Summary")) {
+            if (ImGui::MenuItem("Institutional Money Funds", "PRO")) {
 
             }
-            if (ImGui::MenuItem("Insider Transactions")) {
-                current_frame = SubFrame::INSIDER_TRANSACTIONS;
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Retail Money Funds")) {
-
-            }
-            if (ImGui::MenuItem("Institutional Money Funds")) {
-
-            }
-            if (ImGui::MenuItem("Institutional Ownership")) {
+            if (ImGui::MenuItem("Institutional Ownership", "PRO")) {
                 current_frame = SubFrame::INSTITUTIONAL_OWNERSHIP;
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Largest Trades")) {
+            if (ImGui::MenuItem("Largest Trades", "PRO")) {
 
             }
-            if (ImGui::MenuItem("Market Volume (U.S.)")) {
+            if (ImGui::MenuItem("Market Volume (U.S.)", "PRO")) {
 
             }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Account")) 
+        {
+            ImGui::MenuItem("Sync Data");
+            ImGui::Separator();
+            ImGui::MenuItem("General Settings");
+            ImGui::MenuItem("Graphical Settings");
+            ImGui::Separator();
+            ImGui::MenuItem("Activate Trial");
             ImGui::EndMenu();
         }
         
@@ -567,6 +607,8 @@ void MenuFrame::update()
 
         if ( ImGui::BeginMenu("Help") )
         {
+            ImGui::MenuItem("Get Started");
+            ImGui::MenuItem("Tips and Tricks");
             if ( ImGui::MenuItem("About") )
                 about = true;
 
@@ -582,12 +624,10 @@ void MenuFrame::update()
 
     if ( ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
     {
-        ImGui::Text("Premia Version 0.01");
+        ImGui::Text("Premia Version 0.3");
         ImGui::Text("Written by: Justin Scofield (scawful)");
-        ImGui::Text("Dependencies: SDL2, SDL_image, SDL_ttf, OpenGL");
-        ImGui::Text("\t\t\t  Boost, OpenSSL, libcURL, QuantLib");
-        ImGui::Text("\t\t\t  ImGui, ImGuiSDL, ImPlot");
-        ImGui::Text("API: TDAmeritrade, Coinbase Pro");
+        ImGui::Text("Dependencies: Boost, SDL2, ImGui, ImPlot, libCURL");
+        ImGui::Text("Data provided by: CoinbasePro, IEXCloud, TDAmeritrade, SqueezeMetrics");
 
         if ( ImGui::Button("Close", ImVec2(120, 0)) ) { about = false; ImGui::CloseCurrentPopup(); }
         ImGui::EndPopup();

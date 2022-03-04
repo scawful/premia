@@ -10,6 +10,7 @@ protected:
     Manager *premia;
     bool *public_mode;
     bool *tda_logged_in;
+    bool initialized;
 
 public:
     Frame() { }
