@@ -16,15 +16,18 @@ void PrimaryState::init(Manager *premia)
     this->title_string = "Home";
 
     mainMenu.import_manager(premia, &protected_mode, &tda_logged_in);
+    premiaHome.import_manager(premia, &protected_mode, &tda_logged_in);
     console.import_manager(premia, &protected_mode, &tda_logged_in);
     portfolioFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     loginFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
     optionChain.import_manager(premia, &protected_mode, &tda_logged_in);
     watchlistFrame.import_manager(premia, &protected_mode, &tda_logged_in);
-    premiaHome.import_manager(premia, &protected_mode, &tda_logged_in);
     fundOwnership.import_manager(premia);
     marketOverview.import_manager(premia);
+    
+    SDL_SetWindowSize(premia->pWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
+    SDL_SetWindowPosition(premia->pWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     
     ImGui::StyleColorsClassic();
 }
