@@ -14,6 +14,7 @@ void Client::get_user_principals()
     JSONObject::ptree json_principals = parser.read_response(response);
     _user_principals = parser.read_response(response);
     user_principals = parser.parse_user_principals(json_principals);
+    has_user_principals = true;
 }
 
 std::string Client::post_access_token() 
@@ -136,6 +137,8 @@ size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, st
 Client::Client() 
 {
     this->access_token = "";
+    this->has_access_token = false;
+    this->has_user_principals = false;
     this->refresh_token = REFRESH_TOKEN;
 }
 
@@ -210,6 +213,29 @@ std::string Client::get_price_history(std::string symbol, PeriodType ptype, int 
     return send_request(url);
 }
 
+std::string Client::get_option_chain(std::string ticker, std::string contractType, std::string strikeCount,
+                                     bool includeQuotes, std::string strategy, std::string range,
+                                     std::string expMonth, std::string optionType)
+{
+    OptionChain option_chain;
+    std::string url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+
+    string_replace(url, "{ticker}", ticker);
+    string_replace(url, "{contractType}", contractType);
+    string_replace(url, "{strikeCount}", strikeCount);
+    string_replace(url, "{strategy}", strategy);
+    string_replace(url, "{range}", range);
+    string_replace(url, "{expMonth}", expMonth);
+    string_replace(url, "{optionType}", optionType);
+
+    if (!includeQuotes)
+        string_replace(url, "{includeQuotes}", "FALSE");
+    else
+        string_replace(url, "{includeQuotes}", "TRUE");
+
+    return send_request(url);
+}
+
 std::string Client::get_quote(std::string symbol)
 {
     std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
@@ -228,6 +254,7 @@ std::string Client::get_account(std::string account_id)
 std::vector<std::string> Client::get_all_account_ids()
 {
     std::vector<std::string> accounts;
+    fetch_access_token();
     get_user_principals();
 
     for (auto& array : _user_principals.get_child("accounts")) {
@@ -256,7 +283,22 @@ void Client::send_interrupt_signal()
     websocket_session->interrupt();
 }
 
+/**
+ * @brief Getter for API access token
+ * 
+ * @return std::string 
+ */
+std::string Client::get_access_token()
+{
+    return access_token;
+}
+
+/**
+ * @brief 
+ * 
+ */
 void Client::fetch_access_token()
 {
-    this->access_token = parser.parse_access_token(post_access_token());
+    access_token = parser.parse_access_token(post_access_token());
+    has_access_token = true;
 }

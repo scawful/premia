@@ -19,6 +19,10 @@ namespace tda
     class Client 
     {
     private:
+        // Flags
+        bool has_access_token;
+        bool has_user_principals;
+
         // API Strings 
         std::string api_key;
         std::string refresh_token;
@@ -52,6 +56,9 @@ namespace tda
         std::string send_authorized_request(std::string endpoint);
 
         std::string get_price_history(std::string symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
+        std::string get_option_chain(std::string ticker, std::string contractType, std::string strikeCount,
+                                     bool includeQuotes, std::string strategy, std::string range,
+                                     std::string expMonth, std::string optionType);
         std::string get_quote(std::string symbol);
         std::string get_account(std::string account_id);
         std::vector<std::string> get_all_account_ids();
@@ -60,6 +67,9 @@ namespace tda
         void start_session();
         void send_session_request(std::string request);
         void send_interrupt_signal();
+
+        
+        std::string get_access_token();
         void fetch_access_token();
     };
 }
