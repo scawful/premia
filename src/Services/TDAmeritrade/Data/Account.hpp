@@ -29,12 +29,8 @@ namespace tda
 
         std::vector<PositionBalances> position_balances;
         
-
-        void initVariables();
-
     public:
         Account();
-        Account( boost::property_tree::ptree account_data );
 
         void add_position(std::unordered_map<std::string, std::string> position);
         void add_balance(PositionBalances balance);
