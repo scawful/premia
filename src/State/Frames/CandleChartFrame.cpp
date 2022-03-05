@@ -18,7 +18,14 @@ void CandleChartFrame::init_candles()
 
     for ( int i = 0; i < candles.size(); i++ )
     {
-        double new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
+        double new_dt = 0.0;
+        try {
+            new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
+        }
+        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
+            std::cout << e.what() << std::endl;
+        }
+        
         new_dt *= 0.001;
         xs[i] = new_dt;
         highs[i] = candles[i].highLow.first;
@@ -30,26 +37,6 @@ void CandleChartFrame::init_candles()
 }
 
 /**
- * @brief Rewrite the details of the instrument quote
- * @author @scawful
- * 
- */
-void CandleChartFrame::init_quote_details()
-{
-    tda::Quote quote = premia->tda_interface.getQuote(ticker_symbol);
-    detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
-                                 "\nBid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
-                                 "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
-                                 "\nOpen: $" + quote.getQuoteVariable("openPrice") +
-                                 "\nClose: $" + quote.getQuoteVariable("closePrice") +
-                                 "\n52 Week High: $" + quote.getQuoteVariable("52WkHigh") +
-                                 "\n52 Week Low: $" + quote.getQuoteVariable("52WkLow") +
-                                 "\nTotal Volume: " + quote.getQuoteVariable("totalVolume");
-
-    title_string = quote.getQuoteVariable("symbol") + " - " + quote.getQuoteVariable("description");
-}
-
-/**
  * @brief Load an instrument to be charted
  * @author @scawful
  * 
@@ -58,7 +45,7 @@ void CandleChartFrame::init_quote_details()
 void CandleChartFrame::init_instrument(std::string ticker)
 {
     quote = premia->tda_interface.getQuote(ticker_symbol);
-    price_history_data = premia->tda_interface.createPriceHistory( ticker, tda::PeriodType::YEAR, 1, tda::FrequencyType::DAILY, 1, false );
+    price_history_data = premia->tda_interface.getPriceHistory( ticker, tda::PeriodType::YEAR, 1, tda::FrequencyType::DAILY, 1, true );
     candles = price_history_data.getCandleVector();
 
     detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
@@ -126,7 +113,14 @@ void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec
 
     for ( int i = 0; i < candles.size(); i++ )
     {
-        double new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
+        double new_dt = 0.0;
+        try {
+            new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
+        }
+        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
+            std::cout << e.what() << std::endl;
+        }
+        
         new_dt *= 0.001;
         xs[i] = new_dt;
         highs[i] = candles[i].highLow.first;
@@ -238,8 +232,7 @@ void CandleChartFrame::update()
             quote.clear();
             price_history_data.clear();
             quote = premia->tda_interface.getQuote(buf);
-            // quote = premia->tda_interface.createQuote( buf );
-            price_history_data = premia->tda_interface.createPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
+            price_history_data = premia->tda_interface.getPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
             candles = price_history_data.getCandleVector();
             init_instrument(buf);
@@ -274,7 +267,7 @@ void CandleChartFrame::update()
     if ( ImGui::Button("Apply") ) 
     {
         std::cout << "Change chart settings!" << std::endl;
-        price_history_data = premia->tda_interface.createPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount, 
+        price_history_data = premia->tda_interface.getPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount,
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
         candles = price_history_data.getCandleVector();
     }  
@@ -293,8 +286,14 @@ void CandleChartFrame::update()
     if (ImPlot::BeginPlot("Candlestick Chart",ImVec2(-1,0),0)) 
     {
         ImPlot::SetupAxes("Date","Price");
-        ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
-                                       boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
+        try {
+            ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
+                                           boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
+        }
+        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
+            std::cout << "Update:: " << e.what() << std::endl;
+        }
+
         build_candle_chart( 0.25, 218, bullCol, bearCol, tooltip );
         ImPlot::EndPlot();
     }

@@ -15,14 +15,14 @@ void PrimaryState::init(Manager *premia)
     this->premia = premia;
     this->title_string = "Home";
 
-    mainMenu.import_manager(premia);
+    mainMenu.import_manager(premia, &protected_mode, &tda_logged_in);
     console.import_manager(premia, &protected_mode, &tda_logged_in);
     portfolioFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     loginFrame.import_manager(premia, &protected_mode, &tda_logged_in);
     candleChart.import_manager(premia, &protected_mode, &tda_logged_in);
     optionChain.import_manager(premia, &protected_mode, &tda_logged_in);
     watchlistFrame.import_manager(premia, &protected_mode, &tda_logged_in);
-    premiaHome.import_manager(premia);
+    premiaHome.import_manager(premia, &protected_mode, &tda_logged_in);
     fundOwnership.import_manager(premia);
     marketOverview.import_manager(premia);
     

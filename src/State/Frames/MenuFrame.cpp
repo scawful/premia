@@ -285,7 +285,7 @@ void MenuFrame::draw_style_editor()
     ImGui::PopItemWidth();
 }
 
-MenuFrame::MenuFrame()
+MenuFrame::MenuFrame() : Frame()
 {
     this->current_frame = SubFrame::PREMIA_HOME;
     this->free_mode = false;
@@ -311,11 +311,6 @@ bool MenuFrame::watchlistView()
 bool MenuFrame::freeMode()
 {
     return free_mode;
-}
-
-void MenuFrame::import_manager(Manager *premia) 
-{
-    this->premia = premia;
 }
 
 void MenuFrame::set_title(std::string &title_string)
@@ -593,6 +588,10 @@ void MenuFrame::update()
         
         if (ImGui::BeginMenu("Debug"))
         {
+            if (ImGui::MenuItem("Service Login", "TDA")) {
+                *tda_logged_in = true;
+                *public_mode = false;
+            }
             if (ImGui::MenuItem("Fetch Access Token", "TDA")) {
                 premia->tda_interface.fetchAccessToken();
             }

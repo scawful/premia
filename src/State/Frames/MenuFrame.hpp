@@ -1,10 +1,9 @@
 #ifndef MenuFrame_hpp
 #define MenuFrame_hpp
 
-#include "../../core.hpp"
-#include "../Manager.hpp"
+#include "Frame.hpp"
 
-class MenuFrame 
+class MenuFrame : public Frame
 {
 public:
     enum SubFrame {
@@ -23,7 +22,6 @@ public:
     };
 
 private:
-    Manager *premia;
     std::string title_string;
     SubFrame current_frame;
     ImGuiStyle* ref;
@@ -46,7 +44,6 @@ public:
     bool watchlistView();
     bool freeMode();
 
-    void import_manager(Manager *premia);
     void set_title(std::string & title_string);
     SubFrame get_current_frame();
     void update();

@@ -19,7 +19,6 @@ private:
 
     // Initialization functions
     void init_candles();
-    void init_quote_details();
 
     // Candle Chart
     int binary_search( const double* arr, int l, int r, double x );
