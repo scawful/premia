@@ -15,17 +15,30 @@ void reverse_array(double arr[], int start, int end)
 
 void RiskPremiaFrame::init_pie_chart()
 {
-    tda::Account account = premia->tda_interface.getCurrentAccount();
-    int size = account.get_position_vector_size();
+    tda::Account account = premia->tda_interface.getDefaultAccount();
+    if ( symbols_array.size() != 0 ) {
+        symbols_array.clear();
+    }
+    for ( int i = 0; i < account.get_position_vector_size(); i++ ) {
+        for ( auto& position_it : account.get_position( i ) ) {
+            if ( position_it.first == "symbol" ) {
+                std::string str = position_it.second;
+                symbols_array.push_back( str );
+            }
+        }
+    }
+    int size = symbols_array.size();
+    num_positions = size;
     positions_labels = new char*[size];
     positions_pie = new double[size];
     
     double sum = 0;
     for (int i = 0; i < size; i++) {
-        std::string symbol = account.get_position(i)["symbol"];
-        positions_pie[i] = stod(account.get_position_balances(symbol, "marketValue"));
+        std::string symbol = symbols_array[i];
+        positions_pie[i] = boost::lexical_cast<double>(account.get_position_balances(symbol, "marketValue"));
         sum += positions_pie[i];
-        positions_labels[i] = symbol.data();
+        positions_labels[i] = new char[symbol.size()];
+        std::strncpy(positions_labels[i], symbol.c_str(), symbol.size());
     }
 }
 
@@ -139,7 +152,6 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
     reverse_array(dix, 0, length);
     reverse_array(spx, 0, length);
 
-
     for (int i = 0; i < 400; i++) {
         oneYearDix[i] = dix[length - i - 1];
     }
@@ -205,10 +217,19 @@ RiskPremiaFrame::RiskPremiaFrame() : Frame()
     maxDix = 0;
 }
 
+RiskPremiaFrame::~RiskPremiaFrame()
+{
+    delete[] positions_labels;
+    delete positions_pie;
+}
+
 void RiskPremiaFrame::update()
 {
     if (!initialized) {
         get_spx_gamma_exposure();
+        if ((*tda_logged_in)) {
+            init_pie_chart();
+        }
     }
 
     ImGuiIO& io = ImGui::GetIO();
@@ -331,14 +352,21 @@ void RiskPremiaFrame::update()
                     ImGui::EndMenuBar();
                 }
 
-                static const char* labels1[] = { "Frogs","Hogs","Dogs","Logs" };
-                static float data1[] = { 0.15f,  0.30f,  0.2f, 0.05f };
+                /**
+                 * @brief Pie Chart 
+                 * 
+                 */
                 if (ImPlot::BeginPlot("##Pie1", ImVec2(250, 250), ImPlotFlags_Equal | ImPlotFlags_NoMouseText)) {
                     ImPlot::SetupAxes(NULL, NULL, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
                     ImPlot::SetupAxesLimits(0, 1, 0, 1);
-                    ImPlot::PlotPieChart(labels1, data1, 4, 0.5, 0.5, 0.4, false, "%.2f");
+                    ImPlot::PlotPieChart(positions_labels, positions_pie, num_positions, 0.5, 0.5, 0.4, false, "%.2f");
                     ImPlot::EndPlot();
                 }
+
+                /**
+                 * @brief Button Table
+                 * 
+                 */
                 if (ImGui::BeginTable("split", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
                 {
                     for (int i = 0; i < 30; i++)

@@ -15,8 +15,11 @@ private:
     double gxv[3500];
     double date[3500];
 
+    int num_positions;
     double* positions_pie;
     char** positions_labels;
+
+    std::vector<std::string> symbols_array;
 
     double oneYearDix[400];
 
@@ -30,6 +33,7 @@ private:
 
 public:
     RiskPremiaFrame();
+    ~RiskPremiaFrame();
     
     void update();
 };
