@@ -620,9 +620,9 @@ namespace tda
     std::vector<std::string> TDAmeritrade::get_all_accounts()
     {
         std::vector<std::string> accounts;
-        if (!_user_principals) {
-            get_user_principals();
-        }
+        client.fetch_access_token();
+        this->_access_token = client.get_access_token();
+        get_user_principals();
 
         for (auto &array : user_principals.get_child("accounts")) {
             for (auto &each_element : array.second) {
@@ -664,36 +664,6 @@ namespace tda
         std::remove(output_file_name.c_str());
 
         return propertyTree;
-    }
-
-    /**
-     * @brief Create a tda::OptionChain object from API service with ticker parameter
-     * @author @scawful
-     * 
-     * @param ticker 
-     * @return boost::shared_ptr<tda::OptionChain> 
-     */
-    OptionChain TDAmeritrade::createOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
-                                                                        bool includeQuotes, std::string strategy, std::string range,
-                                                                        std::string expMonth, std::string optionType)
-    {
-        std::string url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
-
-        string_replace(url, "{ticker}", ticker);
-        string_replace(url, "{contractType}", contractType);
-        string_replace(url, "{strikeCount}", strikeCount);
-        string_replace(url, "{strategy}", strategy);
-        string_replace(url, "{range}", range);
-        string_replace(url, "{expMonth}", expMonth);
-        string_replace(url, "{optionType}", optionType);
-
-        if (!includeQuotes)
-            string_replace(url, "{includeQuotes}", "FALSE");
-        else
-            string_replace(url, "{includeQuotes}", "TRUE");
-
-        JSONObject::ptree propertyTree = createPropertyTree(ticker, url);
-        return OptionChain(propertyTree);
     }
 
     std::vector<Watchlist> TDAmeritrade::retrieveWatchlistsByAccount(std::string account_num)
@@ -740,7 +710,7 @@ namespace tda
     PriceHistory TDAmeritrade::getPriceHistory(std::string ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
     {
         std::string response = client.get_price_history(ticker, ptype, period_amt, ftype, freq_amt, ext);
-        return parser.parse_price_history(parser.read_response(response));
+        return parser.parse_price_history(parser.read_response(response), ticker, ftype);
     }
 
     /**
@@ -767,16 +737,31 @@ namespace tda
         return current_account;
     }
 
-    OptionChain TDAmeritrade::getOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
-        bool includeQuotes, std::string strategy, std::string range,
-        std::string expMonth, std::string optionType)
-    {
 
+    /**
+     * @brief Create a tda::OptionChain object from API service with ticker parameter
+     * @author @scawful
+     * 
+     * @param ticker 
+     * @return tda::OptionChain 
+     */
+    OptionChain TDAmeritrade::getOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
+                                            bool includeQuotes, std::string strategy, std::string range,
+                                            std::string expMonth, std::string optionType)
+    {
+        std::string response = client.get_option_chain(ticker, contractType, strikeCount, includeQuotes, strategy, range, expMonth, optionType);
+        return parser.parse_option_chain(parser.read_response(response));
     }
 
     Account TDAmeritrade::getCurrentAccount()
     {
         return current_account;
+    }
+
+    Account TDAmeritrade::getDefaultAccount()
+    {
+        std::string account_id = client.get_all_account_ids().at(0);
+        return getAccount(account_id);
     }
 
     void TDAmeritrade::fetchAccessToken()

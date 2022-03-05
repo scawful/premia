@@ -143,11 +143,6 @@ namespace tda
         std::vector<std::string> get_all_accounts();
 
         JSONObject::ptree createPropertyTree(std::string ticker, std::string new_url);
-
-        OptionChain       createOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
-                                            bool includeQuotes, std::string strategy, std::string range,
-                                            std::string expMonth, std::string optionType);
-
         std::vector<Watchlist> retrieveWatchlistsByAccount(std::string account_num);
 
         bool is_session_active();
@@ -157,10 +152,11 @@ namespace tda
         Quote getQuote(std::string symbol);
         Account getAccount(std::string account_id);
         OptionChain getOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
-            bool includeQuotes, std::string strategy, std::string range,
-            std::string expMonth, std::string optionType);
+                                   bool includeQuotes, std::string strategy, std::string range,
+                                   std::string expMonth, std::string optionType);
 
         Account getCurrentAccount();
+        Account getDefaultAccount();
 
         void fetchAccessToken();
     };
