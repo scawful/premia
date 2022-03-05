@@ -1,5 +1,5 @@
 #ifndef FundOwnershipFrame_hpp
-#define FundOwnershipFramee_hpp
+#define FundOwnershipFrame_hpp
 
 #include "../Frame.hpp"
 
