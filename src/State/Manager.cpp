@@ -13,12 +13,9 @@ void Manager::init(int width, int height)
 {
     m_running = true;
 
-    if ( SDL_Init( SDL_INIT_EVERYTHING ) )
-    {
+    if ( SDL_Init( SDL_INIT_EVERYTHING ) ) {
         SDL_Log("SDL_Init: %s\n", SDL_GetError() );
-    }
-    else
-    {
+    } else {
         pWindow = SDL_CreateWindow(
             "Premia",                           // window title
             SDL_WINDOWPOS_UNDEFINED,            // initial x position
@@ -28,8 +25,7 @@ void Manager::init(int width, int height)
             SDL_WINDOW_RESIZABLE                // flags - see below
         );
         
-        if ( pWindow == NULL )
-        {
+        if ( pWindow == NULL ) {
             SDL_Log("SDL_CreateWindow: %s\n", SDL_GetError());
             SDL_Quit();
         }
