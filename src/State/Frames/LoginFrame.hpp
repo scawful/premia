@@ -16,6 +16,7 @@ private:
 public:
     LoginFrame();
 
+    bool checkLoginStatus();
     void update();
 };
 
