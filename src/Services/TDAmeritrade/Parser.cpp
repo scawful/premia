@@ -25,12 +25,9 @@ JSONObject::ptree Parser::read_response(std::string response)
 std::string Parser::parse_access_token(std::string response)
 {
     std::string access_token;
-    std::cout << "==>" << response << std::endl;
-
     JSONObject::ptree data = read_response(response);
     for (auto& access_it : data) {
-        if (access_it.first == "access_token")
-        {
+        if (access_it.first == "access_token") {
             access_token = access_it.second.get_value<std::string>();
         }
     }
@@ -43,42 +40,50 @@ Quote Parser::parse_quote(JSONObject::ptree data)
 
     for (auto& array_element : data) {
         for (auto& property : array_element.second) {
-            quote.setQuoteVariable(property.first, property.second.get_value <std::string>());
+            quote.setQuoteVariable(property.first, property.second.get_value<std::string>());
         }
     }
 
     return quote;
 }
 
-PriceHistory Parser::parse_price_history(boost::property_tree::ptree data)
+PriceHistory Parser::parse_price_history(boost::property_tree::ptree data, std::string ticker, int freq)
 {
     PriceHistory price_history;
-    for (auto& history_it : data)
-    {
-        if (history_it.first == "candles")
-        {
-            for (auto& candle_it : history_it.second)
-            {
+    price_history.setTickerSymbol(ticker);
+
+    for (auto& history_it : data) {
+        if (history_it.first == "candles") {
+            for (auto& candle_it : history_it.second) {
                 tda::Candle newCandle;
                 std::string datetime;
                 std::pair<double, double> high_low;
                 std::pair<double, double> open_close;
 
-                for (auto& candle2_it : candle_it.second)
-                {
+                for (auto& candle2_it : candle_it.second) {
                     try {
-                        if (candle2_it.first == "high")
-                            high_low.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string>());
-                        if (candle2_it.first == "low")
-                            high_low.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string>());
+                        if ( candle2_it.first == "high" ) {
+                            high_low.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                            newCandle.high = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                        }
 
-                        if (candle2_it.first == "open")
-                            open_close.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string>());
-                        if (candle2_it.first == "close")
-                            open_close.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string>());
+                        if ( candle2_it.first == "low" ) {
+                            high_low.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                            newCandle.low = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                        }
+                        
+                        if ( candle2_it.first == "open" ) {
+                            open_close.first = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                            newCandle.open = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                        }
+                        if ( candle2_it.first == "close" ) {
+                            open_close.second = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                            newCandle.close = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
+                        }
 
-                        if (candle2_it.first == "volume")
-                            newCandle.volume = boost::lexical_cast<double>(candle2_it.second.get_value<std::string>());
+                        if ( candle2_it.first == "volume" ) {
+                            newCandle.volume = boost::lexical_cast<double>( candle2_it.second.get_value<std::string> () );
+                        }
                     } 
                     catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
                         std::cout << "parse_price_history:: " << e.what() << std::endl;
@@ -105,13 +110,12 @@ PriceHistory Parser::parse_price_history(boost::property_tree::ptree data)
                 newCandle.highLow = high_low;
                 newCandle.openClose = open_close;
 
+                price_history.addCandleByType(newCandle, freq);
                 price_history.addCandle(newCandle);
             }
         }
-        else if (history_it.first == "symbol") {
-            price_history.setPriceHistoryVariable("symbol", history_it.second.get_value<std::string>());
-        }
     }
+    price_history.setInitialized();
     return price_history;
 }
 
@@ -119,63 +123,93 @@ UserPrincipals Parser::parse_user_principals( boost::property_tree::ptree data )
 {
     UserPrincipals user_principals;
 
-    std::unordered_map<std::string, std::string> account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, data.get_child("accounts."))
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, data.get_child("accounts.")) 
     {
+        std::unordered_map<std::string, std::string> account_data;
         for (auto &acct_it : v.second)
         {
             account_data[acct_it.first] = acct_it.second.get_value<std::string>();
         }
-        break;
+        user_principals.add_account_data(account_data);
     }
-    user_principals.set_account_data(account_data);
+    user_principals.set_account_data(user_principals.get_account_data_array(0));
 
     return user_principals;
+}
+
+OptionChain Parser::parse_option_chain(JSONObject::ptree data)
+{
+    OptionChain optionChain;
+    for (auto &option_it: data) {
+        if (option_it.first == "callExpDateMap") {
+            for (auto &date_it: option_it.second) {
+                OptionsDateTimeObj options_dt_obj;
+                options_dt_obj.datetime = date_it.first;
+
+                for (auto &strike_it: date_it.second) {
+                    StrikePriceMap imported_strike;
+                    imported_strike.strikePrice = strike_it.first;
+
+                    for (auto &contract_it: strike_it.second) {
+                        //std::cout << details_it.first << " :: " << details_it.second.get_value< std::string >() << std::endl;
+                        for (auto &details_it: contract_it.second) {
+                            imported_strike.raw_option[ details_it.first ] = details_it.second.get_value< std::string >();
+                        }
+                        options_dt_obj.strikePriceObj.push_back( imported_strike );
+                    }
+                }
+                optionChain.addOptionsDateTimeObj(options_dt_obj);
+            }
+        }
+        
+        if (option_it.first == "putExpDateMap") {
+            for ( auto &date_it: option_it.second ) {
+                
+            }
+        }
+
+        if ( option_it.first == "underlying" ) {
+            for ( auto &underlying_it: option_it.second ) {
+                optionChain.setUnderlyingVariable(underlying_it.first, underlying_it.second.get_value<std::string>());
+            }
+        }
+
+        optionChain.setOptionChainVariable(option_it.first, option_it.second.get_value< std::string >());
+    }
+    return optionChain;
 }
 
 Account Parser::parse_account(JSONObject::ptree data)
 {
     Account account;
-    for (auto& class_it : data)
-    {
-        for (auto& account_it : class_it.second)
-        {
-            if (account_it.first == "positions")
-            {
-                for (auto& position_list_it : account_it.second)
-                {
+    for (auto& class_it : data) {
+        for (auto& account_it : class_it.second) {
+            if (account_it.first == "positions") {
+                for (auto& position_list_it : account_it.second) {
                     tda::PositionBalances new_position_balance;
 
-                    for (auto& positions_it : position_list_it.second)
-                    {
-                        //std::cout << positions_it.first << " ::: " << positions_it.second.get_value<std::string>() << std::endl;
-
+                    for (auto& positions_it : position_list_it.second) {
                         new_position_balance.balances[positions_it.first] = positions_it.second.get_value<std::string>();
 
                         std::unordered_map<std::string, std::string> pos_field;
                         std::unordered_map<std::string, std::string> instrument;
 
-                        for (auto& field_it : positions_it.second)
-                        {
-                            //std::cout << field_it.first << " :::: " << field_it.second.get_value<std::string>() << std::endl;
-                            if (field_it.first == "symbol")
+                        for (auto& field_it : positions_it.second) {
+                            if (field_it.first == "symbol") {
                                 new_position_balance.symbol = field_it.second.get_value<std::string>();
+                            }
 
                             pos_field[field_it.first] = field_it.second.get_value<std::string>();
                         }
-
                         account.add_position(pos_field);
                     }
-
                     account.add_balance(new_position_balance);
                 }
-            }
-            else if (account_it.first == "currentBalances") {
+            } else if (account_it.first == "currentBalances") {
                 for (auto& balance_it : account_it.second) {
                     account.set_balance_variable(balance_it.first, balance_it.second.get_value<std::string>());
                 }
-            }
-            else {
+            } else {
                 account.set_account_variable(account_it.first, account_it.second.get_value<std::string>());
             }
         }
@@ -190,8 +224,7 @@ std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(boost::property_tr
     for ( auto & each_data : data ) {
         // Array of Watchlists
         Watchlist watchlist;
-        for ( auto & each_watchlist : each_data.second )
-        {
+        for ( auto & each_watchlist : each_data.second ) {
             // Each element in a watchlist 
             if ( each_watchlist.first == "name" ) {
                 watchlist.setName(each_watchlist.second.get_value< std::string >());
@@ -200,12 +233,8 @@ std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(boost::property_tr
             } else if ( each_watchlist.first == "accountId" ) {
                 // account_d = each_element.second.get_value< std::string >();
             } else {
-                for ( auto & each_element : each_watchlist.second ) 
-                {
-                    // Watchlist items 
-                    for ( auto & each_item : each_element.second ) 
-                    {
-                        // Instrument sub array 
+                for ( auto & each_element : each_watchlist.second ) { // Watchlist items 
+                    for ( auto & each_item : each_element.second ) { // Instrument sub array 
                         if ( each_item.first == "instrument" ) {
                             std::string symbol, desc, type;
                             for ( auto & each : each_item.second ) {
