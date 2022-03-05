@@ -434,21 +434,12 @@ namespace tda
      * @brief Construct a new TDAmeritrade::TDAmeritrade object
      * @author @scawful
      * 
-     * @todo Decouple from retrieval type initialization 
-     * 
      * @param type 
      */
     TDAmeritrade::TDAmeritrade()
     {
-        // case GET_QUOTE:
-        //     _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
-        // case PRICE_HISTORY:
-        //     _base_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-        // case OPTION_CHAIN:
-        //     _base_url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}";
         _session_active = false;
         _user_principals = false;
-        _col_name = "Open";
         _refresh_token = REFRESH_TOKEN;
         _access_token = "nope";
 
@@ -730,10 +721,13 @@ namespace tda
         return parser.parse_watchlist_data(propertyTree);
     }
 
+    // AUXILIARY FUNCTIONS ====================================================
+
     bool TDAmeritrade::is_session_active()
     {
         return _session_active;
     }
+
 
     /**
      * @brief 

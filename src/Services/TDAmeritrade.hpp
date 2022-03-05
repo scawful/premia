@@ -93,12 +93,9 @@ namespace tda
     class TDAmeritrade
     {
     private:
-        int _period;
-        int _frequency;
         bool _access_token_found;
         bool _session_active;
         bool _user_principals;
-        std::string _col_name;
         std::string _current_ticker;
         std::string _access_token;
         std::string _refresh_token;
