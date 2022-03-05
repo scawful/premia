@@ -8,7 +8,7 @@ void OptionChainFrame::draw_search()
     static char ticker[128] = "";
     ImGui::InputText("Symbol", ticker, IM_ARRAYSIZE(ticker));
     if (ImGui::Button("Fetch")) {
-        optionChainData = premia->tda_interface.createOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
+        optionChainData = premia->tda_interface.getOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
         optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
         std::vector<tda::OptionsDateTimeObj> temp_vec = optionsDateTimeObj;
         for ( int i = 0; i < temp_vec.size(); i++) 
