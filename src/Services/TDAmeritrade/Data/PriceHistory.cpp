@@ -73,6 +73,11 @@ PriceHistory::PriceHistory( boost::property_tree::ptree price_history_data )
     initVariables();
 }
 
+void PriceHistory::addCandle(tda::Candle candle)
+{
+    candleVector.push_back(candle);
+}
+
 std::vector< tda::Candle > PriceHistory::getCandleVector()
 {
     return candleVector;
@@ -86,6 +91,11 @@ std::string PriceHistory::getCandleDataVariable( std::string variable )
 std::string PriceHistory::getPriceHistoryVariable( std::string variable )
 {
     return priceHistoryVariables[variable];
+}
+
+void PriceHistory::setPriceHistoryVariable(std::string key, std::string value)
+{
+    priceHistoryVariables[key] = value;
 }
 
 void PriceHistory::clear()

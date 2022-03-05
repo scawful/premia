@@ -70,6 +70,27 @@ std::string Client::post_access_token()
     return response;
 }
 
+
+std::string Client::get_api_interval_value(int value)
+{
+    return EnumAPIValues[value];
+}
+
+std::string Client::get_api_frequency_type(int value)
+{
+    return EnumAPIFreq[value];
+}
+
+std::string Client::get_api_period_amount(int value)
+{
+    return EnumAPIPeriod[value];
+}
+
+std::string Client::get_api_frequency_amount(int value)
+{
+    return EnumAPIFreqAmt[value];
+}
+
 /**
  * @brief Replace a substring within a string with given parameter
  * @author @scawful
@@ -170,9 +191,22 @@ std::string Client::send_authorized_request(std::string endpoint)
     return response;
 }
 
-std::string Client::get_price_history(std::string endpoint)
+std::string Client::get_price_history(std::string symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
 {
-    return send_request(endpoint);
+    std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
+    string_replace(url, "{ticker}", symbol);
+    string_replace(url, "{periodType}", get_api_interval_value(ptype));
+    string_replace(url, "{period}", get_api_period_amount(period_amt));
+    string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
+    string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
+
+    if (!ext)
+        string_replace(url, "{ext}", "false");
+    else
+        string_replace(url, "{ext}", "true");
+
+    return send_request(url);
 }
 
 std::string Client::get_quote(std::string symbol)

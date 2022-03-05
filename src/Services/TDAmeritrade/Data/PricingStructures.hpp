@@ -7,7 +7,7 @@ namespace tda
 {
     struct Candle
     {
-        int volume;
+        double volume;
         double high, low;
         double open, close;
         std::pair<double, double> highLow;
@@ -36,6 +36,23 @@ namespace tda
         std::string datetime;
         std::vector<StrikePriceMap> strikePriceObj;
     };
+
+    enum PeriodType
+    {
+        DAY,
+        MONTH,
+        YEAR,
+        YTD
+    };
+
+    enum FrequencyType
+    {
+        MINUTE,
+        DAILY,
+        WEEKLY,
+        MONTHLY
+    };
+
 }
 
 #endif

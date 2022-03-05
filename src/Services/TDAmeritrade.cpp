@@ -2,28 +2,6 @@
 
 namespace tda
 {
-    // PRIVATE FUNCTIONS =========================================================================
-
-    std::string TDAmeritrade::get_api_interval_value(int value)
-    {
-        return EnumAPIValues[value];
-    }
-
-    std::string TDAmeritrade::get_api_frequency_type(int value)
-    {
-        return EnumAPIFreq[value];
-    }
-
-    std::string TDAmeritrade::get_api_period_amount(int value)
-    {
-        return EnumAPIPeriod[value];
-    }
-
-    std::string TDAmeritrade::get_api_frequency_amount(int value)
-    {
-        return EnumAPIFreqAmt[value];
-    }
-
     /**
      * @brief Replace a substring within a string with given parameter
      * @author @scawful
@@ -698,46 +676,6 @@ namespace tda
     }
 
     /**
-     * @brief Create a tda::PriceHistory object from API service data
-     * @author @scawful
-     * 
-     * @return boost::shared_ptr<tda::PriceHistory> 
-     */
-    PriceHistory TDAmeritrade::createPriceHistory()
-    {
-        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-        JSONObject::ptree propertyTree = createPropertyTree(this->_current_ticker, url);
-        return PriceHistory(propertyTree);
-    }
-
-    /**
-     * @brief Create a tda::PriceHistory object from API service data with ticker parameter
-     * @author @scawful
-     * 
-     * @param ticker 
-     * @return boost::shared_ptr<tda::PriceHistory> 
-     */
-    PriceHistory TDAmeritrade::createPriceHistory(std::string ticker, PeriodType ptype, int period_amt,
-                                                  FrequencyType ftype, int freq_amt, bool ext)
-    {
-        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
-
-        string_replace(url, "{ticker}", ticker);
-        string_replace(url, "{periodType}", get_api_interval_value(ptype));
-        string_replace(url, "{period}", get_api_period_amount(period_amt));
-        string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
-        string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
-
-        if (!ext)
-            string_replace(url, "{ext}", "false");
-        else
-            string_replace(url, "{ext}", "true");
-
-        JSONObject::ptree propertyTree = createPropertyTree(ticker, url);
-        return PriceHistory(propertyTree);
-    }
-
-    /**
      * @brief Create a tda::OptionChain object from API service with ticker parameter
      * @author @scawful
      * 
@@ -767,40 +705,6 @@ namespace tda
         return OptionChain(propertyTree);
     }
 
-    /**
-     * @brief Create a tda::Account object from API service with account number parameter
-     * @author @scawful
-     * 
-     * @param account_num 
-     * @return boost::shared_ptr<tda::Account> 
-     */
-    Account TDAmeritrade::createAccount(std::string account_num)
-    {
-        std::string account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
-        string_replace(account_url, "{accountNum}", account_num);
-
-        std::time_t now = std::time(0);
-        std::string account_filename = account_num + "_" + std::to_string(now) + ".json";
-
-        post_account_auth(account_url, account_filename);
-        std::ifstream jsonFile(account_filename, std::ios::in | std::ios::binary);
-
-        JSONObject::ptree propertyTree;
-
-        try
-        {
-            read_json(jsonFile, propertyTree);
-        }
-        catch (std::exception &json_parser_error)
-        {
-            SDL_Log("%s", json_parser_error.what());
-        }
-
-        jsonFile.close();
-        std::remove(account_filename.c_str());
-        return Account(propertyTree);
-    }
-
     std::vector<Watchlist> TDAmeritrade::retrieveWatchlistsByAccount(std::string account_num)
     {
         std::string url = "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
@@ -826,45 +730,10 @@ namespace tda
         return parser.parse_watchlist_data(propertyTree);
     }
 
-    /**
-     * @brief Set the column name? idk
-     * @author @scawful
-     * 
-     * @param name 
-     */
-    void TDAmeritrade::set_col_name(std::string name)
-    {
-        this->_col_name = name;
-    }
-
-    void TDAmeritrade::set_price_history_parameters(std::string ticker, PeriodType ptype,
-                                                    time_t start_date, time_t end_date,
-                                                    FrequencyType ftype, int freq_amt, bool ext)
-    {
-        std::string new_url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
-
-        string_replace(new_url, "{ticker}", ticker);
-        string_replace(new_url, "{periodType}", get_api_interval_value(ptype));
-        string_replace(new_url, "{startDate}", boost::lexical_cast<std::string>(start_date));
-        string_replace(new_url, "{endDate}", boost::lexical_cast<std::string>(end_date));
-        string_replace(new_url, "{frequencyType}", get_api_frequency_type(ftype));
-        string_replace(new_url, "{frequency}", get_api_frequency_amount(freq_amt));
-
-        if (!ext)
-            string_replace(new_url, "{ext}", "false");
-        else
-            string_replace(new_url, "{ext}", "true");
-
-        this->_current_ticker = ticker;
-    }
-
-    // AUXILIARY FUNCTIONS ====================================================
-
     bool TDAmeritrade::is_session_active()
     {
         return _session_active;
     }
-
 
     /**
      * @brief 
@@ -874,31 +743,10 @@ namespace tda
      * @param time 
      * @return PriceHistory 
      */
-    PriceHistory TDAmeritrade::getPriceHistory(std::string ticker, int mode, int time)
+    PriceHistory TDAmeritrade::getPriceHistory(std::string ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
     {
-        PriceHistory price_history;
-        std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY;
-        string_replace(url, "{ticker}", ticker);
-        url += "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
-
-        if ( mode == 0 ) {
-            // intraday
-        } else if ( mode == 1 ) {
-            // daily 
-            string_replace(url, "{period}", get_api_period_amount(PeriodType::YEAR));
-            string_replace(url, "{periodType}", get_api_interval_value(1));
-
-            string_replace(url, "{frequencyType}", get_api_frequency_type(FrequencyType::DAILY));
-            string_replace(url, "{frequency}", get_api_frequency_amount(1));
-        } else if ( mode == 2 ) {
-            // weekly 
-            string_replace(url, "{frequencyType}", get_api_frequency_type(FrequencyType::WEEKLY));
-            string_replace(url, "{frequency}", get_api_frequency_amount(1));
-        } else if ( mode == 3 ) {
-            // monthly 
-            string_replace(url, "{frequencyType}", get_api_frequency_type(FrequencyType::MONTHLY));
-            string_replace(url, "{frequency}", get_api_frequency_amount(1));
-        }
+        std::string response = client.get_price_history(ticker, ptype, period_amt, ftype, freq_amt, ext);
+        return parser.parse_price_history(parser.read_response(response));
     }
 
     /**
@@ -912,12 +760,24 @@ namespace tda
         std::string response = client.get_quote(symbol);
         return parser.parse_quote(parser.read_response(response));
     }
-
+    /**
+    * 
+    * @brief Retrieve Account data by account ID number 
+    * 
+    * 
+    */
     Account TDAmeritrade::getAccount(std::string account_id)
     {
         std::string response = client.get_account(account_id);
         this->current_account = parser.parse_account(parser.read_response(response));
         return current_account;
+    }
+
+    OptionChain TDAmeritrade::getOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
+        bool includeQuotes, std::string strategy, std::string range,
+        std::string expMonth, std::string optionType)
+    {
+
     }
 
     Account TDAmeritrade::getCurrentAccount()

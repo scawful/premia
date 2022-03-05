@@ -39,9 +39,11 @@ namespace tda
         PriceHistory();
         PriceHistory(boost::property_tree::ptree price_history_data);
 
+        void addCandle(tda::Candle candle);
         std::vector< tda::Candle > getCandleVector();
         std::string getCandleDataVariable( std::string variable );
         std::string getPriceHistoryVariable( std::string variable );
+        void setPriceHistoryVariable(std::string key, std::string value);
 
         void clear();
     };

@@ -19,22 +19,6 @@ namespace tda
 
     namespace JSONObject = boost::property_tree;
 
-    enum PeriodType
-    {
-        DAY,
-        MONTH,
-        YEAR,
-        YTD
-    };
-
-    enum FrequencyType
-    {
-        MINUTE,
-        DAILY,
-        WEEKLY,
-        MONTHLY
-    };
-
     enum ServiceType
     {
         NONE,
@@ -70,10 +54,6 @@ namespace tda
         UNKNOWN,
     };
 
-    static const std::string EnumAPIValues[]{"day", "month", "year", "ytd"};
-    static const std::string EnumAPIFreq[]{"minute", "daily", "weekly", "monthly"};
-    static const std::string EnumAPIPeriod[]{"1", "2", "3", "4", "5", "6", "10", "15", "20"};
-    static const std::string EnumAPIFreqAmt[]{"1", "5", "10", "15", "30"};
     static const std::string EnumAPIServiceName[]{
         "NONE",
         "ADMIN",
@@ -137,10 +117,6 @@ namespace tda
         JSONObject::ptree user_principals;
 
         // string manipulation
-        std::string get_api_interval_value(int value);
-        std::string get_api_frequency_type(int value);
-        std::string get_api_period_amount(int value);
-        std::string get_api_frequency_amount(int value);
         bool string_replace(std::string &str, const std::string from, const std::string to);
 
         // curl functions
@@ -166,34 +142,26 @@ namespace tda
         void send_logout_request();
         void send_interrupt_signal();
         bool is_session_logged_in();
-        void clear_session_buffer();
-        void sync_buffer();
         std::vector<std::string> get_session_responses();
         std::vector<std::string> get_all_accounts();
 
         JSONObject::ptree createPropertyTree(std::string ticker, std::string new_url);
-        PriceHistory      createPriceHistory();
-        PriceHistory      createPriceHistory(std::string ticker, PeriodType ptype, int period_amt,
-                                             FrequencyType ftype, int freq_amt, bool ext);
 
         OptionChain       createOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
                                             bool includeQuotes, std::string strategy, std::string range,
                                             std::string expMonth, std::string optionType);
-        Account           createAccount(std::string account_num);
 
         std::vector<Watchlist> retrieveWatchlistsByAccount(std::string account_num);
-
-        // Modifiers
-        void set_col_name(std::string col_name);
-        void set_price_history_parameters(std::string ticker, PeriodType ptype, time_t start_date, time_t end_date,
-                                          FrequencyType ftype, int freq_amt, bool ext = true);
 
         bool is_session_active();
 
         // New Model Functions 
-        PriceHistory getPriceHistory(std::string, int mode, int time);
+        PriceHistory getPriceHistory(std::string, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
         Quote getQuote(std::string symbol);
         Account getAccount(std::string account_id);
+        OptionChain getOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
+            bool includeQuotes, std::string strategy, std::string range,
+            std::string expMonth, std::string optionType);
 
         Account getCurrentAccount();
 
