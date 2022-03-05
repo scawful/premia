@@ -12,6 +12,7 @@ void Client::get_user_principals()
     std::string endpoint = "https://api.tdameritrade.com/v1/userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
     std::string response = send_authorized_request(endpoint);
     JSONObject::ptree json_principals = parser.read_response(response);
+    _user_principals = parser.read_response(response);
     user_principals = parser.parse_user_principals(json_principals);
 }
 
@@ -222,6 +223,22 @@ std::string Client::get_account(std::string account_id)
     std::string account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
     string_replace(account_url, "{accountNum}", account_id);
     return send_authorized_request(account_url);
+}
+
+std::vector<std::string> Client::get_all_account_ids()
+{
+    std::vector<std::string> accounts;
+    get_user_principals();
+
+    for (auto& array : _user_principals.get_child("accounts")) {
+        for (auto& each_element : array.second) {
+            if (each_element.first == "accountId") {
+                accounts.push_back(each_element.second.get_value<std::string>());
+            }
+        }
+    }
+
+    return accounts;
 }
 
 void Client::start_session() 

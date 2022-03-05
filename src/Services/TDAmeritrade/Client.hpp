@@ -27,6 +27,7 @@ namespace tda
         // API Data 
         Parser parser;
         UserPrincipals user_principals;
+        boost::property_tree::ptree _user_principals;
 
         // WebSocket session variables 
         boost::asio::io_context ioc;
@@ -53,6 +54,7 @@ namespace tda
         std::string get_price_history(std::string symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
         std::string get_quote(std::string symbol);
         std::string get_account(std::string account_id);
+        std::vector<std::string> get_all_account_ids();
 
 
         void start_session();
