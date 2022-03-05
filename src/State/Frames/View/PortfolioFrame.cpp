@@ -11,9 +11,8 @@ void PortfolioFrame::draw_positions()
 
     const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
-    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 10);
 
-    if (ImGui::BeginTable("table_scrolly", 6, flags, outer_size))
+    if (ImGui::BeginTable("table_scrolly", 6, flags, ImGui::GetContentRegionAvail()))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
         ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthStretch );
@@ -26,17 +25,13 @@ void PortfolioFrame::draw_positions()
 
         ImGuiListClipper clipper;
         clipper.Begin( positions_vector.size() );
-        while (clipper.Step())
-        {
-            for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
-            {
+        while (clipper.Step()) {
+            for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
                 ImGui::TableNextRow();
-                for (int column = 0; column < 6; column++)
-                {
+                for (int column = 0; column < 6; column++) {
                     std::string symbol = positions_vector[row];
                     ImGui::TableSetColumnIndex(column);
-                    switch( column )
-                    {
+                    switch( column ) {
                         case 0:
                             ImGui::Text("%s", symbol.c_str() );
                             break;
@@ -180,8 +175,6 @@ void PortfolioFrame::load_account( std::string account_num )
 void PortfolioFrame::update() 
 {
     ImGuiIO& io = ImGui::GetIO();
-
-
     if (!ImGui::Begin("Portfolio")) {
         ImGui::End();
         return;
