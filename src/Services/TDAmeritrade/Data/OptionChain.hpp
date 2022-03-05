@@ -16,17 +16,20 @@ namespace tda
         std::unordered_map<std::string, std::string> underlyingMap;
         std::vector<OptionsDateTimeObj> optionsDateTimeVector;
 
-        void initVariables();
-
     public:
         OptionChain();
-        OptionChain( boost::property_tree::ptree option_chain_data );
 
         std::vector<OptionsDateTimeObj> getOptionsDateTimeObj();
         std::string getCallVariable( std::string variable );
         std::string getPutVariable( std::string variable );
         std::string getOptionChainDataVariable( std::string variable );
         std::string getUnderlyingDataVariable( std::string variable );
+
+        void addOptionsDateTimeObj( OptionsDateTimeObj obj );
+        void setCallVariable( std::string key, std::string value );
+        void setPutVariable( std::string key, std::string value );
+        void setOptionChainVariable( std::string key, std::string value );
+        void setUnderlyingVariable( std::string key, std::string value );
 
     };
 }
