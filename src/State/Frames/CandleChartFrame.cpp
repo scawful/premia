@@ -1,72 +1,6 @@
 #include "CandleChartFrame.hpp"
 
 /**
- * @brief Initialize the candle arrays 
- * @author @scawful
- * 
- * @todo implement this in the build
- * 
- */
-void CandleChartFrame::init_candles()
-{
-    size_t vecSize = candles.size();
-    double xs[vecSize];
-    double highs[vecSize];
-    double lows[vecSize];
-    double opens[vecSize];
-    double closes[vecSize];
-
-    for ( int i = 0; i < candles.size(); i++ )
-    {
-        double new_dt = 0.0;
-        try {
-            new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
-        }
-        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
-            std::cout << e.what() << std::endl;
-        }
-        
-        new_dt *= 0.001;
-        xs[i] = new_dt;
-        highs[i] = candles[i].highLow.first;
-        lows[i] = candles[i].highLow.second;
-        opens[i] = candles[i].openClose.first;
-        closes[i] = candles[i].openClose.second;
-    }
-
-}
-
-/**
- * @brief Load an instrument to be charted
- * @author @scawful
- * 
- * @param ticker 
- */
-void CandleChartFrame::init_instrument(std::string ticker)
-{
-    quote = premia->tda_interface.getQuote(ticker_symbol);
-    price_history_data = premia->tda_interface.getPriceHistory( ticker, tda::PeriodType::YEAR, 1, tda::FrequencyType::DAILY, 1, true );
-    candles = price_history_data.getCandleVector();
-
-    detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
-                                 "\nBid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
-                                 "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
-                                 "\nOpen: $" + quote.getQuoteVariable("openPrice") +
-                                 "\nClose: $" + quote.getQuoteVariable("closePrice") +
-                                 "\n52 Week High: $" + quote.getQuoteVariable("52WkHigh") +
-                                 "\n52 Week Low: $" + quote.getQuoteVariable("52WkLow") +
-                                 "\nTotal Volume: " + quote.getQuoteVariable("totalVolume");
-
-    title_string = quote.getQuoteVariable("symbol") + " - " + quote.getQuoteVariable("description");
-    ticker_symbol = ticker;
-    for ( int i = 0; i < candles.size(); i++ )
-    {
-        volume.push_back( candles[i].volume );
-    }
-    initialized = true;
-}
-
-/**
  * @brief double array binary search
  * @author @scawful
  * 
@@ -93,6 +27,64 @@ int CandleChartFrame::binary_search(const double* arr, int l, int r, double x)
 }
 
 /**
+ * @brief Initialize the candle arrays 
+ * @author @scawful
+ * 
+ * @todo implement this in the build
+ * 
+ */
+void CandleChartFrame::init_candles(int index)
+{
+    int numCandles = priceHistoryData.getNumCandles(index);
+    candles = priceHistoryData.getCandles(index);
+    dates = new double[numCandles];
+    highs = new double[numCandles];
+    lows = new double[numCandles];
+    opens = new double[numCandles];
+    closes = new double[numCandles];
+
+    for ( int i = 0; i < numCandles; i++ )
+    {
+        double new_dt = 0.0;
+        try {
+            new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
+        }
+        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
+            std::cout << e.what() << std::endl;
+        }
+        
+        new_dt *= 0.001;
+        dates[i] = new_dt;
+        highs[i] = candles[i].high;
+        lows[i] = candles[i].low;
+        opens[i] = candles[i].open;
+        closes[i] = candles[i].close;
+    }
+}
+
+/**
+ * @brief Load an instrument to be charted
+ * @author @scawful
+ * 
+ * @param ticker 
+ */
+void CandleChartFrame::init_instrument(std::string ticker)
+{
+    quote = premia->tda_interface.getQuote(ticker_symbol);
+    detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
+                                 "\nBid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
+                                 "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
+                                 "\nOpen: $" + quote.getQuoteVariable("openPrice") +
+                                 "\nClose: $" + quote.getQuoteVariable("closePrice") +
+                                 "\n52 Week High: $" + quote.getQuoteVariable("52WkHigh") +
+                                 "\n52 Week Low: $" + quote.getQuoteVariable("52WkLow") +
+                                 "\nTotal Volume: " + quote.getQuoteVariable("totalVolume");
+
+    title_string = quote.getQuoteVariable("symbol") + " - " + quote.getQuoteVariable("description");
+    initialized = true;
+}
+
+/**
  * @brief Build the ImGui candle chart 
  * @author @scawful
  * 
@@ -104,36 +96,11 @@ int CandleChartFrame::binary_search(const double* arr, int l, int r, double x)
  */
 void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec4 bullCol, ImVec4 bearCol, bool tooltip )
 {
-    size_t vecSize = candles.size();
-    double xs[vecSize];
-    double highs[vecSize];
-    double lows[vecSize];
-    double opens[vecSize];
-    double closes[vecSize];
-
-    for ( int i = 0; i < candles.size(); i++ )
-    {
-        double new_dt = 0.0;
-        try {
-            new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
-        }
-        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
-            std::cout << e.what() << std::endl;
-        }
-        
-        new_dt *= 0.001;
-        xs[i] = new_dt;
-        highs[i] = candles[i].highLow.first;
-        lows[i] = candles[i].highLow.second;
-        opens[i] = candles[i].openClose.first;
-        closes[i] = candles[i].openClose.second;
-    }
-
     // get ImGui window DrawList
     ImDrawList* draw_list = ImPlot::GetPlotDrawList();
     
     // calc real value width
-    double half_width = count > 1 ? (xs[1] - xs[0]) * width_percent : width_percent;
+    double half_width = count > 1 ? (dates[1] - dates[0]) * width_percent : width_percent;
 
     // custom tool
     if ( ImPlot::IsPlotHovered() && tooltip ) 
@@ -148,12 +115,12 @@ void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec
         draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b), IM_COL32(128,128,128,64));
         ImPlot::PopPlotClipRect();
         // find mouse location index
-        int idx = binary_search(xs, 0, count - 1, mouse.x);
+        int idx = binary_search(dates, 0, count - 1, mouse.x);
         // render tool tip (won't be affected by plot clip rect)
         if (idx != -1) {
             ImGui::BeginTooltip();
             char buff[32];
-            ImPlot::FormatDate(ImPlotTime::FromDouble(xs[idx]),buff,32,ImPlotDateFmt_DayMoYr,ImPlot::GetStyle().UseISO8601);
+            ImPlot::FormatDate(ImPlotTime::FromDouble(dates[idx]),buff,32,ImPlotDateFmt_DayMoYr,ImPlot::GetStyle().UseISO8601);
             ImGui::Text("Day:   %s",  buff);
             ImGui::Text("Open:  $%.2f", opens[idx]);
             ImGui::Text("Close: $%.2f", closes[idx]);
@@ -164,24 +131,24 @@ void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec
     }
 
     // begin plot item
-    if ( ImPlot::BeginItem( price_history_data.getPriceHistoryVariable("symbol").c_str() ) ) 
+    if ( ImPlot::BeginItem( priceHistoryData.getPriceHistoryVariable("symbol").c_str() ) ) 
     {
         // override legend icon color
         ImPlot::GetCurrentItem()->Color = IM_COL32(64,64,64,255);
         // fit data if requested
         if (ImPlot::FitThisFrame()) {
             for (int i = 0; i < count; ++i) {
-                ImPlot::FitPoint(ImPlotPoint(xs[i], lows[i]));
-                ImPlot::FitPoint(ImPlotPoint(xs[i], highs[i]));
+                ImPlot::FitPoint(ImPlotPoint(dates[i], lows[i]));
+                ImPlot::FitPoint(ImPlotPoint(dates[i], highs[i]));
             }
         }
         // render data
         for (int i = 0; i < count; ++i) 
         {
-            ImVec2 open_pos  = ImPlot::PlotToPixels(xs[i] - half_width, opens[i]);
-            ImVec2 close_pos = ImPlot::PlotToPixels(xs[i] + half_width, closes[i]);
-            ImVec2 low_pos   = ImPlot::PlotToPixels(xs[i], lows[i]);
-            ImVec2 high_pos  = ImPlot::PlotToPixels(xs[i], highs[i]);
+            ImVec2 open_pos  = ImPlot::PlotToPixels(dates[i] - half_width, opens[i]);
+            ImVec2 close_pos = ImPlot::PlotToPixels(dates[i] + half_width, closes[i]);
+            ImVec2 low_pos   = ImPlot::PlotToPixels(dates[i], lows[i]);
+            ImVec2 high_pos  = ImPlot::PlotToPixels(dates[i], highs[i]);
             ImU32 color      = ImGui::GetColorU32(opens[i] > closes[i] ? bearCol : bullCol);
             draw_list->AddLine(low_pos, high_pos, color);
             draw_list->AddRectFilled(open_pos, close_pos, color);
@@ -198,44 +165,21 @@ void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec
  */
 void CandleChartFrame::draw_chart()
 {
-
-}
-
-/**
- * @brief Construct a new Candle Chart Frame:: Candle Chart Frame object
- * @author @scawful
- * 
- */
-CandleChartFrame::CandleChartFrame()
-{
-    initialized = false;
-}
-
-/**
- * @brief 
- * 
- */
-void CandleChartFrame::update() 
-{
-    if (!initialized) {
-        init_instrument("SPY");
-    }
-
     static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
 
     ImGui::InputText("Enter symbol", &ticker_symbol, ImGuiInputTextFlags_CharsUppercase);
     ImGui::SameLine(); 
-    if ( ImGui::Button("Search") )
-    {
-        if ( strcmp(buf, "") != 0 )
+    if ( ImGui::Button("Search") ) {
+        if ( strcmp(buf, "") != 0 ) 
         {
-            quote.clear();
-            price_history_data.clear();
-            quote = premia->tda_interface.getQuote(buf);
-            price_history_data = premia->tda_interface.getPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
-                                                                 tda::FrequencyType(frequency_type), frequency_amount, true);
-            candles = price_history_data.getCandleVector();
-            init_instrument(buf);
+            ticker_symbol = buf;
+            if (!priceHistoryData.getInitialized()) {
+                priceHistoryData.clear();
+                priceHistoryData = premia->tda_interface.getPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
+                                                                        tda::FrequencyType(frequency_type), frequency_amount, true);
+                init_candles(frequency_type);
+            }
+            init_instrument(ticker_symbol);
         }
     }
 
@@ -266,10 +210,10 @@ void CandleChartFrame::update()
 
     if ( ImGui::Button("Apply") ) 
     {
-        std::cout << "Change chart settings!" << std::endl;
-        price_history_data = premia->tda_interface.getPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount,
+        priceHistoryData = premia->tda_interface.getPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount,
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
-        candles = price_history_data.getCandleVector();
+        init_instrument(ticker_symbol);
+        init_candles(frequency_type);
     }  
 
     if (ImGui::BeginPopupContextItem())
@@ -280,21 +224,48 @@ void CandleChartFrame::update()
         ImGui::EndPopup();
     }
 
-
     ImPlot::GetStyle().UseLocalTime = true;
     //ImPlot::SetNextPlotFormatY("$%.2f");
-    if (ImPlot::BeginPlot("Candlestick Chart",ImVec2(-1,0),0)) 
+    if (ImPlot::BeginPlot("Candlestick Chart",ImGui::GetContentRegionAvail(),0)) 
     {
         ImPlot::SetupAxes("Date","Price");
-        try {
+        if (priceHistoryData.getInitialized()) {
             ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
                                            boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
+            build_candle_chart( 0.25, priceHistoryData.getNumCandles(frequency_type), bullCol, bearCol, tooltip );
         }
-        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
-            std::cout << "Update:: " << e.what() << std::endl;
-        }
-
-        build_candle_chart( 0.25, 218, bullCol, bearCol, tooltip );
         ImPlot::EndPlot();
     }
+}
+
+/**
+ * @brief Construct a new Candle Chart Frame:: Candle Chart Frame object
+ * @author @scawful
+ * 
+ */
+CandleChartFrame::CandleChartFrame()
+{
+    this->initialized = false;
+    this->ticker_symbol = "";
+}
+
+CandleChartFrame::~CandleChartFrame()
+{
+    if (initialized) {
+        delete[] lows;
+        delete[] highs;
+        delete[] opens;
+        delete[] closes;
+        delete[] dates;
+        delete[] volume;
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
+void CandleChartFrame::update() 
+{
+    draw_chart();
 }
