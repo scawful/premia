@@ -11,12 +11,14 @@ private:
     std::vector<std::string> watchlist_names;
     std::vector<const char*> watchlist_names_char;
     std::unordered_map<std::string, tda::Quote> quotes;
+    bool *openList;
 
     void draw_watchlist_table();
     void draw_custom_watchlist_table();
 
 public:
     WatchlistFrame();
+    ~WatchlistFrame();
     
     void init_watchlists();
     void update();

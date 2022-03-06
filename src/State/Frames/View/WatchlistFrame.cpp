@@ -4,20 +4,17 @@ void WatchlistFrame::init_watchlists()
 {
     std::string account_num = premia->tda_interface.get_all_accounts().at(0);
     watchlists = premia->tda_interface.getWatchlistsByAccount(account_num);
+    openList = new bool[watchlists.size()];
 
     for ( int i = 0; i < watchlists.size(); i++ ) {
         watchlist_names.push_back(watchlists[i].getName());
+        openList[i] = false;
     }
 
     for (std::string const& str : watchlist_names) {
         watchlist_names_char.push_back(str.data());
     }
 
-    //for (int i = 0; i < watchlists.size(); i++) {
-    //    for (int j = 0; j < watchlists[i].getNumInstruments(); j++) {
-    //        quotes[watchlists[i].getInstrumentSymbol(j)] = premia->tda_interface.getQuote(watchlists[i].getInstrumentSymbol(j));
-    //    }
-    //}
     initialized = true;
 }
 
@@ -26,21 +23,24 @@ void WatchlistFrame::draw_watchlist_table()
     static int n = 0;
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
-    const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
-    const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
-    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * watchlists[n].getNumInstruments());
-
-    const char **watchlist_names_gui = watchlist_names_char.data();
     ImGui::SameLine();
-    ImGui::Combo(" ", &n,  watchlist_names_gui, watchlist_names.size()); 
+    ImGui::Combo(" ", &n,  watchlist_names_char.data(), watchlist_names.size()); 
 
-    if (ImGui::BeginTable("Watchlist_Table", 4, flags, outer_size))
+    if (openList[n] == false) {
+        for (int j = 0; j < watchlists[n].getNumInstruments(); j++) {
+           quotes[watchlists[n].getInstrumentSymbol(j)] = premia->tda_interface.getQuote(watchlists[n].getInstrumentSymbol(j));
+        }
+        openList[n] = true;
+    }
+
+    if (ImGui::BeginTable("Watchlist_Table", 5, flags, ImGui::GetContentRegionAvail()))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
         ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthFixed );
-        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed );
         ImGui::TableSetupColumn("Bid", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Ask", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Open", ImGuiTableColumnFlags_WidthFixed );
+        ImGui::TableSetupColumn("Close", ImGuiTableColumnFlags_WidthFixed );
         ImGui::TableHeadersRow();
 
         ImGuiListClipper clipper;
@@ -50,11 +50,9 @@ void WatchlistFrame::draw_watchlist_table()
             for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
             {
                 ImGui::TableNextRow();
-                for (int column = 0; column < 4; column++)
+                for (int column = 0; column < 5; column++)
                 {
                     std::string symbol = watchlists[n].getInstrumentSymbol(row);
-                    std::string description = watchlists[n].getInstrumentDescription(row);
-                    std::string assetType = watchlists[n].getInstrumentType(row);
                     ImGui::TableSetColumnIndex(column);
                     switch( column )
                     {
@@ -62,13 +60,16 @@ void WatchlistFrame::draw_watchlist_table()
                             ImGui::Text("%s", symbol.c_str() );
                             break;
                         case 1:
-                            ImGui::Text("%s", assetType.c_str() );
-                            break;
-                        case 2:
                             ImGui::Text("%s", quotes[symbol].getQuoteVariable("bidPrice").c_str());
                             break;
-                        case 3:
+                        case 2:
                             ImGui::Text("%s", quotes[symbol].getQuoteVariable("askPrice").c_str());
+                            break;
+                        case 3:
+                            ImGui::Text("%s", quotes[symbol].getQuoteVariable("openPrice").c_str());
+                            break;
+                        case 4:
+                            ImGui::Text("%s", quotes[symbol].getQuoteVariable("closePrice").c_str());
                             break;
                         default:
                             ImGui::Text("Hello %d,%d", column, row);
@@ -143,6 +144,11 @@ WatchlistFrame::WatchlistFrame() : Frame()
 {
     this->title_string = "Watchlists";  
     this->initialized = false;
+}
+
+WatchlistFrame::~WatchlistFrame()
+{
+
 }
 
 void WatchlistFrame::update() 
