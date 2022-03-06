@@ -2,9 +2,257 @@
 
 using namespace tda;
 
+std::string Client::get_api_interval_value(int value)
+{
+    return EnumAPIValues[value];
+}
+
+std::string Client::get_api_frequency_type(int value)
+{
+    return EnumAPIFreq[value];
+}
+
+std::string Client::get_api_period_amount(int value)
+{
+    return EnumAPIPeriod[value];
+}
+
+std::string Client::get_api_frequency_amount(int value)
+{
+    return EnumAPIFreqAmt[value];
+}
+
+/**
+ * @brief Replace a substring within a string with given parameter
+ * @author @scawful
+ *
+ * @param str
+ * @param from
+ * @param to
+ * @return true
+ * @return false
+ */
+bool Client::string_replace(std::string& str, const std::string from, const std::string to)
+{
+    size_t start = str.find(from);
+    if (start == std::string::npos)
+        return false;
+
+    str.replace(start, from.length(), to);
+    return true;
+}
+
+/**
+ * @brief Get JSON data from server and store into string 
+ * @author @scawful
+ * 
+ * @param contents 
+ * @param size 
+ * @param nmemb 
+ * @param s 
+ * @return size_t 
+ */
+size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
+{
+    size_t new_length = size * nmemb;
+    try {
+        s->append((char*)contents, new_length);
+    } catch(std::bad_alloc &e) {
+        // handle memory problem
+        return 0;
+    }
+    return new_length;
+}
+
+/**
+ * @brief creates ptree with login request for websocket session
+ * @author @scawful
+ * @todo refactor the _user_principals line with the UserPrincipals class 
+ *
+ * @return JSONObject::ptree
+ */
+JSONObject::ptree Client::create_login_request()
+{
+    JSONObject::ptree credentials, requests, parameters;
+
+    std::unordered_map<std::string, std::string> account_data;
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
+    {
+        for (auto &acct_it : v.second)
+        {
+            account_data[acct_it.first] = acct_it.second.get_value<std::string>();
+        }
+        break;
+    }
+
+    requests.put("service", "ADMIN");
+    requests.put("requestid", 1);
+    requests.put("command", "LOGIN");
+    requests.put("account", account_data["accountId"]);
+    requests.put("source", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
+
+    // format credentials
+    // "userid": userPrincipalsResponse.accounts[0].accountId,
+    // "token": userPrincipalsResponse.streamerInfo.token,
+    // "company": userPrincipalsResponse.accounts[0].company,
+    // "segment": userPrincipalsResponse.accounts[0].segment,
+    // "cddomain": userPrincipalsResponse.accounts[0].accountCdDomainId,
+    // "usergroup": userPrincipalsResponse.streamerInfo.userGroup,
+    // "accesslevel": userPrincipalsResponse.streamerInfo.accessLevel,
+    // "authorized": "Y",
+    // "timestamp": tokenTimeStampAsMs,
+    // "appid": userPrincipalsResponse.streamerInfo.appId,
+    // "acl": userPrincipalsResponse.streamerInfo.acl
+
+    credentials.put("company", account_data["company"]);
+    credentials.put("segment", account_data["segment"]);
+    credentials.put("cddomain", account_data["accountCdDomainId"]);
+    credentials.put("userid", account_data["accountId"]);
+    credentials.put("usergroup", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.userGroup")));
+    credentials.put("accesslevel", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.accessLevel")));
+    credentials.put("authorized", "Y");
+    credentials.put("acl", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.acl")));
+
+    // token timestamp format :: 2021-08-10T14:57:11+0000
+    std::tm token_timestamp = {};
+    std::string original_token_timestamp = _user_principals.get<std::string>("streamerInfo.tokenTimestamp");
+
+    // remove 'T' character
+    std::size_t found = original_token_timestamp.find('T');
+    std::string reformatted_token_timestamp = original_token_timestamp.replace(found, 1, " ");
+
+    // remove the UTC +0000 portion, will adjust for this manually
+    found = reformatted_token_timestamp.find('+');
+    reformatted_token_timestamp = reformatted_token_timestamp.replace(found, 5, " ");
+    SDL_Log("Reformatted Token Timestamp: %s", reformatted_token_timestamp.c_str());
+
+    // convert string timestamp into time_t
+    std::istringstream ss(reformatted_token_timestamp);
+    ss >> std::get_time(&token_timestamp, "%Y-%m-%d %H:%M:%S");
+    if (ss.fail())
+    {
+        SDL_Log("Token timestamp parse failed!");
+    }
+    else
+    {
+        // this is disgusting i'm sorry
+        std::time_t token_timestamp_as_sec = std::mktime(&token_timestamp);
+        std::chrono::time_point token_timestamp_point = std::chrono::system_clock::from_time_t(token_timestamp_as_sec);
+        auto duration = token_timestamp_point.time_since_epoch();
+        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        millis -= 18000000;
+        credentials.put("timestamp", millis);
+    }
+
+    credentials.put("appid", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
+
+    // format parameters
+    std::string credential_str;
+    for (auto &cred_it : credentials)
+    {
+        credential_str += cred_it.first + "%3D" + cred_it.second.get_value<std::string>() + "%26";
+    }
+    std::size_t end = credential_str.size();
+    credential_str.replace(end - 3, 3, "");
+
+    parameters.put("token", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.token")));
+    parameters.put("version", "1.0");
+    parameters.put("credential", credential_str);
+
+    // include in requests
+    requests.add_child("parameters", parameters);
+
+    // "requests": [
+    //     {
+    //         "service": "ADMIN",
+    //         "command": "LOGIN",
+    //         "requestid": 0,
+    //         "account": userPrincipalsResponse.accounts[0].accountId,
+    //         "source": userPrincipalsResponse.streamerInfo.appId,
+    //         "parameters": {
+    //             "credential": jsonToQueryString(credentials),
+    //             "token": userPrincipalsResponse.streamerInfo.token,
+    //             "version": "1.0"
+    //         }
+    //     }
+    // ]
+
+    return requests;
+}
+
+/**
+ * @brief create ptree of logout request for websocket session
+ * @author @scawful
+ *
+ * @return JSONObject::ptree
+ */
+JSONObject::ptree Client::create_logout_request()
+{
+    JSONObject::ptree credentials, requests, parameters;
+
+    std::unordered_map<std::string, std::string> account_data;
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
+    {
+        for (auto &acct_it : v.second)
+        {
+            account_data[acct_it.first] = acct_it.second.get_value<std::string>();
+        }
+        break;
+    }
+
+    requests.put("service", "ADMIN");
+    requests.put("requestid", 1);
+    requests.put("command", "LOGOUT");
+    requests.put("account", account_data["accountId"]);
+    requests.put("source", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
+
+    requests.add_child("parameters", parameters);
+
+    return requests;
+}
+
+/**
+ * @brief Create generic service request with given keys and fields
+ * @author @scawful
+ *
+ * @param serv_type
+ * @param keys
+ * @param fields
+ * @return JSONObject::ptree
+ */
+JSONObject::ptree Client::create_service_request(ServiceType serv_type, std::string keys, std::string fields)
+{
+    JSONObject::ptree requests, parameters, user_principals;
+
+    // gets first account by default, maybe change later
+    std::unordered_map<std::string, std::string> account_data;
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
+    {
+        for (auto &acct_it : v.second)
+        {
+            account_data[acct_it.first] = acct_it.second.get_value<std::string>();
+        }
+        break;
+    }
+
+    requests.put("service", EnumAPIServiceName[serv_type]);
+    requests.put("requestid", 1);
+    requests.put("command", "SUBS");
+    requests.put("account", account_data["accountId"]);
+    requests.put("source", _user_principals.get<std::string>(JSONObject::ptree::path_type("streamerInfo.appId")));
+
+    parameters.put("keys", keys);
+    parameters.put("fields", fields);
+
+    requests.add_child("parameters", parameters);
+
+    return requests;
+}
+
 /**
  * @brief Get User Principals from API endpoint
  *        Parse and store in UserPrincipals object for local use
+ * @author @scawful
  * 
  */
 void Client::get_user_principals() 
@@ -17,6 +265,12 @@ void Client::get_user_principals()
     has_user_principals = true;
 }
 
+/**
+ * @brief Send a POST request using the consumer key and refresh token to get the access token
+ * @author @scawful
+ * 
+ * @return std::string 
+ */
 std::string Client::post_access_token() 
 {
     CURL *curl;
@@ -72,66 +326,9 @@ std::string Client::post_access_token()
     return response;
 }
 
-
-std::string Client::get_api_interval_value(int value)
-{
-    return EnumAPIValues[value];
-}
-
-std::string Client::get_api_frequency_type(int value)
-{
-    return EnumAPIFreq[value];
-}
-
-std::string Client::get_api_period_amount(int value)
-{
-    return EnumAPIPeriod[value];
-}
-
-std::string Client::get_api_frequency_amount(int value)
-{
-    return EnumAPIFreqAmt[value];
-}
-
-/**
- * @brief Replace a substring within a string with given parameter
- * @author @scawful
- *
- * @param str
- * @param from
- * @param to
- * @return true
- * @return false
- */
-bool Client::string_replace(std::string& str, const std::string from, const std::string to)
-{
-    size_t start = str.find(from);
-    if (start == std::string::npos)
-        return false;
-
-    str.replace(start, from.length(), to);
-    return true;
-}
-
-/**
- *
- *
- *
- */
-size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
-{
-    size_t new_length = size * nmemb;
-    try {
-        s->append((char*)contents, new_length);
-    } catch(std::bad_alloc &e) {
-        // handle memory problem
-        return 0;
-    }
-    return new_length;
-}
-
 /**
  * @brief Construct a new Client:: Client object
+ * @author @scawful
  * 
  */
 Client::Client() 
@@ -143,7 +340,7 @@ Client::Client()
 }
 
 /**
- * @brief 
+ * @brief Send a request for data from the API using the json callback
  * 
  * @param endpoint 
  * @return std::string 
@@ -169,6 +366,13 @@ std::string Client::send_request(std::string endpoint)
     return response;
 }
 
+/**
+ * @brief Send an authorized request for data from the API using the json callback
+ * @author @scawful
+ * 
+ * @param endpoint 
+ * @return std::string 
+ */
 std::string Client::send_authorized_request(std::string endpoint) 
 {
     CURL *curl;
@@ -195,6 +399,34 @@ std::string Client::send_authorized_request(std::string endpoint)
     return response;
 }
 
+/**
+ * @brief Prepare a request for watchlist data by an account number
+ *        Return the API response
+ * @author @scawful
+ * 
+ * @param account_id 
+ * @return std::string 
+ */
+std::string Client::get_watchlist_by_account(std::string account_id)
+{
+    std::string url = "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
+    string_replace(url, "{accountNum}", account_id);
+    return send_authorized_request(url);
+}
+
+/**
+ * @brief Prepare a request from the API for price history information 
+ *        Return the API response
+ * @author @scawful
+ * 
+ * @param symbol 
+ * @param ptype 
+ * @param period_amt 
+ * @param ftype 
+ * @param freq_amt 
+ * @param ext 
+ * @return std::string 
+ */
 std::string Client::get_price_history(std::string symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
 {
     std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
@@ -213,6 +445,21 @@ std::string Client::get_price_history(std::string symbol, PeriodType ptype, int 
     return send_request(url);
 }
 
+/**
+ * @brief Prepare a request from the API for option chain data 
+ *        Return the API response
+ * @author @scawful
+ * 
+ * @param ticker 
+ * @param contractType 
+ * @param strikeCount 
+ * @param includeQuotes 
+ * @param strategy 
+ * @param range 
+ * @param expMonth 
+ * @param optionType 
+ * @return std::string 
+ */
 std::string Client::get_option_chain(std::string ticker, std::string contractType, std::string strikeCount,
                                      bool includeQuotes, std::string strategy, std::string range,
                                      std::string expMonth, std::string optionType)
@@ -236,6 +483,14 @@ std::string Client::get_option_chain(std::string ticker, std::string contractTyp
     return send_request(url);
 }
 
+/**
+ * @brief Request quote data by the instrument symbol
+ *        Return the API response
+ * @author @scawful
+ * 
+ * @param symbol 
+ * @return std::string 
+ */
 std::string Client::get_quote(std::string symbol)
 {
     std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
@@ -243,6 +498,14 @@ std::string Client::get_quote(std::string symbol)
     return send_request(url);
 }
 
+/**
+ * @brief Request account data by the account id
+ *        Return the API response after authorization
+ * @author @scawful
+ * 
+ * @param account_id 
+ * @return std::string 
+ */
 std::string Client::get_account(std::string account_id)
 {
     get_user_principals();
@@ -251,6 +514,14 @@ std::string Client::get_account(std::string account_id)
     return send_authorized_request(account_url);
 }
 
+/**
+ * @brief Create a vector of all the account ids present on the API key 
+ * @author @scawful
+ * 
+ * @todo make this less smelly 
+ * 
+ * @return std::vector<std::string> 
+ */
 std::vector<std::string> Client::get_all_account_ids()
 {
     std::vector<std::string> accounts;
@@ -268,19 +539,166 @@ std::vector<std::string> Client::get_all_account_ids()
     return accounts;
 }
 
+/**
+ * @brief Start a WebSocket session
+ * @todo implement this 
+ * 
+ */
 void Client::start_session() 
 {
-    
+    std::string host;
+    std::string port = "443";
+    try
+    {
+        host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
+    }
+    catch (std::exception &ptree_bad_path)
+    {
+        SDL_Log("Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what());
+    }
+
+    JSONObject::ptree login_request = create_login_request();
+    JSONObject::ptree logout_request = create_logout_request();
+
+    // for testing
+    std::ifstream requests_json("requests_test.json", std::ios::out);
+    JSONObject::write_json("requests_test.json", login_request);
+
+    std::stringstream login_text_stream;
+    write_json(login_text_stream, login_request);
+    std::string login_text = login_text_stream.str();
+
+    std::stringstream requests_text_stream;
+    write_json(requests_text_stream, create_service_request(QUOTE, "TLT", "0,1,2,3,4,5,6,7,8"));
+    std::string request_text = requests_text_stream.str();
+
+    std::stringstream logout_text_stream;
+    JSONObject::write_json(logout_text_stream, logout_request);
+    std::string logout_text = logout_text_stream.str();
+
+    std::stringstream chart_request_stream;
+    write_json(chart_request_stream, create_service_request(CHART_EQUITY, "AAPL", "0,1,2,3,4,5,6,7,8"));
+    std::string chart_equity_text = chart_request_stream.str();
+
+    request_queue.push_back(std::make_shared<std::string const>(login_text));
+    request_queue.push_back(std::make_shared<std::string const>(request_text));
+    request_queue.push_back(std::make_shared<std::string const>(logout_text));
+
+    boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
+
+    websocket_session = std::make_shared<tda::Session>(ioc, context, request_queue);
+    websocket_session->run(host.c_str(), port.c_str());
+
+    SDL_Log("~~~");
+    session_active = true;
+
+    std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
+    session_thread.detach();
+
+    //_websocket_session->send_message( std::make_shared<std::string const>(chart_equity_text) );
 }
 
+/**
+ * @brief Start a WebSocket session quickly with a ticker and fields
+ * @author @scawful
+ * 
+ * @param ticker 
+ * @param fields 
+ */
+void Client::start_session(std::string ticker, std::string fields)
+{
+    std::string host;
+    std::string port = "443";
+    try {
+        host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
+    } catch (std::exception &ptree_bad_path) {
+        SDL_Log("Start_Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what());
+    }
+
+    pt::ptree login_request = create_login_request();
+
+    std::stringstream login_text_stream;
+    write_json(login_text_stream, login_request);
+    std::string login_text = login_text_stream.str();
+
+    std::stringstream requests_text_stream;
+    write_json(requests_text_stream, create_service_request(QUOTE, ticker, fields));
+    std::string request_text = requests_text_stream.str();
+
+    request_queue.push_back(std::make_shared<std::string const>(login_text));
+    request_queue.push_back(std::make_shared<std::string const>(request_text));
+
+    boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
+
+    websocket_session = std::make_shared<tda::Session>(ioc, context, request_queue);
+    websocket_session->run(host.c_str(), port.c_str());
+
+    session_active = true;
+
+    std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
+    session_thread.detach();
+}
+
+/**
+ * @brief Send a request to the current WebSocket session
+ * @author @scawful
+ * 
+ * @param request 
+ */
 void Client::send_session_request(std::string request) 
 {
     websocket_session->send_message(std::make_shared<std::string const>(request));
 }
 
+/**
+ * @brief Send a logout request to the current WebSocket session
+ * @author @scawful
+ * 
+ */
+void Client::send_logout_request()
+{
+    websocket_session->interrupt();
+    pt::ptree logout_request = create_logout_request();
+    std::stringstream logout_text_stream;
+    pt::write_json(logout_text_stream, logout_request);
+    std::string logout_text = logout_text_stream.str();
+    websocket_session->send_message(std::make_shared<std::string const>(logout_text));
+}
+
+/**
+ * @brief Send an interrupt signal to the current WebSocket session
+ * @author @scawful 
+ * 
+ */
 void Client::send_interrupt_signal() 
 {
     websocket_session->interrupt();
+}
+
+/**
+ * @brief Check if user is logged into the current WebSocket session
+ * @author @scawful
+ * 
+ * @return true 
+ * @return false 
+ */
+bool Client::is_session_logged_in()
+{
+    if (session_active)
+        return websocket_session->is_logged_in();
+    else
+        return false;
+}
+
+/**
+ * @brief Get a list of all the responses logged in the WebSocket session
+ * @author @scawful
+ * 
+ * @return std::vector<std::string> 
+ */
+std::vector<std::string> Client::get_session_responses()
+{
+    return websocket_session->receive_response();
 }
 
 /**
@@ -294,7 +712,8 @@ std::string Client::get_access_token()
 }
 
 /**
- * @brief 
+ * @brief Public retrieval of access token
+ * @author @scawful
  * 
  */
 void Client::fetch_access_token()
