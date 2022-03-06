@@ -8,6 +8,7 @@
 #include "../Services/TDAmeritrade.hpp"
 #include "../Services/IEXCloud.hpp"
 #include "../Services/CoinbasePro/CoinbasePro.hpp"
+#include "../Services/Halext/Halext.hpp"
 
 class State;
 
@@ -34,6 +35,7 @@ public:
     bool running() { return m_running; }
     void quit() { m_running = false; }
     
+    halext::Halext halext_interface;
     tda::TDAmeritrade tda_interface;
     iex::IEXCloud iex_interface;
     GenericClient client;
