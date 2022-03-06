@@ -3,7 +3,7 @@
 void WatchlistFrame::init_watchlists()
 {
     std::string account_num = premia->tda_interface.get_all_accounts().at(0);
-    watchlists = premia->tda_interface.retrieveWatchlistsByAccount(account_num);
+    watchlists = premia->tda_interface.getWatchlistsByAccount(account_num);
 
     for ( int i = 0; i < watchlists.size(); i++ ) {
         watchlist_names.push_back(watchlists[i].getName());
