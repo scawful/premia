@@ -189,8 +189,8 @@ void CandleChartFrame::draw_chart()
     // ====== implot chart ======= //
 
     static bool tooltip = false;
-    // ImGui::Checkbox("Show Tooltip", &tooltip);
-    // ImGui::SameLine();
+    ImGui::Checkbox("Show Tooltip", &tooltip);
+    ImGui::SameLine();
     static ImVec4 bullCol = ImVec4(0.000f, 1.000f, 0.441f, 1.000f);
     static ImVec4 bearCol = ImVec4(0.853f, 0.050f, 0.310f, 1.000f);
     ImGui::SameLine(); ImGui::ColorEdit4("##Bull", &bullCol.x, ImGuiColorEditFlags_NoInputs);
@@ -225,13 +225,15 @@ void CandleChartFrame::draw_chart()
     }
 
     ImPlot::GetStyle().UseLocalTime = true;
-    //ImPlot::SetNextPlotFormatY("$%.2f");
     if (ImPlot::BeginPlot("Candlestick Chart",ImGui::GetContentRegionAvail(),0)) 
     {
-        ImPlot::SetupAxes("Date","Price");
-        if (priceHistoryData.getInitialized()) {
-            ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
-                                           boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
+        ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
+        ImPlot::SetupAxes("Date","Price",ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit);
+        if (priceHistoryData.getInitialized()) 
+        {
+            ImPlot::SetupAxesLimits(0,100, 
+                                    boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
+                                    boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));
             build_candle_chart( 0.25, priceHistoryData.getNumCandles(frequency_type), bullCol, bearCol, tooltip );
         }
         ImPlot::EndPlot();
