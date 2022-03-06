@@ -28,6 +28,9 @@ void PrimaryState::init(Manager *premia)
     
     SDL_SetWindowSize(premia->pWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
     SDL_SetWindowPosition(premia->pWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey( SDLK_BACKSPACE );
     
     ImGui::StyleColorsClassic();
 }
@@ -81,9 +84,6 @@ void PrimaryState::handleEvents()
             case SDL_KEYDOWN:
                 switch ( event.key.keysym.sym )
                 {
-                    case SDLK_ESCAPE:
-                        premia->quit();
-                        break;
                     case SDLK_UP:
                     case SDLK_DOWN:
                     case SDLK_RETURN:
@@ -99,7 +99,7 @@ void PrimaryState::handleEvents()
             {
                 int key = event.key.keysym.scancode;
                 IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
-                //io.KeysDown[key] = (event.type == SDL_KEYDOWN);
+                io.KeysDown[key] = (event.type == SDL_KEYDOWN);
                 io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
                 io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
                 io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
