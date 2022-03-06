@@ -9,9 +9,6 @@ void PortfolioFrame::draw_positions()
 {
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
-    const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
-    const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
-
     if (ImGui::BeginTable("table_scrolly", 6, flags, ImGui::GetContentRegionAvail()))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
@@ -36,20 +33,35 @@ void PortfolioFrame::draw_positions()
                             ImGui::Text("%s", symbol.c_str() );
                             break;
                         case 1:
-                            ImGui::Text("%s", account_data.get_position_balances( symbol, "currentDayProfitLoss" ).c_str());
+                        {
+                            std::string cdpl = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "currentDayProfitLoss");
+                            ImGui::Text("%s", cdpl.c_str());
                             break;
+                        }
                         case 2:
-                            ImGui::Text("%s", account_data.get_position_balances( symbol, "currentDayProfitLossPercentage").c_str() );
+                        {
+                            std::string cdplp = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "currentDayProfitLossPercentage");
+                            ImGui::Text("%s", cdplp.c_str() );
                             break;
+                        }
                         case 3:
-                            ImGui::Text("%s", account_data.get_position_balances( symbol, "averagePrice" ).c_str());
+                        {
+                            std::string avgp = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances( symbol, "averagePrice");
+                            ImGui::Text("%s", avgp.c_str());
                             break;
+                        }
                         case 4:
-                            ImGui::Text("%s", account_data.get_position_balances( symbol, "marketValue" ).c_str());
+                        {
+                            std::string mval = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "marketValue");
+                            ImGui::Text("%s", mval.c_str());
                             break;
+                        }
                         case 5:
-                            ImGui::Text("%s", account_data.get_position_balances( symbol, "longQuantity" ).c_str());
+                        {
+                            std::string qty = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "longQuantity");
+                            ImGui::Text("%s", qty.c_str());
                             break;
+                        }
                         default:
                             ImGui::Text("Hello %d,%d", column, row);
                             break;
@@ -60,9 +72,6 @@ void PortfolioFrame::draw_positions()
 
         ImGui::EndTable();
     }
-
-    ImGui::Spacing();
-    ImGui::Separator();
 }
 
 /**
@@ -175,7 +184,7 @@ void PortfolioFrame::load_account( std::string account_num )
 void PortfolioFrame::update() 
 {
     ImGuiIO& io = ImGui::GetIO();
-    if (!ImGui::Begin("Portfolio")) {
+    if (!ImGui::Begin("Portfolio", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
         ImGui::End();
         return;
     }    
