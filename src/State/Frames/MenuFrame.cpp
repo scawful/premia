@@ -356,8 +356,7 @@ void MenuFrame::update()
             ImGui::Separator();
             if (ImGui::BeginMenu("Preferences"))
             {
-                static bool enabled = true;
-                ImGui::MenuItem("Private Balances", "", &enabled);
+                ImGui::MenuItem("Private Balances", "", &premia->halext_interface.privateBalance);
                 ImGui::Separator();
 
                 static int n = 0;
