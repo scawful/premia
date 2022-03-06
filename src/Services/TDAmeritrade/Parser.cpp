@@ -7,6 +7,13 @@ Parser::Parser()
     
 }
 
+/**
+ * @brief Take a response from the API as argument and read it into a boost::property_tree
+ * @author @scawful
+ * 
+ * @param response 
+ * @return JSONObject::ptree 
+ */
 JSONObject::ptree Parser::read_response(std::string response)
 {
     std::istringstream json_response(response);
@@ -16,12 +23,19 @@ JSONObject::ptree Parser::read_response(std::string response)
         read_json(json_response, property_tree);
     }
     catch (std::exception &json_parser_error) {
-        SDL_Log("%s", json_parser_error.what());
+        SDL_Log("Parser::read_response: %s", json_parser_error.what());
     }
 
     return property_tree;
 }
 
+/**
+ * @brief Parse the access token from a response 
+ * @author @scawful
+ * 
+ * @param response 
+ * @return std::string 
+ */
 std::string Parser::parse_access_token(std::string response)
 {
     std::string access_token;
@@ -34,6 +48,13 @@ std::string Parser::parse_access_token(std::string response)
     return access_token;
 }
 
+/**
+ * @brief Parse a Quote from the API
+ * @author @scawful
+ * 
+ * @param data 
+ * @return Quote 
+ */
 Quote Parser::parse_quote(JSONObject::ptree data)
 {
     Quote quote;
@@ -47,6 +68,15 @@ Quote Parser::parse_quote(JSONObject::ptree data)
     return quote;
 }
 
+/**
+ * @brief Parse the price history data from the server
+ * @author @scawful
+ * 
+ * @param data 
+ * @param ticker 
+ * @param freq 
+ * @return PriceHistory 
+ */
 PriceHistory Parser::parse_price_history(boost::property_tree::ptree data, std::string ticker, int freq)
 {
     PriceHistory price_history;
@@ -119,6 +149,13 @@ PriceHistory Parser::parse_price_history(boost::property_tree::ptree data, std::
     return price_history;
 }
 
+/**
+ * @brief Parse the current user principals from the API
+ * @author @scawful
+ * 
+ * @param data 
+ * @return UserPrincipals 
+ */
 UserPrincipals Parser::parse_user_principals( boost::property_tree::ptree data )
 {
     UserPrincipals user_principals;
@@ -137,6 +174,13 @@ UserPrincipals Parser::parse_user_principals( boost::property_tree::ptree data )
     return user_principals;
 }
 
+/**
+ * @brief Parse the option chain data from the API
+ * @author @scawful
+ * 
+ * @param data 
+ * @return OptionChain 
+ */
 OptionChain Parser::parse_option_chain(JSONObject::ptree data)
 {
     OptionChain optionChain;
@@ -179,6 +223,13 @@ OptionChain Parser::parse_option_chain(JSONObject::ptree data)
     return optionChain;
 }
 
+/**
+ * @brief Parse the users account data from the API
+ * @author @scawful 
+ * 
+ * @param data 
+ * @return Account 
+ */
 Account Parser::parse_account(JSONObject::ptree data)
 {
     Account account;
@@ -217,6 +268,13 @@ Account Parser::parse_account(JSONObject::ptree data)
     return account;
 }
 
+/**
+ * @brief Parse account watchlist data from the API
+ * @author @scawful
+ * 
+ * @param data 
+ * @return std::vector<tda::Watchlist> 
+ */
 std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(boost::property_tree::ptree data) 
 {
     std::vector<tda::Watchlist> watchlists;
