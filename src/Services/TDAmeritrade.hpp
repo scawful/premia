@@ -49,9 +49,9 @@ namespace tda
         Account getCurrentAccount();
         Account getDefaultAccount();
         std::vector<Watchlist> getWatchlistsByAccount(std::string account_num);
-        PriceHistory getPriceHistory(std::string, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
         Quote getQuote(std::string symbol);
         Account getAccount(std::string account_id);
+        PriceHistory getPriceHistory(std::string, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
         OptionChain getOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
                                    bool includeQuotes, std::string strategy, std::string range,
                                    std::string expMonth, std::string optionType);

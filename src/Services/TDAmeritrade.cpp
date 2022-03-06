@@ -175,7 +175,6 @@ namespace tda
 
         request_access_token(false);
     }
-
     
     /**
      * @brief Retrieve account information from user principals and return as a list
@@ -237,20 +236,6 @@ namespace tda
     }
 
     /**
-     * @brief Retrieve PriceHistory by parameters using client and parser  
-     * 
-     * @param ticker 
-     * @param mode 
-     * @param time 
-     * @return PriceHistory 
-     */
-    PriceHistory TDAmeritrade::getPriceHistory(std::string ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
-    {
-        std::string response = client.get_price_history(ticker, ptype, period_amt, ftype, freq_amt, ext);
-        return parser.parse_price_history(parser.read_response(response), ticker, ftype);
-    }
-
-    /**
      * @brief Create Quote object by ticker using client and parser 
      * @author @scawful
      *
@@ -290,6 +275,20 @@ namespace tda
     {
         std::string response = client.get_option_chain(ticker, contractType, strikeCount, includeQuotes, strategy, range, expMonth, optionType);
         return parser.parse_option_chain(parser.read_response(response));
+    }
+
+    /**
+     * @brief Retrieve PriceHistory by parameters using client and parser  
+     * 
+     * @param ticker 
+     * @param mode 
+     * @param time 
+     * @return PriceHistory 
+     */
+    PriceHistory TDAmeritrade::getPriceHistory(std::string ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
+    {
+        std::string response = client.get_price_history(ticker, ptype, period_amt, ftype, freq_amt, ext);
+        return parser.parse_price_history(parser.read_response(response), ticker, ftype);
     }
 
     /**
