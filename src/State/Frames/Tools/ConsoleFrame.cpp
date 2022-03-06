@@ -212,7 +212,7 @@ void ConsoleFrame::update()
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if (!ImGui::Begin(title.c_str(), &p_open))
+    if (!ImGui::Begin(title.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar ))
     {
         ImGui::End();
         return;
@@ -227,8 +227,8 @@ void ConsoleFrame::update()
 
     if (ImGui::BeginPopupContextItem())
     {
-        if (ImGui::MenuItem("Close Console"))
-            p_open = false;
+        // if (ImGui::MenuItem("Close Console"))
+        //     p_open = false;
         ImGui::EndPopup();
     }
 

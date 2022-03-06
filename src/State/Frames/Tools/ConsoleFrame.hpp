@@ -15,7 +15,6 @@ private:
     bool                  AutoScroll;
     bool                  ScrollToBottom;
     std::string           title;
-    bool                  p_open = true;
     bool                  copy_to_clipboard = false;
 
     void clearLog();
