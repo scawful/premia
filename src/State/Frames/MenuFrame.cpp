@@ -602,7 +602,7 @@ void MenuFrame::update()
                 premia->change(DemoState::instance());
             }      
             if (ImGui::MenuItem("Start WS Session")) {
-                premia->tda_interface.start_session();
+                premia->tda_interface.startStreamingSession();
             }
             ImGui::EndMenu();
         }
