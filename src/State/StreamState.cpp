@@ -154,11 +154,12 @@ void StreamState::update()
         ImGui::EndPopup();
     }
 
-    if ( premia->tda_interface.is_session_logged_in() )
+    //if ( premia->tda_interface.is_session_logged_in() )
+    if ( true )
     {
         if ( ImGui::Button("Logout") )
         {
-            premia->tda_interface.send_logout_request();
+            //premia->tda_interface.send_logout_request();
         }
     }
     else
@@ -175,13 +176,13 @@ void StreamState::update()
 
             SDL_Log("Stream ticker %s with fields: %s", ticker_symbol.c_str(), fields.c_str() );
 
-            premia->tda_interface.start_session( ticker_symbol, fields );
+            //premia->tda_interface.start_session( ticker_symbol, fields );
         }
     }
     ImGui::SameLine();
     if ( ImGui::Button("Interrupt Session") )
     {
-        premia->tda_interface.send_interrupt_signal();
+        //premia->tda_interface.send_interrupt_signal();
     }
 
     ImGui::BulletText("NASDAQ (Quotes and Trades)");
