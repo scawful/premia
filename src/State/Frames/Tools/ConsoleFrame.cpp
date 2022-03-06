@@ -218,11 +218,11 @@ void ConsoleFrame::update()
         return;
     }
 
-    if ( premia->tda_interface.is_session_active() ) {
-        if ( premia->tda_interface.get_session_responses().size() != 0 ) {
-            addLog("%s", premia->tda_interface.get_session_responses().front().c_str());
-        }
-    }
+    // if ( premia->tda_interface.is_session_active() ) {
+    //     if ( premia->tda_interface.get_session_responses().size() != 0 ) {
+    //         addLog("%s", premia->tda_interface.get_session_responses().front().c_str());
+    //     }
+    // }
 
 
     if (ImGui::BeginPopupContextItem())
