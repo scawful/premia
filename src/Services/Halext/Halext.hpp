@@ -2,12 +2,22 @@
 #define Halext_hpp
 
 #include "../../core.hpp"
+#include "Client.hpp"
+#include "User.hpp"
 
-class Halext
+namespace halext 
 {
-public:
-    Halext();
+    class Halext
+    {
+    private:
+        Client client;
+        User currentUser;
 
-};
+    public:
+        Halext();
+
+        bool privateBalance;
+    };
+}
 
 #endif

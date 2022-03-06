@@ -3,13 +3,16 @@
 
 #include "../../core.hpp"
 
-class Client 
+namespace halext 
 {
-private:
-    void establish_connection();
-    
-public:
-    Client();
-};
+    class Client 
+    {
+    private:
+        void establish_connection();
+        
+    public:
+        Client();
+    };
+}
 
 #endif
