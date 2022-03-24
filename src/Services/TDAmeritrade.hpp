@@ -56,6 +56,8 @@ namespace tda
                                    bool includeQuotes, std::string strategy, std::string range,
                                    std::string expMonth, std::string optionType);
 
+        void postOrder(std::string account_id, OrderType order_type, std::string symbol, int quantity);
+
         void startStreamingSession();
 
         void fetchAccessToken();

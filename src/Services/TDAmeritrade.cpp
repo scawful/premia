@@ -107,12 +107,9 @@ namespace tda
         JSONObject::ptree property_tree;
         std::ifstream json_file(filename, std::ios::in | std::ios::binary);
 
-        try
-        {
+        try {
             read_json(json_file, property_tree);
-        }
-        catch (std::exception &json_parser_error)
-        {
+        } catch (std::exception &json_parser_error) {
             SDL_Log("%s", json_parser_error.what());
         }
 
@@ -137,12 +134,9 @@ namespace tda
         JSONObject::ptree propertyTree;
         std::ifstream jsonFile("access_token.json", std::ios::in | std::ios::binary);
 
-        try
-        {
+        try {
             read_json(jsonFile, propertyTree);
-        }
-        catch (std::exception &json_parser_error)
-        {
+        } catch (std::exception &json_parser_error) {
             SDL_Log("%s", json_parser_error.what());
         }
 
@@ -150,10 +144,8 @@ namespace tda
         if (!keep_file)
             std::remove("access_token.json");
 
-        for (auto &access_it : propertyTree)
-        {
-            if (access_it.first == "access_token")
-            {
+        for (auto &access_it : propertyTree) {
+            if (access_it.first == "access_token") {
                 _access_token = access_it.second.get_value<std::string>();
             }
         }
@@ -289,6 +281,21 @@ namespace tda
     {
         std::string response = client.get_price_history(ticker, ptype, period_amt, ftype, freq_amt, ext);
         return parser.parse_price_history(parser.read_response(response), ticker, ftype);
+    }
+
+
+    /**
+     * @brief Interface for Client post_order routine
+     * @todo potentially make it specify the parameters beforehand 
+     * 
+     * @param account_id 
+     * @param order_type 
+     * @param symbol 
+     * @param quantity 
+     */
+    void postOrder(std::string account_id, OrderType order_type, std::string symbol, int quantity)
+    {
+        client.post_order(account_id, order_type, symbol, quantity);
     }
 
     /**

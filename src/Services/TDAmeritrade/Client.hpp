@@ -93,6 +93,7 @@ namespace tda
 
         // API Functions 
         void get_user_principals();
+        std::string post_account_order(std::string account_id);
         std::string post_access_token();
 
 
@@ -110,6 +111,8 @@ namespace tda
         std::string get_quote(std::string symbol);
         std::string get_account(std::string account_id);
         std::vector<std::string> get_all_account_ids();
+
+        void post_order(std::string account_id, OrderType order_type, std::string symbol, int quantity);
 
         void start_session();
         void start_session(std::string ticker, std::string fields);

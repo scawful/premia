@@ -266,6 +266,72 @@ void Client::get_user_principals()
 }
 
 /**
+ * @brief @brief Send a POST request for placing an order 
+ * 
+ * @return std::string 
+ */
+std::string Client::post_account_order(std::string account_id)
+{
+    CURL *curl;
+    CURLcode res;
+    std::string response;
+    std::string endpoint = "https://api.tdameritrade.com/v1/accounts/{account_id}/orders";
+    string_replace(endpoint, "{account_id}", account_id);
+
+    res = curl_global_init(CURL_GLOBAL_ALL);
+    curl = curl_easy_init();
+    if (curl)
+    {
+        // set the url to receive the POST
+        curl_easy_setopt(curl, CURLOPT_URL, endpoint);
+
+        // specify we want to post
+        curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
+
+        // set the headers for the request
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+        res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+        std::string auth_bearer = "Authorization: Bearer " + access_token;
+        headers = curl_slist_append(headers, auth_bearer.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+        // chunked request for http1.1/200 ok
+        struct curl_slist *chunk = NULL;
+        chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
+        res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+
+        // specify post data, have to url encode the refresh token
+        // @todo set up order request 
+        std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), refresh_token.length());
+        std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
+
+        // write data from the url to the function
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+        // specify the user agent
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+
+        // run the operations
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK)
+            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+
+        // cleanup yeah yeah
+        curl_easy_cleanup(curl);
+    }
+
+    curl_global_cleanup();
+    return response;
+}
+
+/**
  * @brief Send a POST request using the consumer key and refresh token to get the access token
  * @author @scawful
  * 
@@ -537,6 +603,19 @@ std::vector<std::string> Client::get_all_account_ids()
     }
 
     return accounts;
+}
+
+/**
+ * @brief 
+ * 
+ * @param account_id 
+ * @param order_type 
+ * @param symbol 
+ * @param quantity 
+ */
+void post_order(std::string account_id, OrderType order_type, std::string symbol, int quantity)
+{
+
 }
 
 /**
