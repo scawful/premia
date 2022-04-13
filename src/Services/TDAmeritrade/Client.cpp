@@ -283,7 +283,7 @@ std::string Client::post_account_order(std::string account_id)
     if (curl)
     {
         // set the url to receive the POST
-        curl_easy_setopt(curl, CURLOPT_URL, endpoint);
+        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
 
         // specify we want to post
         curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
@@ -613,7 +613,7 @@ std::vector<std::string> Client::get_all_account_ids()
  * @param symbol 
  * @param quantity 
  */
-void post_order(std::string account_id, OrderType order_type, std::string symbol, int quantity)
+void Client::post_order(std::string account_id, OrderType order_type, std::string symbol, int quantity)
 {
 
 }
