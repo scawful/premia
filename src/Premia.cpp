@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     Manager premia;
 
-    premia.init(300,400);
+    premia.init(300,200);
     premia.change( LoginState::instance() );
     
     while ( premia.running() )
