@@ -56,11 +56,6 @@
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 
-// QuantLib
-// #include <ql/quantlib.hpp>
-// #include <ql/option.hpp>
-// #include <ql/instruments/stock.hpp>
-// #include <ql/quotes/all.hpp>
 
 // libcURL
 #include <curl/curl.h>
