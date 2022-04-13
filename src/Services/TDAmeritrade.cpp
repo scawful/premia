@@ -293,7 +293,7 @@ namespace tda
      * @param symbol 
      * @param quantity 
      */
-    void postOrder(std::string account_id, OrderType order_type, std::string symbol, int quantity)
+    void TDAmeritrade::postOrder(std::string account_id, OrderType order_type, std::string symbol, int quantity)
     {
         client.post_order(account_id, order_type, symbol, quantity);
     }
