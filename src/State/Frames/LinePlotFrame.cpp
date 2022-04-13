@@ -67,14 +67,14 @@ void LinePlotFrame::update()
     ImGuiIO& io = ImGui::GetIO();
     if (ImPlot::BeginPlot("Equity Curve", ImVec2(io.DisplaySize.x * 0.73, io.DisplaySize.y * 0.59))) {
         ImPlot::SetupAxes("Date","Price");
-        ImPlot::SetupAxesLimits(1,257,1200,18000);
+        ImPlot::SetupAxesLimits(1,290,1200,18000);
         if (show_fills) {
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.25f);
-            ImPlot::PlotShaded("TDAmeritrade", x, y, 257, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
+            ImPlot::PlotShaded("TDAmeritrade", x, y, 290, shade_mode == 0 ? -INFINITY : shade_mode == 1 ? INFINITY : fill_ref);
             ImPlot::PopStyleVar();
         }
         if (show_lines) {
-            ImPlot::PlotLine("TDAmeritrade", x, y, 257);
+            ImPlot::PlotLine("TDAmeritrade", x, y, 290);
         }
         ImPlot::EndPlot();
     }
