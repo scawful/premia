@@ -10,7 +10,7 @@ PrimaryState PrimaryState::m_PrimaryState;
  * 
  * @param premia 
  */
-void PrimaryState::init(Manager *premia)
+void PrimaryState::init(Manager * premia)
 {
     this->premia = premia;
     this->title_string = "Home";
@@ -135,7 +135,8 @@ void PrimaryState::handleEvents()
         }
     }
 
-    int mouseX, mouseY;
+    int mouseX;
+    int mouseY;
     const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
 
     io.DeltaTime = 1.0f / 60.0f;
@@ -156,15 +157,14 @@ void PrimaryState::update()
 {
     ImGui::NewFrame();
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
-    ImGuiIO& io = ImGui::GetIO();
-
+    const ImGuiIO & io = ImGui::GetIO();
 
     ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
     if (mainMenu.watchlistView()) {
-        dimensions.x = io.DisplaySize.x * 0.75;
+        dimensions.x = io.DisplaySize.x * (float) 0.75;
     }
     if (mainMenu.consoleView() || mainMenu.portfolioView() ) {
-        dimensions.y = io.DisplaySize.y * 0.70;
+        dimensions.y = io.DisplaySize.y * (float) 0.70;
     }
     ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
 
@@ -173,7 +173,7 @@ void PrimaryState::update()
         flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
     }
     
-    if (!ImGui::Begin(  title_string.c_str(), NULL, flags)) {
+    if (!ImGui::Begin(  title_string.c_str(), nullptr, flags)) {
         ImGui::End();
         return;
     }
@@ -219,7 +219,7 @@ void PrimaryState::update()
     if (mainMenu.watchlistView()) 
     {
         ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.75, 0));
-        ImVec2 size = ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y * 0.70);
+        auto size = ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y * 0.70);
         if (!mainMenu.consoleView() && !mainMenu.portfolioView()) {
             size = ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y);
         }
@@ -230,7 +230,7 @@ void PrimaryState::update()
     if (mainMenu.consoleView()) 
     {
         ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y * 0.70));
-        ImVec2 size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
+        auto size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
         if (!mainMenu.portfolioView()) {
             size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30);
         }
@@ -239,8 +239,8 @@ void PrimaryState::update()
     }
 
     if (mainMenu.portfolioView()) {
-        ImVec2 size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
-        ImVec2 pos = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70);
+        auto size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
+        auto pos = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70);
         if (!mainMenu.consoleView()) {
             size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30);
             pos = ImVec2(0, io.DisplaySize.y * 0.70);
@@ -262,7 +262,8 @@ void PrimaryState::update()
 void PrimaryState::draw()
 {
     // fill window bounds
-    int w = 1920, h = 1080;
+    int w = 1920;
+    int h = 1080;
     SDL_SetRenderDrawColor(premia->pRenderer, 55, 55, 55, 0);
     SDL_GetWindowSize(premia->pWindow, &w, &h);
     SDL_Rect f = {0, 0, 1920, 1080};
