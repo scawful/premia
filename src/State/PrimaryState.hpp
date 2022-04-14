@@ -22,7 +22,7 @@ class PrimaryState : public State
 private:
     static PrimaryState m_PrimaryState;
 
-    Manager* premia = NULL;
+    Manager* premia = nullptr;
 
     std::string title_string;
     bool protected_mode = true;
@@ -46,18 +46,19 @@ private:
 
 
 protected:
-    PrimaryState() { }
+    PrimaryState()=default;
+    ~PrimaryState()=default;
 
 public:
-    void init(Manager *premia);
-    void cleanup();
+    void init(Manager *premia) override;
+    void cleanup()             override;
 
-    void pause();
-    void resume();
+    void pause()               override;
+    void resume()              override;
 
-    void handleEvents();
-    void update();
-    void draw();
+    void handleEvents()        override;
+    void update()              override;
+    void draw()                override;
 
     static PrimaryState* instance()
     {
