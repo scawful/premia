@@ -10,9 +10,9 @@ PrimaryState PrimaryState::m_PrimaryState;
  * 
  * @param premia 
  */
-void PrimaryState::init(Manager * premia)
+void PrimaryState::init(Manager * manager)
 {
-    this->premia = premia;
+    this->premia = manager;
     this->title_string = "Home";
 
     mainMenu.import_manager(premia, &protected_mode, &tda_logged_in);
@@ -218,10 +218,10 @@ void PrimaryState::update()
 
     if (mainMenu.watchlistView()) 
     {
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.75, 0));
-        auto size = ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y * 0.70);
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.75f, 0));
+        auto size = ImVec2(io.DisplaySize.x * 0.25f, io.DisplaySize.y * 0.70f);
         if (!mainMenu.consoleView() && !mainMenu.portfolioView()) {
-            size = ImVec2(io.DisplaySize.x * 0.25, io.DisplaySize.y);
+            size = ImVec2(io.DisplaySize.x * 0.25f, io.DisplaySize.y);
         }
         ImGui::SetNextWindowSize(size, ImGuiCond_Always);
         watchlistFrame.update();
@@ -229,21 +229,21 @@ void PrimaryState::update()
     
     if (mainMenu.consoleView()) 
     {
-        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y * 0.70));
-        auto size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
+        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y * 0.70f));
+        auto size = ImVec2(io.DisplaySize.x * 0.50f, io.DisplaySize.y * 0.30f);
         if (!mainMenu.portfolioView()) {
-            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30);
+            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30f);
         }
         ImGui::SetNextWindowSize(size, ImGuiCond_Always);
         console.update();
     }
 
     if (mainMenu.portfolioView()) {
-        auto size = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.30);
-        auto pos = ImVec2(io.DisplaySize.x * 0.5, io.DisplaySize.y * 0.70);
+        auto size = ImVec2(io.DisplaySize.x * 0.50f, io.DisplaySize.y * 0.30f);
+        auto pos = ImVec2(io.DisplaySize.x * 0.50f, io.DisplaySize.y * 0.70f);
         if (!mainMenu.consoleView()) {
-            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30);
-            pos = ImVec2(0, io.DisplaySize.y * 0.70);
+            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30f);
+            pos = ImVec2(0, io.DisplaySize.y * 0.70f);
         }       
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size, ImGuiCond_Always);
