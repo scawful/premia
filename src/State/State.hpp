@@ -7,7 +7,7 @@
 class State
 {
 public:
-    virtual void init( Manager *premia ) = 0;
+    virtual void init(Manager *premia) = 0;
     virtual void cleanup() = 0;
     
     virtual void pause() = 0;
@@ -17,13 +17,15 @@ public:
     virtual void update() = 0;
     virtual void draw() = 0;
     
-    void changeState( Manager *premia, State *state )
+    void changeState(Manager *premia, State *state) const
     {
         premia->change(state);
     }
     
 protected:
-    State() { }
+    State()=default;
+    ~State()=default;
+
 };
 
 #endif /* State_hpp */
