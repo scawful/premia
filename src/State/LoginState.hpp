@@ -11,22 +11,23 @@ class LoginState : public State
 private:
     static LoginState m_LoginState;
 
-    Manager* premia = NULL;
+    Manager * premia = nullptr;
     LoginFrame loginFrame;
 
 protected:
-    LoginState() { }
+    LoginState()=default;
+    ~LoginState()=default;
 
 public:
-    void init(Manager *premia);
-    void cleanup();
+    void init(Manager *premia) override;
+    void cleanup()             override;
 
-    void pause();
-    void resume();
+    void pause()               override;
+    void resume()              override;
 
-    void handleEvents();
-    void update();
-    void draw();
+    void handleEvents()        override;
+    void update()              override;
+    void draw()                override;
 
     static LoginState* instance()
     {

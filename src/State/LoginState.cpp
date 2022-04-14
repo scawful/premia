@@ -10,9 +10,9 @@ LoginState LoginState::m_LoginState;
  * 
  * @param premia 
  */
-void LoginState::init(Manager *premia)
+void LoginState::init(Manager * manager)
 {
-    this->premia = premia;
+    this->premia = manager;
     loginFrame.import_manager(premia);
     ImGui::StyleColorsClassic();
 }
@@ -84,7 +84,6 @@ void LoginState::handleEvents()
             {
                 int key = event.key.keysym.scancode;
                 IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
-                //io.KeysDown[key] = (event.type == SDL_KEYDOWN);
                 io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
                 io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
                 io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
@@ -140,11 +139,11 @@ void LoginState::handleEvents()
 void LoginState::update()
 {
     ImGui::NewFrame();
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO & io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(300,400), ImGuiCond_Always);
 
-    if (!ImGui::Begin("Premia Login", NULL, ImGuiWindowFlags_NoCollapse)) {
+    if (!ImGui::Begin("Premia Login", nullptr, ImGuiWindowFlags_NoCollapse)) {
         ImGui::End();
         return;
     }
