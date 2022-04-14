@@ -16,21 +16,17 @@ namespace tda
 {
     class Parser 
     {
-    private:
-
     public:
         Parser();
 
-        JSONObject::ptree read_response(std::string response);
-
-        std::string parse_access_token(std::string response);
-
-        Quote parse_quote(JSONObject::ptree data);
-        PriceHistory parse_price_history(JSONObject::ptree data, std::string ticker, int freq);
-        UserPrincipals parse_user_principals(JSONObject::ptree data);
-        OptionChain parse_option_chain(JSONObject::ptree data);
-        Account parse_account(JSONObject::ptree data);
-        std::vector<Watchlist> parse_watchlist_data(JSONObject::ptree data);
+        JSONObject::ptree read_response(const std::string & response) const;
+        std::string parse_access_token(const std::string & response) const;
+        Quote parse_quote(const JSONObject::ptree & data) const;
+        PriceHistory parse_price_history(const JSONObject::ptree & data, const std::string & ticker, int freq) const;
+        UserPrincipals parse_user_principals(JSONObject::ptree & data) const;
+        OptionChain parse_option_chain(const JSONObject::ptree & data) const;
+        Account parse_account(const JSONObject::ptree & data) const;
+        std::vector<Watchlist> parse_watchlist_data(const JSONObject::ptree & data) const;
     };
 
 }
