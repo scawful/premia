@@ -32,7 +32,7 @@ public:
     void update();
     void draw();
     
-    bool running() { return m_running; }
+    bool running() const { return m_running; }
     void quit() { m_running = false; }
     
     halext::Halext halext_interface;
@@ -40,10 +40,9 @@ public:
     iex::IEXCloud iex_interface;
     GenericClient client;
     
-    SDL_Renderer *pRenderer = NULL;
-    SDL_Window *pWindow = NULL;
-    SDL_Surface *screen;
-
+    SDL_Renderer * pRenderer = nullptr;
+    SDL_Window * pWindow = nullptr;
+    SDL_Surface * screen;
 };
 
 #endif /* Manager_hpp */
