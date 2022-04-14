@@ -47,10 +47,10 @@ void MenuFrame::draw_style_editor()
 
     // Default to using internal storage as reference
     static bool init = true;
-    if (init && ref == NULL)
+    if (init && ref == nullptr)
         ref_saved_style = style;
     init = false;
-    if (ref == NULL)
+    if (ref == nullptr)
         ref = &ref_saved_style;
 
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.50f);
@@ -295,30 +295,30 @@ MenuFrame::MenuFrame() : Frame()
     init_hot_keys();
 }
 
-bool MenuFrame::portfolioView()
+bool MenuFrame::portfolioView() const 
 {
     return portfolio_view;
 }
-bool MenuFrame::consoleView()
+bool MenuFrame::consoleView() const 
 {
     return console_view;
 }
-bool MenuFrame::watchlistView()
+bool MenuFrame::watchlistView() const 
 {
     return watchlist_view;
 }
 
-bool MenuFrame::freeMode()
+bool MenuFrame::freeMode() const 
 {
     return free_mode;
 }
 
-void MenuFrame::set_title(std::string &title_string)
+void MenuFrame::set_title(const std::string & title)
 {
-    this->title_string = title_string;
+    this->title_string = title;
 }
 
-MenuFrame::SubFrame MenuFrame::get_current_frame()
+MenuFrame::SubFrame MenuFrame::get_current_frame() const
 {
     return this->current_frame;
 }
@@ -327,32 +327,20 @@ void MenuFrame::update()
 {
     static bool about = false;
 
-    if (ImGui::BeginMenuBar())
-    {
-        if ( ImGui::BeginMenu( "File" ) )
-        {
-            if ( ImGui::MenuItem("Premia Home") )
-            {
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Premia Home")) {
                 current_frame = MenuFrame::SubFrame::PREMIA_HOME;
             }
-
-            if ( ImGui::MenuItem("New Workspace", "CTRL + N") ) {
-                
-            }
+            ImGui::MenuItem("New Workspace", "CTRL + N");
             ImGui::Separator();
-            if (ImGui::MenuItem("Open Workspace", "CTRL + O")) {
-
-            }
+            ImGui::MenuItem("Open Workspace", "CTRL + O");
             if (ImGui::BeginMenu("Open Recent")) {
                 ImGui::MenuItem("None");
                 ImGui::EndMenu();
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Save Workspace", "CTRL + S"))
-            {
-
-            }
-            
+            ImGui::MenuItem("Save Workspace", "CTRL + S");
             ImGui::Separator();
             if (ImGui::BeginMenu("Preferences"))
             {
@@ -365,8 +353,8 @@ void MenuFrame::update()
 
                 ImGui::Text("Hot Keys");
                 ImGui::BeginChild("Hot Keys", ImVec2(0, 100), true);
-                for ( auto & each : hot_keys ) {
-                    ImGui::Text("%s  %s", each.first.c_str(), each.second.c_str());
+                for ( const auto & [key, value] : hot_keys ) {
+                    ImGui::Text("%s  %s", key.c_str(), value.c_str());
                 }
                 ImGui::EndChild();
 
@@ -385,34 +373,15 @@ void MenuFrame::update()
         * 
         */
         if (ImGui::BeginMenu("Edit")) {
-            if (ImGui::MenuItem("Undo", "CTRL + Z"))
-            {
-
-            }
-            if (ImGui::MenuItem("Redo", "CTRL + Y"))
-            {
-
-            }
+            ImGui::MenuItem("Undo", "CTRL + Z");
+            ImGui::MenuItem("Redo", "CTRL + Y");
             ImGui::Separator();
-            if (ImGui::MenuItem("Cut", "CTRL + X"))
-            {
-
-            }            
-            if (ImGui::MenuItem("Copy", "CTRL + C"))
-            {
-
-            }            
-            if (ImGui::MenuItem("Paste", "CTRL + V"))
-            {
-
-            }
-            if (ImGui::MenuItem("Delete", "DEL"))
-            {
-
-            }
+            ImGui::MenuItem("Cut", "CTRL + X");
+            ImGui::MenuItem("Copy", "CTRL + C");
+            ImGui::MenuItem("Paste", "CTRL + V");
+            ImGui::MenuItem("Delete", "DEL");
             ImGui::Separator();
-            if (ImGui::BeginMenu("Style"))
-            {
+            if (ImGui::BeginMenu("Style")) {
                 draw_style_editor(); 
                 ImGui::EndMenu();       
             }
@@ -425,22 +394,12 @@ void MenuFrame::update()
                 current_frame = SubFrame::LOGIN;
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("General Chat")) {
-
-            }
-            if (ImGui::MenuItem("Script Editor")) {
-
-            }
+            ImGui::MenuItem("General Chat");
+            ImGui::MenuItem("Script Editor");
             ImGui::Separator();
-            if (ImGui::MenuItem("Console View", "", & console_view)) {
-
-            }
-            if (ImGui::MenuItem("Portfolio View", "", &portfolio_view)) {
-
-            }
-            if (ImGui::MenuItem("Watchlist View", "", &watchlist_view)) {
-
-            }
+            ImGui::MenuItem("Console View", "", & console_view);
+            ImGui::MenuItem("Portfolio View", "", &portfolio_view);
+            ImGui::MenuItem("Watchlist View", "", &watchlist_view);
             ImGui::Separator();
             ImGui::MenuItem("Free Mode", "", &free_mode);
 
@@ -449,34 +408,17 @@ void MenuFrame::update()
 
         if (ImGui::BeginMenu("Trade"))
         {
-            if ( ImGui::MenuItem("Place Order") )
-            {
+            if ( ImGui::MenuItem("Place Order") ){
                 current_frame = SubFrame::TRADING;
             }
-
-            if ( ImGui::MenuItem("Replace Order") )
-            {
-                // replace order
-            }
-
-            if ( ImGui::MenuItem("Cancel Order") )
-            {
-                // cancel order
-            }
-
+            ImGui::MenuItem("Replace Order");
+            ImGui::MenuItem("Cancel Order");
             ImGui::Separator();
-
-            if ( ImGui::MenuItem("Get Order") )
-            {
-                // get order 
-            }
-
+            ImGui::MenuItem("Get Order");
             ImGui::Separator();
-
             if (ImGui::MenuItem("Option Chain")) {
                 current_frame = SubFrame::OPTION_CHAIN;
             }
-
             ImGui::EndMenu();
         }
 
@@ -485,48 +427,26 @@ void MenuFrame::update()
             if (ImGui::MenuItem("Market Overview")) {
                 current_frame = SubFrame::MARKET_OVERVIEW;
             }
-
             ImGui::Separator();
-            if (ImGui::MenuItem("Candle Chart")) 
-            {
+            if (ImGui::MenuItem("Candle Chart")) {
                 current_frame = SubFrame::CANDLE_CHART;
             } 
-
-            if (ImGui::MenuItem("Line Chart")) 
-            {
+            if (ImGui::MenuItem("Line Chart")) {
                 current_frame = SubFrame::LINE_PLOT;
             }
-
-            if (ImGui::MenuItem("Bar Chart"))
-            {
-
-            }
-
-
+            ImGui::MenuItem("Bar Chart");
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Research"))
         {   
-            if (ImGui::MenuItem("Daily Treasury Rates", "PRO")) {
-
-            }
-            if (ImGui::MenuItem("Federal Funds Rate", "PRO")) {
-
-            }
-            if (ImGui::MenuItem("Unemployment Rate", "PRO")) {
-
-            }
-            if (ImGui::MenuItem("US Recession Probabilities", "PRO")) {
-
-            }
+            ImGui::MenuItem("Daily Treasury Rates", "PRO");
+            ImGui::MenuItem("Federal Funds Rate", "PRO");
+            ImGui::MenuItem("Unemployment Rate", "PRO");
+            ImGui::MenuItem("US Recession Probabilities", "PRO");
             ImGui::Separator();
-            if (ImGui::MenuItem("Consumer Price Index", "PRO")) {
-
-            }
-            if (ImGui::MenuItem("Industrial Production Index", "PRO")) {
-
-            }
+            ImGui::MenuItem("Consumer Price Index", "PRO");
+            ImGui::MenuItem("Industrial Production Index", "PRO");
             ImGui::Separator();
             if (ImGui::MenuItem("Risk Appetite Index")) {
                 current_frame = SubFrame::RISK_APPETITE;
@@ -540,14 +460,9 @@ void MenuFrame::update()
             if (ImGui::MenuItem("Market Movers")) {
                 current_frame = SubFrame::MARKET_MOVERS;
             }
-
             ImGui::Separator();
-            if (ImGui::MenuItem("Insider Roster", "PRO")) {
-
-            }
-            if (ImGui::MenuItem("Insider Summary", "PRO")) {
-
-            }
+            ImGui::MenuItem("Insider Roster", "PRO");
+            ImGui::MenuItem("Insider Summary", "PRO");
             if (ImGui::MenuItem("Insider Transactions", "PRO")) {
                 current_frame = SubFrame::INSIDER_TRANSACTIONS;
             }
@@ -555,22 +470,14 @@ void MenuFrame::update()
                 current_frame = SubFrame::FUND_OWNERSHIP;
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Retail Money Funds", "PRO")) {
-
-            }
-            if (ImGui::MenuItem("Institutional Money Funds", "PRO")) {
-
-            }
+            ImGui::MenuItem("Retail Money Funds", "PRO");
+            ImGui::MenuItem("Institutional Money Funds", "PRO");
             if (ImGui::MenuItem("Institutional Ownership", "PRO")) {
                 current_frame = SubFrame::INSTITUTIONAL_OWNERSHIP;
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Largest Trades", "PRO")) {
-
-            }
-            if (ImGui::MenuItem("Market Volume (U.S.)", "PRO")) {
-
-            }
+            ImGui::MenuItem("Largest Trades", "PRO");
+            ImGui::MenuItem("Market Volume (U.S.)", "PRO");
             ImGui::EndMenu();
         }
 
@@ -623,7 +530,7 @@ void MenuFrame::update()
     if ( about )
         ImGui::OpenPopup("About");
 
-    if ( ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
+    if ( ImGui::BeginPopupModal("About", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
     {
         ImGui::Text("Premia Version 0.3");
         ImGui::Text("Written by: Justin Scofield (scawful)");

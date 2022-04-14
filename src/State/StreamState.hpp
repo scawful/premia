@@ -28,19 +28,20 @@ private:
     void set_instrument( std::string ticker );
 
 protected:
-    StreamState() { }
+    StreamState()=default;
+    ~StreamState()=default;
 
 public:
-    void init(Manager *premia);
-    void cleanup();
+    void init(Manager *premia) override;
+    void cleanup()             override;
 
-    void pause();
-    void resume();
+    void pause()               override;
+    void resume()              override;
 
 
-    void handleEvents();
-    void update();
-    void draw();
+    void handleEvents()        override;
+    void update()              override;
+    void draw()                override;
 
     static StreamState* instance()
     {

@@ -119,7 +119,8 @@ void LoginState::handleEvents()
         }
     }
 
-    int mouseX, mouseY;
+    int mouseX;
+    int mouseY;
     const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
 
     io.DeltaTime = 1.0f / 60.0f;
@@ -165,7 +166,8 @@ void LoginState::update()
 void LoginState::draw()
 {
     // fill window bounds
-    int w = 1920, h = 1080;
+    int w = 1920;
+    int h = 1080;
     SDL_SetRenderDrawColor(premia->pRenderer, 55, 55, 55, 0);
     SDL_GetWindowSize(premia->pWindow, &w, &h);
     SDL_Rect f = {0, 0, 1920, 1080};

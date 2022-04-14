@@ -39,13 +39,13 @@ private:
 public:
     MenuFrame();
 
-    bool portfolioView();
-    bool consoleView();
-    bool watchlistView();
-    bool freeMode();
+    bool portfolioView() const;
+    bool consoleView() const;
+    bool watchlistView() const;
+    bool freeMode() const;
 
-    void set_title(std::string & title_string);
-    SubFrame get_current_frame();
+    void set_title(const std::string & title_string);
+    SubFrame get_current_frame() const;
     void update();
     void render();
 

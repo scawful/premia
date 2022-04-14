@@ -77,9 +77,9 @@ void PrimaryState::handleEvents()
 
     ImGuiIO& io = ImGui::GetIO();
 
-    while ( SDL_PollEvent(&event) ) 
+    while (SDL_PollEvent(&event)) 
     {
-        switch ( event.type ) 
+        switch (event.type) 
         {
             case SDL_KEYDOWN:
                 switch ( event.key.keysym.sym )
