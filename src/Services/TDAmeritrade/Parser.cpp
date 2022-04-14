@@ -264,29 +264,33 @@ std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::
     for ( auto const & [dataKey, dataValue] : data ) {
         // Array of Watchlists
         Watchlist watchlist;
-        for ( auto const & each_watchlist : dataValue ) {
+        for ( auto const & [watchlistKey, watchlistValue] : dataValue ) {
             // Each element in a watchlist 
-            if ( each_watchlist.first == "name" ) {
-                watchlist.setName(each_watchlist.second.get_value< std::string >());
-            } else if ( each_watchlist.first == "watchlistId" ) {
-                watchlist.setId(each_watchlist.second.get_value< int >());
+            if ( watchlistKey == "name" ) {
+                watchlist.setName(watchlistValue.get_value< std::string >());
+            } else if ( watchlistKey == "watchlistId" ) {
+                watchlist.setId(watchlistValue.get_value< int >());
             } else {
-                for ( auto const & each_element : each_watchlist.second ) { // Watchlist items 
-                    for ( auto const & each_item : each_element.second ) { // Instrument sub array 
-                        if ( each_item.first == "instrument" ) {
-                            std::string symbol, desc, type;
-                            for ( auto const & each : each_item.second ) {
-                                if ( each.first == "symbol" ) {
-                                    symbol = each.second.get_value< std::string >();
-                                } else if ( each.first == "description" ) {
-                                    desc = each.second.get_value< std::string >();
-                                } else if ( each.first == "assetType" ) {
-                                    type = each.second.get_value< std::string >();
+                for (auto const & [elementKey, elementValue] : watchlistValue) { 
+                    // Watchlist items 
+                    for (auto const & [itemKey, itemValue] : elementValue) { 
+                        // Instrument sub array 
+                        if ( itemKey == "instrument" ) {
+                            std::string symbol;
+                            std::string desc;
+                            std::string type;
+                            for ( auto const & [instrumentKey, instrumentValue] : itemValue ) {
+                                if ( instrumentKey == "symbol" ) {
+                                    symbol = instrumentValue.get_value< std::string >();
+                                } else if ( instrumentKey == "description" ) {
+                                    desc = instrumentValue.get_value< std::string >();
+                                } else if ( instrumentKey == "assetType" ) {
+                                    type = instrumentValue.get_value< std::string >();
                                 }
                             }
                             watchlist.addInstrument(symbol, desc, type);
                         } else {
-                            watchlist.addVariable(each_item.first, each_item.second.get_value< std::string >());
+                            watchlist.addVariable(itemKey, itemValue.get_value< std::string >());
                         }
                     }
                 }
