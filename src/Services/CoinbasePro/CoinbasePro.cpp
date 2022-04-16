@@ -2,35 +2,22 @@
 namespace cbp
 {
 
-    CoinbasePro::CoinbasePro()
-    {
+    CoinbasePro::CoinbasePro() {
         http_client = boost::make_shared<Client>( CBP_KEY, CBP_SECRET, CBP_PASSPHRASE, true );
     }
 
-    CoinbasePro::~CoinbasePro()
-    {
-
-    }
+    CoinbasePro::~CoinbasePro()=default;
 
     boost::shared_ptr<Account> CoinbasePro::list_accounts()
     {
-        std::time_t now = std::time(0);
-        std::string output_filename = "cbp_accounts_" + std::to_string(now) + ".json";
-        http_client->send_request( output_filename, "/accounts" );
-
-        std::ifstream json_file( output_filename, std::ios::in | std::ios::binary );
-
+        std::string response = http_client->send_request("/accounts");
+        std::istringstream json_response(response);
         boost::property_tree::ptree property_tree;
-
         try {
-            read_json( json_file, property_tree );
-        }
-        catch ( std::exception& json_parser_error ) {
+            read_json( json_response, property_tree );
+        } catch ( const boost::property_tree::ptree_error & json_parser_error ) {
             SDL_Log( "%s", json_parser_error.what() );
         }
-
-        json_file.close();
-        std::remove( output_filename.c_str() );
 
         boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( property_tree );
         return new_account_data;
@@ -38,47 +25,31 @@ namespace cbp
 
     boost::shared_ptr<Product> CoinbasePro::get_product_ticker( std::string symbol )
     {
-        std::time_t now = std::time(0);
-        std::string output_filename = "cbp_product_" + symbol + "_" + std::to_string(now) + ".json";
-
         std::string request = "/products/" + symbol + "-USD/ticker";
-        http_client->send_request( output_filename, request );
-
-        std::ifstream json_file( output_filename, std::ios::in | std::ios::binary );
+        std::string response = http_client->send_request(request);
+        std::istringstream json_response(response);
         boost::property_tree::ptree property_tree;
-        
         try {
-            read_json( json_file, property_tree );
+            read_json( json_response, property_tree );
         }
         catch ( std::exception& json_parser_error ) {
             SDL_Log( "%s", json_parser_error.what() );
         }
-
-        json_file.close();
-        std::remove( output_filename.c_str() );
         boost::shared_ptr<Product> new_product_data = boost::make_shared<Product>( property_tree );
         return new_product_data;
     }
 
     float CoinbasePro::get_deposits()
     {
-        std::time_t now = std::time(0);
-        std::string output_filename = "cbp_deposits_" + std::to_string(now) + ".json";
-        http_client->send_request( output_filename, "/transfers" );
-
-        std::ifstream json_file( output_filename, std::ios::in | std::ios::binary );
+        std::string response = http_client->send_request("/transfers");
+        std::istringstream json_response(response);
         boost::property_tree::ptree property_tree;
-        
         try {
-            read_json( json_file, property_tree );
+            read_json( json_response, property_tree );
         }
         catch ( std::exception& json_parser_error ) {
             SDL_Log( "%s", json_parser_error.what() );
         }
-
-        json_file.close();
-        std::remove( output_filename.c_str() );
-
         total_deposits_usd = 0.f;
         for ( auto & deposit_it : property_tree )
         {
@@ -90,7 +61,6 @@ namespace cbp
                 }
             }
         }
-
         return total_deposits_usd;
     }
 
