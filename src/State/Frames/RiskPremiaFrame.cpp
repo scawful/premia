@@ -16,18 +16,19 @@ void reverse_array(double arr[], int start, int end)
 void RiskPremiaFrame::init_pie_chart()
 {
     tda::Account account = premia->tda_interface.getDefaultAccount();
-    if ( symbols_array.size() != 0 ) {
+    if ( !symbols_array.empty() ) {
         symbols_array.clear();
     }
     for ( int i = 0; i < account.get_position_vector_size(); i++ ) {
-        for ( auto& position_it : account.get_position( i ) ) {
-            if ( position_it.first == "symbol" ) {
-                std::string str = position_it.second;
+        for ( const auto& [positionsKey, positionsValue] : account.get_position( i ) ) {
+            if ( positionsKey == "symbol" ) {
+                std::string str = positionsValue;
                 symbols_array.push_back( str );
             }
         }
     }
-    int size = symbols_array.size();
+    
+    auto size = static_cast<int>(symbols_array.size());
     num_positions = size;
     positions_labels = new char*[size];
     positions_pie = new double[size];
@@ -390,7 +391,7 @@ void RiskPremiaFrame::update()
 
         if (ImGui::BeginTabItem("Volatility Index"))
         {
-            if (ImPlot::BeginPlot("SPX Volatility Index", ImVec2(-1, io.DisplaySize.x * 0.35)))
+            if (ImPlot::BeginPlot("SPX Volatility Index", ImVec2(-1, io.DisplaySize.x * 0.35f)))
             {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
@@ -407,7 +408,7 @@ void RiskPremiaFrame::update()
         }
 
         if (ImGui::BeginTabItem("Dark Index")) {
-            if (ImPlot::BeginPlot("SPX Dark Index", ImVec2(-1, io.DisplaySize.x * 0.35)))
+            if (ImPlot::BeginPlot("SPX Dark Index", ImVec2(-1, io.DisplaySize.x * 0.35f)))
             {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
@@ -425,7 +426,7 @@ void RiskPremiaFrame::update()
 
         if (ImGui::BeginTabItem("Gamma Exposure Index"))
         {
-            if (ImPlot::BeginPlot("SPX Gamma Exposure Index", ImVec2(-1, io.DisplaySize.x * 0.35)))
+            if (ImPlot::BeginPlot("SPX Gamma Exposure Index", ImVec2(-1, io.DisplaySize.x * 0.35f)))
             {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
@@ -444,7 +445,7 @@ void RiskPremiaFrame::update()
 
         if (ImGui::BeginTabItem("Gamma Volatility Index"))
         {
-            if (ImPlot::BeginPlot("1-day Gamma Volatiltiy", ImVec2(-1, io.DisplaySize.x * 0.35)))
+            if (ImPlot::BeginPlot("1-day Gamma Volatiltiy", ImVec2(-1, io.DisplaySize.x * 0.35f)))
             {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
