@@ -13,7 +13,7 @@ void Manager::init(int width, int height)
 {
     m_running = true;
 
-    if ( SDL_Init( SDL_INIT_EVERYTHING ) ) {
+    if (SDL_Init(SDL_INIT_EVERYTHING)) {
         SDL_Log("SDL_Init: %s\n", SDL_GetError() );
     } else {
         pWindow = SDL_CreateWindow(
@@ -22,41 +22,38 @@ void Manager::init(int width, int height)
             SDL_WINDOWPOS_UNDEFINED,            // initial y position
             width,                              // width, in pixels
             height,                             // height, in pixels
-            SDL_WINDOW_RESIZABLE                // flags - see below
+            SDL_WINDOW_RESIZABLE                // flags
         );
-        
-        if ( pWindow == NULL ) {
-            SDL_Log("SDL_CreateWindow: %s\n", SDL_GetError());
+    }   
+
+    if (pWindow == nullptr) {
+        SDL_Log("SDL_CreateWindow: %s\n", SDL_GetError());
+        SDL_Quit();
+    }
+    else
+    {
+        pRenderer = SDL_CreateRenderer(pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        if (pRenderer == nullptr)
+        {
+            SDL_Log("SDL_CreateRenderer: %s\n", SDL_GetError());
             SDL_Quit();
         }
         else
         {
-            pRenderer = SDL_CreateRenderer( pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
-            if( pRenderer == NULL )
-            {
-                SDL_Log("SDL_CreateRenderer: %s\n", SDL_GetError());
-                SDL_Quit();
-            }
-            else
-            {
-                //Initialize renderer color
-                SDL_SetRenderDrawColor( pRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+            // Initialize renderer color
+            SDL_SetRenderDrawColor(pRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-                //Initialize PNG loading
-                int imgFlags = IMG_INIT_PNG;
-                if( !( IMG_Init( imgFlags ) & imgFlags ) )
-                {
-                    SDL_Log("Error initializing SDL_Image: %s\n", IMG_GetError());
-                }
-                
-                if ( TTF_Init() == -1 )
-                {
-                    SDL_Log("Error initializing SDL_ttf: %s\n", TTF_GetError());
-                }
+            // Initialize PNG loading
+            if (int imgFlags = IMG_INIT_PNG; !(IMG_Init( imgFlags ) & imgFlags)) {
+                SDL_Log("Error initializing SDL_Image: %s\n", IMG_GetError());
             }
-
+            
+            if ( TTF_Init() == -1 ) {
+                SDL_Log("Error initializing SDL_ttf: %s\n", TTF_GetError());
+            }
         }
     }
+
 
     // Create the ImGui context 
     ImGui::CreateContext();
@@ -94,8 +91,8 @@ void Manager::cleanup()
     // Close and destroy the window
     SDL_DestroyRenderer( pRenderer );
     SDL_DestroyWindow( pWindow );
-    pWindow = NULL;
-    pRenderer = NULL;
+    pWindow = nullptr;
+    pRenderer = nullptr;
 
     // Final clean up
     TTF_Quit();
