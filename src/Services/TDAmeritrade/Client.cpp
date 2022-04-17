@@ -32,7 +32,7 @@ std::string Client::get_api_frequency_amount(int value) const
  * @return true
  * @return false
  */
-bool Client::string_replace(std::string& str, const std::string from, const std::string to) const
+bool Client::string_replace(std::string & str, const std::string & from, const std::string & to) const
 {
     size_t start = str.find(from);
     if (start == std::string::npos)
@@ -52,13 +52,13 @@ bool Client::string_replace(std::string& str, const std::string from, const std:
  * @param s 
  * @return size_t 
  */
-size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
+size_t Client::json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s)
 {
     size_t new_length = size * nmemb;
     try {
-        s->append((char*)contents, new_length);
-    } catch(std::bad_alloc &e) {
-        // handle memory problem
+        s->append(contents, new_length);
+    } catch(const std::bad_alloc &e) {
+        SDL_Log("%s", e.what());
         return 0;
     }
     return new_length;
@@ -78,10 +78,8 @@ JSONObject::ptree Client::create_login_request()
     JSONObject::ptree parameters;
 
     std::unordered_map<std::string, std::string> account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
-    {
-        for (const auto& [key, value] : (JSONObject::ptree) v.second)
-        {
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (const auto& [key, value] : (JSONObject::ptree) v.second) {
             account_data[key] = value.get_value<std::string>();
         }
         break;
@@ -131,12 +129,9 @@ JSONObject::ptree Client::create_login_request()
     // convert string timestamp into time_t
     std::istringstream ss(reformatted_token_timestamp);
     ss >> std::get_time(&token_timestamp, "%Y-%m-%d %H:%M:%S");
-    if (ss.fail())
-    {
+    if (ss.fail()) {
         SDL_Log("Token timestamp parse failed!");
-    }
-    else
-    {
+    } else {
         // this is disgusting i'm sorry
         std::time_t token_timestamp_as_sec = std::mktime(&token_timestamp);
         std::chrono::time_point token_timestamp_point = std::chrono::system_clock::from_time_t(token_timestamp_as_sec);
@@ -190,7 +185,9 @@ JSONObject::ptree Client::create_login_request()
  */
 JSONObject::ptree Client::create_logout_request()
 {
-    JSONObject::ptree credentials, requests, parameters;
+    JSONObject::ptree credentials;
+    JSONObject::ptree requests;
+    JSONObject::ptree parameters;
 
     std::unordered_map<std::string, std::string> account_data;
     BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
@@ -269,11 +266,55 @@ void Client::get_user_principals()
 }
 
 /**
+ * @brief POST Request 
+ * 
+ * @param endpoint 
+ * @param data 
+ */
+void Client::post_authorized_request(const std::string & endpoint, const std::string & data) const 
+{
+    CURL *curl;
+    std::string response;
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl = curl_easy_init();
+
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
+
+    struct curl_slist *headers = nullptr;
+    curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+    std::string auth_bearer = "Authorization: Bearer " + access_token;
+    curl_slist_append(headers, auth_bearer.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    // specify post data, have to url encode the refresh token
+    std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
+    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
+
+    // write data from the url to the function
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+    // specify the user agent
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+
+    // run the operations
+    curl_easy_perform(curl);
+
+    // cleanup yeah yeah
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+}
+
+/**
  * @brief @brief Send a POST request for placing an order 
  * 
  * @return std::string 
  */
-std::string Client::post_account_order(std::string const &account_id)
+std::string Client::post_account_order(std::string const &account_id) const
 {
     CURL *curl;
     CURLcode res;
@@ -281,55 +322,51 @@ std::string Client::post_account_order(std::string const &account_id)
     std::string endpoint = "https://api.tdameritrade.com/v1/accounts/{account_id}/orders";
     string_replace(endpoint, "{account_id}", account_id);
 
-    // @todo implement a callback for curl_global_init code response 
-    res = curl_global_init(CURL_GLOBAL_ALL);
+    curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
-    if (curl)
-    {
-        // set the url to receive the POST
-        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+    // set the url to receive the POST
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
 
-        // specify we want to post
-        curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
+    // specify we want to post
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
 
-        // set the headers for the request
-        struct curl_slist *headers = nullptr;
-        headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-        res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    // set the headers for the request
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-        std::string auth_bearer = "Authorization: Bearer " + access_token;
-        headers = curl_slist_append(headers, auth_bearer.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    std::string auth_bearer = "Authorization: Bearer " + access_token;
+    headers = curl_slist_append(headers, auth_bearer.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-        // chunked request for http1.1/200 ok
-        struct curl_slist *chunk = nullptr;
-        chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
-        res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    // chunked request for http1.1/200 ok
+    struct curl_slist *chunk = nullptr;
+    chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
-        // specify post data, have to url encode the refresh token
-        // @todo set up order request 
-        std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-        std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+    // specify post data, have to url encode the refresh token
+    // @todo set up order request 
+    std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
+    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
 
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
 
-        // write data from the url to the function
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    // write data from the url to the function
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
-        // specify the user agent
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+    // specify the user agent
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
 
-        // run the operations
-        res = curl_easy_perform(curl);
+    // run the operations
+    res = curl_easy_perform(curl);
 
-        if (res != CURLE_OK)
-            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+    if (res != CURLE_OK)
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 
-        // cleanup yeah yeah
-        curl_easy_cleanup(curl);
-    }
+    // cleanup yeah yeah
+    curl_easy_cleanup(curl);
 
     curl_global_cleanup();
     return response;
@@ -347,51 +384,46 @@ std::string Client::post_access_token() const
     CURLcode res;
     std::string response;
 
-    // @todo implement a callback for curl_global_init code response 
-    res = curl_global_init(CURL_GLOBAL_ALL);
+    curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
+    // set the url to receive the POST
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
 
-    if (curl)
-    {
-        // set the url to receive the POST
-        curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
+    // specify we want to post
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
 
-        // specify we want to post
-        curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
+    // set the headers for the request
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-        // set the headers for the request
-        struct curl_slist *headers = nullptr;
-        headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-        res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    // chunked request for http1.1/200 ok
+    struct curl_slist *chunk = nullptr;
+    chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
-        // chunked request for http1.1/200 ok
-        struct curl_slist *chunk = nullptr;
-        chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
-        res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    // specify post data, have to url encode the refresh token
+    std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
+    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
 
-        // specify post data, have to url encode the refresh token
-        std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-        std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
 
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
+    // write data from the url to the function
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
-        // write data from the url to the function
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    // specify the user agent
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
 
-        // specify the user agent
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+    // run the operations
+    res = curl_easy_perform(curl);
 
-        // run the operations
-        res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 
-        if (res != CURLE_OK)
-            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-
-        // cleanup yeah yeah
-        curl_easy_cleanup(curl);
-    }
+    // cleanup yeah yeah
+    curl_easy_cleanup(curl);
 
     curl_global_cleanup();
     return response;
@@ -420,17 +452,16 @@ std::string Client::send_request(std::string const & endpoint) const
     std::string response;
 
     curl = curl_easy_init();
-    if (curl)
-    {
-        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-        res = curl_easy_perform(curl);
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    res = curl_easy_perform(curl);
 
-        /* always cleanup */
-        curl_easy_cleanup(curl);
-    }
+    if (res != CURLE_OK)
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 
+    /* always cleanup */
+    curl_easy_cleanup(curl);
     return response;
 }
 
@@ -475,7 +506,7 @@ std::string Client::send_authorized_request(std::string const & endpoint) const
  * @param account_id 
  * @return std::string 
  */
-std::string Client::get_watchlist_by_account(std::string const &account_id)
+std::string Client::get_watchlist_by_account(const std::string  & account_id) const
 {
     std::string url = "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
     string_replace(url, "{accountNum}", account_id);
@@ -495,7 +526,7 @@ std::string Client::get_watchlist_by_account(std::string const &account_id)
  * @param ext 
  * @return std::string 
  */
-std::string Client::get_price_history(std::string const &symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
+std::string Client::get_price_history(const std::string & symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
 {
     std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
 
@@ -530,7 +561,7 @@ std::string Client::get_price_history(std::string const &symbol, PeriodType ptyp
  */
 std::string Client::get_option_chain(std::string const &ticker, std::string const & contractType, std::string const & strikeCount,
                                      bool includeQuotes, std::string const & strategy, std::string const & range,
-                                     std::string const & expMonth, std::string const &  optionType)
+                                     std::string const & expMonth, std::string const &  optionType) const
 {
     OptionChain option_chain;
     std::string url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
@@ -559,7 +590,7 @@ std::string Client::get_option_chain(std::string const &ticker, std::string cons
  * @param symbol 
  * @return std::string 
  */
-std::string Client::get_quote(std::string const & symbol)
+std::string Client::get_quote(std::string const & symbol) const
 {
     std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
     string_replace(url, "{ticker}", symbol);
@@ -615,9 +646,11 @@ std::vector<std::string> Client::get_all_account_ids()
  * @param symbol 
  * @param quantity 
  */
-void Client::post_order(std::string const & account_id, OrderType order_type, std::string const & symbol, int quantity)
+void Client::post_order(const std::string & account_id, const tda::Order & order) const
 {
-    
+    std::string endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
+    string_replace(endpoint, "{accountId}", account_id);
+    post_authorized_request(endpoint, order.getString());
 }
 
 /**

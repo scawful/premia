@@ -6,6 +6,7 @@
 #include "Parser.hpp"
 #include "Session.hpp"
 #include "Data/UserPrincipals.hpp"
+#include "Data/Order.hpp"
 
 namespace JSONObject = boost::property_tree;
 
@@ -82,10 +83,10 @@ namespace tda
         std::string get_api_frequency_type(int value) const;
         std::string get_api_period_amount(int value) const;
         std::string get_api_frequency_amount(int value) const;
-        bool string_replace(std::string& str, const std::string from, const std::string to) const;
+        bool string_replace(std::string & str, const std::string & from, const std::string & to) const;
 
         // Data Retrieval
-        static size_t json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s);
+        static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s);
 
         // WebSocket functions
         JSONObject::ptree create_login_request();
@@ -94,8 +95,10 @@ namespace tda
 
         // API Functions 
         void get_user_principals();
-        std::string post_account_order(std::string const & account_id);
+        void post_authorized_request(const std::string & endpoint, const std::string & data) const;
+        std::string post_account_order(std::string const & account_id) const;
         std::string post_access_token() const;
+
 
 
     public:
@@ -104,19 +107,21 @@ namespace tda
         std::string send_request(std::string const & endpoint) const;
         std::string send_authorized_request(std::string const & endpoint) const;
 
-        std::string get_watchlist_by_account(std::string const & account_id);
-        std::string get_price_history(std::string const &  symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
+        std::string get_watchlist_by_account(std::string const & account_id) const;
+        std::string get_price_history(std::string const & symbol, 
+                                      PeriodType ptype, int period_amt, 
+                                      FrequencyType ftype, int freq_amt, bool ext) const;
         std::string get_option_chain(std::string const & ticker, 
                                      std::string const & contractType, 
                                      std::string const & strikeCount,
                                      bool includeQuotes, 
                                      std::string const & strategy, std::string const & range,
-                                     std::string const & expMonth, std::string const & optionType);
-        std::string get_quote(std::string const & symbol);
+                                     std::string const & expMonth, std::string const & optionType) const;
+        std::string get_quote(std::string const & symbol) const;
         std::string get_account(std::string const & account_id);
         std::vector<std::string> get_all_account_ids();
 
-        void post_order(std::string const & account_id, OrderType order_type, std::string const & symbol, int quantity);
+        void post_order(const std::string & account_id, const Order & order) const;
 
         void start_session();
         void start_session(std::string const & ticker, std::string const & fields);
