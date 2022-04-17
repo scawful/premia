@@ -10,6 +10,7 @@
 #include "TDAmeritrade/Data/PricingStructures.hpp"
 #include "TDAmeritrade/Data/Account.hpp"
 #include "TDAmeritrade/Data/Quote.hpp"
+#include "TDAmeritrade/Data/Order.hpp"
 #include "TDAmeritrade/Data/PriceHistory.hpp"
 #include "TDAmeritrade/Data/OptionChain.hpp"
 
@@ -33,7 +34,7 @@ namespace tda
         JSONObject::ptree user_principals;
 
         // curl functions
-        void post_access_token(std::string refresh_token);
+        void post_access_token(const std::string & refresh_token);
 
         // websocket functions
         JSONObject::ptree get_user_principals();
@@ -48,15 +49,15 @@ namespace tda
 
         Account getCurrentAccount();
         Account getDefaultAccount();
-        std::vector<Watchlist> getWatchlistsByAccount(std::string account_num);
-        Quote getQuote(std::string symbol);
-        Account getAccount(std::string account_id);
-        PriceHistory getPriceHistory(std::string, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
-        OptionChain getOptionChain(std::string ticker, std::string contractType, std::string strikeCount,
-                                   bool includeQuotes, std::string strategy, std::string range,
-                                   std::string expMonth, std::string optionType);
+        std::vector<Watchlist> getWatchlistsByAccount(const std::string & account_num);
+        Quote getQuote(const std::string & symbol);
+        Account getAccount(const std::string & account_id);
+        PriceHistory getPriceHistory(const std::string & ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
+        OptionChain getOptionChain(const std::string & ticker, const std::string & contractType, const std::string & strikeCount,
+                                   bool includeQuotes, const std::string & strategy, const std::string & range,
+                                   const std::string & expMonth, const std::string & optionType);
 
-        void postOrder(std::string account_id, OrderType order_type, std::string symbol, int quantity);
+        void postOrder(const std::string & account_id, Order order) const;
 
         void startStreamingSession();
 
