@@ -23,7 +23,7 @@ namespace cbp
         return new_account_data;
     }
 
-    boost::shared_ptr<Product> CoinbasePro::get_product_ticker( std::string symbol )
+    boost::shared_ptr<Product> CoinbasePro::get_product_ticker( const std::string & symbol )
     {
         std::string request = "/products/" + symbol + "-USD/ticker";
         std::string response = http_client->send_request(request);
@@ -31,9 +31,8 @@ namespace cbp
         boost::property_tree::ptree property_tree;
         try {
             read_json( json_response, property_tree );
-        }
-        catch ( std::exception& json_parser_error ) {
-            SDL_Log( "%s", json_parser_error.what() );
+        } catch ( const boost::property_tree::ptree_error & e ) {
+            SDL_Log( "%s", e.what() );
         }
         boost::shared_ptr<Product> new_product_data = boost::make_shared<Product>( property_tree );
         return new_product_data;
@@ -46,18 +45,15 @@ namespace cbp
         boost::property_tree::ptree property_tree;
         try {
             read_json( json_response, property_tree );
+        } catch ( const boost::property_tree::ptree_error & e ) {
+            SDL_Log( "%s", e.what() );
         }
-        catch ( std::exception& json_parser_error ) {
-            SDL_Log( "%s", json_parser_error.what() );
-        }
+
         total_deposits_usd = 0.f;
-        for ( auto & deposit_it : property_tree )
-        {
-            for ( auto & each_deposit : deposit_it.second )
-            {
-                if ( each_deposit.first == "amount" )
-                {
-                    total_deposits_usd += boost::lexical_cast<float>(each_deposit.second.get_value<float>());
+        for ( const auto & [key,value] : property_tree ) {
+            for ( const auto & [depositKey, depositValue] : value ) {
+                if ( depositKey == "amount" ) {
+                    total_deposits_usd += boost::lexical_cast<float>(depositValue.get_value<float>());
                 }
             }
         }

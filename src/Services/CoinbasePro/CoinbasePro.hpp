@@ -20,7 +20,7 @@ namespace cbp
         ~CoinbasePro();
 
         boost::shared_ptr<cbp::Account> list_accounts();
-        boost::shared_ptr<cbp::Product> get_product_ticker( std::string symbol );
+        boost::shared_ptr<cbp::Product> get_product_ticker( const std::string & symbol );
         float get_deposits();
 
     };
