@@ -18,8 +18,7 @@ JSONObject::ptree Parser::read_response(const std::string & response) const
 
     try {
         read_json(json_response, property_tree);
-    }
-    catch (JSONObject::ptree_error const & json_parser_error) {
+    } catch (JSONObject::ptree_error const & json_parser_error) {
         SDL_Log("Parser::read_response: %s", json_parser_error.what());
     }
 
@@ -84,45 +83,22 @@ PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, const s
             for (const auto& [candleKey, candleValue] : historyValue) {
                 tda::Candle newCandle;
                 std::string datetime;
-                for (auto const & candle2_it : candleValue) {
-                    try {
-                        if ( candle2_it.first == "high" ) {
-                            newCandle.high = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-                        }
-
-                        if ( candle2_it.first == "low" ) {
-                            newCandle.low = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-                        }
-                        
-                        if ( candle2_it.first == "open" ) {
-                            newCandle.open = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-                        }
-                        if ( candle2_it.first == "close" ) {
-                            newCandle.close = boost::lexical_cast<double>(candle2_it.second.get_value<std::string> () );
-                        }
-
-                        if ( candle2_it.first == "volume" ) {
-                            newCandle.volume = boost::lexical_cast<double>( candle2_it.second.get_value<std::string> () );
-                        }
-                    } 
-                    catch (const boost::wrapexcept<boost::bad_lexical_cast> & e) {
-                        std::cout << "parse_price_history:: " << e.what() << std::endl;
-                    }
-
-
-                    if (candle2_it.first == "datetime")
-                    {
-                        std::stringstream dt_ss;
-                        std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(candle2_it.second.get_value<std::string>());
-                        newCandle.raw_datetime = secsSinceEpoch;
-                        secsSinceEpoch *= (time_t) 0.001;
-
-                        //%a %d %b %Y - %I:%M:%S%p
-                        //%H:%M:%S
-                        dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
-                        datetime = dt_ss.str();
-                    }
-
+                try {
+                    newCandle.high = boost::lexical_cast<double>(candleValue.get_child("high.").get_value<std::string>());
+                    newCandle.low = boost::lexical_cast<double>(candleValue.get_child("low.").get_value<std::string>());
+                    newCandle.open = boost::lexical_cast<double>(candleValue.get_child("open.").get_value<std::string>());
+                    newCandle.close = boost::lexical_cast<double>(candleValue.get_child("close.").get_value<std::string>());
+                    newCandle.volume = boost::lexical_cast<double>(candleValue.get_child("volume.").get_value<std::string>());
+                    std::stringstream dt_ss;
+                    std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(candleValue.get_child("datetime.").get_value<std::string>());
+                    newCandle.raw_datetime = secsSinceEpoch;
+                    secsSinceEpoch *= (time_t) 0.001;
+                    // %a %d %b %Y - %I:%M:%S%p
+                    // %H:%M:%S
+                    dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
+                    datetime = dt_ss.str();
+                } catch (const boost::wrapexcept<boost::bad_lexical_cast> & e) {
+                    std::cout << "parse_price_history:: " << e.what() << std::endl;
                 }
                 newCandle.datetime = datetime;
                 price_history.addCandleByType(newCandle, freq);

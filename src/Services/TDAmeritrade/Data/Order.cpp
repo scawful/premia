@@ -5,11 +5,11 @@ void Order::prepareOrderString() const
 {
     boost::property_tree::ptree orderPropertyTree;
 
-    orderPropertyTree.add_child("orderType", getOrderType());
-    orderPropertyTree.add_child("session", getSession());
-    orderPropertyTree.add_child("duration", getDuration());
-    orderPropertyTree.add_child("price", getPrice());
-    orderPropertyTree.add_child("orderStrategyType", getOrderStrategyType());
+    orderPropertyTree.put("orderType", getOrderType());
+    orderPropertyTree.put("session", getSession());
+    orderPropertyTree.put("duration", getDuration());
+    orderPropertyTree.put("price", getPrice());
+    orderPropertyTree.put("orderStrategyType", getOrderStrategyType());
 
     try {
         write_json(orderJSON, orderPropertyTree);
