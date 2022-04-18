@@ -1,15 +1,8 @@
 #include "LoginFrame.hpp"
 
-LoginFrame::LoginFrame() : Frame()
-{
-    this->isLoggedIn = false;
-    this->clientId = 0;
-    this->connectOptions = "";
-    this->port = 7497;
-}
+LoginFrame::LoginFrame() : Frame() { }
 
-bool LoginFrame::checkLoginStatus()
-{
+bool LoginFrame::checkLoginStatus() const {
     return isLoggedIn;
 }
 

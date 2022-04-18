@@ -258,12 +258,6 @@ void MenuFrame::draw_style_editor()
                     draw_list->AddCircle(ImVec2(p1.x + offset_x, p1.y + offset_y), rad, ImGui::GetColorU32(ImGuiCol_Text));
                     ImGui::Dummy(ImVec2(canvas_width, RAD_MAX * 2));
 
-                    /*
-                    const ImVec2 p2 = ImGui::GetCursorScreenPos();
-                    draw_list->AddCircleFilled(ImVec2(p2.x + offset_x, p2.y + offset_y), rad, ImGui::GetColorU32(ImGuiCol_Text));
-                    ImGui::Dummy(ImVec2(canvas_width, RAD_MAX * 2));
-                    */
-
                     ImGui::EndGroup();
                     ImGui::SameLine();
                 }
@@ -344,7 +338,7 @@ void MenuFrame::update()
             ImGui::Separator();
             if (ImGui::BeginMenu("Preferences"))
             {
-                ImGui::MenuItem("Private Balances", "", &premia->halext_interface.privateBalance);
+                ImGui::MenuItem("Private Balances", "", &getPremia()->halext_interface.privateBalance);
                 ImGui::Separator();
 
                 static int n = 0;
@@ -362,7 +356,7 @@ void MenuFrame::update()
             }
 
             if ( ImGui::MenuItem("Quit", "ESC") ) {
-                premia->quit();
+                getPremia()->quit();
             }
 
             ImGui::EndMenu();
@@ -495,20 +489,20 @@ void MenuFrame::update()
         if (ImGui::BeginMenu("Debug"))
         {
             if (ImGui::MenuItem("Service Login", "TDA")) {
-                *tda_logged_in = true;
-                *public_mode = false;
+                *getTDALoggedIn() = true;
+                *getPublicMode() = false;
             }
             if (ImGui::MenuItem("Fetch Access Token", "TDA")) {
-                premia->tda_interface.fetchAccessToken();
+                getPremia()->tda_interface.fetchAccessToken();
             }
             if (ImGui::MenuItem("WebSocket StreamState")) {
-                premia->change(StreamState::instance());
+                getPremia()->change(StreamState::instance());
             }
             if (ImGui::MenuItem("ImGui/ImPlot Demos")) {
-                premia->change(DemoState::instance());
+                getPremia()->change(DemoState::instance());
             }      
             if (ImGui::MenuItem("Start WS Session")) {
-                premia->tda_interface.startStreamingSession();
+                getPremia()->tda_interface.startStreamingSession();
             }
             ImGui::EndMenu();
         }

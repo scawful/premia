@@ -6,19 +6,35 @@
 
 class Frame
 {
-protected:
+private:
     Manager *premia;
     bool *public_mode;
     bool *tda_logged_in;
     bool initialized;
 
-public:
-    Frame() { }
+protected:
+    Manager * getPremia() const { return premia; }
+    bool * getPublicMode() const { return public_mode; }
+    bool * getTDALoggedIn() const { return tda_logged_in; }
+    bool getInitialized() const { return initialized; }
+    void setInitialized(bool init) { initialized = init; }
 
-    void import_manager(Manager *premia, bool *public_mode = NULL, bool *tda_logged_in = NULL) {
-        this->premia = premia;
-        this->public_mode = public_mode;
-        this->tda_logged_in = tda_logged_in;
+
+public:
+    Frame()=default;
+    ~Frame()=default;
+
+    /**
+     * @todo HOLY SHIT FIX THIS LOL
+     * 
+     * @param manager 
+     * @param mode 
+     * @param tda_login 
+     */
+    void import_manager(Manager * manager, bool * mode = nullptr, bool * tda_login = nullptr) {
+        this->premia = manager;
+        this->public_mode = mode;
+        this->tda_logged_in = tda_login;
     }
     virtual void update() = 0;
 };

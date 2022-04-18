@@ -15,7 +15,7 @@ void reverse_array(double arr[], int start, int end)
 
 void RiskPremiaFrame::init_pie_chart()
 {
-    tda::Account account = premia->tda_interface.getDefaultAccount();
+    tda::Account account = getPremia()->tda_interface.getDefaultAccount();
     if ( !symbols_array.empty() ) {
         symbols_array.clear();
     }
@@ -45,7 +45,7 @@ void RiskPremiaFrame::init_pie_chart()
 
 void RiskPremiaFrame::get_spx_gamma_exposure()
 {
-    std::string data = premia->client.get_spx_gex();
+    std::string data = getPremia()->client.get_spx_gex();
     std::istringstream ss(data);
 
     int i = 0;
@@ -157,7 +157,7 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
         oneYearDix[i] = dix[length - i - 1];
     }
 
-    initialized = true;
+    setInitialized(true);
 }
 
 void RiskPremiaFrame::draw_heatmap()
@@ -177,11 +177,6 @@ void RiskPremiaFrame::draw_heatmap()
     static ImPlotColormap map = ImPlotColormap_Viridis;
     if (ImPlot::ColormapButton(ImPlot::GetColormapName(map), ImVec2(225, 0), map)) {
         map = (map + 1) % ImPlot::GetColormapCount();
-        // We bust the color cache of our plots so that item colors will
-        // resample the new colormap in the event that they have already
-        // been created. See documentation in implot.h.
-        //BustColorCache("##Heatmap1");
-        //BustColorCache("##Heatmap2");
     }
 
     ImGui::SameLine();
@@ -193,7 +188,7 @@ void RiskPremiaFrame::draw_heatmap()
     ImPlot::PushColormap(map);
 
     if (ImPlot::BeginPlot("##Heatmap1", ImVec2(225, 225), ImPlotFlags_NoLegend | ImPlotFlags_NoMouseText)) {
-        ImPlot::SetupAxes(NULL, NULL, axes_flags, axes_flags);
+        ImPlot::SetupAxes(nullptr, nullptr, axes_flags, axes_flags);
         ImPlot::SetupAxisTicks(ImAxis_X1, 0 + 1.0 / 14.0, 1 - 1.0 / 14.0, 7, xlabels);
         ImPlot::SetupAxisTicks(ImAxis_Y1, 1 - 1.0 / 14.0, 0 + 1.0 / 14.0, 7, ylabels);
         ImPlot::PlotHeatmap("heat", vix, 7, 7, scale_min, scale_max);
@@ -205,7 +200,7 @@ void RiskPremiaFrame::draw_heatmap()
 
 RiskPremiaFrame::RiskPremiaFrame() : Frame()
 {
-    initialized = false;
+    setInitialized(false);
     minVix = std::numeric_limits<double>::max();
     minGex = std::numeric_limits<double>::max();
     minSpx = std::numeric_limits<double>::max();
@@ -226,9 +221,9 @@ RiskPremiaFrame::~RiskPremiaFrame()
 
 void RiskPremiaFrame::update()
 {
-    if (!initialized) {
+    if (!getInitialized()) {
         get_spx_gamma_exposure();
-        if ((*tda_logged_in)) {
+        if (*getTDALoggedIn()) {
             init_pie_chart();
         }
     }
@@ -343,8 +338,7 @@ void RiskPremiaFrame::update()
                 ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
                 ImGui::BeginChild("ChildR", ImVec2(0, 375), true, window_flags);
-                if (ImGui::BeginMenuBar())
-                {
+                if (ImGui::BeginMenuBar()) {
                     if (ImGui::BeginMenu("Menu"))
                     {
                         
@@ -358,7 +352,7 @@ void RiskPremiaFrame::update()
                  * 
                  */
                 if (ImPlot::BeginPlot("##Pie1", ImVec2(250, 250), ImPlotFlags_Equal | ImPlotFlags_NoMouseText)) {
-                    ImPlot::SetupAxes(NULL, NULL, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
+                    ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
                     ImPlot::SetupAxesLimits(0, 1, 0, 1);
                     ImPlot::PlotPieChart(positions_labels, positions_pie, num_positions, 0.5, 0.5, 0.4, false, "%.2f");
                     ImPlot::EndPlot();
@@ -370,8 +364,7 @@ void RiskPremiaFrame::update()
                  */
                 if (ImGui::BeginTable("split", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
                 {
-                    for (int i = 0; i < 30; i++)
-                    {
+                    for (int i = 0; i < 30; i++) {
                         char buf[32];
                         sprintf(buf, "%03d", i);
                         ImGui::TableNextColumn();

@@ -15,7 +15,7 @@ void FundOwnershipFrame::update()
 
     if ( ImGui::Button("Submit") ) 
     {
-        fund_ownership = premia->iex_interface.getFundOwnership(symbol);
+        fund_ownership = getPremia()->iex_interface.getFundOwnership(symbol);
         data_active = true;
     }
 

@@ -2,8 +2,8 @@
 
 void WatchlistFrame::init_watchlists()
 {
-    std::string account_num = premia->tda_interface.get_all_accounts().at(0);
-    watchlists = premia->tda_interface.getWatchlistsByAccount(account_num);
+    std::string account_num = getPremia()->tda_interface.get_all_accounts().at(0);
+    watchlists = getPremia()->tda_interface.getWatchlistsByAccount(account_num);
     openList = new bool[watchlists.size()];
 
     for ( int i = 0; i < watchlists.size(); i++ ) {
@@ -15,7 +15,7 @@ void WatchlistFrame::init_watchlists()
         watchlist_names_char.push_back(str.data());
     }
 
-    initialized = true;
+    setInitialized(true);
 }
 
 void WatchlistFrame::draw_watchlist_table()
@@ -24,11 +24,11 @@ void WatchlistFrame::draw_watchlist_table()
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
     ImGui::SameLine();
-    ImGui::Combo(" ", &n,  watchlist_names_char.data(), watchlist_names.size()); 
+    ImGui::Combo(" ", &n,  watchlist_names_char.data(), (int) watchlist_names.size()); 
 
     if (openList[n] == false) {
         for (int j = 0; j < watchlists[n].getNumInstruments(); j++) {
-           quotes[watchlists[n].getInstrumentSymbol(j)] = premia->tda_interface.getQuote(watchlists[n].getInstrumentSymbol(j));
+           quotes[watchlists[n].getInstrumentSymbol(j)] = getPremia()->tda_interface.getQuote(watchlists[n].getInstrumentSymbol(j));
         }
         openList[n] = true;
     }
@@ -143,29 +143,25 @@ void WatchlistFrame::draw_custom_watchlist_table()
 WatchlistFrame::WatchlistFrame() : Frame()
 {
     this->title_string = "Watchlists";  
-    this->initialized = false;
+    setInitialized(true);
 }
 
-WatchlistFrame::~WatchlistFrame()
-{
-
-}
+WatchlistFrame::~WatchlistFrame()=default;
 
 void WatchlistFrame::update() 
 {
-    ImGuiIO& io = ImGui::GetIO();
     
-    if (!ImGui::Begin(  title_string.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove ))
+    if (!ImGui::Begin(  title_string.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove ))
     {
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();
         return;
     }
 
-    if (*tda_logged_in) {
+    if (*getTDALoggedIn()) {
         draw_watchlist_table();
     } else {
-        if (!initialized) {
+        if (!getInitialized()) {
             init_watchlists();
         }
         draw_custom_watchlist_table();

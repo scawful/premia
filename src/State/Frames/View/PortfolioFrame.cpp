@@ -1,6 +1,17 @@
 #include "PortfolioFrame.hpp"
 
 /**
+ * @brief 
+ * 
+ * @param variable 
+ */
+void PortfolioFrame::draw_balance_string(const std::string & variable) const
+{
+    std::string str = (getPremia()->halext_interface.privateBalance) ? "***" : variable;
+    ImGui::Text("%s", str.c_str());
+}
+
+/**
  * @brief Construct the table with the current portfolio positions
  * @author @scawful
  * 
@@ -21,49 +32,33 @@ void PortfolioFrame::draw_positions()
         ImGui::TableHeadersRow();
 
         ImGuiListClipper clipper;
-        clipper.Begin( positions_vector.size() );
+        clipper.Begin( (int) positions_vector.size() );
         while (clipper.Step()) {
             for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
                 ImGui::TableNextRow();
                 for (int column = 0; column < 6; column++) {
                     std::string symbol = positions_vector[row];
                     ImGui::TableSetColumnIndex(column);
-                    switch( column ) {
+                    switch(column) {
                         case 0:
                             ImGui::Text("%s", symbol.c_str() );
                             break;
                         case 1:
-                        {
-                            std::string cdpl = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "currentDayProfitLoss");
-                            ImGui::Text("%s", cdpl.c_str());
+                            draw_balance_string(account_data.get_position_balances(symbol, "currentDayProfitLoss"));
                             break;
-                        }
                         case 2:
-                        {
-                            std::string cdplp = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "currentDayProfitLossPercentage");
-                            ImGui::Text("%s", cdplp.c_str() );
+                            draw_balance_string(account_data.get_position_balances(symbol, "currentDayProfitLossPercentage"));
                             break;
-                        }
                         case 3:
-                        {
-                            std::string avgp = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances( symbol, "averagePrice");
-                            ImGui::Text("%s", avgp.c_str());
+                            draw_balance_string(account_data.get_position_balances( symbol, "averagePrice"));
                             break;
-                        }
                         case 4:
-                        {
-                            std::string mval = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "marketValue");
-                            ImGui::Text("%s", mval.c_str());
+                            draw_balance_string(account_data.get_position_balances(symbol, "marketValue"));
                             break;
-                        }
                         case 5:
-                        {
-                            std::string qty = (premia->halext_interface.privateBalance) ? "***" : account_data.get_position_balances(symbol, "longQuantity");
-                            ImGui::Text("%s", qty.c_str());
+                            draw_balance_string(account_data.get_position_balances(symbol, "longQuantity"));
                             break;
-                        }
                         default:
-                            ImGui::Text("Hello %d,%d", column, row);
                             break;
                     }
                 }
@@ -129,7 +124,7 @@ void PortfolioFrame::draw_tabbed_view()
  */
 PortfolioFrame::PortfolioFrame() : Frame()
 {
-    initialized = false;
+    setInitialized(false);
 }
 
 /**
@@ -139,7 +134,7 @@ PortfolioFrame::PortfolioFrame() : Frame()
  */
 void PortfolioFrame::init_positions()
 {
-    account_ids_std = premia->tda_interface.get_all_accounts();
+    account_ids_std = getPremia()->tda_interface.get_all_accounts();
     int i = 0;
     for ( std::string const& each_id : account_ids_std ) 
     {
@@ -148,7 +143,7 @@ void PortfolioFrame::init_positions()
     }
     default_account = account_ids_std.at(0);
     load_account(default_account);
-    initialized = true;
+    setInitialized(true);
 }
 
 /**
@@ -157,19 +152,19 @@ void PortfolioFrame::init_positions()
  * 
  * @param account_num 
  */
-void PortfolioFrame::load_account( std::string account_num )
+void PortfolioFrame::load_account(const std::string & account_num)
 {
-    account_data = premia->tda_interface.getAccount(account_num);
+    account_data = getPremia()->tda_interface.getAccount(account_num);
 
-    if ( positions_vector.size() != 0 ) {
+    if (positions_vector.empty()) {
         positions_vector.clear();
     }
 
-    for ( int i = 0; i < account_data.get_position_vector_size(); i++ ) {
-        for ( auto& position_it : account_data.get_position( i ) ) {
-            if ( position_it.first == "symbol" ) {
-                std::string str = position_it.second;
-                positions_vector.push_back( str );
+    for (int i = 0; i < account_data.get_position_vector_size(); i++) {
+        for (const auto & [key, value] : account_data.get_position(i)) {
+            if (key == "symbol") {
+                std::string str = value;
+                positions_vector.push_back(str);
             }
         }
     }
@@ -183,16 +178,15 @@ void PortfolioFrame::load_account( std::string account_num )
  */
 void PortfolioFrame::update() 
 {
-    ImGuiIO& io = ImGui::GetIO();
-    if (!ImGui::Begin("Portfolio", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
+    if (!ImGui::Begin("Portfolio", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
         ImGui::End();
         return;
     }    
     
-    if (*public_mode) {
+    if (*getPublicMode()) {
         ImGui::Text("No portfolio data in Public Mode");
     } else {
-        if (!initialized) {
+        if (!getInitialized()) {
             init_positions();
         }
         draw_tabbed_view();

@@ -10,10 +10,12 @@ private:
     std::vector<const char*> account_ids;
     std::string default_account;
 
-    std::map<std::string, tda::Quote> quotes;
+    std::unordered_map<std::string, tda::Quote> quotes;
 
     tda::Account account_data;
     std::vector<std::string> positions_vector;
+
+    void draw_balance_string(const std::string & variable) const;
 
     void draw_positions();
     void draw_balances();
@@ -25,7 +27,7 @@ public:
     PortfolioFrame();
     
     void init_positions();
-    void load_account( std::string account );
+    void load_account(const std::string & account);
     void update();
 };
 

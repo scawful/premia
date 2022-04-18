@@ -8,7 +8,7 @@ void OptionChainFrame::draw_search()
     static char ticker[128] = "";
     ImGui::InputText("Symbol", ticker, IM_ARRAYSIZE(ticker));
     if (ImGui::Button("Fetch")) {
-        optionChainData = premia->tda_interface.getOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
+        optionChainData = getPremia()->tda_interface.getOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
         optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
         std::vector<tda::OptionsDateTimeObj> temp_vec = optionsDateTimeObj;
         for ( int i = 0; i < temp_vec.size(); i++) 
@@ -30,20 +30,18 @@ void OptionChainFrame::draw_option_chain()
 
     ImGui::Text( "%s (%s) [B: %s  A: %s]", optionChainData.getOptionChainDataVariable("symbol").c_str(), optionChainData.getUnderlyingDataVariable("markPercentChange").c_str(), optionChainData.getUnderlyingDataVariable("bid").c_str(), optionChainData.getUnderlyingDataVariable("ask").c_str() );
     ImGui::Spacing();
-
-    ImGui::SetNextItemWidth( 200.f );
+    ImGui::SetNextItemWidth(200.f);
 
     static int current_item = 0;
-    ImGui::Combo("Expiration Date", &current_item, datetime_array.data(), datetime_array.size());
+    ImGui::Combo("Expiration Date", &current_item, datetime_array.data(), (int) datetime_array.size());
 
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingFixedFit;
 
-    const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
 
     // When using ScrollX or ScrollY we need to specify a size for our table container!
     // Otherwise by default the table will fit all available space, like a BeginChild() call.
-    ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * optionsDateTimeObj[current_item].strikePriceObj.size());
+    auto outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * (float) optionsDateTimeObj[current_item].strikePriceObj.size());
     if (ImGui::BeginTable("table_scrolly", 16, flags, outer_size))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
@@ -70,7 +68,7 @@ void OptionChainFrame::draw_option_chain()
         static bool select_option = false;
 
         ImGuiListClipper clipper;
-        clipper.Begin(optionsDateTimeObj[current_item].strikePriceObj.size());
+        clipper.Begin((int) optionsDateTimeObj[current_item].strikePriceObj.size());
         while (clipper.Step())
         {
             for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
@@ -86,7 +84,6 @@ void OptionChainFrame::draw_option_chain()
                             break;
                         case 1:
                             ImGui::Selectable(optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str(), &select_options[row]);
-                            //ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["strikePrice"].c_str() );
                             break;
                         case 2:
                             ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["bid"].c_str() );

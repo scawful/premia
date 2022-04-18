@@ -23,8 +23,16 @@ private:
 
     double oneYearDix[400];
 
-    double minVix, minGex, minDix, minSpx, minGxv;
-    double maxVix, maxGex, maxDix, maxSpx, maxGxv;
+    double minVix;
+    double minGex;
+    double minDix;
+    double minSpx;
+    double minGxv;
+    double maxVix;
+    double maxGex;
+    double maxDix;
+    double maxSpx;
+    double maxGxv;
 
     void init_pie_chart();
     void get_spx_gamma_exposure();

@@ -7,16 +7,11 @@ class LoginFrame : public Frame
 {
 private:
     bool isLoggedIn;
-    unsigned attempt = 0;
-    std::string connectOptions;
-    std::string host;
-    int port;
-    int clientId;
 
 public:
     LoginFrame();
 
-    bool checkLoginStatus();
+    bool checkLoginStatus() const;
     void update();
 };
 
