@@ -1,11 +1,11 @@
 #include "GenericClient.hpp"
 
-size_t GenericClient::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
+size_t GenericClient::json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s)
 {
     size_t new_length = size * nmemb;
     try {
-        s->append((char*)contents, new_length);
-    } catch(std::bad_alloc &e) {
+        s->append(contents, new_length);
+    } catch(const std::bad_alloc & e) {
         // handle memory problem
         return 0;
     }
@@ -26,16 +26,13 @@ std::string GenericClient::send_request(std::string endpoint)
     std::string response;
 
     curl = curl_easy_init();
-    if (curl)
-    {
-        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-        res = curl_easy_perform(curl);
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    res = curl_easy_perform(curl);
 
-        /* always cleanup */
-        curl_easy_cleanup(curl);
-    }
+    /* always cleanup */
+    curl_easy_cleanup(curl);
 
     return response;
 }

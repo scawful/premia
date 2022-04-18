@@ -6,7 +6,7 @@
 class GenericClient
 {
 private:
-        static size_t json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s);
+    static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s);
 
     std::string send_request(std::string endpoint);
 
