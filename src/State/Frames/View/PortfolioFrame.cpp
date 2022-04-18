@@ -7,7 +7,7 @@
  */
 void PortfolioFrame::draw_balance_string(const std::string & variable) const
 {
-    std::string str = (getPremia()->halext_interface.privateBalance) ? "***" : variable;
+    std::string str = (getPremia()->getHalextInterface().getPrivateBalance()) ? "***" : variable;
     ImGui::Text("%s", str.c_str());
 }
 

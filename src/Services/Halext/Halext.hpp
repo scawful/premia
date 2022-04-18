@@ -12,11 +12,14 @@ namespace halext
     private:
         Client client;
         User currentUser;
+        bool privateBalance;
 
     public:
         Halext();
 
-        bool privateBalance;
+        bool & getPrivateBalance();
+        void setPrivateBalance(bool private_balance);
+
     };
 }
 

@@ -44,6 +44,7 @@ namespace tda
 
     public:
         TDAmeritrade();
+        ~TDAmeritrade();
 
         std::vector<std::string> get_all_accounts();
 

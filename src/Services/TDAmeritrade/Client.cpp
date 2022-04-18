@@ -192,8 +192,7 @@ JSONObject::ptree Client::create_logout_request()
     std::unordered_map<std::string, std::string> account_data;
     BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
     {
-        for (const auto & [key,value] : (JSONObject::ptree) v.second)
-        {
+        for (const auto & [key,value] : (JSONObject::ptree) v.second) {
             account_data[key] = value.get_value<std::string>();
         }
         break;

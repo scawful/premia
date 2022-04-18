@@ -71,7 +71,6 @@ namespace tda
         boost::property_tree::ptree _user_principals;
 
         // WebSocket session variables 
-        std::thread websocket_session_thread;
         boost::asio::io_context ioc;
         std::shared_ptr<tda::Session> websocket_session;
         std::shared_ptr<std::vector<std::string>> websocket_buffer;

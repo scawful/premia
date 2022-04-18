@@ -338,7 +338,7 @@ void MenuFrame::update()
             ImGui::Separator();
             if (ImGui::BeginMenu("Preferences"))
             {
-                ImGui::MenuItem("Private Balances", "", &getPremia()->halext_interface.privateBalance);
+                ImGui::MenuItem("Private Balances", "", getPremia()->getHalextInterface().getPrivateBalance());
                 ImGui::Separator();
 
                 static int n = 0;

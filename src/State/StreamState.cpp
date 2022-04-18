@@ -4,14 +4,14 @@
 
 StreamState StreamState::m_StreamState;
 
-void StreamState::set_instrument( std::string ticker )
+void StreamState::set_instrument(const std::string & ticker)
 {
     ticker_symbol = ticker;
 }
 
-void StreamState::init(Manager *premia)
+void StreamState::init(Manager * manager)
 {
-    this->premia = premia;
+    this->premia = manager;
     title_string = "Live Quotes";
     mainMenu.import_manager(premia);
     mainMenu.set_title(title_string);
@@ -180,10 +180,6 @@ void StreamState::update()
         }
     }
     ImGui::SameLine();
-    if ( ImGui::Button("Interrupt Session") )
-    {
-        //premia->tda_interface.send_interrupt_signal();
-    }
 
     ImGui::BulletText("NASDAQ (Quotes and Trades)");
     ImGui::BulletText("OTCBB (Quotes and Trades)");
@@ -193,35 +189,20 @@ void StreamState::update()
     ImGui::BulletText("Indices (Trades only)");
     ImGui::BulletText("Indicators");
     ImGui::Spacing();
-
-    // ImPlot::GetStyle().UseLocalTime = true;
-    // ImPlot::SetNextPlotFormatY("$%.2f");
-    // ImPlot::SetNextAxesLimits((1609740000000 * 0.001), (1625267160000 * 0.001), 0, 100, ImGuiCond_Once);
-
-    // if (ImPlot::BeginPlot("Candlestick Chart",NULL,NULL, ImVec2(-1,0),0,
-    //                         ImPlotAxisFlags_Time,
-    //                         ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit|ImPlotAxisFlags_LockMax)) 
-    // {
-    //     //createCandleChart( 0.25, 218, bullCol, bearCol, tooltip );
-    //     ImPlot::EndPlot();
-    // }
-
-
     ImGui::End();
-
-    SDL_RenderClear( premia->pRenderer );
+    SDL_RenderClear( premia->getRenderer() );
 }
 
 void StreamState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( premia->pRenderer, 55, 55, 55, 0 );
-    SDL_GetWindowSize( premia->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->getRenderer(), 55, 55, 55, 0 );
+    SDL_GetWindowSize( premia->getWindow(), &w, &h );
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect( premia->pRenderer, &f );
+    SDL_RenderFillRect( premia->getRenderer(), &f );
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent( premia->pRenderer );
+    SDL_RenderPresent( premia->getRenderer());
 }

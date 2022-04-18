@@ -114,19 +114,19 @@ void DemoState::update()
     ImGui::ShowDemoWindow();
     ImPlot::ShowDemoWindow();
     
-    SDL_RenderClear(premia->pRenderer);
+    SDL_RenderClear(premia->getRenderer());
 }
 
 void DemoState::draw()
 {
     // fill window bounds
     int w = 1920, h = 1080;
-    SDL_SetRenderDrawColor( premia->pRenderer, 0, 0, 0, 0 );
-    SDL_GetWindowSize( premia->pWindow, &w, &h );
+    SDL_SetRenderDrawColor( premia->getRenderer(), 0, 0, 0, 0 );
+    SDL_GetWindowSize( premia->getWindow(), &w, &h );
     SDL_Rect f = { 0, 0, 1920, 1080 };
-    SDL_RenderFillRect( premia->pRenderer, &f );
+    SDL_RenderFillRect( premia->getRenderer(), &f );
 
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent(premia->pRenderer);
+    SDL_RenderPresent(premia->getRenderer());
 }

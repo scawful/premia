@@ -148,18 +148,13 @@ namespace tda
     // PUBLIC FUNCTIONS =========================================================================
 
     /**
-     * @brief Construct a new TDAmeritrade::TDAmeritrade object
+     * @brief TDAmeritrade::TDAmeritrade object constructor and destructor
      * @author @scawful
      * 
      * @param type 
      */
-    TDAmeritrade::TDAmeritrade()
-    {
-        session_active = false;
-        _refresh_token = REFRESH_TOKEN;
-
-        request_access_token(false);
-    }
+    TDAmeritrade::TDAmeritrade() : session_active(false), _refresh_token(REFRESH_TOKEN) { }
+    TDAmeritrade::~TDAmeritrade()=default;
     
     /**
      * @brief Retrieve account information from user principals and return as a list

@@ -25,14 +25,14 @@ private:
     "Regular Market Trade Time", "Regular Market Trade Day", "Regular Market Net Change", "Security Status",
     "Mark", "Quote Time in Long", "Trade Time in Long", "Regular Market Trade Time in Long" };
 
-    void set_instrument( std::string ticker );
+    void set_instrument(const std::string & ticker);
 
 protected:
     StreamState()=default;
     ~StreamState()=default;
 
 public:
-    void init(Manager *premia) override;
+    void init(Manager * manager) override;
     void cleanup()             override;
 
     void pause()               override;

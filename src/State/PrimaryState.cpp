@@ -26,8 +26,8 @@ void PrimaryState::init(Manager * manager)
     fundOwnership.import_manager(premia);
     marketOverview.import_manager(premia);
     
-    SDL_SetWindowSize(premia->pWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
-    SDL_SetWindowPosition(premia->pWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_SetWindowSize(premia->getWindow(), SCREEN_WIDTH, SCREEN_HEIGHT);
+    SDL_SetWindowPosition(premia->getWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
     ImGuiIO& io = ImGui::GetIO();
     io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey( SDLK_BACKSPACE );
@@ -251,7 +251,7 @@ void PrimaryState::update()
     }
     
     
-    SDL_RenderClear(premia->pRenderer);
+    SDL_RenderClear(premia->getRenderer());
 }
 
 /**
@@ -264,11 +264,11 @@ void PrimaryState::draw()
     // fill window bounds
     int w = 1920;
     int h = 1080;
-    SDL_SetRenderDrawColor(premia->pRenderer, 55, 55, 55, 0);
-    SDL_GetWindowSize(premia->pWindow, &w, &h);
+    SDL_SetRenderDrawColor(premia->getRenderer(), 55, 55, 55, 0);
+    SDL_GetWindowSize(premia->getWindow(), &w, &h);
     SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect(premia->pRenderer, &f);
+    SDL_RenderFillRect(premia->getRenderer(), &f);
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent(premia->pRenderer);
+    SDL_RenderPresent(premia->getRenderer());
 }

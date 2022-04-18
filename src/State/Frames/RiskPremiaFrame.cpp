@@ -45,7 +45,7 @@ void RiskPremiaFrame::init_pie_chart()
 
 void RiskPremiaFrame::get_spx_gamma_exposure()
 {
-    std::string data = getPremia()->client.get_spx_gex();
+    std::string data = getPremia()->getGenericClient().get_spx_gex();
     std::istringstream ss(data);
 
     int i = 0;
