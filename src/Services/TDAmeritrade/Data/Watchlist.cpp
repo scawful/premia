@@ -1,16 +1,13 @@
 #include "Watchlist.hpp"
 
-tda::Watchlist::Watchlist() 
-{
+tda::Watchlist::Watchlist()=default;
 
-}
-
-int tda::Watchlist::getNumInstruments()
+int tda::Watchlist::getNumInstruments() const
 {
     return instruments.size();
 }
 
-std::string tda::Watchlist::getName()
+std::string tda::Watchlist::getName() const
 {
     return name;
 }
@@ -35,17 +32,17 @@ void tda::Watchlist::setId( int id )
     this->watchlist_id = id;
 }
 
-void tda::Watchlist::setName( std::string name )
+void tda::Watchlist::setName(const std::string & name)
 {
     this->name = name;
 }
 
-void tda::Watchlist::addInstrument(std::string symbol, std::string desc, std::string type)
+void tda::Watchlist::addInstrument(const std::string & symbol, const std::string & desc, const std::string &type)
 {
     instruments.push_back(WatchlistInstrument(symbol, desc, type));
 }
 
-void tda::Watchlist::addVariable(std::string key, std::string value)
+void tda::Watchlist::addVariable(const std::string & key, const std::string & value)
 {
     variables[key] = value;
 }

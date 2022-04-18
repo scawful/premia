@@ -13,21 +13,17 @@ namespace tda
             std::string description;
             std::string asset_type;
 
-            WatchlistInstrument(std::string sym, std::string desc, std::string type) {
-                this->symbol = sym;
-                this->description = desc;
-                this->asset_type = type;
-            }
+            WatchlistInstrument(const std::string & sym, const std::string & desc, const std::string & type) : symbol(sym), description(desc), asset_type(type) { }
 
-            std::string getSymbol() {
+            std::string getSymbol() const {
                 return this->symbol;
             }
 
-            std::string getDescription() {
+            std::string getDescription() const {
                 return this->description;
             }
 
-            std::string getType() {
+            std::string getType() const {
                 return this->asset_type;
             }
         };
@@ -47,19 +43,19 @@ namespace tda
     public:
         Watchlist();
 
-        int getNumInstruments();
+        int getNumInstruments() const;
 
-        std::string getName();
-        std::string getInstrumentSymbol( int item_id );
-        std::string getInstrumentDescription( int item_id );
-        std::string getInstrumentType( int item_id );
+        std::string getName() const;
+        std::string getInstrumentSymbol(int item_id);
+        std::string getInstrumentDescription(int item_id);
+        std::string getInstrumentType(int item_id);
 
         void setId( int id );
-        void setName( std::string name );
-        void setWatchlistVariable( std::string variable );
+        void setName(const std::string & name);
+        void setWatchlistVariable(const std::string & variable);
 
-        void addVariable(std::string key, std::string value);
-        void addInstrument(std::string symbol, std::string desc, std::string type);
+        void addVariable(const std::string & key, const std::string & value);
+        void addInstrument(const std::string & symbol, const std::string & desc, const std::string & type);
     };
 }
 
