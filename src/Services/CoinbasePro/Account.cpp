@@ -18,9 +18,7 @@ namespace cbp
         }
     }
 
-    Account::Account(const boost::property_tree::ptree & account_data)
-    {
-        accountData = account_data;
+    Account::Account(const boost::property_tree::ptree & account_data) : accountData(account_data) {
         initVariables();
     }
 
