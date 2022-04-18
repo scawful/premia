@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3")
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 
 # set the project name
@@ -38,19 +39,25 @@ find_package(SDL_ttf REQUIRED)
 # cURL library --------------------------------------------------------------------------------------------
 find_package(CURL REQUIRED)
 
+# MySQL library --------------------------------------------------------------------------------------------
+if(APPLE)
+    set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR "/usr/local/Cellar/mysql-connector-c++/8.0.28")
+    include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
+    link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
+endif()
 
 # OpenSSL library --------------------------------------------------------------------------------------------
 if(APPLE)
-    set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1k/include")
-    set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1k/lib/libcrypto.dylib")
-    set(OPENSSL_SSL_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1k/lib/libssl.dylib")
+    set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1m/include")
+    set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1m/lib/libcrypto.dylib")
+    set(OPENSSL_SSL_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1m/lib/libssl.dylib")
 endif()
 find_package(OpenSSL REQUIRED)
 if(OPENSSL_FOUND)
     if(APPLE)
-        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1k/include)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1k/lib/libssl.dylib)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1k/lib/libcrypto.dylib)
+        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1m/include)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1m/lib/libssl.dylib)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1m/lib/libcrypto.dylib)
         message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
     else()
         include_directories(${OPENSSL_INCLUDE_DIR})
@@ -59,13 +66,8 @@ if(OPENSSL_FOUND)
     endif()
 endif()
 
-# QuantLib --------------------------------------------------------------------------------------------
-#find_package(QuantLib REQUIRED)
-
-
 # ImGui library --------------------------------------------------------------------------------------------
 # Set where the ImGui files are stored
-# set(IMGUI_PATH  "${CMAKE_SOURCE_DIR}/Libraries/imgui")
 set(IMGUI_PATH  "../include/imgui")
     
 # Compile as static library 
@@ -89,6 +91,7 @@ add_executable(Premia Premia.cpp
                     State/DemoState.cpp
                     State/PrimaryState.cpp 
                     State/StreamState.cpp
+                    State/LoginState.cpp
                     State/Frames/MenuFrame.cpp
                     State/Frames/CandleChartFrame.cpp
                     State/Frames/LinePlotFrame.cpp
@@ -118,9 +121,13 @@ add_executable(Premia Premia.cpp
                     Services/TDAmeritrade/Data/Account.cpp
                     Services/TDAmeritrade/Data/Watchlist.cpp
                     Services/TDAmeritrade/Data/UserPrincipals.cpp
+                    Services/TDAmeritrade/Data/Order.cpp
                     Services/IEXCloud.cpp
                     Services/IEXCloud/Client.cpp
                     Services/IEXCloud/Parser.cpp
+                    Services/Halext/Halext.cpp
+                    Services/Halext/Client.cpp
+                    Services/Halext/User.cpp
                     ${IMGUI_PATH}/imgui.cpp
                     ${IMGUI_PATH}/imgui_demo.cpp
                     ${IMGUI_PATH}/imgui_draw.cpp
@@ -133,16 +140,11 @@ add_executable(Premia Premia.cpp
                     ${IMPLOT_PATH}/implot_demo.cpp )
 include_directories("../assets")
 
-#quantlib library --------------------------------------------------------------------------------------------
-# add_library(quantlib STATIC IMPORTED)
-# set_property(TARGET quantlib PROPERTY IMPORTED_LOCATION ${QL_LIBRARY})
-
 target_link_libraries(Premia ${SDL2_LIBRARIES} 
                              ${SDL_IMAGE_LIBRARIES} 
                              ${SDL_TTF_LIBRARIES}
-                             curl 
-                             OpenSSL::SSL 
-                             ImGui ImPlot ws2_32
+                             curl OpenSSL::SSL
+                             ImGui ImPlot 
                              ${BOOST_LIBRARIES} 
                              ${OPENGL_LIBRARIES} )
 
@@ -152,5 +154,4 @@ add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
     DEPENDS ${destination}
-    COMMENT "symbolic link resources folder from ${source} => ${destination}"
-)
+    COMMENT "symbolic link resources folder from ${source} => ${destination}")
