@@ -9,13 +9,13 @@ namespace tda
     {
     private:
         boost::property_tree::ptree quoteData;
-        std::map<std::string, std::string> quoteVariables;
+        std::unordered_map<std::string, std::string> quoteVariables;
 
     public:
         Quote();
 
-        void setQuoteVariable(std::string key, std::string value);
-        std::string getQuoteVariable(std::string variable);
+        void setQuoteVariable(const std::string & key, const std::string & value);
+        std::string getQuoteVariable(const std::string & variable);
 
         void clear();
     };

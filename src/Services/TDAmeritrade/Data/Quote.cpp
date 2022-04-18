@@ -2,18 +2,15 @@
 
 using namespace tda;
 
-Quote::Quote()
-{
-    
-}
+Quote::Quote()=default;
 
 
-void Quote::setQuoteVariable(std::string key, std::string value)
+void Quote::setQuoteVariable(const std::string & key, const std::string & value)
 {
     quoteVariables[key] = value;
 }
 
-std::string Quote::getQuoteVariable( std::string variable )
+std::string Quote::getQuoteVariable(const std::string & variable)
 {
     return quoteVariables[variable];
 }
