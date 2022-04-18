@@ -8,7 +8,7 @@ namespace iex
     class MarketVolume
     {
     public:
-        MarketVolume();
+        MarketVolume()=default;
     }
 }
 

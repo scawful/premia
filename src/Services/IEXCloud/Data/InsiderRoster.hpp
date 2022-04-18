@@ -10,7 +10,7 @@ namespace iex
     private:
 
     public:
-        InsiderRoster();
+        InsiderRoster()=default;
         
     };
 }

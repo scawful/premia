@@ -44,7 +44,7 @@ namespace iex
         double tranValue;
 
     public:
-        InsiderTransactions() { }
+        InsiderTransactions()=default;
 
         double getTranValue() const { return tranValue; }
         void setTranValue(double tranValue_) { tranValue = tranValue_; }
@@ -72,6 +72,18 @@ namespace iex
 
         double getConversionOrExercisePrice() const { return conversionOrExercisePrice; }
         void setConversionOrExercisePrice(double conversionOrExercisePrice_) { conversionOrExercisePrice = conversionOrExercisePrice_; }
+
+        double getTransactionPrice() const { return transactionPrice; }
+        void setTransactionPrice(double transactionPrice_) { transactionPrice = transactionPrice_; }
+
+        bool getIs10b51() const { return is10b51; }
+        void setIs10b51(bool is10b51_) { is10b51 = is10b51_; }
+
+        double getEffectiveDate() const { return effectiveDate; }
+        void setEffectiveDate(double effectiveDate_) { effectiveDate = effectiveDate_; }
+
+        char getDirectIndirect() const { return directIndirect; }
+        void setDirectIndirect(char directIndirect_) { directIndirect = directIndirect_; }
     };
 }
 

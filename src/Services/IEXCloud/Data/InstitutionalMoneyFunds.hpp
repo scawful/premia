@@ -10,7 +10,7 @@ namespace iex
     private:
     
     public:
-        InstitutionalMoneyFunds();
+        InstitutionalMoneyFunds()=default;
     };
 }
 
