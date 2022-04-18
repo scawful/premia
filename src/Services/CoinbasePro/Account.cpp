@@ -2,38 +2,43 @@
 
 namespace cbp
 {
+    /**
+     * @brief Initialize the property tree variables into Account map
+     * @todo needs proper parsing 
+     * 
+     */
     void Account::initVariables()
     {
-        for ( auto& account_it : accountData )
-        {
+        for (const auto & [key, value] : accountData) {
             std::unordered_map< std::string, std::string > new_position_data;
-            for ( auto& data_it: account_it.second )
-            {
-                new_position_data[data_it.first] = data_it.second.get_value<std::string>();
+            for (const auto & [dataKey, dataValue]: value) {
+                new_position_data[dataKey] = dataValue.get_value<std::string>();
             }
             accounts_vector.push_back( new_position_data );
         }
     }
 
-    Account::Account( boost::property_tree::ptree account_data )
+    Account::Account(const boost::property_tree::ptree & account_data)
     {
         accountData = account_data;
         initVariables();
     }
 
-    std::unordered_map<std::string, std::string> Account::get_position( std::string ticker )
+    /**
+     * @brief Get an account positions 
+     * 
+     * @param ticker 
+     * @return std::unordered_map<std::string, std::string> 
+     */
+    std::unordered_map<std::string, std::string> Account::get_position(const std::string & ticker)
     {
-        for ( auto fields: accounts_vector )
-        {
-            for ( auto& accounts_vector_it: fields )
-            {
-                if ( accounts_vector_it.second == ticker )
-                {
+        for (const auto & fields: accounts_vector) {
+            for (const auto & [key, value]: fields) {
+                if (value == ticker) {
                     return fields;
                 }
             }
         }
-
         return accounts_vector[0];
     }
 

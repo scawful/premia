@@ -9,15 +9,15 @@ namespace cbp
     {
     private:
         boost::property_tree::ptree accountData;
-        std::vector< std::unordered_map<std::string, std::string > > accounts_vector;
+        std::vector<std::unordered_map<std::string, std::string >> accounts_vector;
 
         void initVariables();
 
     public:
-        Account( boost::property_tree::ptree account_data );
+        explicit Account(const boost::property_tree::ptree & account_data);
 
 
-        std::unordered_map<std::string, std::string> get_position( std::string ticker );
+        std::unordered_map<std::string, std::string> get_position(const std::string & ticker);
 
     };
 }
