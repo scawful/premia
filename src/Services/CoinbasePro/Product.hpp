@@ -9,16 +9,16 @@ namespace cbp
     {
     private:
         boost::property_tree::ptree product_data;
-        std::vector< std::unordered_map<std::string, std::string > > accounts_vector;
+        std::vector<std::unordered_map<std::string, std::string>> accounts_vector;
 
         float current_price;
 
         void initVariables();
 
     public:
-        Product( boost::property_tree::ptree product_data );
+        explicit Product(const boost::property_tree::ptree & data);
 
-        float get_current_price();
+        float get_current_price() const;
 
 
     };

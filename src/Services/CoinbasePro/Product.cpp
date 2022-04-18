@@ -4,20 +4,19 @@ namespace cbp
 {
     void Product::initVariables()
     {
-        for ( auto & product_it : product_data )
+        for (const auto & [key, value] : product_data)
         {
-            if ( product_it.first == "price" )
-                current_price = product_it.second.get_value<float>();
+            if (key == "price")
+                current_price = value.get_value<float>();
         }
     }
 
-    Product::Product( boost::property_tree::ptree product_data )
+    Product::Product(const boost::property_tree::ptree & data) : product_data(data)
     {
-        this->product_data = product_data;
         initVariables();
     }
 
-    float Product::get_current_price()
+    float Product::get_current_price() const
     {
         return current_price;
     }
