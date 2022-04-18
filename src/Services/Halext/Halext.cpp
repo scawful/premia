@@ -2,9 +2,7 @@
 
 using namespace halext;
 
-Halext::Halext() : privateBalance(false)
-{
-}
+Halext::Halext()=default;
 
 bool & Halext::getPrivateBalance()
 {
