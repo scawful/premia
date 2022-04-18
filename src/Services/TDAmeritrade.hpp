@@ -34,7 +34,7 @@ namespace tda
         JSONObject::ptree user_principals;
 
         // curl functions
-        void post_access_token(const std::string & refresh_token);
+        void post_access_token() const;
 
         // websocket functions
         JSONObject::ptree get_user_principals();
@@ -47,17 +47,17 @@ namespace tda
 
         std::vector<std::string> get_all_accounts();
 
-        Account getCurrentAccount();
+        Account getCurrentAccount() const;
         Account getDefaultAccount();
-        std::vector<Watchlist> getWatchlistsByAccount(const std::string & account_num);
-        Quote getQuote(const std::string & symbol);
+        std::vector<Watchlist> getWatchlistsByAccount(const std::string & account_num) const;
+        Quote getQuote(const std::string & symbol) const;
         Account getAccount(const std::string & account_id);
-        PriceHistory getPriceHistory(const std::string & ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext);
+        PriceHistory getPriceHistory(const std::string & ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const;
         OptionChain getOptionChain(const std::string & ticker, const std::string & contractType, const std::string & strikeCount,
                                    bool includeQuotes, const std::string & strategy, const std::string & range,
-                                   const std::string & expMonth, const std::string & optionType);
+                                   const std::string & expMonth, const std::string & optionType) const;
 
-        void postOrder(const std::string & account_id, Order order) const;
+        void postOrder(const std::string & account_id, const Order & order) const;
 
         void startStreamingSession();
 

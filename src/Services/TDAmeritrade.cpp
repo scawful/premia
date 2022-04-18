@@ -9,7 +9,7 @@ namespace tda
      * @param refresh_token
      * @param filename
      */
-    void TDAmeritrade::post_access_token(const std::string & refresh_token)
+    void TDAmeritrade::post_access_token() const
     {
         CURL *curl;
         FILE *fp;
@@ -27,12 +27,12 @@ namespace tda
             curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
 
             // set the headers for the request
-            struct curl_slist *headers = NULL;
+            struct curl_slist *headers = nullptr;
             headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
             res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
             // chunked request for http1.1/200 ok
-            struct curl_slist *chunk = NULL;
+            struct curl_slist *chunk = nullptr;
             chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
             res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
@@ -83,23 +83,20 @@ namespace tda
         std::string response;
 
         curl = curl_easy_init();
-        if (curl)
-        {
-            struct curl_slist *headers = NULL;
-            std::string auth_bearer = "Authorization: Bearer " + _access_token;
-            headers = curl_slist_append(headers, auth_bearer.c_str());
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        struct curl_slist *headers = nullptr;
+        std::string auth_bearer = "Authorization: Bearer " + _access_token;
+        headers = curl_slist_append(headers, auth_bearer.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-            fp = fopen(filename.c_str(), "wb");
-            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        fp = fopen(filename.c_str(), "wb");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
-            res = curl_easy_perform(curl);
+        res = curl_easy_perform(curl);
 
-            curl_easy_cleanup(curl);
-            fclose(fp);
-        }
+        curl_easy_cleanup(curl);
+        fclose(fp);
 
         JSONObject::ptree property_tree;
         std::ifstream json_file(filename, std::ios::in | std::ios::binary);
@@ -126,14 +123,14 @@ namespace tda
     void TDAmeritrade::request_access_token(bool keep_file)
     {
         std::time_t now = std::time(0);
-        post_access_token(_refresh_token);
+        post_access_token();
 
         JSONObject::ptree propertyTree;
         std::ifstream jsonFile("access_token.json", std::ios::in | std::ios::binary);
 
         try {
             read_json(jsonFile, propertyTree);
-        } catch (std::exception &json_parser_error) {
+        } catch (const JSONObject::ptree_error & json_parser_error) {
             SDL_Log("%s", json_parser_error.what());
         }
 
@@ -141,9 +138,9 @@ namespace tda
         if (!keep_file)
             std::remove("access_token.json");
 
-        for (auto &access_it : propertyTree) {
-            if (access_it.first == "access_token") {
-                _access_token = access_it.second.get_value<std::string>();
+        for (const auto & [key, value] : propertyTree) {
+            if (key == "access_token") {
+                _access_token = value.get_value<std::string>();
             }
         }
     }
@@ -160,7 +157,6 @@ namespace tda
     {
         session_active = false;
         _refresh_token = REFRESH_TOKEN;
-        _access_token = "nope";
 
         request_access_token(false);
     }
@@ -178,10 +174,10 @@ namespace tda
         this->_access_token = client.get_access_token();
         get_user_principals();
 
-        for (auto &array : user_principals.get_child("accounts")) {
-            for (auto &each_element : array.second) {
-                if (each_element.first == "accountId") {
-                    accounts.push_back(each_element.second.get_value<std::string>());
+        for (const auto & [key, value] : user_principals.get_child("accounts")) {
+            for (const auto & [elementKey, elementValue] : value) {
+                if (elementKey == "accountId") {
+                    accounts.push_back(elementValue.get_value<std::string>());
                 }
             }
         }
@@ -195,7 +191,7 @@ namespace tda
      * 
      * @return Account 
      */
-    Account TDAmeritrade::getCurrentAccount()
+    Account TDAmeritrade::getCurrentAccount() const
     {
         return current_account;
     }
@@ -218,7 +214,7 @@ namespace tda
      * @param account_num 
      * @return std::vector<Watchlist> 
      */
-    std::vector<Watchlist> TDAmeritrade::getWatchlistsByAccount(const std::string & account_num)
+    std::vector<Watchlist> TDAmeritrade::getWatchlistsByAccount(const std::string & account_num) const
     {
         std::string response = client.get_watchlist_by_account(account_num);
         return parser.parse_watchlist_data(parser.read_response(response));
@@ -231,7 +227,7 @@ namespace tda
      * @param symbol
      * @return FundOwnership
      */
-    Quote TDAmeritrade::getQuote(const std::string & symbol)
+    Quote TDAmeritrade::getQuote(const std::string & symbol) const
     {
         std::string response = client.get_quote(symbol);
         return parser.parse_quote(parser.read_response(response));
@@ -260,7 +256,7 @@ namespace tda
      */
     OptionChain TDAmeritrade::getOptionChain(const std::string & ticker, const std::string & contractType, const std::string & strikeCount,
                                             bool includeQuotes, const std::string & strategy, const std::string & range,
-                                            const std::string & expMonth, const std::string & optionType)
+                                            const std::string & expMonth, const std::string & optionType) const
     {
         std::string response = client.get_option_chain(ticker, contractType, strikeCount, includeQuotes, strategy, range, expMonth, optionType);
         return parser.parse_option_chain(parser.read_response(response));
@@ -274,7 +270,7 @@ namespace tda
      * @param time 
      * @return PriceHistory 
      */
-    PriceHistory TDAmeritrade::getPriceHistory(const std::string & ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext)
+    PriceHistory TDAmeritrade::getPriceHistory(const std::string & ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
     {
         std::string response = client.get_price_history(ticker, ptype, period_amt, ftype, freq_amt, ext);
         return parser.parse_price_history(parser.read_response(response), ticker, ftype);
@@ -290,7 +286,7 @@ namespace tda
      * @param symbol 
      * @param quantity 
      */
-    void TDAmeritrade::postOrder(const std::string & account_id, tda::Order order) const
+    void TDAmeritrade::postOrder(const std::string & account_id, const tda::Order & order) const
     {
         client.post_order(account_id, order);
     }
