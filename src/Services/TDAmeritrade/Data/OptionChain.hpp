@@ -19,17 +19,17 @@ namespace tda
     public:
         OptionChain();
 
-        std::vector<OptionsDateTimeObj> getOptionsDateTimeObj();
-        std::string getCallVariable( std::string variable );
-        std::string getPutVariable( std::string variable );
-        std::string getOptionChainDataVariable( std::string variable );
-        std::string getUnderlyingDataVariable( std::string variable );
+        std::vector<OptionsDateTimeObj> getOptionsDateTimeObj() const;
+        std::string getCallVariable( const std::string & variable );
+        std::string getPutVariable( const std::string & variable );
+        std::string getOptionChainDataVariable( const std::string & variable );
+        std::string getUnderlyingDataVariable( const std::string & variable );
 
-        void addOptionsDateTimeObj( OptionsDateTimeObj obj );
-        void setCallVariable( std::string key, std::string value );
-        void setPutVariable( std::string key, std::string value );
-        void setOptionChainVariable( std::string key, std::string value );
-        void setUnderlyingVariable( std::string key, std::string value );
+        void addOptionsDateTimeObj( const OptionsDateTimeObj & obj );
+        void setCallVariable( const std::string & key, const std::string & value );
+        void setPutVariable( const std::string & key, const std::string & value );
+        void setOptionChainVariable( const std::string & key, const std::string & value );
+        void setUnderlyingVariable( const std::string & key, const std::string & value );
 
     };
 }
