@@ -20,8 +20,7 @@ void PortfolioFrame::draw_positions()
 {
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
-    if (ImGui::BeginTable("table_scrolly", 6, flags, ImGui::GetContentRegionAvail()))
-    {
+    if (ImGui::BeginTable("table_scrolly", 6, flags, ImGui::GetContentRegionAvail())) {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
         ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthStretch );
         ImGui::TableSetupColumn("P/L Day", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed );
@@ -96,20 +95,16 @@ void PortfolioFrame::draw_tabbed_view()
     ImGui::Combo("Accounts", &n,  accounts, 6); 
 
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
-    {
-        if (ImGui::BeginTabItem("Positions"))
-        {
+    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags)) {
+        if (ImGui::BeginTabItem("Positions")) {
             draw_positions();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Balances"))
-        {
+        if (ImGui::BeginTabItem("Balances")) {
             draw_balances();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Orders"))
-        {
+        if (ImGui::BeginTabItem("Orders")) {
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
@@ -136,8 +131,7 @@ void PortfolioFrame::init_positions()
 {
     account_ids_std = premia->tda_interface.get_all_accounts();
     int i = 0;
-    for ( std::string const& each_id : account_ids_std ) 
-    {
+    for (std::string const& each_id : account_ids_std) {
         account_ids.push_back(each_id.c_str());
         i++;
     }

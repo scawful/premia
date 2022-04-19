@@ -16,7 +16,10 @@ namespace tda
     class Session : public std::enable_shared_from_this<Session>
     {
     private:
-        bool _logged_in, _subscribed, _notified, _interrupt;
+        bool _logged_in;
+        bool _subscribed;
+        bool _notified;
+        bool _interrupt;
         unsigned int _sub_count;
         net::io_context _ioc;
         tcp::resolver _resolver;
@@ -27,10 +30,10 @@ namespace tda
         std::string _host;
         std::size_t _queue_size;
 
-        void fail( beast::error_code ec, char const* what );
+        void fail( beast::error_code ec, char const* what ) const;
 
     public:
-        explicit Session( net::io_context& ioc, ssl::context& ctx, std::vector<std::shared_ptr<std::string const>> queue )
+        explicit Session( net::io_context & ioc, ssl::context & ctx, const std::vector<std::shared_ptr<std::string const>> & queue )
             : _resolver(net::make_strand(ioc))
             , _ws(net::make_strand(ioc), ctx)
             , _queue(queue)
@@ -52,19 +55,19 @@ namespace tda
         void on_close( beast::error_code ec );
 
         void send_message( std::shared_ptr<std::string const> const& s );
-        std::vector<std::string> receive_response();
+        std::vector<std::string> receive_response() const;
         std::shared_ptr<std::vector<std::string>> receive_response_ptr();
 
         bool on_login( beast::error_code ec );
-        void on_logout( beast::error_code ec );
+        void on_logout( beast::error_code ec ) const;
         void on_notify( beast::error_code ec );
         void on_subscription( beast::error_code ec );
 
         void interrupt();
         void clear_buffer();
 
-        bool is_logged_in();
-        bool is_subscribed();
+        bool is_logged_in() const;
+        bool is_subscribed() const;
 
     };
 }

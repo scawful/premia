@@ -103,8 +103,7 @@ void CandleChartFrame::build_candle_chart( float width_percent, int count, ImVec
     double half_width = count > 1 ? (dates[1] - dates[0]) * width_percent : width_percent;
 
     // custom tool
-    if ( ImPlot::IsPlotHovered() && tooltip ) 
-    {
+    if (ImPlot::IsPlotHovered() && tooltip) {
         ImPlotPoint mouse   = ImPlot::GetPlotMousePos();
         mouse.x             = ImPlot::RoundTime(ImPlotTime::FromDouble(mouse.x), ImPlotTimeUnit_Day).ToDouble();
         float  tool_l       = ImPlot::PlotToPixels(mouse.x - half_width * 1.5, mouse.y).x;
@@ -208,16 +207,14 @@ void CandleChartFrame::draw_chart()
 
     ImGui::SameLine();
 
-    if ( ImGui::Button("Apply") ) 
-    {
+    if (ImGui::Button("Apply")) {
         priceHistoryData = premia->tda_interface.getPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount,
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
         init_instrument(ticker_symbol);
         init_candles(frequency_type);
     }  
 
-    if (ImGui::BeginPopupContextItem())
-    {
+    if (ImGui::BeginPopupContextItem()) {
         ImGui::Text("Edit name:");
         if (ImGui::Button("Close"))
             ImGui::CloseCurrentPopup();
@@ -225,12 +222,10 @@ void CandleChartFrame::draw_chart()
     }
 
     ImPlot::GetStyle().UseLocalTime = true;
-    if (ImPlot::BeginPlot("Candlestick Chart",ImGui::GetContentRegionAvail(),0)) 
-    {
+    if (ImPlot::BeginPlot("Candlestick Chart",ImGui::GetContentRegionAvail(),0))  {
         ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
         ImPlot::SetupAxes("Date","Price",ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit);
-        if (priceHistoryData.getInitialized()) 
-        {
+        if (priceHistoryData.getInitialized()) {
             ImPlot::SetupAxesLimits(0,100, 
                                     boost::lexical_cast<double>(quote.getQuoteVariable("52WkLow")), 
                                     boost::lexical_cast<double>(quote.getQuoteVariable("52WkHigh")));

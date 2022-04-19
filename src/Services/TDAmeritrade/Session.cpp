@@ -12,12 +12,12 @@ using tcp = boost::asio::ip::tcp;
 namespace tda
 {
     void 
-    Session::fail( beast::error_code ec, char const* what )
+    Session::fail( beast::error_code ec, char const* what ) const
     {
-        if( ec == net::error::operation_aborted || ec == websocket::error::closed )
+        if(ec == net::error::operation_aborted || ec == websocket::error::closed)
             return;
         
-        SDL_Log( "Session::fail( %s: %s )", ec.message().c_str(), what );
+        SDL_Log("Session::fail( %s: %s )", ec.message().c_str(), what);
     }
 
     void 
@@ -37,7 +37,7 @@ namespace tda
     void 
     Session::on_resolve( beast::error_code ec, tcp::resolver::results_type results )
     {
-        if ( ec )
+        if (ec)
             return fail(ec, "resolve");
 
         SDL_Log("Session::on_resolve");
@@ -137,7 +137,7 @@ namespace tda
     }
 
     void
-    Session::on_write( beast::error_code ec, std::size_t bytes_transferred )
+    Session::on_write(beast::error_code ec, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
@@ -145,25 +145,20 @@ namespace tda
             return fail(ec, "write");
 
         SDL_Log("Session::on_write");
-        // SDL_Log("Queue Request Stream:\n%s", _queue[0].get()->c_str() );
 
-        if ( _logged_in )
-        {
+        if (_logged_in) {
             // clear request from the queue
             _queue.erase( _queue.begin() );
 
-            if ( !_queue.empty() )
-            {
+            if (!_queue.empty()) {
                 SDL_Log("Session::on_write( Queue Not Empty )");
             }
             else
             {
-                if ( _interrupt == false )
-                {
+                if (_interrupt == false) {
                     SDL_Log( "Uninterrupted stream");
                 }
-                else
-                {
+                else {
                     // logout
                     SDL_Log("Session::on_write( Logging out ) ");
                     _logged_in = false;
@@ -201,17 +196,15 @@ namespace tda
             on_login( ec );
             _buffer.consume( _buffer.size() );
         }
-        else if ( !_notified ) {
+        else if (!_notified) {
             on_notify( ec );
         }
-        else if ( !_subscribed ) {
+        else if (!_subscribed) {
             on_subscription( ec );
         }
 
-        if ( _logged_in )
-        {
-            if ( _notified && !_subscribed )
-            {
+        if (_logged_in) {
+            if (_notified && !_subscribed) {
                 SDL_Log("Notified, but not subscribed!");
                 _ws.async_read(
                     _buffer,
@@ -219,8 +212,7 @@ namespace tda
                         &Session::on_read,
                         shared_from_this()));
             }
-            else if ( _subscribed && !_interrupt )
-            {
+            else if ( _subscribed && !_interrupt ) {
                 SDL_Log("Subscribed but not finished");
                 _sub_count++;
                 _ws.async_read(
@@ -229,8 +221,7 @@ namespace tda
                         &Session::on_read,
                         shared_from_this()));
             }
-            else
-            {
+            else {
                 _ws.async_write(
                     net::buffer( *_queue.front() ),
                     beast::bind_front_handler(
@@ -239,8 +230,7 @@ namespace tda
             }
 
         }
-        else
-        {
+        else {
             // Close the WebSocket connection
             _ws.async_close(websocket::close_code::normal,
                 beast::bind_front_handler(
@@ -266,14 +256,13 @@ namespace tda
 
     // sends a message to the queue from the main threads
     void 
-    Session::send_message( std::shared_ptr<std::string const> const& s )
+    Session::send_message(const std::shared_ptr<std::string const> & s)
     {
         SDL_Log("Session::send_message");
 
         _queue.push_back( s );
 
-        if ( _queue.size() > 1 )
-        {
+        if (_queue.size() > 1) {
             SDL_Log("Session::send_message( Already Writing )");
             return;
         }
@@ -287,7 +276,7 @@ namespace tda
 
     // returns the cumulative vector of responses from the server
     std::vector<std::string> 
-    Session::receive_response()
+    Session::receive_response() const
     {
         return _response_stack;
     }
@@ -299,7 +288,7 @@ namespace tda
     }
 
     bool 
-    Session::on_login( beast::error_code ec )
+    Session::on_login(beast::error_code ec)
     {
         std::string response_code;
         std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
@@ -330,44 +319,39 @@ namespace tda
     }
 
     void 
-    Session::on_logout( beast::error_code ec )
+    Session::on_logout(beast::error_code ec) const
     {
-        
+        // need a callback for this 
     }
 
     void
-    Session::on_notify( beast::error_code ec )
+    Session::on_notify(beast::error_code ec)
     {
         SDL_Log("Session::on_notify");
         std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("notify");
 
-        if ( found != std::string::npos )
-        {
+        if (found != std::string::npos) {
             _notified = true;
             _buffer.consume( _buffer.size() );
         }
-
-        // maybe store the heartbeat 
     }
 
     void
-    Session::on_subscription( beast::error_code ec )
+    Session::on_subscription(beast::error_code ec)
     {
         SDL_Log("Session::on_subscription");
         std::string sub_code;
         std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("code");
 
-        if ( found != std::string::npos )
-        {
+        if (found != std::string::npos) {
             sub_code = s[found + 6];
             SDL_Log("SUBS code %s", sub_code.c_str() );
-            if ( sub_code == "0" )
-            {
+            if (sub_code == "0") {
                 _subscribed = true;
             }
-            _buffer.consume( _buffer.size() );
+            _buffer.consume(_buffer.size());
         }
     }
 
@@ -384,13 +368,13 @@ namespace tda
     }
 
     bool
-    Session::is_logged_in()
+    Session::is_logged_in() const
     {
         return _logged_in;
     }
 
     bool
-    Session::is_subscribed()
+    Session::is_subscribed() const
     {
         return _subscribed;
     }

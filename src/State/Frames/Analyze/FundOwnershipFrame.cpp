@@ -13,19 +13,15 @@ void FundOwnershipFrame::update()
     static char symbol[128] = "";
     ImGui::InputText("Enter symbol", symbol, IM_ARRAYSIZE(symbol));
 
-    if ( ImGui::Button("Submit") ) 
-    {
+    if (ImGui::Button("Submit")) {
         fund_ownership = premia->getIEXInterface().getFundOwnership(symbol);
         data_active = true;
     }
 
-    if ( data_active ) 
-    {
-        ImGui::Text("Symbol: %s", fund_ownership[0].getSymbol().c_str());
-        
+    if (data_active) {
+        ImGui::Text("Symbol: %s", fund_ownership[0].getSymbol().c_str());  
 
-        if (ImGui::BeginTable("table1", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
-        {
+        if (ImGui::BeginTable("table1", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
             ImGui::TableSetupColumn("Fund Name");
             ImGui::TableSetupColumn("Adj Holding");
             ImGui::TableSetupColumn("Adj Market Value");
@@ -34,8 +30,7 @@ void FundOwnershipFrame::update()
             ImGui::TableSetupColumn("Report Date");
             ImGui::TableHeadersRow();
 
-            for ( auto & each : fund_ownership ) 
-            {
+            for (const auto & each : fund_ownership) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
                 ImGui::Text("%s", each.entityProperName().c_str());
@@ -54,5 +49,4 @@ void FundOwnershipFrame::update()
         }
         ImGui::TreePop();
     }
-
 }

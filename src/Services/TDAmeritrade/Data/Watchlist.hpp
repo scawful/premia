@@ -38,7 +38,7 @@ namespace tda
         // "status": "'UNCHANGED' or 'CREATED' or 'UPDATED' or 'DELETED'",
         std::string name;
         unsigned int watchlist_id;
-        unsigned int account_id;
+        std::string account_id;
 
     public:
         Watchlist();
@@ -52,6 +52,7 @@ namespace tda
 
         void setId( int id );
         void setName(const std::string & name);
+        void setAccountId(const std::string & accountId);
         void setWatchlistVariable(const std::string & variable);
 
         void addVariable(const std::string & key, const std::string & value);

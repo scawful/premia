@@ -10,10 +10,8 @@ void LinePlotFrame::initData()
 
     int i = 0;
     std::string temp, word, line;
-    if(fileInput.good())
-    {
-        while(std::getline(fileInput, line))
-        {
+    if(fileInput.good()) {
+        while(std::getline(fileInput, line)) {
             // Create a stringstream from line
             std::stringstream ss(line);
             std::getline(ss, word, ',');

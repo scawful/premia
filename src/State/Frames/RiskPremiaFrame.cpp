@@ -53,8 +53,7 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
     std::string header;
     ss >> header;
 
-    while (!ss.eof())
-    {
+    while (!ss.eof()) {
         std::string row;
         ss >> row;
 
@@ -138,8 +137,9 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
         i++;
 
         // Animate a simple progress bar
-        static float progress = 0.0f, progress_dir = 1.0f;
-        progress += progress_dir * i * ImGui::GetIO().DeltaTime;
+        static float progress = 0.0f;
+        static float progress_dir = 1.0f;
+        progress += progress_dir * (float) i * ImGui::GetIO().DeltaTime;
 
         ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
@@ -244,29 +244,24 @@ void RiskPremiaFrame::update()
                 ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
                 ImGui::BeginChild("ChildL", ImVec2(ImGui::GetContentRegionAvail().x * 0.65f, 375), false, window_flags);
                 ImGui::Text("General");
-                if (ImGui::TreeNode("Getting Started")) 
-                {
+                if (ImGui::TreeNode("Getting Started")) {
                     ImGui::Separator();
                     ImGui::Text("Welcome to Premia!");
                     ImGui::Separator();
                     ImGui::TreePop();
                 }
-                if (ImGui::TreeNode("Linking Accounts")) 
-                {
-                    ImGui::Separator(); ImGui::TextColored(ImVec4(42.f, 170.f, 138.f, 1.0f), "TDAmeritrade"); ImGui::Separator();
-                    
+                if (ImGui::TreeNode("Linking Accounts")) {
+                    ImGui::Separator(); ImGui::TextColored(ImVec4(42.f, 170.f, 138.f, 1.0f), "TDAmeritrade"); ImGui::Separator();            
                     ImGui::TextColored(ImVec4(0.f, 128.f, 128.f, 1.0f), "Coinbase"); ImGui::Separator();
                     ImGui::TreePop();
                 }
-                if (ImGui::TreeNode("Premia Pro Subscription")) 
-                {
+                if (ImGui::TreeNode("Premia Pro Subscription")) {
                     ImGui::TreePop();
                 }
 
 
                 ImGui::Text("Education");
-                if (ImGui::TreeNode("Delta Hedging")) 
-                {
+                if (ImGui::TreeNode("Delta Hedging")) {
                     ImGui::Separator();
                     ImGui::Text("Delta is an important hedge parameter for an options dealers portfolio.");
                     ImGui::TextWrapped("Options traders adjust delta frequently, making it close to zero, by trading the underlying asset.");
@@ -275,13 +270,11 @@ void RiskPremiaFrame::update()
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Gamma Exposure")) 
-                {
+                if (ImGui::TreeNode("Gamma Exposure")) {
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Standardizing Volatility")) 
-                {
+                if (ImGui::TreeNode("Standardizing Volatility")) {
                     ImGui::Separator(); ImGui::Text("Average True Range"); ImGui::Separator();
                     ImGui::TextWrapped("One of the most common ways to measure volatility is in terms of the average true range of a trading session.");
 
@@ -298,15 +291,14 @@ void RiskPremiaFrame::update()
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Bonds and Interest Rates")) 
-                {
+                if (ImGui::TreeNode("Bonds and Interest Rates")) {
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Futures and Futures Options")) 
-                {
+                if (ImGui::TreeNode("Futures and Futures Options")) {
                     ImGui::TreePop();
                 }
+
                 ImGui::Separator();
                 ImGui::Text("Development");
                 if (ImGui::TreeNode("Changelog")) {
@@ -337,9 +329,7 @@ void RiskPremiaFrame::update()
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
                 ImGui::BeginChild("ChildR", ImVec2(0, 375), true, window_flags);
                 if (ImGui::BeginMenuBar()) {
-                    if (ImGui::BeginMenu("Menu"))
-                    {
-                        
+                    if (ImGui::BeginMenu("Menu")) {
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenuBar();
@@ -360,8 +350,7 @@ void RiskPremiaFrame::update()
                  * @brief Button Table
                  * 
                  */
-                if (ImGui::BeginTable("split", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
-                {
+                if (ImGui::BeginTable("split", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings)) {
                     for (int i = 0; i < 30; i++) {
                         char buf[32];
                         sprintf(buf, "%03d", i);
@@ -375,15 +364,11 @@ void RiskPremiaFrame::update()
             }
 
             ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
-
-            // draw_heatmap();
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Volatility Index"))
-        {
-            if (ImPlot::BeginPlot("SPX Volatility Index", ImVec2(-1, io.DisplaySize.x * 0.35f)))
-            {
+        if (ImGui::BeginTabItem("Volatility Index")) {
+            if (ImPlot::BeginPlot("SPX Volatility Index", ImVec2(-1, io.DisplaySize.x * 0.35f))) {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
                 ImPlot::SetupAxis(ImAxis_Y2, "VIX", ImPlotAxisFlags_AuxDefault);
@@ -399,8 +384,7 @@ void RiskPremiaFrame::update()
         }
 
         if (ImGui::BeginTabItem("Dark Index")) {
-            if (ImPlot::BeginPlot("SPX Dark Index", ImVec2(-1, io.DisplaySize.x * 0.35f)))
-            {
+            if (ImPlot::BeginPlot("SPX Dark Index", ImVec2(-1, io.DisplaySize.x * 0.35f))) {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
                 ImPlot::SetupAxis(ImAxis_Y2, "DIX", ImPlotAxisFlags_AuxDefault);
@@ -415,10 +399,8 @@ void RiskPremiaFrame::update()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Gamma Exposure Index"))
-        {
-            if (ImPlot::BeginPlot("SPX Gamma Exposure Index", ImVec2(-1, io.DisplaySize.x * 0.35f)))
-            {
+        if (ImGui::BeginTabItem("Gamma Exposure Index")) {
+            if (ImPlot::BeginPlot("SPX Gamma Exposure Index", ImVec2(-1, io.DisplaySize.x * 0.35f))) {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
                 ImPlot::SetupAxis(ImAxis_Y2, "GEX", ImPlotAxisFlags_AuxDefault);
@@ -434,10 +416,8 @@ void RiskPremiaFrame::update()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Gamma Volatility Index"))
-        {
-            if (ImPlot::BeginPlot("1-day Gamma Volatiltiy", ImVec2(-1, io.DisplaySize.x * 0.35f)))
-            {
+        if (ImGui::BeginTabItem("Gamma Volatility Index")) {
+            if (ImPlot::BeginPlot("1-day Gamma Volatiltiy", ImVec2(-1, io.DisplaySize.x * 0.35f))) {
                 ImPlot::SetupAxes("Date", "SPX");
                 ImPlot::SetupAxesLimits(0, length, minSpx, maxSpx);
                 ImPlot::SetupAxis(ImAxis_Y2, "GXV", ImPlotAxisFlags_AuxDefault);

@@ -8,10 +8,8 @@ SettingsFrame::SettingsFrame() : Frame()
 void SettingsFrame::update() 
 {
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
-    {
-        if (ImGui::BeginTabItem("TDAmeritrade"))
-        {
+    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags)) {
+        if (ImGui::BeginTabItem("TDAmeritrade")) {
             ImGui::Spacing();
             static char api_key[128] = "";
             static char refresh_token[128] = "";
@@ -25,16 +23,16 @@ void SettingsFrame::update()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("IEXCloud"))
-        {
+
+        if (ImGui::BeginTabItem("IEXCloud")) {
             ImGui::Spacing();
             static char api_key[128] = "";
             ImGui::InputText("API Key", api_key, IM_ARRAYSIZE(api_key));
             ImGui::Button("Login");
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("CoinbasePro"))
-        {
+
+        if (ImGui::BeginTabItem("CoinbasePro")) {
             ImGui::Spacing();
             static char api_key[128] = "";
             static char secret_key[128] = "";

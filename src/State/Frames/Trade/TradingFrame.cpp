@@ -15,17 +15,14 @@ void TradingFrame::update()
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if ( ImGui::BeginPopupModal("Quick Order", nullptr, ImGuiWindowFlags_AlwaysAutoResize) ) 
-    {
+    if (ImGui::BeginPopupModal("Quick Order", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         static std::string new_ticker = "";
         static bool active_instrument = false;
         static char buf[64] = "";
         ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
         ImGui::SameLine(); 
-        if ( ImGui::Button("Search") ) 
-        {
-            if ( strcmp(buf, "") != 0 ) 
-            {
+        if (ImGui::Button("Search")) {
+            if (strcmp(buf, "") != 0) {
                 new_ticker = std::string(buf);
                 quotes[new_ticker] = premia->tda_interface.getQuote(new_ticker);
                 active_instrument = true;
@@ -34,7 +31,7 @@ void TradingFrame::update()
             }
         }
 
-        if ( active_instrument ) {
+        if (active_instrument) {
             static int n = 0;
             ImGui::Combo("Order Type", &n, "Limit\0Market\0Stop\0Stop Limit\0\0");
 
@@ -57,8 +54,7 @@ void TradingFrame::update()
         ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
 
         if (ImGui::Button("Confirm", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-        ImGui::SetItemDefaultFocus();
-        ImGui::SameLine();
+        ImGui::SetItemDefaultFocus(); ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
         ImGui::EndPopup();
     } 

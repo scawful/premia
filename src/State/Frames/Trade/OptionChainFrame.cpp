@@ -42,8 +42,7 @@ void OptionChainFrame::draw_option_chain()
     // When using ScrollX or ScrollY we need to specify a size for our table container!
     // Otherwise by default the table will fit all available space, like a BeginChild() call.
     auto outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * (float) optionsDateTimeObj[current_item].strikePriceObj.size());
-    if (ImGui::BeginTable("table_scrolly", 16, flags, outer_size))
-    {
+    if (ImGui::BeginTable("table_scrolly", 16, flags, outer_size)) {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
         ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Strike", ImGuiTableColumnFlags_None);
@@ -69,16 +68,12 @@ void OptionChainFrame::draw_option_chain()
 
         ImGuiListClipper clipper;
         clipper.Begin((int) optionsDateTimeObj[current_item].strikePriceObj.size());
-        while (clipper.Step())
-        {
-            for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
-            {
+        while (clipper.Step()) {
+            for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
                 ImGui::TableNextRow();
-                for (int column = 0; column < 16; column++)
-                {
+                for (int column = 0; column < 16; column++) {
                     ImGui::TableSetColumnIndex(column);
-                    switch( column )
-                    {
+                    switch( column ) {
                         case 0:
                             ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[row].raw_option["putCall"].c_str() );
                             break;
@@ -139,19 +134,14 @@ void OptionChainFrame::draw_option_chain()
 
     for ( int i = 0; i < optionsDateTimeObj[current_item].strikePriceObj.size(); i++ )
     {
-        if ( select_options[i] == true && last_select == 0 )
-        {
+        if ( select_options[i] == true && last_select == 0 ) {
             last_select = i;
             ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[i].raw_option["description"].c_str() );
-        }
-        else if ( select_options[i] == true && last_select > 0 )
-        {
+        } else if ( select_options[i] == true && last_select > 0 ) {
             select_options[last_select] = false;
             last_select = i;
             ImGui::Text("%s", optionsDateTimeObj[current_item].strikePriceObj[i].raw_option["description"].c_str() );
-        }
-        else if ( select_options[i] == false && last_select == i )
-        {
+        } else if ( select_options[i] == false && last_select == i ) {
             last_select = 0;
         }
     }
@@ -166,7 +156,8 @@ OptionChainFrame::OptionChainFrame() : Frame()
 
 void OptionChainFrame::load_data()
 {
-    static float progress = 0.0f, progress_dir = 1.0f;
+    static float progress = 0.0f;
+    static float progress_dir = 1.0f;
     ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
     ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
     ImGui::Text("Progress Bar");
@@ -179,9 +170,4 @@ void OptionChainFrame::update()
     } else {
         draw_search();
     }
-    // if (*tda_logged_in) {
-
-    // } else {
-    //     ImGui::Text("Not Logged In");
-    // }
 }
