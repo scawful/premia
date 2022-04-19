@@ -11,6 +11,7 @@ private:
 
     Manager *premia;
     MenuFrame mainMenu;
+    bool protectedMode, tdaLoggedIn;
 
     std::string title_string, ticker_symbol;
 

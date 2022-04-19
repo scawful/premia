@@ -165,7 +165,6 @@ namespace tda
     std::vector<std::string> TDAmeritrade::get_all_accounts()
     {
         std::vector<std::string> accounts;
-        client.fetch_access_token();
         this->_access_token = client.get_access_token();
         get_user_principals();
 

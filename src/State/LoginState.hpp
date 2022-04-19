@@ -10,6 +10,7 @@ class LoginState : public State
 {
 private:
     static LoginState m_LoginState;
+    bool protectedMode, tdaLoggedIn;
 
     Manager * premia = nullptr;
     LoginFrame loginFrame;

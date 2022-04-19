@@ -15,7 +15,7 @@ void reverse_array(double arr[], int start, int end)
 
 void RiskPremiaFrame::init_pie_chart()
 {
-    tda::Account account = getPremia()->tda_interface.getDefaultAccount();
+    tda::Account account = premia->tda_interface.getDefaultAccount();
     if ( !symbols_array.empty() ) {
         symbols_array.clear();
     }
@@ -45,7 +45,7 @@ void RiskPremiaFrame::init_pie_chart()
 
 void RiskPremiaFrame::get_spx_gamma_exposure()
 {
-    std::string data = getPremia()->getGenericClient().get_spx_gex();
+    std::string data = premia->getGenericClient().get_spx_gex();
     std::istringstream ss(data);
 
     int i = 0;
@@ -223,9 +223,7 @@ void RiskPremiaFrame::update()
 {
     if (!getInitialized()) {
         get_spx_gamma_exposure();
-        if (*getTDALoggedIn()) {
-            init_pie_chart();
-        }
+        //init_pie_chart();
     }
 
     ImGuiIO& io = ImGui::GetIO();

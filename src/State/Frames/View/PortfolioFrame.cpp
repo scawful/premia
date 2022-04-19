@@ -5,9 +5,9 @@
  * 
  * @param variable 
  */
-void PortfolioFrame::draw_balance_string(const std::string & variable) const
+void PortfolioFrame::draw_balance_string(const std::string & variable)
 {
-    std::string str = (getPremia()->getHalextInterface().getPrivateBalance()) ? "***" : variable;
+    std::string str = (premia->getHalextInterface().getPrivateBalance()) ? "***" : variable;
     ImGui::Text("%s", str.c_str());
 }
 
@@ -134,7 +134,7 @@ PortfolioFrame::PortfolioFrame() : Frame()
  */
 void PortfolioFrame::init_positions()
 {
-    account_ids_std = getPremia()->tda_interface.get_all_accounts();
+    account_ids_std = premia->tda_interface.get_all_accounts();
     int i = 0;
     for ( std::string const& each_id : account_ids_std ) 
     {
@@ -154,9 +154,9 @@ void PortfolioFrame::init_positions()
  */
 void PortfolioFrame::load_account(const std::string & account_num)
 {
-    account_data = getPremia()->tda_interface.getAccount(account_num);
+    account_data = premia->tda_interface.getAccount(account_num);
 
-    if (positions_vector.empty()) {
+    if (!positions_vector.empty()) {
         positions_vector.clear();
     }
 
@@ -183,14 +183,10 @@ void PortfolioFrame::update()
         return;
     }    
     
-    if (*getPublicMode()) {
-        ImGui::Text("No portfolio data in Public Mode");
-    } else {
-        if (!getInitialized()) {
-            init_positions();
-        }
-        draw_tabbed_view();
+    if (!getInitialized()) {
+        init_positions();
     }
+    draw_tabbed_view();
 
     ImGui::End();
 }

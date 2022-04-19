@@ -151,6 +151,7 @@ void LoginState::update()
 
     loginFrame.update();
     if (loginFrame.checkLoginStatus()) {
+        premia->tda_interface.fetchAccessToken();
         premia->change(PrimaryState::instance());
     }
 

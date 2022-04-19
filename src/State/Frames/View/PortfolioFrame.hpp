@@ -15,7 +15,7 @@ private:
     tda::Account account_data;
     std::vector<std::string> positions_vector;
 
-    void draw_balance_string(const std::string & variable) const;
+    void draw_balance_string(const std::string & variable);
 
     void draw_positions();
     void draw_balances();

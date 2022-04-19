@@ -2,8 +2,8 @@
 
 void WatchlistFrame::init_watchlists()
 {
-    std::string account_num = getPremia()->tda_interface.get_all_accounts().at(0);
-    watchlists = getPremia()->tda_interface.getWatchlistsByAccount(account_num);
+    std::string account_num = premia->tda_interface.get_all_accounts().at(0);
+    watchlists = premia->tda_interface.getWatchlistsByAccount(account_num);
     openList = new bool[watchlists.size()];
 
     for ( int i = 0; i < watchlists.size(); i++ ) {
@@ -28,7 +28,7 @@ void WatchlistFrame::draw_watchlist_table()
 
     if (openList[n] == false) {
         for (int j = 0; j < watchlists[n].getNumInstruments(); j++) {
-           quotes[watchlists[n].getInstrumentSymbol(j)] = getPremia()->tda_interface.getQuote(watchlists[n].getInstrumentSymbol(j));
+           quotes[watchlists[n].getInstrumentSymbol(j)] = premia->tda_interface.getQuote(watchlists[n].getInstrumentSymbol(j));
         }
         openList[n] = true;
     }
@@ -143,7 +143,7 @@ void WatchlistFrame::draw_custom_watchlist_table()
 WatchlistFrame::WatchlistFrame() : Frame()
 {
     this->title_string = "Watchlists";  
-    setInitialized(true);
+    setInitialized(false);
 }
 
 WatchlistFrame::~WatchlistFrame()=default;
@@ -158,12 +158,12 @@ void WatchlistFrame::update()
         return;
     }
 
-    if (*getTDALoggedIn()) {
-        draw_watchlist_table();
-    } else {
+    if (true) {
         if (!getInitialized()) {
             init_watchlists();
         }
+        draw_watchlist_table();
+    } else {
         draw_custom_watchlist_table();
     }
 

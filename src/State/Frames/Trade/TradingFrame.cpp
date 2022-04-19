@@ -27,7 +27,7 @@ void TradingFrame::update()
             if ( strcmp(buf, "") != 0 ) 
             {
                 new_ticker = std::string(buf);
-                quotes[new_ticker] = getPremia()->tda_interface.getQuote(new_ticker);
+                quotes[new_ticker] = premia->tda_interface.getQuote(new_ticker);
                 active_instrument = true;
             } else {
                 active_instrument = false;

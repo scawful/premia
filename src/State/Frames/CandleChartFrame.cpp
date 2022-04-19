@@ -70,7 +70,7 @@ void CandleChartFrame::init_candles(int index)
  */
 void CandleChartFrame::init_instrument(std::string ticker)
 {
-    quote = getPremia()->tda_interface.getQuote(ticker_symbol);
+    quote = premia->tda_interface.getQuote(ticker_symbol);
     detailed_quote = "Exchange: " + quote.getQuoteVariable("exchangeName") +
                                  "\nBid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
                                  "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
@@ -175,7 +175,7 @@ void CandleChartFrame::draw_chart()
             ticker_symbol = buf;
             if (!priceHistoryData.getInitialized()) {
                 priceHistoryData.clear();
-                priceHistoryData = getPremia()->tda_interface.getPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
+                priceHistoryData = premia->tda_interface.getPriceHistory( buf, tda::PeriodType(period_type), period_amount, 
                                                                         tda::FrequencyType(frequency_type), frequency_amount, true);
                 init_candles(frequency_type);
             }
@@ -210,7 +210,7 @@ void CandleChartFrame::draw_chart()
 
     if ( ImGui::Button("Apply") ) 
     {
-        priceHistoryData = getPremia()->tda_interface.getPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount,
+        priceHistoryData = premia->tda_interface.getPriceHistory(ticker_symbol, tda::PeriodType(period_type), period_amount,
                                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
         init_instrument(ticker_symbol);
         init_candles(frequency_type);

@@ -7,15 +7,10 @@
 class Frame
 {
 private:
-    Manager *premia;
-    bool *public_mode;
-    bool *tda_logged_in;
     bool initialized;
 
 protected:
-    Manager * getPremia() const { return premia; }
-    bool * getPublicMode() const { return public_mode; }
-    bool * getTDALoggedIn() const { return tda_logged_in; }
+    Manager * premia;
     bool getInitialized() const { return initialized; }
     void setInitialized(bool init) { initialized = init; }
 
@@ -31,10 +26,8 @@ public:
      * @param mode 
      * @param tda_login 
      */
-    void import_manager(Manager * manager, bool * mode = nullptr, bool * tda_login = nullptr) {
+    void import_manager(Manager * manager) {
         this->premia = manager;
-        this->public_mode = mode;
-        this->tda_logged_in = tda_login;
     }
     virtual void update() = 0;
 };

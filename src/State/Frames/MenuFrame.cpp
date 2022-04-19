@@ -338,7 +338,7 @@ void MenuFrame::update()
             ImGui::Separator();
             if (ImGui::BeginMenu("Preferences"))
             {
-                ImGui::MenuItem("Private Balances", "", getPremia()->getHalextInterface().getPrivateBalance());
+                ImGui::MenuItem("Private Balances", "", premia->getHalextInterface().getPrivateBalance());
                 ImGui::Separator();
 
                 static int n = 0;
@@ -356,7 +356,7 @@ void MenuFrame::update()
             }
 
             if ( ImGui::MenuItem("Quit", "ESC") ) {
-                getPremia()->quit();
+                premia->quit();
             }
 
             ImGui::EndMenu();
@@ -488,21 +488,17 @@ void MenuFrame::update()
         
         if (ImGui::BeginMenu("Debug"))
         {
-            if (ImGui::MenuItem("Service Login", "TDA")) {
-                *getTDALoggedIn() = true;
-                *getPublicMode() = false;
-            }
             if (ImGui::MenuItem("Fetch Access Token", "TDA")) {
-                getPremia()->tda_interface.fetchAccessToken();
+                premia->tda_interface.fetchAccessToken();
             }
             if (ImGui::MenuItem("WebSocket StreamState")) {
-                getPremia()->change(StreamState::instance());
+                premia->change(StreamState::instance());
             }
             if (ImGui::MenuItem("ImGui/ImPlot Demos")) {
-                getPremia()->change(DemoState::instance());
+                premia->change(DemoState::instance());
             }      
             if (ImGui::MenuItem("Start WS Session")) {
-                getPremia()->tda_interface.startStreamingSession();
+                premia->tda_interface.startStreamingSession();
             }
             ImGui::EndMenu();
         }
