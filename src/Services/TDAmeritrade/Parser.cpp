@@ -80,7 +80,7 @@ PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, const s
 
     for (const auto & [historyKey, historyValue] : data) {
         if (historyKey == "candles") {
-            for (const auto& [candleKey, candleValue] : historyValue) {
+            for (const auto & [candleKey, candleValue] : historyValue) {
                 tda::Candle newCandle;
                 std::string datetime;
                 try {
@@ -121,11 +121,9 @@ UserPrincipals Parser::parse_user_principals(JSONObject::ptree & data) const
 {
     UserPrincipals user_principals;
 
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, data.get_child("accounts.")) 
-    {
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, data.get_child("accounts.")) {
         std::unordered_map<std::string, std::string> account_data;
-        for (const auto & [acctKey, acctValue] : v.second)
-        {
+        for (const auto & [acctKey, acctValue] : v.second) {
             account_data[acctKey] = acctValue.get_value<std::string>();
         }
         user_principals.add_account_data(account_data);
@@ -147,8 +145,7 @@ OptionChain Parser::parse_option_chain(const JSONObject::ptree & data) const
     OptionChain optionChain;
     for (const auto & [optionsKey, optionsValue]: data) {
         if (optionsKey == "callExpDateMap") {
-            for (const auto & [dateKey, dateValue]: optionsValue)
-            {
+            for (const auto & [dateKey, dateValue]: optionsValue) {
                 OptionsDateTimeObj options_dt_obj;
                 options_dt_obj.datetime = dateKey;
                 for (const auto & [strikeKey, strikeValue]: dateValue) {
@@ -171,7 +168,7 @@ OptionChain Parser::parse_option_chain(const JSONObject::ptree & data) const
         // }
 
         if ( optionsKey == "underlying" ) {
-            for ( const auto & [underlyingKey, underlyingValue]: optionsValue ) {
+            for (const auto & [underlyingKey, underlyingValue]: optionsValue) {
                 optionChain.setUnderlyingVariable(underlyingKey, underlyingValue.get_value<std::string>());
             }
         }
@@ -195,14 +192,11 @@ Account Parser::parse_account(const JSONObject::ptree & data) const
         for (const auto & [accountKey, accountValue] : classValue) {
             if (accountKey == "positions") {
                 for (const auto & [positionListKey, positionListValue] : accountValue) {
-                    // positions and balances
-                    tda::PositionBalances new_position_balance;
-                    for (const auto& [positionsKey, positionsValue] : positionListValue) {
+                    tda::PositionBalances new_position_balance; // positions and balances
+                    for (const auto & [positionsKey, positionsValue] : positionListValue) {
                         new_position_balance.balances[positionsKey] = positionsValue.get_value<std::string>();
-
                         std::unordered_map<std::string, std::string> pos_field;
                         std::unordered_map<std::string, std::string> instrument;
-
                         for (const auto & [fieldKey, fieldValue] : positionsValue) {
                             if (fieldKey == "symbol") {
                                 new_position_balance.symbol = fieldValue.get_value<std::string>();
@@ -236,39 +230,29 @@ Account Parser::parse_account(const JSONObject::ptree & data) const
 std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::ptree & data) const
 {
     std::vector<tda::Watchlist> watchlists;
-    // JSON Outer Layer 
-    for ( auto const & [dataKey, dataValue] : data ) {
-        // Array of Watchlists
+    for (const auto & [dataKey, dataValue] : data) {
         Watchlist watchlist;
-        for ( auto const & [watchlistKey, watchlistValue] : dataValue ) {
-            // Each element in a watchlist 
-            if ( watchlistKey == "name" ) {
-                watchlist.setName(watchlistValue.get_value< std::string >());
-            } else if ( watchlistKey == "watchlistId" ) {
-                watchlist.setId(watchlistValue.get_value< int >());
-            } else {
-                for (auto const & [elementKey, elementValue] : watchlistValue) { 
-                    // Watchlist items 
-                    for (auto const & [itemKey, itemValue] : elementValue) { 
-                        // Instrument sub array 
-                        if ( itemKey == "instrument" ) {
-                            std::string symbol;
-                            std::string desc;
-                            std::string type;
-                            for ( auto const & [instrumentKey, instrumentValue] : itemValue ) {
-                                if ( instrumentKey == "symbol" ) {
-                                    symbol = instrumentValue.get_value< std::string >();
-                                } else if ( instrumentKey == "description" ) {
-                                    desc = instrumentValue.get_value< std::string >();
-                                } else if ( instrumentKey == "assetType" ) {
-                                    type = instrumentValue.get_value< std::string >();
-                                }
-                            }
-                            watchlist.addInstrument(symbol, desc, type);
-                        } else {
-                            watchlist.addVariable(itemKey, itemValue.get_value< std::string >());
-                        }
+        try {
+            watchlist.setName(dataValue.get_child("name").get_value<std::string>());
+            watchlist.setId(dataValue.get_child("watchlistId").get_value<int>());
+            watchlist.setAccountId(dataValue.get_child("accountId").get_value<std::string>());
+        } catch (const JSONObject::ptree_error & e) {
+            SDL_Log("%s", e.what());
+        }
+        
+        for (const auto & [itemKey, itemValue] : dataValue.get_child("watchlistItems") ) { 
+            for (const auto & [item2Key, item2Value] : itemValue ) {
+                if (item2Key == "instrument") {
+                    try {
+                        std::string symbol = item2Value.get_child("symbol").get_value<std::string>();
+                        std::string desc = "";
+                        std::string type = item2Value.get_child("assetType").get_value<std::string>();
+                        watchlist.addInstrument(symbol, desc, type);
+                    } catch (const JSONObject::ptree_error & e) {
+                        SDL_Log("%s", e.what());
                     }
+                } else {
+                    watchlist.addVariable(item2Key, itemValue.get_value<std::string>());
                 }
             }
         }
