@@ -14,9 +14,9 @@ private:
 
 public:
     ViewManager()=default;
-    explicit ViewManager(const DebugView &, const VoidEventHandler & event);
+    explicit ViewManager(const VoidEventHandler & event);
 
-    void addEventHandler(const VoidEventHandler & event) const;
+    void addEventHandler(const std::string & key, const VoidEventHandler & event) const;
     void setCurrentView(std::shared_ptr<View> newView);
     void updateCurrentView() const;
 };
