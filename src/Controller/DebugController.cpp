@@ -46,7 +46,7 @@ DebugController::initCallbacks()
         viewManager.setCurrentView(std::make_shared<DebugView>()); 
     };
 
-    viewManager.addEventHandler(debugCallback);
+    viewManager.addEventHandler("debug", debugCallback);
 }
 
 DebugController::DebugController(const Model & nm, const ViewManager & vm) 
