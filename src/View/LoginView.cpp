@@ -1,12 +1,18 @@
 #include "LoginView.hpp"
 
-void LoginView::addEvent(const VoidEventHandler & event) 
+void LoginView::drawScreen() const
 {
-    this->loginEvent = event;
-}
+    ImGui::StyleColorsClassic();
+    ImGui::NewFrame();
+    const ImGuiIO & io = ImGui::GetIO();
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(300,400), ImGuiCond_Always);
 
-void LoginView::update() 
-{
+    if (!ImGui::Begin("Premia Login", nullptr, ImGuiWindowFlags_NoCollapse)) {
+        ImGui::End();
+        return;
+    }
+
     static char username[128] = "";
     static char password[128] = "";
 
@@ -22,4 +28,16 @@ void LoginView::update()
     if ( ImGui::Button("Login") ) {
         loginEvent();
     }
+
+    ImGui::End();
+}
+
+void LoginView::addEvent(const VoidEventHandler & event) 
+{
+    this->loginEvent = event;
+}
+
+void LoginView::update() 
+{
+    drawScreen();
 }

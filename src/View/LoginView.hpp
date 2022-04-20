@@ -7,7 +7,10 @@
 class LoginView : public View
 {
 private:
+    bool initialized = false;
     VoidEventHandler loginEvent;
+
+    void drawScreen() const;
 
 public:
     void addEvent(const VoidEventHandler & event) override;
