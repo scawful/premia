@@ -18,10 +18,9 @@ int main(int argc, char *argv[])
         premia.cleanup();
     };
 
-    DebugView debug;
-    ViewManager vm(debug, legacyPremia);
+    ViewManager vm;
     PrimaryModel model;
-    DebugController controller(model, vm);
+    PrimaryController controller(model, vm);
 
     controller.onEntry();
     while (controller.isActive()) 
