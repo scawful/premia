@@ -1,8 +1,8 @@
 #include "PrimaryView.hpp"
 
-void PrimaryView::addEvent(const VoidEventHandler & event) 
+void PrimaryView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
-    this->primaryEvent = event;
+    this->events[key] = event;
 }
 
 void PrimaryView::update() 
@@ -19,7 +19,6 @@ void PrimaryView::update()
         ImGui::End();
         return;
     }
-    ImGui::Text("Primary State");
 
     ImGui::End();
 }

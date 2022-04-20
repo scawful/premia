@@ -4,9 +4,8 @@ void LoginView::drawScreen() const
 {
     ImGui::StyleColorsClassic();
     ImGui::NewFrame();
-    const ImGuiIO & io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(300,400), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiCond_Always);
 
     if (!ImGui::Begin("Premia Login", nullptr, ImGuiWindowFlags_NoCollapse)) {
         ImGui::End();
@@ -26,15 +25,15 @@ void LoginView::drawScreen() const
     ImGui::Text("Password: "); ImGui::SameLine(); ImGui::InputText("##password",password, IM_ARRAYSIZE(password));
     
     if ( ImGui::Button("Login") ) {
-        loginEvent();
+        events.at("login")();
     }
 
     ImGui::End();
 }
 
-void LoginView::addEvent(const VoidEventHandler & event) 
+void LoginView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
-    this->loginEvent = event;
+    this->events[key] = event;
 }
 
 void LoginView::update() 

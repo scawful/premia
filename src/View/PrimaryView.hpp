@@ -7,9 +7,10 @@ class PrimaryView: public View
 {
 private:
     VoidEventHandler primaryEvent;
+    std::unordered_map<std::string, VoidEventHandler> events;
 
 public:
-    void addEvent(const VoidEventHandler & event) override;
+    void addEvent(const std::string & key, const VoidEventHandler & event) override;
     void update() override;
 };
 
