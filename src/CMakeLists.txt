@@ -108,8 +108,10 @@ add_executable(Premia Premia.cpp
                     Model/PrimaryModel.cpp
                     View/ViewManager.cpp
                     View/LoginView.cpp
+                    View/Dev/DebugView.cpp
                     View/PrimaryView.cpp
                     Controller/PrimaryController.cpp
+                    Controller/DebugController.cpp
                     Services
                     Services/GenericClient.cpp
                     Services/CoinbasePro/CoinbasePro.cpp
