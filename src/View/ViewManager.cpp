@@ -1,5 +1,11 @@
 #include "ViewManager.hpp"
 
+ViewManager::ViewManager(const DebugView & newView, const VoidEventHandler & event)
+{
+    this->currentView = std::make_shared<DebugView>(newView);
+    addEventHandler(event);
+}
+
 void 
 ViewManager::addEventHandler(const VoidEventHandler & event) const
 {
