@@ -7,12 +7,12 @@ class DebugView : public View
 {
 private:
     bool initialized = false;
-    std::vector<VoidEventHandler> events;
+    std::unordered_map<std::string, VoidEventHandler> events;
 
     void drawScreen() const;
 
 public:
-    void addEvent(const VoidEventHandler & event) override;
+    void addEvent(const std::string & key, const VoidEventHandler & event) override;
     void update() override;
 };
 

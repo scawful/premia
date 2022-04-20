@@ -16,19 +16,15 @@ void DebugView::drawScreen() const
     }
     
     if ( ImGui::Button("Legacy State Manager") ) {
-        events[0];
-    }
-
-    if ( ImGui::Button("New MVC Framework") ) {
-        events[1];
+        events.at("legacy")();
     }
 
     ImGui::End();
 }
 
-void DebugView::addEvent(const VoidEventHandler & event) 
+void DebugView::addEvent(const std::string & key, const VoidEventHandler & event) 
 {
-    this->events.emplace_back(event);
+    this->events[key] = event;
 }
 
 void DebugView::update() 
