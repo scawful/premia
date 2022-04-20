@@ -56,7 +56,6 @@
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 
-
 // libcURL
 #include <curl/curl.h>
 
@@ -67,6 +66,8 @@
 #include "../include/imgui/misc/cpp/imgui_stdlib.h"
 #include "../include/implot/implot.h"
 #include "../include/implot/implot_internal.h"
+
+using VoidEventHandler = std::function<void()>;
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 800
