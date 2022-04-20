@@ -105,6 +105,11 @@ add_executable(Premia Premia.cpp
                     State/Frames/Analyze/RiskAppetiteFrame.cpp
                     State/Frames/Analyze/FundOwnershipFrame.cpp
                     State/Frames/RiskPremiaFrame.cpp
+                    Model/PrimaryModel.cpp
+                    View/ViewManager.cpp
+                    View/LoginView.cpp
+                    View/PrimaryView.cpp
+                    Controller/PrimaryController.cpp
                     Services
                     Services/GenericClient.cpp
                     Services/CoinbasePro/CoinbasePro.cpp
