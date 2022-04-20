@@ -9,7 +9,7 @@ public:
     View()=default;
     virtual ~View()=default;
 
-    virtual void addEvent(const VoidEventHandler &) = 0;
+    virtual void addEvent(const std::string &, const VoidEventHandler &) = 0;
     virtual void update() = 0;
 };
 
