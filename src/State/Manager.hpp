@@ -45,11 +45,11 @@ public:
 
     tda::TDAmeritrade tda_interface;
     halext::Halext getHalextInterface() const { return halext_interface; }
-    iex::IEXCloud getIEXInterface() const { return iex_interface; }
-    GenericClient getGenericClient() const { return client; };
-    SDL_Renderer * getRenderer() const { return pRenderer; }
-    SDL_Window * getWindow() const { return pWindow; }
-    SDL_Surface * getScreen() const { return screen; }
+    iex::IEXCloud getIEXInterface()     const { return iex_interface; }
+    GenericClient getGenericClient()    const { return client; };
+    SDL_Renderer * getRenderer()        const { return pRenderer; }
+    SDL_Window * getWindow()            const { return pWindow; }
+    SDL_Surface * getScreen()           const { return screen; }
 };
 
 #endif /* Manager_hpp */

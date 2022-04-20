@@ -145,8 +145,7 @@ JSONObject::ptree Client::create_login_request()
 
     // format parameters
     std::string credential_str;
-    for (const auto& [key, value] : (JSONObject::ptree) credentials)
-    {
+    for (const auto& [key, value] : (JSONObject::ptree) credentials) {
         credential_str += key + "%3D" + value.get_value<std::string>() + "%26";
     }
     std::size_t end = credential_str.size();
@@ -190,8 +189,7 @@ JSONObject::ptree Client::create_logout_request()
     JSONObject::ptree parameters;
 
     std::unordered_map<std::string, std::string> account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
-    {
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts.")) {
         for (const auto & [key,value] : (JSONObject::ptree) v.second) {
             account_data[key] = value.get_value<std::string>();
         }
@@ -225,10 +223,8 @@ JSONObject::ptree Client::create_service_request(ServiceType serv_type, std::str
 
     // gets first account by default, maybe change later
     std::unordered_map<std::string, std::string> account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts."))
-    {
-        for (const auto & [key,value] : (JSONObject::ptree) v.second)
-        {
+    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (const auto & [key,value] : (JSONObject::ptree) v.second) {
             account_data[key] = value.get_value<std::string>();
         }
         break;

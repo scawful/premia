@@ -15,22 +15,22 @@ void PrimaryState::init(Manager * manager)
     this->premia = manager;
     this->title_string = "Home";
 
-    mainMenu.import_manager(premia );
-    premiaHome.import_manager(premia );
-    console.import_manager(premia );
-    portfolioFrame.import_manager(premia );
-    loginFrame.import_manager(premia );
-    candleChart.import_manager(premia );
-    optionChain.import_manager(premia );
-    watchlistFrame.import_manager(premia );
-    fundOwnership.import_manager(premia );
-    marketOverview.import_manager(premia );
+    mainMenu.import_manager(premia);
+    premiaHome.import_manager(premia);
+    console.import_manager(premia);
+    portfolioFrame.import_manager(premia);
+    loginFrame.import_manager(premia);
+    candleChart.import_manager(premia);
+    optionChain.import_manager(premia);
+    watchlistFrame.import_manager(premia);
+    fundOwnership.import_manager(premia);
+    marketOverview.import_manager(premia);
     
     SDL_SetWindowSize(premia->getWindow(), SCREEN_WIDTH, SCREEN_HEIGHT);
     SDL_SetWindowPosition(premia->getWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
     ImGuiIO& io = ImGui::GetIO();
-    io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey( SDLK_BACKSPACE );
+    io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
     
     ImGui::StyleColorsClassic();
 }

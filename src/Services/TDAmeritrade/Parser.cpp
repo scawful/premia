@@ -201,7 +201,6 @@ Account Parser::parse_account(const JSONObject::ptree & data) const
                             if (fieldKey == "symbol") {
                                 new_position_balance.symbol = fieldValue.get_value<std::string>();
                             }
-
                             pos_field[fieldKey] = fieldValue.get_value<std::string>();
                         }
                         account.add_position(pos_field);

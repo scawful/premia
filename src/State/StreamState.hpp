@@ -11,9 +11,11 @@ private:
 
     Manager *premia;
     MenuFrame mainMenu;
-    bool protectedMode, tdaLoggedIn;
+    bool protectedMode;
+    bool tdaLoggedIn;
 
-    std::string title_string, ticker_symbol;
+    std::string title_string;
+    std::string ticker_symbol;
 
     bool request_fields[53];
     const char *quote_fields[53] = { "Symbol", "Bid Price", "Ask Price", "Last Price", "Bid Size",
@@ -48,6 +50,9 @@ public:
     {
         return &m_StreamState;
     }
+
+    std::string getTickerSymbol() const { return ticker_symbol; }
+    void setTickerSymbol(const std::string title_string, const std::string & tickerSymbol) { ticker_symbol = tickerSymbol; }
 };
 
 #endif

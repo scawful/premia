@@ -20,6 +20,8 @@ namespace halext
         bool & getPrivateBalance();
         void setPrivateBalance(bool private_balance);
 
+        bool login(const std::string & username, const std::string & password) const;
+
     };
 }
 

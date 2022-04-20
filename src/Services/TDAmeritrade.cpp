@@ -29,12 +29,12 @@ namespace tda
             // set the headers for the request
             struct curl_slist *headers = nullptr;
             headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-            res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
             // chunked request for http1.1/200 ok
             struct curl_slist *chunk = nullptr;
             chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
-            res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
             // specify post data, have to url encode the refresh token
             std::string easy_escape = curl_easy_escape(curl, _refresh_token.c_str(), _refresh_token.length());
@@ -103,7 +103,7 @@ namespace tda
 
         try {
             read_json(json_file, property_tree);
-        } catch (std::exception &json_parser_error) {
+        } catch (const std::exception & json_parser_error) {
             SDL_Log("%s", json_parser_error.what());
         }
 

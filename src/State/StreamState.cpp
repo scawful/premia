@@ -16,7 +16,7 @@ void StreamState::init(Manager * manager)
     mainMenu.import_manager(premia);
     mainMenu.set_title(title_string);
 
-    for ( auto v: request_fields )
+    for (auto & v: request_fields)
     {
         v = false;
     }
