@@ -12,8 +12,14 @@ private:
     tda::PriceHistory priceHistory;
     std::vector<tda::Candle> candles;
 
+    double *dates;
+
+    void initCandles();
+
 public:
     bool isActive() const;
+    double * getDates();
+    double getDate(int i);
     tda::Quote & getQuote();
     int getNumCandles() const;
     tda::Candle getCandle(int i);

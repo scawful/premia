@@ -1,5 +1,36 @@
 #include "ChartModel.hpp"
 
+void ChartModel::initCandles()
+{
+    int numCandles = getNumCandles();
+    dates = new double[numCandles];
+
+    for ( int i = 0; i < numCandles; i++ )
+    {
+        double new_dt = 0.0;
+        try {
+            new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
+        }
+        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
+            std::cout << e.what() << std::endl;
+        }
+        
+        new_dt *= 0.001;
+        dates[i] = new_dt;
+    }
+
+}
+
+double * ChartModel::getDates()
+{
+    return dates;
+}
+
+double ChartModel::getDate(int i)
+{
+    return dates[i];
+}
+
 bool ChartModel::isActive() const
 {
     return active;
@@ -43,5 +74,6 @@ void ChartModel::fetchPriceHistory(const std::string & ticker, tda::PeriodType p
     tickerSymbol = ticker;
     quote = getTDAInterface().getQuote(ticker);
     priceHistory = getTDAInterface().getPriceHistory(ticker, ptype, period_amt, ftype, freq_amt, ext);
+    initCandles();
 }
 
