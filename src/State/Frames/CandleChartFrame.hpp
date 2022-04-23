@@ -12,7 +12,9 @@ private:
     tda::PriceHistory priceHistoryData;
     std::vector<tda::Candle> candles;
     std::unordered_map< std::string, tda::Quote> quotes;
-    std::string detailed_quote, title_string, ticker_symbol;
+    std::string detailed_quote;
+    std::string title_string;
+    std::string ticker_symbol;
 
     // Current Chart Arrays
     double *dates;
