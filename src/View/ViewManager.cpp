@@ -8,6 +8,7 @@ ViewManager::ViewManager(const VoidEventHandler & event)
 void 
 ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & event) const
 {
+    this->events[key] = event;
     this->currentView->addEvent(key, event);
 }
 

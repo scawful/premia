@@ -1,11 +1,11 @@
-#include "PrimaryView.hpp"
+#include "ChartView.hpp"
 
-void PrimaryView::addEvent(const std::string & key, const VoidEventHandler & event)
+void ChartView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;
 }
 
-void PrimaryView::update() 
+void ChartView::update() 
 {
     ImGui::NewFrame();
     ImGui::SetNextWindowPos( ImVec2(0, 0) );

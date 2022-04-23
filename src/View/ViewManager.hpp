@@ -3,14 +3,15 @@
 
 #include "../core.hpp"
 #include "View.hpp"
-#include "LoginView.hpp"
 #include "PrimaryView.hpp"
+#include "Core/LoginView.hpp"
 #include "Dev/DebugView.hpp"
 
 class ViewManager
 {
 private:
     std::shared_ptr<View> currentView = std::make_shared<LoginView>();
+    std::unordered_map<std::string, VoidEventHandler> events;
 
 public:
     ViewManager()=default;
