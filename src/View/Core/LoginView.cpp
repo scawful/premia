@@ -2,6 +2,9 @@
 
 void LoginView::drawScreen() const
 {
+    static char username[128];
+    static char password[128];
+    
     ImGui::StyleColorsClassic();
     ImGui::NewFrame();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
