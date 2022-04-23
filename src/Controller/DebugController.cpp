@@ -49,8 +49,8 @@ DebugController::initCallbacks()
     viewManager.addEventHandler("debug", debugCallback);
 }
 
-DebugController::DebugController(const Model & nm, const ViewManager & vm) 
-    : model(nm), viewManager(vm) { this->initCallbacks(); }
+DebugController::DebugController(const ViewManager & vm) 
+    : viewManager(vm) { this->initCallbacks(); }
 
 bool
 DebugController::isActive() const {

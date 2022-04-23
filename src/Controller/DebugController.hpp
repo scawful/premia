@@ -20,7 +20,7 @@ private:
     void initCallbacks();
 
 public:
-    DebugController(const Model & nm, const ViewManager & vm);
+    DebugController(const ViewManager & vm);
 
     bool isActive() const;
 
