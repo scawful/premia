@@ -8,7 +8,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3")
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
-
 # set the project name
 project(Premia VERSION 1.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -105,11 +104,14 @@ add_executable(Premia Premia.cpp
                     State/Frames/Analyze/RiskAppetiteFrame.cpp
                     State/Frames/Analyze/FundOwnershipFrame.cpp
                     State/Frames/RiskPremiaFrame.cpp
-                    Model/PrimaryModel.cpp
+                    Model/Model.cpp
+                    Model/Chart/ChartModel.cpp
                     View/ViewManager.cpp
-                    View/LoginView.cpp
-                    View/Dev/DebugView.cpp
                     View/PrimaryView.cpp
+                    View/Core/LoginView.cpp
+                    View/Dev/DebugView.cpp
+                    View/Chart/ChartView.cpp
+                    View/Chart/CandleChart.cpp
                     Controller/PrimaryController.cpp
                     Controller/DebugController.cpp
                     Services
