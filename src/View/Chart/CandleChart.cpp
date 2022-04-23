@@ -40,7 +40,7 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol, Im
 {
     ImDrawList* draw_list = ImPlot::GetPlotDrawList();
     // calc real value width
-    double half_width = count > 1 ? (dates[1] - dates[0]) * width_percent : width_percent;
+    double half_width = count > 1 ? (model.getDate(1) - model.getDate(0)) * width_percent : width_percent;
     // custom tool
     if (ImPlot::IsPlotHovered() && tooltip) {
         ImPlotPoint mouse   = ImPlot::GetPlotMousePos();
@@ -53,12 +53,12 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol, Im
         draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b), IM_COL32(128,128,128,64));
         ImPlot::PopPlotClipRect();
         // find mouse location index
-        int idx = binary_search(dates, 0, count - 1, mouse.x);
+        int idx = binary_search(model.getDates(), 0, count - 1, mouse.x);
         // render tool tip (won't be affected by plot clip rect)
         if (idx != -1) {
             ImGui::BeginTooltip();
             char buff[32];
-            ImPlot::FormatDate(ImPlotTime::FromDouble(dates[idx]),buff,32,ImPlotDateFmt_DayMoYr,ImPlot::GetStyle().UseISO8601);
+            ImPlot::FormatDate(ImPlotTime::FromDouble(model.getDate(idx)),buff,32,ImPlotDateFmt_DayMoYr,ImPlot::GetStyle().UseISO8601);
             ImGui::Text("Day:   %s",  buff);
             ImGui::Text("Open:  $%.2f", model.getCandle(idx).open);
             ImGui::Text("Close: $%.2f", model.getCandle(idx).close);
@@ -75,16 +75,16 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol, Im
         // fit data if requested
         if (ImPlot::FitThisFrame()) {
             for (int i = 0; i < count; ++i) {
-                ImPlot::FitPoint(ImPlotPoint(dates[i], model.getCandle(i).low));
-                ImPlot::FitPoint(ImPlotPoint(dates[i], model.getCandle(i).high));
+                ImPlot::FitPoint(ImPlotPoint(model.getDate(i), model.getCandle(i).low));
+                ImPlot::FitPoint(ImPlotPoint(model.getDate(i), model.getCandle(i).high));
             }
         }
         // render data
         for (int i = 0; i < count; ++i) {
-            ImVec2 open_pos  = ImPlot::PlotToPixels(dates[i] - half_width, model.getCandle(i).open);
-            ImVec2 close_pos = ImPlot::PlotToPixels(dates[i] + half_width, model.getCandle(i).close);
-            ImVec2 low_pos   = ImPlot::PlotToPixels(dates[i], model.getCandle(i).low);
-            ImVec2 high_pos  = ImPlot::PlotToPixels(dates[i], model.getCandle(i).high);
+            ImVec2 open_pos  = ImPlot::PlotToPixels(model.getDate(i) - half_width, model.getCandle(i).open);
+            ImVec2 close_pos = ImPlot::PlotToPixels(model.getDate(i) + half_width, model.getCandle(i).close);
+            ImVec2 low_pos   = ImPlot::PlotToPixels(model.getDate(i), model.getCandle(i).low);
+            ImVec2 high_pos  = ImPlot::PlotToPixels(model.getDate(i), model.getCandle(i).high);
             ImU32 color      = ImGui::GetColorU32(model.getCandle(i).open > model.getCandle(i).close ? bearCol : bullCol);
             draw_list->AddLine(low_pos, high_pos, color);
             draw_list->AddRectFilled(open_pos, close_pos, color);
