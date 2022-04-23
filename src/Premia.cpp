@@ -19,8 +19,7 @@ int main(int argc, char *argv[])
     };
 
     ViewManager vm;
-    PrimaryModel model;
-    PrimaryController controller(model, vm);
+    PrimaryController controller(vm);
 
     controller.onEntry();
     while (controller.isActive()) 
