@@ -10,8 +10,8 @@ PrimaryController::initWindow()
             "Premia",                           // window title
             SDL_WINDOWPOS_UNDEFINED,            // initial x position
             SDL_WINDOWPOS_UNDEFINED,            // initial y position
-            300,                                // width, in pixels
-            200,                                // height, in pixels
+            LOGIN_WIDTH,                        // width, in pixels
+            LOGIN_HEIGHT,                       // height, in pixels
             SDL_WINDOW_RESIZABLE                // flags
         );
     }   
@@ -48,17 +48,19 @@ PrimaryController::initWindow()
 void 
 PrimaryController::initCallbacks()
 {
-    loginCallback = [this] () -> void { 
+    viewManager.addEventHandler("login", [this] () -> void { 
         viewManager.setCurrentView(std::make_shared<PrimaryView>()); 
         SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    };
-
-    viewManager.addEventHandler("login", loginCallback);
+    });
+    
+    viewManager.addEventHandler("chartView", [this] () -> void {
+        viewManager.setCurrentView(std::make_shared<ChartView>());
+    });
 }
 
-PrimaryController::PrimaryController(const Model & nm, const ViewManager & vm) 
-    : model(nm), viewManager(vm) { this->initCallbacks(); }
+PrimaryController::PrimaryController(const ViewManager & vm) 
+    : viewManager(vm) { }
 
 bool
 PrimaryController::isActive() const {
@@ -69,6 +71,7 @@ void
 PrimaryController::onEntry()
 {
     initWindow();
+    initCallbacks();
     active = true;
 }
 

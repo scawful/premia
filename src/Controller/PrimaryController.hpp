@@ -14,13 +14,12 @@ private:
 
     Model model;
     ViewManager viewManager;
-    VoidEventHandler loginCallback;
 
     void initWindow();
     void initCallbacks();
 
 public:
-    PrimaryController(const Model & nm, const ViewManager & vm);
+    PrimaryController(const ViewManager & vm);
 
     bool isActive() const;
 
