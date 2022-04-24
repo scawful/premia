@@ -50,6 +50,7 @@ PrimaryController::initCallbacks()
 {
     viewManager.addEventHandler("login", [this] () -> void { 
         viewManager.setCurrentView(std::make_shared<PrimaryView>()); 
+        viewManager.transferEvents();
         SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     });
