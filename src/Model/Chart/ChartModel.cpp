@@ -2,33 +2,30 @@
 
 void ChartModel::initCandles()
 {
+    candles = priceHistory.getCandleVector();
     int numCandles = getNumCandles();
-    dates = new double[numCandles];
-
     for ( int i = 0; i < numCandles; i++ )
     {
         double new_dt = 0.0;
         try {
             new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
-        }
-        catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
+        } catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
             std::cout << e.what() << std::endl;
         }
         
         new_dt *= 0.001;
-        dates[i] = new_dt;
+        datesVec.push_back(new_dt);
     }
-
 }
 
-double * ChartModel::getDates()
+std::vector<double> ChartModel::getDates()
 {
-    return dates;
+    return datesVec;
 }
 
 double ChartModel::getDate(int i)
 {
-    return dates[i];
+    return datesVec.at(i);
 }
 
 bool ChartModel::isActive() const
@@ -71,9 +68,15 @@ const std::string ChartModel::getQuoteDetails()
 
 void ChartModel::fetchPriceHistory(const std::string & ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext)
 {
+    if (active) {
+        quote.clear();
+        priceHistory.clear();
+        datesVec.clear();
+    }
     tickerSymbol = ticker;
     quote = getTDAInterface().getQuote(ticker);
     priceHistory = getTDAInterface().getPriceHistory(ticker, ptype, period_amt, ftype, freq_amt, ext);
     initCandles();
+    active = true;
 }
 
