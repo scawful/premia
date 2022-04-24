@@ -5,6 +5,14 @@ ViewManager::ViewManager(const VoidEventHandler & event)
     addEventHandler("initEvent", event);
 }
 
+void
+ViewManager::transferEvents()
+{
+    for (const auto & [key, event] : this->events) {
+        this->currentView->addEvent(key, event);
+    }
+}
+
 void 
 ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & event)
 {

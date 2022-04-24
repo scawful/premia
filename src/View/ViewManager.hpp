@@ -5,6 +5,7 @@
 #include "View.hpp"
 #include "PrimaryView.hpp"
 #include "Core/LoginView.hpp"
+#include "Core/MenuView.hpp"
 #include "Dev/DebugView.hpp"
 
 class ViewManager
@@ -17,6 +18,7 @@ public:
     ViewManager()=default;
     explicit ViewManager(const VoidEventHandler & event);
 
+    void transferEvents();
     void addEventHandler(const std::string & key, const VoidEventHandler & event);
     void setCurrentView(std::shared_ptr<View> newView);
     void updateCurrentView() const;
