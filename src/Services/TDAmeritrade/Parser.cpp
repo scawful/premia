@@ -78,27 +78,35 @@ PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, const s
     PriceHistory price_history;
     price_history.setTickerSymbol(ticker);
 
-    for (const auto & [historyKey, historyValue] : data) {
+    for (const auto & [historyKey, historyValue] : data ) {
         if (historyKey == "candles") {
-            for (const auto & [candleKey, candleValue] : historyValue) {
+            for (const auto & [candleKey, candleValue] : historyValue ) {
                 tda::Candle newCandle;
                 std::string datetime;
-                try {
-                    newCandle.high = boost::lexical_cast<double>(candleValue.get_child("high.").get_value<std::string>());
-                    newCandle.low = boost::lexical_cast<double>(candleValue.get_child("low.").get_value<std::string>());
-                    newCandle.open = boost::lexical_cast<double>(candleValue.get_child("open.").get_value<std::string>());
-                    newCandle.close = boost::lexical_cast<double>(candleValue.get_child("close.").get_value<std::string>());
-                    newCandle.volume = boost::lexical_cast<double>(candleValue.get_child("volume.").get_value<std::string>());
-                    std::stringstream dt_ss;
-                    std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(candleValue.get_child("datetime.").get_value<std::string>());
-                    newCandle.raw_datetime = secsSinceEpoch;
-                    secsSinceEpoch *= (time_t) 0.001;
-                    // %a %d %b %Y - %I:%M:%S%p
-                    // %H:%M:%S
-                    dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
-                    datetime = dt_ss.str();
-                } catch (const boost::wrapexcept<boost::bad_lexical_cast> & e) {
-                    std::cout << "parse_price_history:: " << e.what() << std::endl;
+                for (const auto & [valueKey, finalValue] : candleValue ) {
+                    try {
+                        if (valueKey == "open") {
+                            newCandle.open = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                        } else if (valueKey == "close") {
+                            newCandle.close = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                        } else if (valueKey == "high") {
+                            newCandle.high = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                        } else if (valueKey == "low") {
+                            newCandle.low = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                        } else if (valueKey == "volume") {
+                            newCandle.volume = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                        } else if (valueKey == "datetime") {
+                            std::stringstream dt_ss;
+                            std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(finalValue.get_value<std::string>());
+                            newCandle.raw_datetime = secsSinceEpoch;
+                            secsSinceEpoch *= (time_t) 0.001;
+                            // %a %d %b %Y - %I:%M:%S%p,    %H:%M:%S
+                            dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
+                            datetime = dt_ss.str();
+                        }
+                    } catch (const boost::wrapexcept<boost::bad_lexical_cast> & e) {
+                        std::cout << "parse_price_history:: " << e.what() << std::endl;
+                    }
                 }
                 newCandle.datetime = datetime;
                 price_history.addCandleByType(newCandle, freq);
