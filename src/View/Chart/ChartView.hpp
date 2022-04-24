@@ -10,6 +10,8 @@ private:
     std::unordered_map<std::string, VoidEventHandler> events;
     std::unordered_map<std::string, std::unique_ptr<Chart>> charts;
 
+    CandleChart candleChart;
+
 public:
     void addEvent(const std::string & key, const VoidEventHandler & event) override;
     void update() override;

@@ -20,5 +20,7 @@ void ChartView::update()
         return;
     }
 
+    candleChart.update();
+
     ImGui::End();
 }
