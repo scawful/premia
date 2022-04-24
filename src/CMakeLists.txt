@@ -109,6 +109,7 @@ add_executable(Premia Premia.cpp
                     View/ViewManager.cpp
                     View/PrimaryView.cpp
                     View/Core/LoginView.cpp
+                    View/Core/MenuView.cpp
                     View/Dev/DebugView.cpp
                     View/Chart/ChartView.cpp
                     View/Chart/CandleChart.cpp
