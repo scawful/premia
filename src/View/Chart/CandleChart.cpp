@@ -10,7 +10,7 @@
  * @param x 
  * @return int 
  */
-int CandleChart::binary_search(const double* arr, int l, int r, double x) 
+int CandleChart::binary_search(const std::vector<double> arr, int l, int r, double x) 
 {
     if (r >= l) 
     {
@@ -69,7 +69,7 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol, Im
     }
 
     // begin plot item
-    if (ImPlot::BeginItem( "symbol" )) {
+    if (ImPlot::BeginItem(model.getTickerSymbol().c_str())) {
         // override legend icon color
         ImPlot::GetCurrentItem()->Color = IM_COL32(64,64,64,255);
         // fit data if requested
@@ -103,7 +103,7 @@ CandleChart::drawCandleChart()
     ImGui::InputText("Enter symbol", &tickerSymbol, ImGuiInputTextFlags_CharsUppercase);
     ImGui::SameLine(); 
     if (ImGui::Button("Search")) {
-        if (!tickerSymbol.empty() && !model.isActive()) {
+        if (!tickerSymbol.empty()) {
             model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
                                                   tda::FrequencyType(frequency_type), frequency_amount, true);
         }
@@ -137,8 +137,6 @@ CandleChart::drawCandleChart()
     if (ImGui::Button("Apply")) {
         model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
                                               tda::FrequencyType(frequency_type), frequency_amount, true);
-        // init_instrument(ticker_symbol);
-        // init_candles(frequency_type);
     }  
 
     if (ImGui::BeginPopupContextItem()) {
@@ -151,7 +149,7 @@ CandleChart::drawCandleChart()
     ImPlot::GetStyle().UseLocalTime = true;
     if (ImPlot::BeginPlot("Candlestick Chart",ImGui::GetContentRegionAvail(),0))  {
         ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
-        ImPlot::SetupAxes("Date","Price",ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit|ImPlotAxisFlags_RangeFit);
+        ImPlot::SetupAxes("Date","Price", ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit);
 
         if (model.isActive()) {
             ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(model.getQuote().getQuoteVariable("52WkLow")), 
