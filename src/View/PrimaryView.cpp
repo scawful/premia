@@ -20,5 +20,11 @@ void PrimaryView::update()
         return;
     }
 
+    menuView->update();
+
+    if (ImGui::Button("ChartView")) {
+        events.at("chartView")();
+    }
+
     ImGui::End();
 }
