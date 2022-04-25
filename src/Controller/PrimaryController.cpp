@@ -37,7 +37,7 @@ PrimaryController::initWindow()
     ImPlot::CreateContext();
 
     // Initialize ImGui for SDL 
-    ImGui_ImplSDL2_InitForSDLRenderer(window);
+    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer_Init(renderer);
 
     // Build a new ImGui frame

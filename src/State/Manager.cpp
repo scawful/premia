@@ -60,7 +60,7 @@ void Manager::init(int width, int height)
     ImPlot::CreateContext();
 
     // Initialize ImGui for SDL 
-    ImGui_ImplSDL2_InitForSDLRenderer(pWindow);
+    ImGui_ImplSDL2_InitForSDLRenderer(pWindow, pRenderer);
     ImGui_ImplSDLRenderer_Init(pRenderer);
 
     // Build a new ImGui frame

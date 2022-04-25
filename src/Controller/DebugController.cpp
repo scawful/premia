@@ -33,7 +33,7 @@ DebugController::initWindow()
     }
     ImGui::CreateContext();
     ImPlot::CreateContext();
-    ImGui_ImplSDL2_InitForSDLRenderer(window);
+    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer_Init(renderer);
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);  
