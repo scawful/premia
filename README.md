@@ -2,7 +2,7 @@
 
 Details
 --------
-- Description: Risk Parity Anaylsis and Trading Client
+- Description: Risk Premia Anaylsis and Trading Client
 - Platform: Windows, macOS, GNU/Linux
 - Dependencies: Boost, SDL2, ImGui, ImPlot
 - Supported API: TDAmeritrade, CoinbasePro
