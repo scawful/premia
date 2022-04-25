@@ -2,3 +2,8 @@ build/**
 .vscode/**
 premia.code-workspace
 apikey.hpp
+CMakeFiles/**
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+chart.csv
