@@ -1,7 +1,7 @@
 #ifndef HalextClient_hpp
 #define HalextClient_hpp
 
-#include "../../core.hpp"
+#include "core.hpp"
 
 namespace halext 
 {

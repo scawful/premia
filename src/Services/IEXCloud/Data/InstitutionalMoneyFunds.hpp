@@ -1,7 +1,7 @@
 #ifndef INSTITUTIONALMONEYFUNDS_HPP
 #define INSTITUTIONALMONEYFUNDS_HPP
 
-#include "../../../core.hpp"
+#include "core.hpp"
 
 namespace iex
 {

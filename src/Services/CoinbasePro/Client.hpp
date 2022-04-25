@@ -1,7 +1,7 @@
 #ifndef CBP_Client_hpp
 #define CBP_Client_hpp
 
-#include "../../core.hpp"
+#include "core.hpp"
 
 namespace cbp
 {

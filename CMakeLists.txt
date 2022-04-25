@@ -67,7 +67,7 @@ endif()
 
 # ImGui library --------------------------------------------------------------------------------------------
 # Set where the ImGui files are stored
-set(IMGUI_PATH  "../include/imgui")
+set(IMGUI_PATH  "libs/imgui")
     
 # Compile as static library 
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
@@ -78,66 +78,67 @@ target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
 target_compile_definitions(ImGui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  GL_GLEXT_PROTOTYPES=1)
 
 # ImPlot library --------------------------------------------------------------------------------------------
-set(IMPLOT_PATH "../include/implot")
+set(IMPLOT_PATH "libs/implot")
 
 file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
 # add the executable
-add_executable(Premia Premia.cpp 
-                    State/Manager.cpp 
-                    State/DemoState.cpp
-                    State/PrimaryState.cpp 
-                    State/StreamState.cpp
-                    State/LoginState.cpp
-                    State/Frames/MenuFrame.cpp
-                    State/Frames/CandleChartFrame.cpp
-                    State/Frames/LinePlotFrame.cpp
-                    State/Frames/LoginFrame.cpp
-                    State/Frames/View/WatchlistFrame.cpp
-                    State/Frames/View/PortfolioFrame.cpp
-                    State/Frames/Trade/OptionChainFrame.cpp
-                    State/Frames/Tools/ConsoleFrame.cpp
-                    State/Frames/Trade/TradingFrame.cpp
-                    State/Frames/MarketOverviewFrame.cpp 
-                    State/Frames/Analyze/RiskAppetiteFrame.cpp
-                    State/Frames/Analyze/FundOwnershipFrame.cpp
-                    State/Frames/RiskPremiaFrame.cpp
-                    Model/Model.cpp
-                    Model/Chart/ChartModel.cpp
-                    View/ViewManager.cpp
-                    View/PrimaryView.cpp
-                    View/Core/LoginView.cpp
-                    View/Core/MenuView.cpp
-                    View/Dev/DebugView.cpp
-                    View/Chart/ChartView.cpp
-                    View/Chart/CandleChart.cpp
-                    Controller/PrimaryController.cpp
-                    Controller/DebugController.cpp
-                    Services
-                    Services/GenericClient.cpp
-                    Services/CoinbasePro/CoinbasePro.cpp
-                    Services/CoinbasePro/Account.cpp
-                    Services/CoinbasePro/Client.cpp
-                    Services/CoinbasePro/Product.cpp
-                    Services/TDAmeritrade.cpp 
-                    Services/TDAmeritrade/Parser.cpp
-                    Services/TDAmeritrade/Session.cpp
-                    Services/TDAmeritrade/Client.cpp
-                    Services/TDAmeritrade/Data/Quote.cpp 
-                    Services/TDAmeritrade/Data/PriceHistory.cpp 
-                    Services/TDAmeritrade/Data/OptionChain.cpp 
-                    Services/TDAmeritrade/Data/Account.cpp
-                    Services/TDAmeritrade/Data/Watchlist.cpp
-                    Services/TDAmeritrade/Data/UserPrincipals.cpp
-                    Services/TDAmeritrade/Data/Order.cpp
-                    Services/IEXCloud.cpp
-                    Services/IEXCloud/Client.cpp
-                    Services/IEXCloud/Parser.cpp
-                    Services/Halext/Halext.cpp
-                    Services/Halext/Client.cpp
-                    Services/Halext/User.cpp
+add_executable(Premia 
+                    src/Premia.cpp 
+                    src/State/Manager.cpp 
+                    src/State/DemoState.cpp
+                    src/State/PrimaryState.cpp 
+                    src/State/StreamState.cpp
+                    src/State/LoginState.cpp
+                    src/State/Frames/MenuFrame.cpp
+                    src/State/Frames/CandleChartFrame.cpp
+                    src/State/Frames/LinePlotFrame.cpp
+                    src/State/Frames/LoginFrame.cpp
+                    src/State/Frames/View/WatchlistFrame.cpp
+                    src/State/Frames/View/PortfolioFrame.cpp
+                    src/State/Frames/Trade/OptionChainFrame.cpp
+                    src/State/Frames/Tools/ConsoleFrame.cpp
+                    src/State/Frames/Trade/TradingFrame.cpp
+                    src/State/Frames/MarketOverviewFrame.cpp 
+                    src/State/Frames/Analyze/RiskAppetiteFrame.cpp
+                    src/State/Frames/Analyze/FundOwnershipFrame.cpp
+                    src/State/Frames/RiskPremiaFrame.cpp
+                    src/Model/Model.cpp
+                    src/Model/Chart/ChartModel.cpp
+                    src/View/ViewManager.cpp
+                    src/View/PrimaryView.cpp
+                    src/View/Core/LoginView.cpp
+                    src/View/Core/MenuView.cpp
+                    src/View/Dev/DebugView.cpp
+                    src/View/Chart/ChartView.cpp
+                    src/View/Chart/CandleChart.cpp
+                    src/Controller/PrimaryController.cpp
+                    src/Controller/DebugController.cpp
+                    src/Services
+                    src/Services/GenericClient.cpp
+                    src/Services/CoinbasePro/CoinbasePro.cpp
+                    src/Services/CoinbasePro/Account.cpp
+                    src/Services/CoinbasePro/Client.cpp
+                    src/Services/CoinbasePro/Product.cpp
+                    src/Services/TDAmeritrade.cpp 
+                    src/Services/TDAmeritrade/Parser.cpp
+                    src/Services/TDAmeritrade/Session.cpp
+                    src/Services/TDAmeritrade/Client.cpp
+                    src/Services/TDAmeritrade/Data/Quote.cpp 
+                    src/Services/TDAmeritrade/Data/PriceHistory.cpp 
+                    src/Services/TDAmeritrade/Data/OptionChain.cpp 
+                    src/Services/TDAmeritrade/Data/Account.cpp
+                    src/Services/TDAmeritrade/Data/Watchlist.cpp
+                    src/Services/TDAmeritrade/Data/UserPrincipals.cpp
+                    src/Services/TDAmeritrade/Data/Order.cpp
+                    src/Services/IEXCloud.cpp
+                    src/Services/IEXCloud/Client.cpp
+                    src/Services/IEXCloud/Parser.cpp
+                    src/Services/Halext/Halext.cpp
+                    src/Services/Halext/Client.cpp
+                    src/Services/Halext/User.cpp
                     ${IMGUI_PATH}/imgui.cpp
                     ${IMGUI_PATH}/imgui_demo.cpp
                     ${IMGUI_PATH}/imgui_draw.cpp
@@ -148,7 +149,8 @@ add_executable(Premia Premia.cpp
                     ${IMPLOT_PATH}/implot.cpp
                     ${IMPLOT_PATH}/implot_items.cpp
                     ${IMPLOT_PATH}/implot_demo.cpp )
-include_directories("../assets")
+include_directories(Premia "assets")
+target_include_directories(Premia INTERFACE "include")
 
 target_link_libraries(Premia ${SDL2_LIBRARIES} 
                              ${SDL_IMAGE_LIBRARIES} 

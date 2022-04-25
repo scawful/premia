@@ -1,7 +1,7 @@
 #ifndef RETAILMONEYFUNDS_HPP
 #define RETAILMONEYFUNDS_HPP
 
-#include "../../../core.hpp"
+#include "core.hpp"
 
 namespace iex
 {

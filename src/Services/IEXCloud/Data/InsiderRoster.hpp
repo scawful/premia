@@ -1,7 +1,7 @@
 #ifndef INSIDERROSTER_HPP
 #define INSIDERROSTER_HPP
 
-#include "../../../core.hpp"
+#include "core.hpp"
 
 namespace iex
 {

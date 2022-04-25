@@ -1,8 +1,8 @@
 #ifndef Client_hpp
 #define Client_hpp
 
-#include "../../core.hpp"
-#include "../../apikey.hpp"
+#include "core.hpp"
+#include "apikey.hpp"
 #include "Parser.hpp"
 #include "Session.hpp"
 #include "Data/UserPrincipals.hpp"

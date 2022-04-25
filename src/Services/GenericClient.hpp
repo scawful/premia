@@ -1,7 +1,7 @@
 #ifndef GenericClient_hpp
 #define GenericClient_hpp
 
-#include "../core.hpp"
+#include "core.hpp"
 
 class GenericClient
 {

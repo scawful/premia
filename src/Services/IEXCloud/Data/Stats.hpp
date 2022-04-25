@@ -1,7 +1,7 @@
 #ifndef STATS_HPP
 #define STATS_HPP
 
-#include "../../../core.hpp"
+#include "core.hpp"
 
 namespace iex
 {

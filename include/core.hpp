@@ -60,12 +60,12 @@
 #include <curl/curl.h>
 
 // ImGui, ImGuiSDL, ImPlot
-#include "../include/imgui/imgui.h"
-#include "../include/imgui/backends/imgui_impl_sdl.h"
-#include "../include/imgui/backends/imgui_impl_sdlrenderer.h"
-#include "../include/imgui/misc/cpp/imgui_stdlib.h"
-#include "../include/implot/implot.h"
-#include "../include/implot/implot_internal.h"
+#include "../libs/imgui/imgui.h"
+#include "../libs/imgui/backends/imgui_impl_sdl.h"
+#include "../libs/imgui/backends/imgui_impl_sdlrenderer.h"
+#include "../libs/imgui/misc/cpp/imgui_stdlib.h"
+#include "../libs/implot/implot.h"
+#include "../libs/implot/implot_internal.h"
 
 using VoidEventHandler = std::function<void()>;
 

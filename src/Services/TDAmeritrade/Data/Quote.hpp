@@ -1,7 +1,7 @@
 #ifndef Quote_hpp
 #define Quote_hpp
 
-#include "../../../core.hpp"
+#include "core.hpp"
 
 namespace tda 
 {

@@ -1,7 +1,7 @@
 #ifndef Chart_hpp
 #define Chart_hpp
 
-#include "../../core.hpp"
+#include "core.hpp"
 
 class Chart 
 {

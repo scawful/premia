@@ -1,7 +1,7 @@
 #ifndef LinePlotFrame_hpp
 #define LinePlotFrame_hpp
 
-#include "../../core.hpp"
+#include "core.hpp"
 
 class LinePlotFrame
 {

@@ -1,7 +1,7 @@
 #ifndef View_hpp
 #define View_hpp
 
-#include "../core.hpp"
+#include "../../include/core.hpp"
 
 class View 
 {

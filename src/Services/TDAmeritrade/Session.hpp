@@ -1,7 +1,7 @@
 #ifndef Session_hpp
 #define Session_hpp
 
-#include "../../core.hpp"
+#include "core.hpp"
 
 namespace tda 
 {

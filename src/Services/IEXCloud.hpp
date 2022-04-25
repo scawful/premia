@@ -1,7 +1,7 @@
 #ifndef IEXCloud_hpp
 #define IEXCloud_hpp
 
-#include "../core.hpp"
+#include "core.hpp"
 #include "IEXCloud/Client.hpp"
 #include "IEXCloud/Parser.hpp"
 #include "IEXCloud/Data/FundOwnership.hpp"

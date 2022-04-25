@@ -1,8 +1,8 @@
 #ifndef IEXClient_hpp
 #define IEXClient_hpp
 
-#include "../../core.hpp"
-#include "../../apikey.hpp"
+#include "core.hpp"
+#include "apikey.hpp"
 
 namespace iex 
 {

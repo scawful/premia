@@ -3,7 +3,7 @@
 #ifndef Manager_hpp
 #define Manager_hpp
 
-#include "../core.hpp"
+#include "core.hpp"
 #include "../Services/GenericClient.hpp"
 #include "../Services/TDAmeritrade.hpp"
 #include "../Services/IEXCloud.hpp"

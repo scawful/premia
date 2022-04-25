@@ -1,7 +1,7 @@
 #ifndef ViewManager_hpp
 #define ViewManager_hpp
 
-#include "../core.hpp"
+#include "core.hpp"
 #include "View.hpp"
 #include "PrimaryView.hpp"
 #include "Core/LoginView.hpp"

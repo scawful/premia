@@ -1,8 +1,8 @@
 #ifndef TDAmeritrade_hpp
 #define TDAmeritrade_hpp
 
-#include "../core.hpp"
-#include "../apikey.hpp"
+#include "core.hpp"
+#include "apikey.hpp"
 #include "TDAmeritrade/Client.hpp"
 #include "TDAmeritrade/Parser.hpp"
 #include "TDAmeritrade/Session.hpp"

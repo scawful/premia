@@ -1,7 +1,6 @@
 #ifndef ChartFrame_hpp
 #define ChartFrame_hpp
 
-#include "../../core.hpp"
 #include "Frame.hpp"
 
 class CandleChartFrame : public Frame

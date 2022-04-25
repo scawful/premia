@@ -1,7 +1,7 @@
 #ifndef InsiderTransactions_hpp
 #define InsiderTransactions_hpp
 
-#include "../../../core.hpp"
+#include "core.hpp"
 
 namespace iex
 {

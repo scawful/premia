@@ -1,8 +1,8 @@
 #ifndef CoinbasePro_hpp
 #define CoinbasePro_hpp
 
-#include "../../core.hpp"
-#include "../../apikey.hpp"
+#include "core.hpp"
+#include "apikey.hpp"
 #include "Account.hpp"
 #include "Client.hpp"
 #include "Product.hpp"

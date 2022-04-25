@@ -1,7 +1,7 @@
 #ifndef UserPrincipals_hpp
 #define UserPrincipals_hpp
 
-#include "../../../core.hpp"
+#include "core.hpp"
 
 namespace tda
 {

@@ -1,7 +1,7 @@
 #ifndef Product_hpp
 #define Product_hpp
 
-#include "../../core.hpp"
+#include "core.hpp"
 
 namespace cbp
 {
