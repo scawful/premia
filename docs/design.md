@@ -4,34 +4,64 @@
 ### Overview
 - Stock trading client with support for multiple brokerages API 
     - TDAmeritrade
-    - IEXCloud
     - CoinbasePro
+    - IEXCloud
 - Primary function is analyzing risk of portfolio 
 - Places an emphasis on risk premia hedging and the impact of the options market
 - Support for making buy and sell orders
 - Real time quotes and historical charts
 
-## Frames
-Frames have been added as an alternative to States. The purpose of a frame is to display GUI elements and provide abstractions for importing the data from the client to those GUI elements. This will reduce the need for multiple states and encourage more modular design within each individual state. Whereas before Quotes, Options, Portfolio, etc were all their own state, now they will be Frames within a State.
+## MVC Framework
+Premia's main event loop is managed by the common Model-View-Controller framework, with a few custom touches to accomodate the ImGui library.
 
-General
-- Risk Premia
-- Candle Chart
-- Line Plot
-- Positions
-- Order
-- Watchlist
+- Model
+    - Chart
+        - ChartModel : Model
+            - Historical Data Timeframes:
+			- Period: Day, Month, Year, YTD
+			- Period Type: 1 2 3 4 5 6 10 15 20
+			- Frequency: Minute Daily Weekly Monthly
+			- Amount: 1 5 10 15 30
+    - Model Concrete Parent
+- View
+    - Account
+        - TODO : SettingsView
+    - Analyze 
+        - TODO : FundOwnershipView
+    - Chart
+        - Chart Abstract Parent
+        - CandleChart : Chart
+        - ChartView : View  
+        - TODO : LinePlotChart
+        - TODO : BarPlotChart
+    - Core 
+        - LoginView : View
+        - MenuView : View
+    - Tools
+        - TODO : ConsoleView
+    - Trade
+        - TODO : OptionChainView
+        - TODO : OrderView
+        - TODO : PortfolioView
+        - TODO : WatchlistView
+    - Dev 
+        - DebugView : View
+    - ViewManager
+    - View Abstract Parent
+    - PrimaryView : View
+- Controller
+    - Controller Abstract Parent
+    - DebugController : Controller
+    - PrimaryController : Controller
 
-Analyze
-- Fund Ownership 
-- Risk Appetite
+### Controller Details
+The controllers all follow a very simple order of execution.
 
-Tools
-- Console
-
-Trade
-- Option Chain
-- Trading Execution
+- onEntry()
+- onInput()
+- onLoad()
+- doRender()
+- onExit()
 
 
 ## Structure
@@ -40,15 +70,6 @@ Premia's main event loop is handled by a virtual state manager defined in the Ma
 - Start Screen
 	- TODO: Create login method
 	- TODO: Display balances, movers, brief portfolio analysis 
-- Quotes
-	- Candle chart for TDA supported assets
-		- Historical Data Timeframes:
-			- Period: Day, Month, Year, YTD
-			- Period Type: 1 2 3 4 5 6 10 15 20
-			- Frequency: Minute Daily Weekly Monthly
-			- Amount: 1 5 10 15 30
-	- TODO: Add additional indicators
-	- TODO: Crayon drawing on charts
 - Stream
 	- Real time quote streaming via async WebSocket session
 	- TODO: Build candles from stream data 
