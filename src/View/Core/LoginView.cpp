@@ -5,16 +5,6 @@ void LoginView::drawScreen() const
     static char username[128];
     static char password[128];
     
-    ImGui::StyleColorsClassic();
-    ImGui::NewFrame();
-    ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiCond_Always);
-
-    if (!ImGui::Begin("Premia Login", nullptr, ImGuiWindowFlags_NoCollapse)) {
-        ImGui::End();
-        return;
-    }
-
     std::string welcomePrompt = "Welcome to Premia"; 
     auto windowWidth = ImGui::GetWindowSize().x;
     auto textWidth   = ImGui::CalcTextSize(welcomePrompt.c_str()).x;
@@ -28,7 +18,6 @@ void LoginView::drawScreen() const
         events.at("login")();
     }
 
-    ImGui::End();
 }
 
 void LoginView::addEvent(const std::string & key, const VoidEventHandler & event)
