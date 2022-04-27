@@ -15,6 +15,9 @@
 Premia's main event loop is managed by the common Model-View-Controller framework, with a few custom touches to accomodate the ImGui library.
 
 ### Model
+- Concrete Parent
+    - API Interface Objects
+    - Map of EventHandlers
 - Chart
     - ChartModel : Model
         - Historical Data Timeframes:
@@ -22,9 +25,14 @@ Premia's main event loop is managed by the common Model-View-Controller framewor
         - Period Type: 1 2 3 4 5 6 10 15 20
         - Frequency: Minute Daily Weekly Monthly
         - Amount: 1 5 10 15 30
-- Model Concrete Parent
 
 ### View
+- Abstract Parent
+    - Public update function for ViewManager
+- ViewManager
+    - Handles the lifetime of a View object
+- PrimaryView : View
+
 - Account
     - TODO : SettingsView
 - Analyze 
@@ -47,33 +55,22 @@ Premia's main event loop is managed by the common Model-View-Controller framewor
     - TODO : WatchlistView
 - Dev 
     - DebugView : View
-- ViewManager
-- View Abstract Parent
-- PrimaryView : View
 
 ### Controller
-- Controller Abstract Parent
+- Abstract Parent
+    - onEntry()
+    - onInput()
+    - onLoad()
+    - doRender()
+    - onExit()
 - DebugController : Controller
 - PrimaryController : Controller
 
-The controllers all follow a very simple order of execution.
 
-- onEntry()
-- onInput()
-- onLoad()
-- doRender()
-- onExit()
-
-
-## Structure
-Premia's main event loop is handled by a virtual state manager defined in the Manager class and implemented using the State virtual class. 
-
-- Start Screen
-	- TODO: Create login method
-	- TODO: Display balances, movers, brief portfolio analysis 
-- Stream
-	- Real time quote streaming via async WebSocket session
-	- TODO: Build candles from stream data 
+## Todo List
+- Create login method
+- Display balances, movers, brief portfolio analysis 
+- Set up parsing and GUI callbacks for WebSocket session data
 - Options
 	- Detailed option chain (Very buggy)
 	- TODO: Add chart for options price history 
@@ -85,8 +82,8 @@ Premia's main event loop is handled by a virtual state manager defined in the Ma
 	- Get Order
 - Portfolio
 	- Positions
-	- TODO: Balances
-	- TODO: Orders (Active, Cancelled, Executed)
+	- Balances
+	- Orders (Active, Cancelled, Executed)
 	
 ## Market Data 
 **TDAmeritrade**
