@@ -14,47 +14,48 @@
 ## MVC Framework
 Premia's main event loop is managed by the common Model-View-Controller framework, with a few custom touches to accomodate the ImGui library.
 
-- Model
-    - Chart
-        - ChartModel : Model
-            - Historical Data Timeframes:
-			- Period: Day, Month, Year, YTD
-			- Period Type: 1 2 3 4 5 6 10 15 20
-			- Frequency: Minute Daily Weekly Monthly
-			- Amount: 1 5 10 15 30
-    - Model Concrete Parent
-- View
-    - Account
-        - TODO : SettingsView
-    - Analyze 
-        - TODO : FundOwnershipView
-    - Chart
-        - Chart Abstract Parent
-        - CandleChart : Chart
-        - ChartView : View  
-        - TODO : LinePlotChart
-        - TODO : BarPlotChart
-    - Core 
-        - LoginView : View
-        - MenuView : View
-    - Tools
-        - TODO : ConsoleView
-    - Trade
-        - TODO : OptionChainView
-        - TODO : OrderView
-        - TODO : PortfolioView
-        - TODO : WatchlistView
-    - Dev 
-        - DebugView : View
-    - ViewManager
-    - View Abstract Parent
-    - PrimaryView : View
-- Controller
-    - Controller Abstract Parent
-    - DebugController : Controller
-    - PrimaryController : Controller
+### Model
+- Chart
+    - ChartModel : Model
+        - Historical Data Timeframes:
+        - Period: Day, Month, Year, YTD
+        - Period Type: 1 2 3 4 5 6 10 15 20
+        - Frequency: Minute Daily Weekly Monthly
+        - Amount: 1 5 10 15 30
+- Model Concrete Parent
 
-### Controller Details
+### View
+- Account
+    - TODO : SettingsView
+- Analyze 
+    - TODO : FundOwnershipView
+- Chart
+    - Chart Abstract Parent
+    - CandleChart : Chart
+    - ChartView : View  
+    - TODO : LinePlotChart
+    - TODO : BarPlotChart
+- Core 
+    - LoginView : View
+    - MenuView : View
+- Tools
+    - TODO : ConsoleView
+- Trade
+    - TODO : OptionChainView
+    - TODO : OrderView
+    - TODO : PortfolioView
+    - TODO : WatchlistView
+- Dev 
+    - DebugView : View
+- ViewManager
+- View Abstract Parent
+- PrimaryView : View
+
+### Controller
+- Controller Abstract Parent
+- DebugController : Controller
+- PrimaryController : Controller
+
 The controllers all follow a very simple order of execution.
 
 - onEntry()
