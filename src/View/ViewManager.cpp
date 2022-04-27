@@ -1,14 +1,21 @@
 #include "ViewManager.hpp"
 
-ViewManager::ViewManager(const VoidEventHandler & event)
+ViewManager::ViewManager()
 {
-    addEventHandler("initEvent", event);
+    this->events["toggleFixedDimensions"] = [this] () -> void {
+        if (this->fixedDimensions) {
+            this->fixedDimensions = false;
+        } else {
+            this->fixedDimensions = true;
+        }
+    };
 }
 
 void
 ViewManager::transferEvents()
 {
     for (const auto & [key, event] : this->events) {
+        this->menuView->addEvent(key, event);
         this->currentView->addEvent(key, event);
     }
 }
@@ -27,9 +34,11 @@ ViewManager::startGuiFrame() const
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     const ImGuiIO & io = ImGui::GetIO();
 
-    ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
     if (isLoggedIn) {
-        ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
+        if (fixedDimensions) {
+            ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
+            ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
+        }
     } else {
         ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiCond_Always);
     }
@@ -51,6 +60,7 @@ void
 ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;
+    this->menuView->addEvent(key, event);
     this->currentView->addEvent(key, event);
 }
 

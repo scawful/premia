@@ -17,7 +17,6 @@ void LoginView::drawScreen() const
     if ( ImGui::Button("Login") ) {
         events.at("login")();
     }
-
 }
 
 void LoginView::addEvent(const std::string & key, const VoidEventHandler & event)

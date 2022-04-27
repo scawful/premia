@@ -7,6 +7,7 @@
 #include "../View/Core/LoginView.hpp"
 #include "../View/Dev/DebugView.hpp"
 #include "../View/Chart/ChartView.hpp"
+#include "../View/Options/OptionChainView.hpp"
 
 class Controller
 {

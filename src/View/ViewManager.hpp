@@ -13,13 +13,13 @@ class ViewManager
 private:
     bool menuActive = true;
     bool isLoggedIn = false;
+    bool fixedDimensions = true;
     std::shared_ptr<View> currentView = std::make_shared<LoginView>();
     std::shared_ptr<View> menuView = std::make_shared<MenuView>();
     std::unordered_map<std::string, VoidEventHandler> events;
 
 public:
-    ViewManager()=default;
-    explicit ViewManager(const VoidEventHandler & event);
+    ViewManager();
 
     void transferEvents();
     void setLoggedIn();

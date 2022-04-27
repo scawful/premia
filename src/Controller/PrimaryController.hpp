@@ -8,6 +8,9 @@ class PrimaryController : public Controller
 private:
     int wheel = 0;
     bool active = false;
+    void quit() {
+        active = false;
+    }
 
     SDL_Window * window = nullptr;
     SDL_Renderer * renderer = nullptr;

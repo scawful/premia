@@ -59,6 +59,16 @@ PrimaryController::initCallbacks()
     viewManager.addEventHandler("chartView", [this] () -> void {
         viewManager.setCurrentView(std::make_shared<ChartView>());
     });
+
+    viewManager.addEventHandler("optionChainView", [this] () -> void {
+        viewManager.setCurrentView(std::make_shared<OptionChainView>());
+    });
+    
+    
+
+    viewManager.addEventHandler("quit", [this] () -> void {
+        this->quit();
+    });
 }
 
 PrimaryController::PrimaryController(const ViewManager & vm) 

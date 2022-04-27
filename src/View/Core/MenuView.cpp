@@ -255,8 +255,9 @@ void MenuView::drawStyleEditor()
 void MenuView::drawFileMenu()
 {
     if (ImGui::BeginMenu("File")) {
-        if (ImGui::MenuItem("Premia Home")) {
-            //current_frame = MenuFrame::SubFrame::PREMIA_HOME;
+        if (ImGui::BeginMenu("New")) {
+            ImGui::MenuItem("Quick Chart");
+            ImGui::EndMenu();
         }
         ImGui::MenuItem("New Workspace", "CTRL + N");
         ImGui::Separator();
@@ -270,6 +271,9 @@ void MenuView::drawFileMenu()
         ImGui::Separator();
         if (ImGui::BeginMenu("Preferences"))
         {
+            if (ImGui::MenuItem("Toggle Fixed Window")) {
+                events.at("toggleFixedDimensions")();
+            }
             //ImGui::MenuItem("Private Balances", "", premia->getHalextInterface().getPrivateBalance());
             ImGui::Separator();
 
@@ -288,7 +292,7 @@ void MenuView::drawFileMenu()
         }
 
         if ( ImGui::MenuItem("Quit", "ESC") ) {
-            //premia->quit();
+            events.at("quit")();
         }
 
         ImGui::EndMenu();
@@ -348,7 +352,7 @@ void MenuView::drawTradeMenu()
         ImGui::MenuItem("Get Order");
         ImGui::Separator();
         if (ImGui::MenuItem("Option Chain")) {
-            //current_frame = SubFrame::OPTION_CHAIN;
+            events.at("optionChainView")();
         }
         ImGui::EndMenu();
     }
