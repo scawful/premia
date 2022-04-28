@@ -100,15 +100,6 @@ CandleChart::drawCandleChart()
 {
     static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
 
-    ImGui::InputText("Enter symbol", &tickerSymbol, ImGuiInputTextFlags_CharsUppercase);
-    ImGui::SameLine(); 
-    if (ImGui::Button("Search")) {
-        if (!tickerSymbol.empty()) {
-            model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
-                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
-        }
-    }
-
     ImGui::Text("%s", model.getQuoteDetails().c_str());
     ImGui::Spacing();
 
@@ -133,11 +124,15 @@ CandleChart::drawCandleChart()
     ImGui::SameLine(); ImGui::Combo("Amount", &frequency_amount, " 1\0 5\0 10\0 15\0 30\0");
 
     ImGui::SameLine();
-
-    if (ImGui::Button("Apply")) {
-        model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
-                                              tda::FrequencyType(frequency_type), frequency_amount, true);
-    }  
+    ImGui::SetNextItemWidth(50.f);
+    ImGui::InputText("Enter symbol", &tickerSymbol, ImGuiInputTextFlags_CharsUppercase);
+    ImGui::SameLine(); 
+    if (ImGui::Button("Search")) {
+        if (!tickerSymbol.empty()) {
+            model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
+                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
+        }
+    }
 
     if (ImGui::BeginPopupContextItem()) {
         ImGui::Text("Edit name:");
