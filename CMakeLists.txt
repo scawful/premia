@@ -107,13 +107,16 @@ add_executable(Premia
                     src/State/Frames/RiskPremiaFrame.cpp
                     src/Model/Model.cpp
                     src/Model/Chart/ChartModel.cpp
+                    src/Model/Options/OptionsModel.cpp
                     src/View/ViewManager.cpp
                     src/View/PrimaryView.cpp
                     src/View/Core/LoginView.cpp
                     src/View/Core/MenuView.cpp
+                    src/View/Core/ConsoleView.cpp
                     src/View/Dev/DebugView.cpp
                     src/View/Chart/ChartView.cpp
                     src/View/Chart/CandleChart.cpp
+                    src/View/Options/OptionChainView.cpp
                     src/Controller/PrimaryController.cpp
                     src/Controller/DebugController.cpp
                     src/Services
