@@ -184,10 +184,9 @@ int ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data)
 
 void ConsoleView::drawScreen()
 {
-   ImGuiIO& io = ImGui::GetIO();
+   const ImGuiIO & io = ImGui::GetIO();
 
-    if (!ImGui::Begin(title.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar ))
-    {
+    if (!ImGui::Begin(title.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
         ImGui::End();
         return;
     }
@@ -198,9 +197,6 @@ void ConsoleView::drawScreen()
         //     p_open = false;
         ImGui::EndPopup();
     }
-
-    ImGui::TextWrapped("Enter 'HELP' for help. TAB key for autocomplete, UP/DOWN key for history");
-    ImGui::Separator();
 
     // Options menu
     if (ImGui::BeginPopup("Options"))
@@ -321,6 +317,7 @@ ConsoleView::ConsoleView() : View()
     AutoScroll = true;
     ScrollToBottom = false;
     addLog("Welcome to Premia!"); 
+    addLog("Enter 'HELP' for help. TAB key for autocomplete, UP/DOWN key for history");
 
     this->title = "Console";
 }
