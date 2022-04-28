@@ -54,6 +54,11 @@ PrimaryController::initCallbacks()
         viewManager.transferEvents();
         SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        ImGuiIO & io = ImGui::GetIO();
+        io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
+        io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
+        io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
+        io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
     });
 
     viewManager.addEventHandler("toggleConsoleView", [this] () -> void {
@@ -98,7 +103,7 @@ PrimaryController::onInput()
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-            case SDL_KEYDOWN: {
+            case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
                     case SDLK_UP:
                     case SDLK_DOWN:
@@ -110,7 +115,7 @@ PrimaryController::onInput()
                         break;
                 }
                 break;
-            }
+
             case SDL_KEYUP: {
                 int key = event.key.keysym.scancode;
                 IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
