@@ -150,7 +150,8 @@ CandleChart::drawCandleChart()
     if (ImPlot::BeginPlot("Candlestick Chart",ImGui::GetContentRegionAvail(),0))  {
         ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
         ImPlot::SetupAxes("Date","Price", ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit);
-
+        ImPlot::GetStyle().UseLocalTime = false;
+        
         if (model.isActive()) {
             ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(model.getQuote().getQuoteVariable("52WkLow")), 
                                            boost::lexical_cast<double>(model.getQuote().getQuoteVariable("52WkHigh")));

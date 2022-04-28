@@ -2,7 +2,6 @@
 #define OptionChainView_hpp
 
 #include "../View.hpp"
-#include "../Core/MenuView.hpp"
 #include "../../Model/Options/OptionsModel.hpp"
 
 class OptionChainView: public View 
