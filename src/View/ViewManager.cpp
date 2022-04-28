@@ -39,7 +39,6 @@ ViewManager::setConsoleView()
 void 
 ViewManager::startGuiFrame() const
 {
-    ImGui::StyleColorsClassic();
     ImGui::NewFrame();  
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     const ImGuiIO & io = ImGui::GetIO();
@@ -54,7 +53,7 @@ ViewManager::startGuiFrame() const
     }
     ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
     if (!ImGui::Begin("Premia", nullptr, flags)) {
         ImGui::End();
         return;
