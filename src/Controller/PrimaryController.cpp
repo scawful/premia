@@ -55,6 +55,10 @@ PrimaryController::initCallbacks()
         SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     });
+
+    viewManager.addEventHandler("toggleConsoleView", [this] () -> void {
+        viewManager.setConsoleView(); 
+    });
     
     viewManager.addEventHandler("chartView", [this] () -> void {
         viewManager.setCurrentView(std::make_shared<ChartView>());
@@ -63,8 +67,6 @@ PrimaryController::initCallbacks()
     viewManager.addEventHandler("optionChainView", [this] () -> void {
         viewManager.setCurrentView(std::make_shared<OptionChainView>());
     });
-    
-    
 
     viewManager.addEventHandler("quit", [this] () -> void {
         this->quit();
@@ -90,12 +92,13 @@ PrimaryController::onEntry()
 void
 PrimaryController::onInput()
 {
+    int wheel = 0;
     SDL_Event event;
     ImGuiIO & io = ImGui::GetIO();
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-            case SDL_KEYDOWN:
+            case SDL_KEYDOWN: {
                 switch (event.key.keysym.sym) {
                     case SDLK_UP:
                     case SDLK_DOWN:
@@ -107,6 +110,7 @@ PrimaryController::onInput()
                         break;
                 }
                 break;
+            }
             case SDL_KEYUP: {
                 int key = event.key.keysym.scancode;
                 IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));

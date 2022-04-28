@@ -6,7 +6,6 @@
 class PrimaryController : public Controller
 {
 private:
-    int wheel = 0;
     bool active = false;
     void quit() {
         active = false;

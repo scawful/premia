@@ -5,6 +5,7 @@
 #include "../Model/Model.hpp"
 #include "../View/ViewManager.hpp"
 #include "../View/Core/LoginView.hpp"
+#include "../View/Core/ConsoleView.hpp"
 #include "../View/Dev/DebugView.hpp"
 #include "../View/Chart/ChartView.hpp"
 #include "../View/Options/OptionChainView.hpp"

@@ -320,21 +320,48 @@ void MenuView::drawEditMenu()
 
 void MenuView::drawViewMenu()
 {
+    static bool show_imgui_metrics       = false;
+    static bool show_implot_metrics      = false;
+    static bool show_imgui_style_editor  = false;
+    static bool show_implot_style_editor = false;
+    if (show_imgui_metrics) {
+        ImGui::ShowMetricsWindow(&show_imgui_metrics);
+    }
+    if (show_implot_metrics) {
+        ImPlot::ShowMetricsWindow(&show_implot_metrics);
+    }
+    if (show_imgui_style_editor) {
+        ImGui::Begin("Style Editor (ImGui)", &show_imgui_style_editor);
+        ImGui::ShowStyleEditor();
+        ImGui::End();
+    }
+    if (show_implot_style_editor) {
+        ImGui::SetNextWindowSize(ImVec2(415,762), ImGuiCond_Appearing);
+        ImGui::Begin("Style Editor (ImPlot)", &show_implot_style_editor);
+        ImPlot::ShowStyleEditor();
+        ImGui::End();
+    }
+
     if (ImGui::BeginMenu("View"))
     {         
-        if (ImGui::MenuItem("Service Login")) {
-            //current_frame = SubFrame::LOGIN;
+        if (ImGui::MenuItem("Console")) {
+            events.at("toggleConsoleView")();
         }
         ImGui::Separator();
-        ImGui::MenuItem("General Chat");
-        ImGui::MenuItem("Script Editor");
+        if (ImGui::BeginMenu("Appearance")) {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Window Layout")) {
+            ImGui::EndMenu();
+        }
         ImGui::Separator();
-        // ImGui::MenuItem("Console View", "", & console_view);
-        // ImGui::MenuItem("Portfolio View", "", &portfolio_view);
-        // ImGui::MenuItem("Watchlist View", "", &watchlist_view);
-        // ImGui::Separator();
-        // ImGui::MenuItem("Free Mode", "", &free_mode);
-
+        if (ImGui::BeginMenu("GUI Tools")) {
+            ImGui::MenuItem("Metrics (ImGui)",       NULL, &show_imgui_metrics);
+            ImGui::MenuItem("Metrics (ImPlot)",      NULL, &show_implot_metrics);
+            ImGui::MenuItem("Style Editor (ImGui)",  NULL, &show_imgui_style_editor);
+            ImGui::MenuItem("Style Editor (ImPlot)", NULL, &show_implot_style_editor);
+            ImGui::EndMenu();
+        }
         ImGui::EndMenu();
     }
 }
