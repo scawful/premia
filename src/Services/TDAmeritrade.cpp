@@ -165,13 +165,19 @@ namespace tda
     std::vector<std::string> TDAmeritrade::get_all_accounts()
     {
         std::vector<std::string> accounts;
+        client.fetch_access_token();
         this->_access_token = client.get_access_token();
         get_user_principals();
 
-        for (const auto & [key, value] : user_principals.get_child("accounts")) {
-            for (const auto & [elementKey, elementValue] : value) {
-                if (elementKey == "accountId") {
-                    accounts.push_back(elementValue.get_value<std::string>());
+        for (const auto & [key, value] : user_principals) {
+            std::cout << key << " : " << value.get_value<std::string>() << std::endl;
+            if (key == "accounts") {
+                for (const auto & [key2, val2] : value) {
+                    for (const auto & [elementKey, elementValue] : val2) {
+                        if (elementKey == "accountId") {
+                            accounts.push_back(elementValue.get_value<std::string>());
+                        }
+                    }
                 }
             }
         }
