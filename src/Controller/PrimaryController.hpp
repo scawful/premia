@@ -21,7 +21,7 @@ private:
     void initCallbacks();
 
 public:
-    PrimaryController(const ViewManager & vm);
+    explicit PrimaryController(const ViewManager & vm);
 
     bool isActive() const;
 

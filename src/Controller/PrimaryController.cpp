@@ -59,6 +59,7 @@ PrimaryController::initCallbacks()
         io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
         io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
         io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
+        io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     });
 
     viewManager.addEventHandler("toggleConsoleView", [this] () -> void { viewManager.setConsoleView(); });
