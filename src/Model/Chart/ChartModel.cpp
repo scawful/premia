@@ -7,20 +7,28 @@ void ChartModel::initCandles()
     for ( int i = 0; i < numCandles; i++ )
     {
         double new_dt = 0.0;
+        double volume = 0.0;
         try {
             new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
+            volume = candles[i].volume;
         } catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
             std::cout << e.what() << std::endl;
         }
         
         new_dt *= 0.001;
         datesVec.push_back(new_dt);
+        volumeVec.push_back(volume);
     }
 }
 
 std::vector<double> ChartModel::getDates()
 {
     return datesVec;
+}
+
+std::vector<double> ChartModel::getVolumeVector()
+{
+    return volumeVec;
 }
 
 double ChartModel::getDate(int i)
