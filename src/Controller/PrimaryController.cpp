@@ -61,21 +61,12 @@ PrimaryController::initCallbacks()
         io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
     });
 
-    viewManager.addEventHandler("toggleConsoleView", [this] () -> void {
-        viewManager.setConsoleView(); 
-    });
+    viewManager.addEventHandler("toggleConsoleView", [this] () -> void { viewManager.setConsoleView(); });
+    viewManager.addEventHandler("toggleWatchlistView", [this] () -> void {viewManager.setWatchlistView(); });
     
-    viewManager.addEventHandler("chartView", [this] () -> void {
-        viewManager.setCurrentView(std::make_shared<ChartView>());
-    });
-
-    viewManager.addEventHandler("optionChainView", [this] () -> void {
-        viewManager.setCurrentView(std::make_shared<OptionChainView>());
-    });
-
-    viewManager.addEventHandler("quit", [this] () -> void {
-        this->quit();
-    });
+    viewManager.addEventHandler("chartView", [this] () -> void { viewManager.setCurrentView(std::make_shared<ChartView>()); });
+    viewManager.addEventHandler("optionChainView", [this] () -> void { viewManager.setCurrentView(std::make_shared<OptionChainView>()); });
+    viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
 }
 
 PrimaryController::PrimaryController(const ViewManager & vm) 
