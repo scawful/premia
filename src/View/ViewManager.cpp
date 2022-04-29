@@ -37,6 +37,16 @@ ViewManager::setConsoleView()
 }
 
 void 
+ViewManager::setWatchlistView()
+{
+    if (this->watchlistActive) {
+        this->watchlistActive = false;
+    } else {
+        this->watchlistActive = true;
+    }
+}
+
+void 
 ViewManager::startGuiFrame() const
 {
     ImGui::NewFrame();  
@@ -78,6 +88,17 @@ ViewManager::displayConsole() const
 }
 
 void 
+ViewManager::displayWatchlist() const
+{
+    ImGui::End();    
+    const ImGuiIO & io = ImGui::GetIO();
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.70f, 0));
+    auto size = ImVec2(io.DisplaySize.x * 0.30f, io.DisplaySize.y);
+    ImGui::SetNextWindowSize(size, ImGuiCond_Always);
+    this->watchlistView->update();
+}
+
+void 
 ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;
@@ -101,6 +122,9 @@ ViewManager::updateCurrentView() const
     
     this->currentView->update();
 
+    if (watchlistActive)
+        this->displayWatchlist();
+    
     if (consoleActive)
         this->displayConsole();
     
