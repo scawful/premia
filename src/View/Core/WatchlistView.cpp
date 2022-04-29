@@ -2,11 +2,10 @@
 
 void WatchlistView::drawWatchlistTable()
 {
-    if (!ImGui::Begin("Watchlists", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
+    if (!ImGui::Begin("Watchlists", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
         ImGui::End();
         return;
     }
-
 
     static int n = 0;
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
@@ -128,6 +127,11 @@ void WatchlistView::drawCustomWatchlistTable()
     }
 }
 
+void WatchlistView::addLogger(const ConsoleLogger & newLogger)
+{
+    this->logger = newLogger;
+}
+
 void WatchlistView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;
@@ -136,6 +140,7 @@ void WatchlistView::addEvent(const std::string & key, const VoidEventHandler & e
 void WatchlistView::update() 
 {
     if (!model.isActive()) {
+        model.addLogger(this->logger);
         model.initWatchlist();
     }
     drawWatchlistTable();

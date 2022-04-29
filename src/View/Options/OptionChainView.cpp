@@ -137,6 +137,11 @@ void OptionChainView::drawOptionChain()
     ImGui::Text("Last: %d", last_select );
 }
 
+void OptionChainView::addLogger(const ConsoleLogger & newLogger)
+{
+    this->logger = newLogger;
+}
+
 void OptionChainView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;

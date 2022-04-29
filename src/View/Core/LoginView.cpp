@@ -19,6 +19,11 @@ void LoginView::drawScreen() const
     }
 }
 
+void LoginView::addLogger(const ConsoleLogger & newLogger)
+{
+    this->logger = newLogger;
+}
+
 void LoginView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;

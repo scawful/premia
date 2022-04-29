@@ -1,5 +1,10 @@
 #include "ChartView.hpp"
 
+void ChartView::addLogger(const ConsoleLogger & newLogger)
+{
+    this->logger = newLogger;
+}
+
 void ChartView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;

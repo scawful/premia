@@ -17,17 +17,17 @@ private:
     bool menuActive = true;
     bool consoleActive = false;
     bool watchlistActive = false;
-    bool fixedDimensions = true;
     std::shared_ptr<View> currentView = std::make_shared<LoginView>();
-    std::shared_ptr<View> consoleView = std::make_shared<ConsoleView>();
-    std::shared_ptr<View> watchlistView = std::make_shared<WatchlistView>();
-    std::shared_ptr<View> menuView = std::make_shared<MenuView>();
+    std::shared_ptr<WatchlistView> watchlistView = std::make_shared<WatchlistView>();
+    std::shared_ptr<MenuView> menuView = std::make_shared<MenuView>();
+    std::shared_ptr<ConsoleView> consoleView = std::make_shared<ConsoleView>();
+    ConsoleLogger consoleLogger;
     std::unordered_map<std::string, VoidEventHandler> events;
 
 public:
     ViewManager();
 
-    void transferEvents();
+    void transferEvents() const;
     void setLoggedIn();
     void setConsoleView();
     void setWatchlistView();

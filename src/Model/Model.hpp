@@ -11,6 +11,7 @@ class Model
 {
 private:
     std::unordered_map<std::string, VoidEventHandler> callbacks;
+    ConsoleLogger consoleLogger;
 
     tda::TDAmeritrade TDAInterface;
     cbp::CoinbasePro CoinbaseProInterface;
@@ -21,9 +22,9 @@ public:
     Model()=default;
     ~Model()=default;
     
-    void addEventHandler(const std::string & key, const VoidEventHandler & handler) {
-        this->callbacks[key] = handler;
-    }
+
+    void addLogger(const ConsoleLogger & logger) const;
+    void addEventHandler(const std::string & key, const VoidEventHandler & handler);
 
     tda::TDAmeritrade & getTDAInterface();
     void setTDAInterface(const tda::TDAmeritrade & tda);

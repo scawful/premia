@@ -19,9 +19,8 @@ private:
     bool                  copy_to_clipboard = false;
 
     void clearLog();
-    void addLog(const char* fmt, ...);
     void executeCommand(const char* command_line);
-
+    ConsoleLogger logger;
     std::unordered_map<std::string, VoidEventHandler> events;
 
     void drawScreen();
@@ -32,6 +31,9 @@ public:
 
     int TextEditCallback(ImGuiInputTextCallbackData* data);
 
+    void addLog(const char* fmt, ...);
+    void addLogStd(const std::string & data);
+    void addLogger(const ConsoleLogger & logger) override;
     void addEvent(const std::string & key, const VoidEventHandler & event) override;
     void update() override;
 };

@@ -12,20 +12,22 @@ private:
     std::vector<tda::Watchlist> watchlists;
     std::vector<std::string> watchlistNames;
     std::vector<const char*> watchlistNamesChar;
+    ConsoleLogger logger;
     std::unordered_map<std::string, tda::Quote> quotes;
 
 
 public:
     bool isActive() const;
     
+    void addLogger(const ConsoleLogger & logger);
     void initWatchlist();
     bool getOpenList(int n);
     void setOpenList(int n);
     std::string getWatchlistName(int index);
-    tda::Quote & getQuote(std::string key);
+    tda::Quote & getQuote(const std::string & key);
     tda::Watchlist & getWatchlist(int index);
-    void setQuote(std::string key, tda::Quote quote);
-    std::vector<const char *> getWatchlistNamesCharVec();
+    void setQuote(const std::string & key, const tda::Quote & quote);
+    std::vector<const char *> getWatchlistNamesCharVec() const;
 };
 
 #endif 

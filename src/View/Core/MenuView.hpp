@@ -10,6 +10,7 @@ private:
     bool initialized = false;
     bool about = false;
     ImGuiStyle * ref;
+    ConsoleLogger logger;
     std::unordered_map<std::string, VoidEventHandler> events;
 
     void drawStyleEditor();
@@ -26,6 +27,7 @@ private:
     void drawScreen();
 
 public:
+    void addLogger(const ConsoleLogger & logger) override;
     void addEvent(const std::string &, const VoidEventHandler &) override;
     void update() override;
 };

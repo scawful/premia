@@ -153,6 +153,11 @@ void PrimaryView::drawScreen()
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 
+void PrimaryView::addLogger(const ConsoleLogger & newLogger)
+{
+    this->logger = newLogger;
+}
+
 void PrimaryView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;

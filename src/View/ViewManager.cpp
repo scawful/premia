@@ -2,17 +2,16 @@
 
 ViewManager::ViewManager()
 {
-    this->events["toggleFixedDimensions"] = [this] () -> void {
-        if (this->fixedDimensions) {
-            this->fixedDimensions = false;
-        } else {
-            this->fixedDimensions = true;
-        }
-    };
+    this->consoleLogger = std::bind( &ConsoleView::addLogStd,
+        consoleView,
+        std::placeholders::_1
+    );
+    this->currentView->addLogger(this->consoleLogger);
+    this->watchlistView->addLogger(this->consoleLogger);
 }
 
 void
-ViewManager::transferEvents()
+ViewManager::transferEvents() const
 {
     for (const auto & [key, event] : this->events) {
         this->menuView->addEvent(key, event);
@@ -112,6 +111,7 @@ ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & e
     this->events[key] = event;
     this->menuView->addEvent(key, event);
     this->currentView->addEvent(key, event);
+    this->currentView->addLogger(consoleLogger);
 }
 
 void 

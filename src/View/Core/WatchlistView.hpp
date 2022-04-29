@@ -8,6 +8,7 @@ class WatchlistView: public View
 {
 private:
     WatchlistModel model;
+    ConsoleLogger logger;
     std::unordered_map<std::string, VoidEventHandler> events;
 
     void initWatchlist();
@@ -15,6 +16,7 @@ private:
     void drawCustomWatchlistTable();
 
 public:
+    void addLogger(const ConsoleLogger & logger) override;
     void addEvent(const std::string &, const VoidEventHandler &) override;
     void update() override;
 

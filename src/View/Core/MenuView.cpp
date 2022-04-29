@@ -360,10 +360,10 @@ void MenuView::drawViewMenu()
         }
         ImGui::Separator();
         if (ImGui::BeginMenu("GUI Tools")) {
-            ImGui::MenuItem("Metrics (ImGui)",       NULL, &show_imgui_metrics);
-            ImGui::MenuItem("Metrics (ImPlot)",      NULL, &show_implot_metrics);
-            ImGui::MenuItem("Style Editor (ImGui)",  NULL, &show_imgui_style_editor);
-            ImGui::MenuItem("Style Editor (ImPlot)", NULL, &show_implot_style_editor);
+            ImGui::MenuItem("Metrics (ImGui)",       nullptr, &show_imgui_metrics);
+            ImGui::MenuItem("Metrics (ImPlot)",      nullptr, &show_implot_metrics);
+            ImGui::MenuItem("Style Editor (ImGui)",  nullptr, &show_imgui_style_editor);
+            ImGui::MenuItem("Style Editor (ImPlot)", nullptr, &show_implot_style_editor);
             ImGui::EndMenu();
         }
         ImGui::EndMenu();
@@ -374,9 +374,7 @@ void MenuView::drawTradeMenu()
 {
     if (ImGui::BeginMenu("Trade"))
     {
-        if ( ImGui::MenuItem("Place Order") ){
-            //current_frame = SubFrame::TRADING;
-        }
+        ImGui::MenuItem("Place Order");
         ImGui::MenuItem("Replace Order");
         ImGui::MenuItem("Cancel Order");
         ImGui::Separator();
@@ -393,16 +391,12 @@ void MenuView::drawChartsMenu()
 {
     if (ImGui::BeginMenu("Charts")) 
     {
-        if (ImGui::MenuItem("Market Overview")) {
-            //current_frame = SubFrame::MARKET_OVERVIEW;
-        }
+        ImGui::MenuItem("Market Overview");
         ImGui::Separator();
         if (ImGui::MenuItem("Candle Chart")) {
             events.at("chartView")();
         } 
-        if (ImGui::MenuItem("Line Chart")) {
-            //current_frame = SubFrame::LINE_PLOT;
-        }
+        ImGui::MenuItem("Line Chart");
         ImGui::MenuItem("Bar Chart");
         ImGui::EndMenu();
     }
@@ -420,9 +414,7 @@ void MenuView::drawResearchMenu()
         ImGui::MenuItem("Consumer Price Index", "PRO");
         ImGui::MenuItem("Industrial Production Index", "PRO");
         ImGui::Separator();
-        if (ImGui::MenuItem("Risk Appetite Index")) {
-            //current_frame = SubFrame::RISK_APPETITE;
-        }
+        ImGui::MenuItem("Risk Appetite Index");
         ImGui::EndMenu();
     }
 }
@@ -535,6 +527,11 @@ void MenuView::drawScreen()
         }
         ImGui::EndPopup();
     }
+}
+
+void MenuView::addLogger(const ConsoleLogger & newLogger)
+{
+    this->logger = newLogger;
 }
 
 void MenuView::addEvent(const std::string & key, const VoidEventHandler & event)

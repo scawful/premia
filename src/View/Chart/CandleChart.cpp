@@ -100,8 +100,8 @@ CandleChart::drawCandleChart()
 {
     static int period_type = 2, period_amount = 0, frequency_type = 1, frequency_amount = 0;
     static bool tooltip = false;
-    static ImVec4 bullCol = ImVec4(0.000f, 1.000f, 0.441f, 1.000f);
-    static ImVec4 bearCol = ImVec4(0.853f, 0.050f, 0.310f, 1.000f);
+    static auto bullCol = ImVec4(0.000f, 1.000f, 0.441f, 1.000f);
+    static auto bearCol = ImVec4(0.853f, 0.050f, 0.310f, 1.000f);
 
     if (ImGui::BeginTable("Chart Settings", 12, ImGuiTableFlags_SizingFixedFit))
     {
@@ -122,11 +122,9 @@ CandleChart::drawCandleChart()
     ImGui::ColorEdit4("##Bull", &bullCol.x, ImGuiColorEditFlags_NoInputs);
     ImGui::SameLine(); ImGui::ColorEdit4("##Bear", &bearCol.x, ImGuiColorEditFlags_NoInputs);
     ImGui::SameLine(); 
-    if (ImGui::Button("Search")) {
-        if (!tickerSymbol.empty()) {
-            model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
-                                                tda::FrequencyType(frequency_type), frequency_amount, true);
-        }
+    if (ImGui::Button("Search") && !tickerSymbol.empty()) {
+        model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
+                                              tda::FrequencyType(frequency_type), frequency_amount, true);
     }
     ImGui::SameLine(); ImGui::Checkbox("Show Tooltip", &tooltip);
 

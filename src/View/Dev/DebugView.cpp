@@ -22,6 +22,11 @@ void DebugView::drawScreen() const
     ImGui::End();
 }
 
+void DebugView::addLogger(const ConsoleLogger & newLogger)
+{
+    this->logger = newLogger;
+}
+
 void DebugView::addEvent(const std::string & key, const VoidEventHandler & event) 
 {
     this->events[key] = event;
