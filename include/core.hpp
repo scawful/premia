@@ -68,6 +68,7 @@
 #include "../libs/implot/implot_internal.h"
 
 using VoidEventHandler = std::function<void()>;
+using ConsoleLogger = std::function<void(const std::string &)>;
 
 constexpr int LOGIN_WIDTH = 300;
 constexpr int LOGIN_HEIGHT = 200;
