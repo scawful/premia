@@ -11,6 +11,10 @@ private:
     std::shared_ptr<View> menuView = std::make_shared<MenuView>();
     std::unordered_map<std::string, VoidEventHandler> events;
 
+    void drawInfoPane();
+    void drawAccountPane();
+    void drawScreen();
+
 public:
     void addEvent(const std::string & key, const VoidEventHandler & event) override;
     void update() override;
