@@ -347,6 +347,10 @@ void MenuView::drawViewMenu()
         if (ImGui::MenuItem("Console")) {
             events.at("toggleConsoleView")();
         }
+        if (ImGui::MenuItem("Watchlists")) {
+            events.at("toggleWatchlistView")();
+        }
+
         ImGui::Separator();
         if (ImGui::BeginMenu("Appearance")) {
             ImGui::EndMenu();
@@ -394,7 +398,7 @@ void MenuView::drawChartsMenu()
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Candle Chart")) {
-            //current_frame = SubFrame::CANDLE_CHART;
+            events.at("chartView")();
         } 
         if (ImGui::MenuItem("Line Chart")) {
             //current_frame = SubFrame::LINE_PLOT;
