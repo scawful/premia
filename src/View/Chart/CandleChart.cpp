@@ -98,41 +98,38 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol, Im
 void
 CandleChart::drawCandleChart()
 {
-    static int period_type = 0, period_amount = 1, frequency_type  = 0, frequency_amount = 1;
-
-    ImGui::Text("%s", model.getQuoteDetails().c_str());
-    ImGui::Spacing();
-
-    // ====== implot chart ======= //
-
+    static int period_type = 2, period_amount = 0, frequency_type = 1, frequency_amount = 0;
     static bool tooltip = false;
-    ImGui::Checkbox("Show Tooltip", &tooltip);
-    ImGui::SameLine();
     static ImVec4 bullCol = ImVec4(0.000f, 1.000f, 0.441f, 1.000f);
     static ImVec4 bearCol = ImVec4(0.853f, 0.050f, 0.310f, 1.000f);
-    ImGui::SameLine(); ImGui::ColorEdit4("##Bull", &bullCol.x, ImGuiColorEditFlags_NoInputs);
+
+    if (ImGui::BeginTable("Chart Settings", 12, ImGuiTableFlags_SizingFixedFit))
+    {
+        ImGui::TableNextColumn(); ImGui::Text("Symbol");
+        ImGui::TableNextColumn(); ImGui::SetNextItemWidth(50.f); ImGui::InputText("##chartEnterSymbol", &tickerSymbol, ImGuiInputTextFlags_CharsUppercase);
+        ImGui::TableNextColumn(); ImGui::Text("Period");
+        ImGui::TableNextColumn(); ImGui::SetNextItemWidth(55.f); ImGui::Combo("##Period", &period_type, "Day\0Month\0Year\0YTD\0");
+        ImGui::TableNextColumn(); ImGui::Text("Type");
+        ImGui::TableNextColumn(); ImGui::SetNextItemWidth(50.f); ImGui::Combo("##type", &period_amount, " 1\0 2\0 3\0 4\0 5\0 6\0 10\0 15\0 20\0");
+        ImGui::TableNextColumn(); ImGui::Text("Frequency");
+        ImGui::TableNextColumn(); ImGui::SetNextItemWidth(75.f); ImGui::Combo("##frequency", &frequency_type, "Minute\0Daily\0Weekly\0Monthly\0");
+        ImGui::TableNextColumn(); ImGui::Text("Amount");
+        ImGui::TableNextColumn(); ImGui::SetNextItemWidth(50.f); ImGui::Combo("##amount", &frequency_amount, " 1\0 5\0 10\0 15\0 30\0");
+        ImGui::EndTable();
+    }
+
+
+    ImGui::ColorEdit4("##Bull", &bullCol.x, ImGuiColorEditFlags_NoInputs);
     ImGui::SameLine(); ImGui::ColorEdit4("##Bear", &bearCol.x, ImGuiColorEditFlags_NoInputs);
-
-    ImGui::SetNextItemWidth( 75.f );
-    ImGui::SameLine(); ImGui::Combo("Period", &period_type, "Day\0Month\0Year\0YTD\0");
-    ImGui::SetNextItemWidth( 50.f );
-    ImGui::SameLine(); ImGui::Combo("Type | ", &period_amount, " 1\0 2\0 3\0 4\0 5\0 6\0 10\0 15\0 20\0");
-
-    ImGui::SetNextItemWidth( 75.f );
-    ImGui::SameLine(); ImGui::Combo("Frequency ", &frequency_type, "Minute\0Daily\0Weekly\0Monthly\0");
-    ImGui::SetNextItemWidth( 50.f );
-    ImGui::SameLine(); ImGui::Combo("Amount", &frequency_amount, " 1\0 5\0 10\0 15\0 30\0");
-
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(50.f);
-    ImGui::InputText("Enter symbol", &tickerSymbol, ImGuiInputTextFlags_CharsUppercase);
     ImGui::SameLine(); 
     if (ImGui::Button("Search")) {
         if (!tickerSymbol.empty()) {
             model.fetchPriceHistory(tickerSymbol, tda::PeriodType(period_type), period_amount, 
-                                                  tda::FrequencyType(frequency_type), frequency_amount, true);
+                                                tda::FrequencyType(frequency_type), frequency_amount, true);
         }
     }
+    ImGui::SameLine(); ImGui::Checkbox("Show Tooltip", &tooltip);
+
 
     if (ImGui::BeginPopupContextItem()) {
         ImGui::Text("Edit name:");
@@ -142,10 +139,9 @@ CandleChart::drawCandleChart()
     }
 
     ImPlot::GetStyle().UseLocalTime = true;
-    if (ImPlot::BeginPlot("Candlestick Chart",ImGui::GetContentRegionAvail(),0))  {
+    if (ImPlot::BeginPlot(model.getQuoteDetails().c_str(),ImGui::GetContentRegionAvail(),0))  {
         ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
         ImPlot::SetupAxes("Date","Price", ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit);
-        ImPlot::GetStyle().UseLocalTime = false;
         
         if (model.isActive()) {
             ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(model.getQuote().getQuoteVariable("52WkLow")), 

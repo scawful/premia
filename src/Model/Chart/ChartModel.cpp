@@ -63,11 +63,9 @@ std::string ChartModel::getTickerSymbol() const
 
 const std::string ChartModel::getQuoteDetails()
 {
-    std::string quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") + " - Size: " + quote.getQuoteVariable("bidSize") +
-                                 "\nAsk: $" + quote.getQuoteVariable("askPrice") + " - Size: " + quote.getQuoteVariable("askSize") +
-                                 "\nOpen: $" + quote.getQuoteVariable("openPrice") + " | Close: $" + quote.getQuoteVariable("closePrice") +
-                                 "\n52 Week High: $" + quote.getQuoteVariable("52WkHigh") + " | 52 Week Low: $" + quote.getQuoteVariable("52WkLow") +
-                                 "\nTotal Volume: " + quote.getQuoteVariable("totalVolume") + " | Exchange: " + quote.getQuoteVariable("exchangeName");
+    std::string quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") + " | Ask: $" + quote.getQuoteVariable("askPrice") + 
+                                " | Open: $" + quote.getQuoteVariable("openPrice") + " | Close: $" + quote.getQuoteVariable("closePrice") +
+                                " | Total Volume: " + quote.getQuoteVariable("totalVolume");
     return quoteDetails;
 }
 

@@ -26,7 +26,6 @@ void ConsoleView::addLog(const char* fmt, ...)
     Items.push_back(Strdup(buf));
 }
 
-
 void ConsoleView::executeCommand(const char* command_line)
 {
     addLog("# %s\n", command_line);
@@ -44,28 +43,23 @@ void ConsoleView::executeCommand(const char* command_line)
     History.push_back(Strdup(command_line));
 
     // Process command
-    if (Stricmp(command_line, "CLEAR") == 0)
-    {
+    if (Stricmp(command_line, "CLEAR") == 0) {
         clearLog();
     }
-    else if (Stricmp(command_line, "HELP") == 0)
-    {
+    else if (Stricmp(command_line, "HELP") == 0) {
         addLog("Commands:");
         for (int i = 0; i < Commands.Size; i++)
             addLog("- %s", Commands[i]);
     }
-    else if (Stricmp(command_line, "HISTORY") == 0)
-    {
+    else if (Stricmp(command_line, "HISTORY") == 0) {
         int first = History.Size - 10;
         for (int i = first > 0 ? first : 0; i < History.Size; i++)
             addLog("%3d: %s\n", i, History[i]);
     }
-    else if (Stricmp(command_line, "SESSION") == 0)
-    {
+    else if (Stricmp(command_line, "SESSION") == 0) {
         addLog("Starting WebSocket session...");
     }
-    else
-    {
+    else {
         addLog("Unknown command: '%s'\n", command_line);
     }
 

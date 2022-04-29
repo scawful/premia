@@ -52,18 +52,23 @@ ViewManager::startGuiFrame() const
     ImGui::NewFrame();  
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     const ImGuiIO & io = ImGui::GetIO();
-
     ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
-    if (this->isLoggedIn) {
-        if (this->consoleActive) {
-            dimensions.y = io.DisplaySize.y * (float) 0.70;
-        }
-    } else {
-        ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiCond_Always);
-    }
+
+    if (!this->isLoggedIn)
+        dimensions = ImVec2(300,200);
+
+    if (this->consoleActive)
+        dimensions.y = io.DisplaySize.y * 0.75f;
+
+    if (this->watchlistActive)
+        dimensions.x = io.DisplaySize.x * 0.75f;
+
     ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize |
+                             ImGuiWindowFlags_NoCollapse | 
+                             ImGuiWindowFlags_NoBringToFrontOnFocus | 
+                             ImGuiWindowFlags_NoScrollbar;
     if (!ImGui::Begin("Premia", nullptr, flags)) {
         ImGui::End();
         return;
@@ -81,9 +86,12 @@ ViewManager::displayConsole() const
 {
     ImGui::End();
     const ImGuiIO & io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y * 0.70f));
-    auto size = ImVec2(io.DisplaySize.x, io.DisplaySize.y * 0.30f);
-    ImGui::SetNextWindowSize(size, ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y * 0.75f));
+    ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y * 0.25f);
+    if (watchlistActive)
+        dimensions.x = io.DisplaySize.x * 0.75f;
+        
+    ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
     this->consoleView->update();
 }
 
@@ -92,8 +100,8 @@ ViewManager::displayWatchlist() const
 {
     ImGui::End();    
     const ImGuiIO & io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.70f, 0));
-    auto size = ImVec2(io.DisplaySize.x * 0.30f, io.DisplaySize.y);
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.75f, 0));
+    auto size = ImVec2(io.DisplaySize.x * 0.25f, io.DisplaySize.y);
     ImGui::SetNextWindowSize(size, ImGuiCond_Always);
     this->watchlistView->update();
 }
