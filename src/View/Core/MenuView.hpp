@@ -25,6 +25,7 @@ private:
     void drawDebugMenu();
     void drawHelpMenu();
     void drawScreen();
+    void StyleColorsPremia(ImGuiStyle* dst = nullptr);
 
 public:
     void addAuth(const std::string & key , const std::string & token) override;
