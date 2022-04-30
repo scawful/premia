@@ -1,8 +1,13 @@
 #include "Model.hpp"
 
-void Model::addLogger(const ConsoleLogger & newLogger) const
+void Model::addLogger(const ConsoleLogger & newLogger)
 {
-    this->logger = newLogger;
+    this->consoleLogger = newLogger;
+}
+
+ConsoleLogger & Model::getLogger()
+{
+    return consoleLogger;
 }
 
 void Model::addEventHandler(const std::string & key, const VoidEventHandler & handler) 

@@ -23,8 +23,10 @@ public:
     ~Model()=default;
     
 
-    void addLogger(const ConsoleLogger & logger) const;
+    void addLogger(const ConsoleLogger & logger);
     void addEventHandler(const std::string & key, const VoidEventHandler & handler);
+
+    ConsoleLogger & getLogger();
 
     tda::TDAmeritrade & getTDAInterface();
     void setTDAInterface(const tda::TDAmeritrade & tda);
