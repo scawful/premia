@@ -471,7 +471,7 @@ void MenuView::drawDebugMenu()
             //premia->tda_interface.fetchAccessToken();
         }
         if (ImGui::MenuItem("WebSocket StreamState")) {
-            //premia->change(StreamState::instance());
+
         }
         if (ImGui::MenuItem("ImGui/ImPlot Demos")) {
             //premia->change(DemoState::instance());

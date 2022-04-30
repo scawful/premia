@@ -12,7 +12,7 @@ using tcp = boost::asio::ip::tcp;
 namespace tda
 {
     void 
-    Session::fail( beast::error_code ec, char const* what ) const
+    Session::fail(beast::error_code ec, char const* what) const
     {
         if(ec == net::error::operation_aborted || ec == websocket::error::closed)
             return;

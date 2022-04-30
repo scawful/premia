@@ -17,11 +17,11 @@ private:
     bool menuActive = true;
     bool consoleActive = false;
     bool watchlistActive = false;
+    ConsoleLogger consoleLogger;
     std::shared_ptr<View> currentView = std::make_shared<LoginView>();
     std::shared_ptr<WatchlistView> watchlistView = std::make_shared<WatchlistView>();
     std::shared_ptr<MenuView> menuView = std::make_shared<MenuView>();
     std::shared_ptr<ConsoleView> consoleView = std::make_shared<ConsoleView>();
-    ConsoleLogger consoleLogger;
     std::unordered_map<std::string, VoidEventHandler> events;
 
 public:

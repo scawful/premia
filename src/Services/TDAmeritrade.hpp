@@ -27,6 +27,7 @@ namespace tda
         std::string _refresh_token;
         std::string _consumer_key;
 
+        ConsoleLogger consoleLogger;
         Account current_account;
         Client client;
         Parser parser;
@@ -61,9 +62,11 @@ namespace tda
         void postOrder(const std::string & account_id, const Order & order) const;
 
         void startStreamingSession();
-
+        Candle processQuoteResponse(const char* response);
         void fetchAccessToken();
         bool is_session_active();
+
+        void addLogger(const ConsoleLogger &);
     };
 
 }

@@ -657,12 +657,9 @@ void Client::start_session()
 {
     std::string host;
     std::string port = "443";
-    try
-    {
+    try {
         host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
-    }
-    catch (JSONObject::ptree_error const & ptree_bad_path)
-    {
+    } catch (JSONObject::ptree_error const & ptree_bad_path) {
         SDL_Log("Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what());
     }
 
@@ -701,8 +698,11 @@ void Client::start_session()
     SDL_Log("~~~");
     session_active = true;
 
-    std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
-    session_thread.detach();
+    boost::asio::thread_pool sessionPool(5);
+    boost::asio::post(sessionPool, boost::bind(&boost::asio::io_context::run, &ioc));
+
+    //std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
+    //session_thread.detach();
 
     // send an initial message to get price data from AAPL
     websocket_session->send_message( std::make_shared<std::string const>(chart_equity_text) );

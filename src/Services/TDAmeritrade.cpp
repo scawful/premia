@@ -170,7 +170,6 @@ namespace tda
         get_user_principals();
 
         for (const auto & [key, value] : user_principals) {
-            std::cout << key << " : " << value.get_value<std::string>() << std::endl;
             if (key == "accounts") {
                 for (const auto & [key2, val2] : value) {
                     for (const auto & [elementKey, elementValue] : val2) {
@@ -301,6 +300,13 @@ namespace tda
         client.start_session();
     }
 
+    Candle TDAmeritrade::processQuoteResponse(const char* response)
+    {
+        Candle newCandle;
+        consoleLogger(response);
+        return newCandle;
+    }
+
     void TDAmeritrade::fetchAccessToken()
     {
         client.fetch_access_token();
@@ -309,6 +315,11 @@ namespace tda
     bool TDAmeritrade::is_session_active()
     {
         return session_active;
+    }
+
+    void TDAmeritrade::addLogger(const ConsoleLogger & logger)
+    {
+        this->consoleLogger = logger;
     }
 
 }

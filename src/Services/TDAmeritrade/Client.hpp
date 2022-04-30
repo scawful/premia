@@ -98,8 +98,6 @@ namespace tda
         std::string post_account_order(std::string const & account_id) const;
         std::string post_access_token() const;
 
-
-
     public:
         Client();
 
