@@ -125,7 +125,7 @@ void PrimaryView::drawAccountPane()
 
 void PrimaryView::drawScreen()
 {
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO & io = ImGui::GetIO();
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
 
     // Child 1: no border, enable horizontal scrollbar
