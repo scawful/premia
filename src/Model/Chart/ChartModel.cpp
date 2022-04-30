@@ -11,8 +11,8 @@ void ChartModel::initCandles()
         try {
             new_dt = boost::lexical_cast<double>(candles[i].raw_datetime);
             volume = candles[i].volume;
-        } catch (boost::wrapexcept<boost::bad_lexical_cast>& e) {
-            std::cout << e.what() << std::endl;
+        } catch (const boost::wrapexcept<boost::bad_lexical_cast>& e) {
+            getLogger()(e.what());
         }
         
         new_dt *= 0.001;
@@ -21,13 +21,21 @@ void ChartModel::initCandles()
     }
 }
 
-std::vector<double> ChartModel::getDates()
+void ChartModel::initListener()
+{
+    this->socketListener = [this] (const char* response) -> void {
+        // std::future<tda::Candle> responseFuture = std::async(this->getTDAInterface().processQuoteResponse, response); 
+        // candles.push_back(responseFuture.get());
+    };
+}
+
+std::vector<double> ChartModel::getDates() const
 {
     return datesVec;
 }
 
-std::vector<double> ChartModel::getVolumeVector()
-{
+std::vector<double> ChartModel::getVolumeVector() const
+{ 
     return volumeVec;
 }
 
@@ -48,7 +56,7 @@ tda::Quote & ChartModel::getQuote()
 
 int ChartModel::getNumCandles() const
 {
-    return candles.size();
+    return (int) candles.size();
 }
 
 tda::Candle ChartModel::getCandle(int i)
@@ -61,7 +69,7 @@ std::string ChartModel::getTickerSymbol() const
     return tickerSymbol;
 }
 
-const std::string ChartModel::getQuoteDetails()
+std::string ChartModel::getQuoteDetails()
 {
     std::string quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") + " | Ask: $" + quote.getQuoteVariable("askPrice") + 
                                 " | Open: $" + quote.getQuoteVariable("openPrice") + " | Close: $" + quote.getQuoteVariable("closePrice") +
