@@ -2,14 +2,13 @@
 #include "Controller/PrimaryController.hpp"
 #include "Controller/DebugController.hpp"
 #include "State/PrimaryState.hpp"
-#include "State/LoginState.hpp"
 
 int main(int argc, char *argv[]) 
 {
     VoidEventHandler legacyPremia = []() -> void { 
         Manager premia;
         premia.init(300,200);
-        premia.change(LoginState::instance());
+        premia.change(PrimaryState::instance());
         while (premia.running()) {
             premia.handleEvents();
             premia.update();

@@ -1,6 +1,5 @@
 #include "MenuFrame.hpp"
 #include "../PrimaryState.hpp"
-#include "../StreamState.hpp"
 #include "../DemoState.hpp"
 
 static void HelpMarker(const char* desc)
@@ -490,9 +489,6 @@ void MenuFrame::update()
         {
             if (ImGui::MenuItem("Fetch Access Token", "TDA")) {
                 premia->tda_interface.fetchAccessToken();
-            }
-            if (ImGui::MenuItem("WebSocket StreamState")) {
-                premia->change(StreamState::instance());
             }
             if (ImGui::MenuItem("ImGui/ImPlot Demos")) {
                 premia->change(DemoState::instance());
