@@ -2,10 +2,7 @@
 
 ViewManager::ViewManager()
 {
-    this->consoleLogger = std::bind( &ConsoleView::addLogStd,
-        consoleView,
-        std::placeholders::_1
-    );
+    this->consoleLogger = std::bind(&ConsoleView::addLogStd, consoleView, std::placeholders::_1);
     this->watchlistView->addLogger(this->consoleLogger);
 }
 

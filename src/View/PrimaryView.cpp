@@ -12,7 +12,8 @@ void PrimaryView::drawInfoPane()
     }
     
     if (ImGui::TreeNode("Linking Accounts")) {
-        ImGui::Separator(); ImGui::TextColored(ImVec4(42.f, 170.f, 138.f, 1.0f), "TDAmeritrade"); ImGui::Separator();            
+        ImGui::Separator(); 
+        ImGui::TextColored(ImVec4(0.f, 170.f, 138.f, 1.0f), "TDAmeritrade"); ImGui::Separator();            
         ImGui::TextColored(ImVec4(0.f, 128.f, 128.f, 1.0f), "Coinbase"); ImGui::Separator();
         ImGui::TreePop();
     }
@@ -65,6 +66,7 @@ void PrimaryView::drawInfoPane()
     ImGui::Text("Development");
     if (ImGui::TreeNode("Changelog")) {
         ImGui::Separator();
+        ImGui::BulletText("V0.04 \tAdded more event driven programming.");
         ImGui::BulletText("V0.03 \tExtensive upgrades to API interfaces and more GUI enhancements.");
         ImGui::BulletText("V0.02 \tAdded support for CoinbasePro and created basic GUI layout.");
         ImGui::BulletText("V0.01 \tStarted Premia using TDAmeritrade API and SDL with ImGUI.");
@@ -166,11 +168,6 @@ void PrimaryView::addLogger(const ConsoleLogger & newLogger)
 void PrimaryView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;
-}
-
-void PrimaryView::setLoggedIn(const std::string &, const std::string &)
-{
-
 }
 
 void PrimaryView::update() 

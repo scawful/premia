@@ -19,7 +19,6 @@ public:
     void addAuth(const std::string & key , const std::string & token) override;
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(const std::string & key, const VoidEventHandler & event) override;
-    void setLoggedIn(const std::string &, const std::string &);
     void update() override;
 };
 
