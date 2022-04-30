@@ -52,14 +52,14 @@
 #include "boost/date_time/posix_time/posix_time.hpp"
 #define BOOST_ASIO_ENABLE_HANDLER_TRACKING
 
+// libcURL
+#include <curl/curl.h>
+
 // OpenSSL
 #include <openssl/ssl.h>
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
-
-// libcURL
-#include <curl/curl.h>
 
 // ImGui, ImGuiSDL, ImPlot
 #include "../libs/imgui/imgui.h"
@@ -72,6 +72,7 @@
 using VoidEventHandler = std::function<void()>;
 using ConsoleLogger = std::function<void(const std::string &)>;
 using SocketListener = std::function<void(const char*)>;
+using TDALoginEvent = std::function<void(const std::string &, std::string &)>;
 
 constexpr int LOGIN_WIDTH = 300;
 constexpr int LOGIN_HEIGHT = 200;

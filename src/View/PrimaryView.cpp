@@ -153,6 +153,11 @@ void PrimaryView::drawScreen()
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 
+void PrimaryView::addAuth(const std::string & key , const std::string & token)
+{
+    
+}
+
 void PrimaryView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
@@ -161,6 +166,11 @@ void PrimaryView::addLogger(const ConsoleLogger & newLogger)
 void PrimaryView::addEvent(const std::string & key, const VoidEventHandler & event)
 {
     this->events[key] = event;
+}
+
+void PrimaryView::setLoggedIn(const std::string &, const std::string &)
+{
+
 }
 
 void PrimaryView::update() 

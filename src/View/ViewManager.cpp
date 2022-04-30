@@ -6,7 +6,6 @@ ViewManager::ViewManager()
         consoleView,
         std::placeholders::_1
     );
-    this->currentView->addLogger(this->consoleLogger);
     this->watchlistView->addLogger(this->consoleLogger);
 }
 
@@ -20,8 +19,10 @@ ViewManager::transferEvents() const
 }
 
 void 
-ViewManager::setLoggedIn()
+ViewManager::setLoggedIn(const std::string & key, const std::string & token)
 {
+    this->currentView->addAuth(key, token);
+    this->watchlistView->addAuth(key, token);
     this->isLoggedIn = true;
 }
 
@@ -47,10 +48,11 @@ ViewManager::setWatchlistView()
 
 void 
 ViewManager::startGuiFrame() const
-{
+{    
+    const ImGuiIO & io = ImGui::GetIO();
     ImGui::NewFrame();  
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
-    const ImGuiIO & io = ImGui::GetIO();
+
     ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
 
     if (!this->isLoggedIn)
@@ -64,10 +66,15 @@ ViewManager::startGuiFrame() const
 
     ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize |
+    ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize |
                              ImGuiWindowFlags_NoCollapse | 
                              ImGuiWindowFlags_NoBringToFrontOnFocus | 
                              ImGuiWindowFlags_NoScrollbar;
+
+    if (isLoggedIn) {
+        flags += ImGuiWindowFlags_MenuBar;
+    }
+                               
     if (!ImGui::Begin("Premia", nullptr, flags)) {
         ImGui::End();
         return;
@@ -110,8 +117,17 @@ ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & e
 {
     this->events[key] = event;
     this->menuView->addEvent(key, event);
-    this->currentView->addEvent(key, event);
-    this->currentView->addLogger(consoleLogger);
+    if (!isLoggedIn) {
+        this->loginView->addEvent(key, event);
+    } else {
+        this->currentView->addEvent(key, event);
+        this->currentView->addLogger(consoleLogger);
+    }
+}
+
+void ViewManager::addLoginEvent(const TDALoginEvent & event)
+{
+    this->loginView->addLoginEvent(event);
 }
 
 void 
@@ -128,7 +144,10 @@ ViewManager::updateCurrentView() const
     if (menuActive)
         this->menuView->update();
     
-    this->currentView->update();
+    if (!isLoggedIn)
+        this->loginView->update();
+    else
+        this->currentView->update();
 
     if (watchlistActive)
         this->displayWatchlist();

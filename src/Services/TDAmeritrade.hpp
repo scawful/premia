@@ -67,6 +67,7 @@ namespace tda
         bool is_session_active();
 
         void addLogger(const ConsoleLogger &);
+        void addAuth(const std::string, const std::string);
     };
 
 }

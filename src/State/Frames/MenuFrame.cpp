@@ -18,7 +18,7 @@ static void HelpMarker(const char* desc)
 
 void MenuFrame::init_hot_keys()
 {
-    std::ifstream fileInput("../assets/hotkeys.csv");
+    std::ifstream fileInput("assets/hotkeys.csv");
 
     if (!fileInput.good()) {
         SDL_Log("file not opened");

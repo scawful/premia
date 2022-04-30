@@ -431,7 +431,7 @@ std::string Client::post_access_token() const
  */
 Client::Client()
 {
-    this->refresh_token = REFRESH_TOKEN;
+    //this->refresh_token = REFRESH_TOKEN;
 }
 
 /**
@@ -830,4 +830,10 @@ void Client::fetch_access_token()
 {
     access_token = parser.parse_access_token(post_access_token());
     has_access_token = true;
+}
+
+void Client::addAuth(const std::string & key, const std::string & token)
+{
+    this->api_key = key;
+    this->refresh_token = token;
 }

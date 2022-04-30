@@ -1,5 +1,10 @@
 #include "Model.hpp"
 
+void Model::addAuth(const std::string & key, const std::string & token)
+{
+    TDAInterface.addAuth(key, token);
+}
+
 void Model::addLogger(const ConsoleLogger & newLogger)
 {
     this->consoleLogger = newLogger;

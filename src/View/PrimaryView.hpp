@@ -7,9 +7,8 @@
 class PrimaryView: public View 
 {
 private:
-    VoidEventHandler primaryEvent;
-    std::shared_ptr<View> menuView = std::make_shared<MenuView>();
     ConsoleLogger logger;
+    std::shared_ptr<View> menuView = std::make_shared<MenuView>();
     std::unordered_map<std::string, VoidEventHandler> events;
 
     void drawInfoPane();
@@ -17,8 +16,10 @@ private:
     void drawScreen();
 
 public:
+    void addAuth(const std::string & key , const std::string & token) override;
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(const std::string & key, const VoidEventHandler & event) override;
+    void setLoggedIn(const std::string &, const std::string &);
     void update() override;
 };
 

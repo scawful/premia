@@ -8,6 +8,7 @@
 #include "../View/Core/ConsoleView.hpp"
 #include "../View/Dev/DebugView.hpp"
 #include "../View/Chart/ChartView.hpp"
+#include "../View/Chart/LinePlotChart.hpp"
 #include "../View/Options/OptionChainView.hpp"
 
 class Controller

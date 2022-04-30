@@ -22,6 +22,11 @@ void DebugView::drawScreen() const
     ImGui::End();
 }
 
+void DebugView::addAuth(const std::string & key , const std::string & token)
+{
+    
+}
+
 void DebugView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

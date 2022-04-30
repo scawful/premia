@@ -137,6 +137,11 @@ void OptionChainView::drawOptionChain()
     ImGui::Text("Last: %d", last_select );
 }
 
+void OptionChainView::addAuth(const std::string & key , const std::string & token)
+{
+    
+}
+
 void OptionChainView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

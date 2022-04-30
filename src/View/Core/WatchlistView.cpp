@@ -127,6 +127,11 @@ void WatchlistView::drawCustomWatchlistTable()
     }
 }
 
+void WatchlistView::addAuth(const std::string & key , const std::string & token)
+{
+    model.addAuth(key, token);
+}
+
 void WatchlistView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

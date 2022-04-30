@@ -153,7 +153,7 @@ namespace tda
      * 
      * @param type 
      */
-    TDAmeritrade::TDAmeritrade() : session_active(false), _refresh_token(REFRESH_TOKEN) { }
+    TDAmeritrade::TDAmeritrade() : session_active(false) { }
     TDAmeritrade::~TDAmeritrade()=default;
     
     /**
@@ -320,6 +320,13 @@ namespace tda
     void TDAmeritrade::addLogger(const ConsoleLogger & logger)
     {
         this->consoleLogger = logger;
+    }
+
+    void TDAmeritrade::addAuth(const std::string key, const std::string token)
+    {
+        this->_consumer_key = key;
+        this->_refresh_token = token;
+        client.addAuth(_consumer_key, _refresh_token);  
     }
 
 }

@@ -296,6 +296,11 @@ ConsoleView::~ConsoleView()
         free(History[i]);
 }
 
+void ConsoleView::addAuth(const std::string & key, const std::string & token)
+{
+    
+}
+
 void ConsoleView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

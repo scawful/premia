@@ -129,6 +129,8 @@ namespace tda
         std::vector<std::string> get_session_responses() const;
         std::string get_access_token() const;
         void fetch_access_token();
+
+        void addAuth(const std::string &, const std::string &);
     };
 }
 

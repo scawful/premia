@@ -13,6 +13,7 @@ private:
     void drawScreen() const;
 
 public:
+    void addAuth(const std::string & key , const std::string & token) override;
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(const std::string & key, const VoidEventHandler & event) override;
     void update() override;

@@ -255,9 +255,8 @@ void MenuView::drawStyleEditor()
 void MenuView::drawFileMenu()
 {
     if (ImGui::BeginMenu("File")) {
-        if (ImGui::BeginMenu("New")) {
-            ImGui::MenuItem("Quick Chart");
-            ImGui::EndMenu();
+        if (ImGui::MenuItem("Home")) {
+            events.at("goHome")();
         }
         ImGui::MenuItem("New Workspace", "CTRL + N");
         ImGui::Separator();
@@ -374,11 +373,11 @@ void MenuView::drawTradeMenu()
 {
     if (ImGui::BeginMenu("Trade"))
     {
-        ImGui::MenuItem("Place Order");
-        ImGui::MenuItem("Replace Order");
-        ImGui::MenuItem("Cancel Order");
+        ImGui::MenuItem("Place Order", "N/A");
+        ImGui::MenuItem("Replace Order", "N/A");
+        ImGui::MenuItem("Cancel Order", "N/A");
         ImGui::Separator();
-        ImGui::MenuItem("Get Order");
+        ImGui::MenuItem("Get Order", "N/A");
         ImGui::Separator();
         if (ImGui::MenuItem("Option Chain")) {
             events.at("optionChainView")();
@@ -391,13 +390,15 @@ void MenuView::drawChartsMenu()
 {
     if (ImGui::BeginMenu("Charts")) 
     {
-        ImGui::MenuItem("Market Overview");
-        ImGui::Separator();
         if (ImGui::MenuItem("Candle Chart")) {
             events.at("chartView")();
         } 
-        ImGui::MenuItem("Line Chart");
-        ImGui::MenuItem("Bar Chart");
+        if (ImGui::MenuItem("Line Chart")) {
+            events.at("linePlotView")();
+        }
+        ImGui::MenuItem("Bar Chart", "N/A");   
+        ImGui::Separator();     
+        ImGui::MenuItem("Market Overview", "N/A");
         ImGui::EndMenu();
     }
 }
@@ -414,7 +415,7 @@ void MenuView::drawResearchMenu()
         ImGui::MenuItem("Consumer Price Index", "PRO");
         ImGui::MenuItem("Industrial Production Index", "PRO");
         ImGui::Separator();
-        ImGui::MenuItem("Risk Appetite Index");
+        ImGui::MenuItem("Risk Appetite Index", "N/A");
         ImGui::EndMenu();
     }
 }
@@ -423,19 +424,13 @@ void MenuView::drawAnalyzeMenu()
 {
     if (ImGui::BeginMenu("Analyze"))
     {
-        ImGui::MenuItem("Fundamentals");
-        if (ImGui::MenuItem("Market Movers")) {
-            //current_frame = SubFrame::MARKET_MOVERS;
-        }
+        ImGui::MenuItem("Fundamentals", "N/A");
+        ImGui::MenuItem("Market Movers", "N/A");
         ImGui::Separator();
         ImGui::MenuItem("Insider Roster", "PRO");
         ImGui::MenuItem("Insider Summary", "PRO");
-        if (ImGui::MenuItem("Insider Transactions", "PRO")) {
-            //current_frame = SubFrame::INSIDER_TRANSACTIONS;
-        }
-        if (ImGui::MenuItem("Fund Ownership", "PRO")) {
-            //current_frame = SubFrame::FUND_OWNERSHIP;
-        }
+        ImGui::MenuItem("Insider Transactions", "PRO");
+        ImGui::MenuItem("Fund Ownership", "PRO");
         ImGui::Separator();
         ImGui::MenuItem("Retail Money Funds", "PRO");
         ImGui::MenuItem("Institutional Money Funds", "PRO");
@@ -453,12 +448,12 @@ void MenuView::drawAccountMenu()
 {
     if (ImGui::BeginMenu("Account")) 
     {
-        ImGui::MenuItem("Sync Data");
+        ImGui::MenuItem("Sync Data", "N/A");
         ImGui::Separator();
-        ImGui::MenuItem("General Settings");
-        ImGui::MenuItem("Graphical Settings");
+        ImGui::MenuItem("General Settings", "N/A");
+        ImGui::MenuItem("Graphical Settings", "N/A");
         ImGui::Separator();
-        ImGui::MenuItem("Activate Trial");
+        ImGui::MenuItem("Activate Trial", "N/A");
         ImGui::EndMenu();
     }
 }
@@ -470,13 +465,13 @@ void MenuView::drawDebugMenu()
         if (ImGui::MenuItem("Fetch Access Token", "TDA")) {
             //premia->tda_interface.fetchAccessToken();
         }
-        if (ImGui::MenuItem("WebSocket StreamState")) {
+        if (ImGui::MenuItem("WebSocket StreamState", "N/A")) {
 
         }
-        if (ImGui::MenuItem("ImGui/ImPlot Demos")) {
+        if (ImGui::MenuItem("ImGui/ImPlot Demos", "N/A")) {
             //premia->change(DemoState::instance());
         }      
-        if (ImGui::MenuItem("Start WS Session")) {
+        if (ImGui::MenuItem("Start WS Session", "N/A")) {
             //premia->tda_interface.startStreamingSession();
         }
         ImGui::EndMenu();
@@ -518,8 +513,8 @@ void MenuView::drawScreen()
     if (ImGui::BeginPopupModal("About", nullptr, ImGuiWindowFlags_AlwaysAutoResize )) {
         ImGui::Text("Premia Version 0.4");
         ImGui::Text("Written by: Justin Scofield (scawful)");
-        ImGui::Text("Dependencies: Boost, SDL2, ImGui, ImPlot, libCURL");
-        ImGui::Text("Data provided by: CoinbasePro, IEXCloud, TDAmeritrade, SqueezeMetrics");
+        ImGui::Text("Dependencies: Boost, SDL2, ImGui, ImPlot");
+        ImGui::Text("Data provided by: TDAmeritrade, CoinbasePro");
 
         if (ImGui::Button("Close", ImVec2(120, 0))) { 
             about = false; 
@@ -527,6 +522,11 @@ void MenuView::drawScreen()
         }
         ImGui::EndPopup();
     }
+}
+
+void MenuView::addAuth(const std::string & key , const std::string & token)
+{
+    
 }
 
 void MenuView::addLogger(const ConsoleLogger & newLogger)

@@ -40,9 +40,18 @@ PrimaryController::initWindow()
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer_Init(renderer);
 
+    const ImGuiIO & io = ImGui::GetIO();
+    io.Fonts->AddFontDefault();
+    io.Fonts->AddFontFromFileTTF("assets/Cousine-Regular.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("assets/DroidSans.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("assets/Karla-Regular.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 14.0f);
+
+
     // Build a new ImGui frame
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);  
+
 }
 
 void 
@@ -50,7 +59,7 @@ PrimaryController::initCallbacks()
 {
     viewManager.addEventHandler("login", [this] () -> void { 
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
-        viewManager.setLoggedIn(); 
+        viewManager.setLoggedIn("test", "token"); 
         viewManager.transferEvents();
         SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
@@ -62,10 +71,27 @@ PrimaryController::initCallbacks()
         io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     });
 
+    viewManager.addLoginEvent([this] (const std::string & key, const std::string & token) -> void {
+        viewManager.setCurrentView(std::make_shared<PrimaryView>());
+        viewManager.setLoggedIn(key, token); 
+        viewManager.transferEvents();
+        SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+        SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        ImGuiIO & io = ImGui::GetIO();
+        io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
+        io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
+        io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
+        io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
+        io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
+        io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
+    });
+
     viewManager.addEventHandler("toggleConsoleView", [this] () -> void { viewManager.setConsoleView(); });
     viewManager.addEventHandler("toggleWatchlistView", [this] () -> void {viewManager.setWatchlistView(); });
     
+    viewManager.addEventHandler("goHome", [this] () -> void { viewManager.setCurrentView(std::make_shared<PrimaryView>()); });
     viewManager.addEventHandler("chartView", [this] () -> void { viewManager.setCurrentView(std::make_shared<ChartView>()); });
+    viewManager.addEventHandler("linePlotView", [this] () -> void { viewManager.setCurrentView(std::make_shared<LinePlotChart>()); });
     viewManager.addEventHandler("optionChainView", [this] () -> void { viewManager.setCurrentView(std::make_shared<OptionChainView>()); });
     viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
 }

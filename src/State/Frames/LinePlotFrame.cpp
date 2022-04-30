@@ -2,7 +2,7 @@
 
 void LinePlotFrame::initData()
 {
-    std::ifstream fileInput("../assets/chart.csv");
+    std::ifstream fileInput("assets/chart.csv");
 
     if (!fileInput.good()) {
         SDL_Log("file not opened");

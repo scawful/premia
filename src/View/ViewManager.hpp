@@ -17,8 +17,11 @@ private:
     bool menuActive = true;
     bool consoleActive = false;
     bool watchlistActive = false;
+    bool fontLoaded = false;
+    TDALoginEvent loginEvent;
     ConsoleLogger consoleLogger;
-    std::shared_ptr<View> currentView = std::make_shared<LoginView>();
+    std::shared_ptr<View> currentView;
+    std::shared_ptr<LoginView> loginView = std::make_shared<LoginView>();
     std::shared_ptr<WatchlistView> watchlistView = std::make_shared<WatchlistView>();
     std::shared_ptr<MenuView> menuView = std::make_shared<MenuView>();
     std::shared_ptr<ConsoleView> consoleView = std::make_shared<ConsoleView>();
@@ -28,7 +31,7 @@ public:
     ViewManager();
 
     void transferEvents() const;
-    void setLoggedIn();
+    void setLoggedIn(const std::string &, const std::string &);
     void setConsoleView();
     void setWatchlistView();
     void startGuiFrame() const;
@@ -36,6 +39,7 @@ public:
     void displayConsole() const;
     void displayWatchlist() const;
     void addEventHandler(const std::string & key, const VoidEventHandler & event);
+    void addLoginEvent(const TDALoginEvent &);
     void setCurrentView(std::shared_ptr<View> newView);
     void updateCurrentView() const;
 };

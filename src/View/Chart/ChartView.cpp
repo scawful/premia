@@ -1,5 +1,10 @@
 #include "ChartView.hpp"
 
+void ChartView::addAuth(const std::string & key , const std::string & token)
+{
+    
+}
+
 void ChartView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
