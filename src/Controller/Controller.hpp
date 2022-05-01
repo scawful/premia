@@ -1,7 +1,8 @@
 #ifndef Controller_hpp
 #define Controller_hpp
 
-#include "../../include/core.hpp"
+#include "core.hpp"
+#include "EventInterface.hpp"
 #include "../Model/Model.hpp"
 #include "../View/ViewManager.hpp"
 #include "../View/Core/LoginView.hpp"

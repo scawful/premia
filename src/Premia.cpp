@@ -1,6 +1,5 @@
 #define SDL_MAIN_HANDLED
 #include "Controller/PrimaryController.hpp"
-#include "Controller/DebugController.hpp"
 #include "State/PrimaryState.hpp"
 
 int main(int argc, char *argv[]) 
