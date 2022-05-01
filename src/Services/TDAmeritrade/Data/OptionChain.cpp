@@ -34,6 +34,16 @@ void OptionChain::addOptionsDateTimeObj(const OptionsDateTimeObj & obj)
     optionsDateTimeVector.push_back(obj);
 }
 
+std::vector<OptionsDateTimeObj> OptionChain::getCallOptionArray() const
+{
+    return callOptionArray;
+}
+
+std::vector<OptionsDateTimeObj> OptionChain::getPutOptionArray() const
+{
+    return putOptionArray;
+}
+
 void OptionChain::addOptionsDateTimeObj( const OptionsDateTimeObj & obj, int idx )
 {
     if (idx) {

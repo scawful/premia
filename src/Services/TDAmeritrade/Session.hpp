@@ -13,7 +13,8 @@ namespace tda
     namespace pt = boost::property_tree; 
     using tcp = boost::asio::ip::tcp;
     
-    class Session : public std::enable_shared_from_this<Session>
+    class Session 
+        : public std::enable_shared_from_this<Session>
     {
     private:
         bool _logged_in;
@@ -33,7 +34,8 @@ namespace tda
         void fail( beast::error_code ec, char const* what ) const;
 
     public:
-        explicit Session( net::io_context & ioc, ssl::context & ctx, const std::vector<std::shared_ptr<std::string const>> & queue )
+        explicit Session( net::io_context & ioc, ssl::context & ctx, 
+                          const std::vector<std::shared_ptr<std::string const>> & queue )
             : _resolver(net::make_strand(ioc))
             , _ws(net::make_strand(ioc), ctx)
             , _queue(queue)

@@ -1,5 +1,10 @@
 #include "ViewManager.hpp"
 
+void ViewManager::shareEvents()
+{
+
+}
+
 ViewManager::ViewManager()
 {
     this->consoleLogger = std::bind(&ConsoleView::addLogStd, consoleView, std::placeholders::_1);
@@ -121,6 +126,12 @@ ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & e
         this->currentView->addLogger(consoleLogger);
     }
 }
+
+// template <typename T>
+// void ViewManager::addEvent(const std::string & key, T event)
+// {
+//     this->allEvents.insert<T>(key, event);
+// }
 
 void ViewManager::addLoginEvent(const TDALoginEvent & event)
 {

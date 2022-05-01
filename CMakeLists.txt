@@ -93,9 +93,8 @@ add_executable(Premia src/Premia.cpp
                     src/View/Chart/ChartView.cpp
                     src/View/Chart/CandleChart.cpp
                     src/View/Chart/LinePlotChart.cpp
-                    src/View/Options/OptionChainView.cpp
+                    src/View/Options/OptionChain.cpp
                     src/Controller/PrimaryController.cpp
-                    src/Controller/DebugController.cpp
                     src/Services
                     src/Services/GenericClient.cpp
                     src/Services/CoinbasePro/CoinbasePro.cpp

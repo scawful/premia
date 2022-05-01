@@ -19,11 +19,15 @@ namespace tda
     public:
         OptionChain();
 
+        std::vector<OptionsDateTimeObj> getCallOptionArray() const;
+        std::vector<OptionsDateTimeObj> getPutOptionArray() const;
         std::vector<OptionsDateTimeObj> getOptionsDateTimeObj() const;
         std::string getCallVariable( const std::string & variable );
         std::string getPutVariable( const std::string & variable );
         std::string getOptionChainDataVariable( const std::string & variable );
         std::string getUnderlyingDataVariable( const std::string & variable );
+
+
 
         void addOptionsDateTimeObj( const OptionsDateTimeObj & obj );
         void addOptionsDateTimeObj( const OptionsDateTimeObj & obj, int idx );

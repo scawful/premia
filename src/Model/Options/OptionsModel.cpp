@@ -47,8 +47,10 @@ OptionsModel::fetchOptionChain(const std::string & ticker, const std::string & c
                                bool includeQuotes, const std::string & strategy, const std::string & range,
                                const std::string & expMonth, const std::string & optionType)
 {
-    optionChainData = getTDAInterface().getOptionChain( ticker, "ALL", "50", true, "SINGLE", "ALL", "ALL", "ALL" );
+    optionChainData = getTDAInterface().getOptionChain( ticker, "ALL", strikeCount, true, "SINGLE", "ALL", "ALL", "ALL" );
     optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
+    callOptionArray = optionChainData.getCallOptionArray();
+    putOptionArray = optionChainData.getPutOptionArray();
     std::vector<tda::OptionsDateTimeObj> temp_vec = optionsDateTimeObj;
     for ( int i = 0; i < temp_vec.size(); i++) {
         datetime_array.push_back(temp_vec[i].datetime.data());

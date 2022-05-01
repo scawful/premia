@@ -2,6 +2,7 @@
 #define ViewManager_hpp
 
 #include "core.hpp"
+#include "EventInterface.hpp"
 #include "View.hpp"
 #include "PrimaryView.hpp"
 #include "Core/LoginView.hpp"
@@ -26,6 +27,9 @@ private:
     std::shared_ptr<MenuView> menuView = std::make_shared<MenuView>();
     std::shared_ptr<ConsoleView> consoleView = std::make_shared<ConsoleView>();
     std::unordered_map<std::string, VoidEventHandler> events;
+    Premia::EventInterface allEvents;
+
+    void shareEvents();
 
 public:
     ViewManager();
@@ -39,6 +43,10 @@ public:
     void displayConsole() const;
     void displayWatchlist() const;
     void addEventHandler(const std::string & key, const VoidEventHandler & event);
+
+    // template <typename T>
+    // void addEvent(const std::string & key, T event);
+
     void addLoginEvent(const TDALoginEvent &);
     void setCurrentView(std::shared_ptr<View> newView);
     void updateCurrentView() const;

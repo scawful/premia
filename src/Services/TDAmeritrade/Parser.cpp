@@ -157,7 +157,7 @@ void Parser::parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain,
                 options_dt_obj.strikePriceObj.push_back(imported_strike);
             }
         }
-        // chain.addOptionsDateTimeObj(options_dt_obj);
+        chain.addOptionsDateTimeObj(options_dt_obj);
         chain.addOptionsDateTimeObj(options_dt_obj, idx);
     }
 }

@@ -13,7 +13,7 @@ private:
 
     void drawSearch();
     void drawChain();
-    void drawGreeks();
+    void drawUnderlying();
     void drawOptionChain();
 
 public:
