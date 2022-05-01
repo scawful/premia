@@ -141,6 +141,27 @@ UserPrincipals Parser::parse_user_principals(JSONObject::ptree & data) const
     return user_principals;
 }
 
+
+void Parser::parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain, int idx) const
+{
+    for (const auto & [dateKey, dateValue]: data) {
+        OptionsDateTimeObj options_dt_obj;
+        options_dt_obj.datetime = dateKey;
+        for (const auto & [strikeKey, strikeValue]: dateValue) {
+            StrikePriceMap imported_strike;
+            imported_strike.strikePrice = strikeKey;
+            for (const auto & [contractKey, contractValue]: strikeValue) {
+                for (const auto & [detailsKey, detailsValue]: contractValue) {
+                    imported_strike.raw_option[detailsKey] = detailsValue.get_value< std::string >();
+                }
+                options_dt_obj.strikePriceObj.push_back(imported_strike);
+            }
+        }
+        // chain.addOptionsDateTimeObj(options_dt_obj);
+        chain.addOptionsDateTimeObj(options_dt_obj, idx);
+    }
+}
+
 /**
  * @brief Parse the option chain data from the API
  * @author @scawful
@@ -153,27 +174,12 @@ OptionChain Parser::parse_option_chain(const JSONObject::ptree & data) const
     OptionChain optionChain;
     for (const auto & [optionsKey, optionsValue]: data) {
         if (optionsKey == "callExpDateMap") {
-            for (const auto & [dateKey, dateValue]: optionsValue) {
-                OptionsDateTimeObj options_dt_obj;
-                options_dt_obj.datetime = dateKey;
-                for (const auto & [strikeKey, strikeValue]: dateValue) {
-                    StrikePriceMap imported_strike;
-                    imported_strike.strikePrice = strikeKey;
-                    for (const auto & [contractKey, contractValue]: strikeValue) {
-                        for (const auto & [detailsKey, detailsValue]: contractValue) {
-                            imported_strike.raw_option[detailsKey] = detailsValue.get_value< std::string >();
-                        }
-                        options_dt_obj.strikePriceObj.push_back(imported_strike);
-                    }
-                }
-                optionChain.addOptionsDateTimeObj(options_dt_obj);
-            }
+            parseStrikeMap(optionsValue, optionChain, 1);
         }
         
-        // -- if -- (optionsKey == "putExpDateMap") -- {
-        // --    for -- ( const auto & -- [dateKey, dateValue]: optionsValue ) {
-        //     }
-        // }
+        if (optionsKey == "putExpDateMap") {
+            parseStrikeMap(optionsValue, optionChain, 0);
+        }
 
         if ( optionsKey == "underlying" ) {
             for (const auto & [underlyingKey, underlyingValue]: optionsValue) {

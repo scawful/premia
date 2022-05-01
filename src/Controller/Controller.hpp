@@ -9,7 +9,7 @@
 #include "../View/Dev/DebugView.hpp"
 #include "../View/Chart/ChartView.hpp"
 #include "../View/Chart/LinePlotChart.hpp"
-#include "../View/Options/OptionChainView.hpp"
+#include "../View/Options/OptionChain.hpp"
 
 class Controller
 {

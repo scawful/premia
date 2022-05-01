@@ -9,23 +9,22 @@ class MenuView : public View
 private:
     bool initialized = false;
     bool about = false;
+    bool privateBalance = false;
     ImGuiStyle * ref;
     ConsoleLogger logger;
     std::unordered_map<std::string, VoidEventHandler> events;
-
+   
+    void StyleColorsPremia(ImGuiStyle* dst = nullptr) const;
     void drawStyleEditor();
-    void drawFileMenu();
+    void drawFileMenu() const;
     void drawEditMenu();
-    void drawViewMenu();
-    void drawTradeMenu();
-    void drawChartsMenu();
-    void drawResearchMenu();
-    void drawAnalyzeMenu();
-    void drawAccountMenu();
-    void drawDebugMenu();
+    void drawViewMenu() const;
+    void drawTradeMenu() const;
+    void drawChartsMenu() const;
+    void drawAnalyzeMenu() const;
+    void drawAccountMenu() const;
     void drawHelpMenu();
     void drawScreen();
-    void StyleColorsPremia(ImGuiStyle* dst = nullptr);
 
 public:
     void addAuth(const std::string & key , const std::string & token) override;

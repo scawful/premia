@@ -8,10 +8,10 @@ namespace tda
     struct Candle
     {
         double volume;
-        double high, low;
-        double open, close;
-        std::pair<double, double> highLow;
-        std::pair<double, double> openClose;     
+        double high;
+        double low;
+        double open;
+        double close;
         std::string datetime;
         time_t raw_datetime;
     };
@@ -19,7 +19,10 @@ namespace tda
     struct OptionsContract
     {
         std::string putCall;
-        double bid, ask, bidSize, askSize;
+        double bid;
+        double ask;
+        double bidSize;
+        double askSize;
         double open, close, high, low;
         double delta, gamma, theta, vega, rho;
     };

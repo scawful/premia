@@ -8,12 +8,12 @@ namespace tda
     class OptionChain
     {
     private:
-        boost::property_tree::ptree optionChainData;
-
         std::unordered_map<std::string, std::string> callExpDateMap;
         std::unordered_map<std::string, std::string> putExpDateMap;
         std::unordered_map<std::string, std::string> optionChainMap;
         std::unordered_map<std::string, std::string> underlyingMap;
+        std::vector<OptionsDateTimeObj> callOptionArray;
+        std::vector<OptionsDateTimeObj> putOptionArray;
         std::vector<OptionsDateTimeObj> optionsDateTimeVector;
 
     public:
@@ -26,6 +26,7 @@ namespace tda
         std::string getUnderlyingDataVariable( const std::string & variable );
 
         void addOptionsDateTimeObj( const OptionsDateTimeObj & obj );
+        void addOptionsDateTimeObj( const OptionsDateTimeObj & obj, int idx );
         void setCallVariable( const std::string & key, const std::string & value );
         void setPutVariable( const std::string & key, const std::string & value );
         void setOptionChainVariable( const std::string & key, const std::string & value );

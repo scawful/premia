@@ -7,6 +7,8 @@ class ConsoleView : public View
 {
 private:
     bool initialized = false;
+    bool guiDemo = false;
+    bool plotDemo = false;
     char                  InputBuf[256];
     ImVector<char*>       Items;
     ImVector<const char*> Commands;

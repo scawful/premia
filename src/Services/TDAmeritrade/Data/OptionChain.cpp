@@ -34,6 +34,15 @@ void OptionChain::addOptionsDateTimeObj(const OptionsDateTimeObj & obj)
     optionsDateTimeVector.push_back(obj);
 }
 
+void OptionChain::addOptionsDateTimeObj( const OptionsDateTimeObj & obj, int idx )
+{
+    if (idx) {
+        callOptionArray.push_back(obj);
+    } else {
+        putOptionArray.push_back(obj);
+    }
+}
+
 void OptionChain::setCallVariable(const std::string & key, const std::string & value)
 {
     callExpDateMap[key] = value;

@@ -42,10 +42,10 @@ PrimaryController::initWindow()
 
     const ImGuiIO & io = ImGui::GetIO();
     io.Fonts->AddFontDefault();
-    io.Fonts->AddFontFromFileTTF("assets/Cousine-Regular.ttf", 14.0f);
-    io.Fonts->AddFontFromFileTTF("assets/DroidSans.ttf", 14.0f);
-    io.Fonts->AddFontFromFileTTF("assets/Karla-Regular.ttf", 14.0f);
-    io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("/Users/scawful/code/premia/build/assets/Cousine-Regular.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("/Users/scawful/code/premia/build/assets/DroidSans.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("/Users/scawful/code/premia/build/assets/Karla-Regular.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("/Users/scawful/code/premia/build/assets/Roboto-Medium.ttf", 14.0f);
 
 
     // Build a new ImGui frame

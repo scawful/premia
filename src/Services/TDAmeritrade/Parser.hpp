@@ -24,6 +24,9 @@ namespace tda
         Quote parse_quote(const JSONObject::ptree & data) const;
         PriceHistory parse_price_history(const JSONObject::ptree & data, const std::string & ticker, int freq) const;
         UserPrincipals parse_user_principals(JSONObject::ptree & data) const;
+
+        void parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain, int idx) const;
+        
         OptionChain parse_option_chain(const JSONObject::ptree & data) const;
         Account parse_account(const JSONObject::ptree & data) const;
         std::vector<Watchlist> parse_watchlist_data(const JSONObject::ptree & data) const;

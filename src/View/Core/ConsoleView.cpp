@@ -61,6 +61,11 @@ void ConsoleView::executeCommand(const char* command_line)
         for (int i = first > 0 ? first : 0; i < History.Size; i++)
             addLog("%3d: %s\n", i, History[i]);
     }
+    else if (Stricmp(command_line, "GUIDEMO") == 0) {
+        guiDemo = true;
+    } else if (Stricmp(command_line, "PLOTDEMO") == 0) {
+        plotDemo = true;
+    }
     else if (Stricmp(command_line, "SESSION") == 0) {
         addLog("Starting WebSocket session...");
     }
@@ -313,5 +318,11 @@ void ConsoleView::addEvent(const std::string & key, const VoidEventHandler & eve
 
 void ConsoleView::update() 
 {
+    if (guiDemo)
+        ImGui::ShowDemoWindow();
+
+    if (plotDemo)
+        ImPlot::ShowDemoWindow();
+
     drawScreen();
 }

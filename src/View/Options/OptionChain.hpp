@@ -9,10 +9,11 @@ class OptionChainView: public View
 private:
     std::unordered_map<std::string, VoidEventHandler> events;
     ConsoleLogger logger;
-
     OptionsModel model;
 
     void drawSearch();
+    void drawChain();
+    void drawGreeks();
     void drawOptionChain();
 
 public:

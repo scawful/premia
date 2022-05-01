@@ -13,7 +13,7 @@ static void HelpMarker(const char* desc)
     }
 }
 
-void MenuView::StyleColorsPremia(ImGuiStyle* dst)
+void MenuView::StyleColorsPremia(ImGuiStyle* dst) const
 {
     ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
@@ -40,7 +40,7 @@ void MenuView::StyleColorsPremia(ImGuiStyle* dst)
     style->TabBorderSize = 1;
 
 
-    // rounding;
+    // rounding
     style->WindowRounding = 7;
     style->ChildRounding = 0;
     style->FrameRounding = 10;
@@ -354,7 +354,7 @@ void MenuView::drawStyleEditor()
     ImGui::PopItemWidth();
 }
 
-void MenuView::drawFileMenu()
+void MenuView::drawFileMenu() const
 {
     if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Home")) {
@@ -372,10 +372,7 @@ void MenuView::drawFileMenu()
         ImGui::Separator();
         if (ImGui::BeginMenu("Preferences"))
         {
-            if (ImGui::MenuItem("Toggle Fixed Window")) {
-                events.at("toggleFixedDimensions")();
-            }
-            //ImGui::MenuItem("Private Balances", "", premia->getHalextInterface().getPrivateBalance());
+            ImGui::MenuItem("Private Balances", "", privateBalance);
             ImGui::Separator();
 
             static int n = 0;
@@ -419,7 +416,7 @@ void MenuView::drawEditMenu()
     }
 }
 
-void MenuView::drawViewMenu()
+void MenuView::drawViewMenu() const
 {
     static bool show_imgui_metrics       = false;
     static bool show_implot_metrics      = false;
@@ -471,7 +468,7 @@ void MenuView::drawViewMenu()
     }
 }
 
-void MenuView::drawTradeMenu()
+void MenuView::drawTradeMenu() const
 {
     if (ImGui::BeginMenu("Trade"))
     {
@@ -488,43 +485,24 @@ void MenuView::drawTradeMenu()
     }
 }
 
-void MenuView::drawChartsMenu()
+void MenuView::drawChartsMenu() const
 {
-    if (ImGui::BeginMenu("Charts")) 
-    {
-        if (ImGui::MenuItem("Candle Chart")) {
-            events.at("chartView")();
-        } 
+    if (ImGui::BeginMenu("Charts")) {
         if (ImGui::MenuItem("Line Chart")) {
             events.at("linePlotView")();
         }
-        ImGui::MenuItem("Bar Chart", "N/A");   
+        if (ImGui::MenuItem("Candle Chart")) {
+            events.at("chartView")();
+        } 
         ImGui::Separator();     
         ImGui::MenuItem("Market Overview", "N/A");
         ImGui::EndMenu();
     }
 }
 
-void MenuView::drawResearchMenu()
+void MenuView::drawAnalyzeMenu() const
 {
-    if (ImGui::BeginMenu("Research"))
-    {   
-        ImGui::MenuItem("Daily Treasury Rates", "PRO");
-        ImGui::MenuItem("Federal Funds Rate", "PRO");
-        ImGui::MenuItem("Unemployment Rate", "PRO");
-        ImGui::MenuItem("US Recession Probabilities", "PRO");
-        ImGui::Separator();
-        ImGui::MenuItem("Consumer Price Index", "PRO");
-        ImGui::MenuItem("Industrial Production Index", "PRO");
-        ImGui::Separator();
-        ImGui::MenuItem("Risk Appetite Index", "N/A");
-        ImGui::EndMenu();
-    }
-}
-
-void MenuView::drawAnalyzeMenu()
-{
-    if (ImGui::BeginMenu("Analyze"))
+    if (ImGui::BeginMenu("Analyis"))
     {
         ImGui::MenuItem("Fundamentals", "N/A");
         ImGui::MenuItem("Market Movers", "N/A");
@@ -536,46 +514,32 @@ void MenuView::drawAnalyzeMenu()
         ImGui::Separator();
         ImGui::MenuItem("Retail Money Funds", "PRO");
         ImGui::MenuItem("Institutional Money Funds", "PRO");
-        if (ImGui::MenuItem("Institutional Ownership", "PRO")) {
-            //current_frame = SubFrame::INSTITUTIONAL_OWNERSHIP;
-        }
+        ImGui::MenuItem("Institutional Ownership", "PRO");
         ImGui::Separator();
         ImGui::MenuItem("Largest Trades", "PRO");
         ImGui::MenuItem("Market Volume (U.S.)", "PRO");
+        ImGui::Separator();
+        ImGui::MenuItem("Daily Treasury Rates", "PRO");
+        ImGui::MenuItem("Federal Funds Rate", "PRO");
+        ImGui::MenuItem("Unemployment Rate", "PRO");
+        ImGui::MenuItem("US Recession Probabilities", "PRO");
+        ImGui::Separator();
+        ImGui::MenuItem("Consumer Price Index", "PRO");
+        ImGui::MenuItem("Industrial Production Index", "PRO");
+        ImGui::Separator();
         ImGui::EndMenu();
     }
 }
 
-void MenuView::drawAccountMenu()
+void MenuView::drawAccountMenu() const
 {
-    if (ImGui::BeginMenu("Account")) 
-    {
+    if (ImGui::BeginMenu("Account")) {
         ImGui::MenuItem("Sync Data", "N/A");
         ImGui::Separator();
         ImGui::MenuItem("General Settings", "N/A");
         ImGui::MenuItem("Graphical Settings", "N/A");
         ImGui::Separator();
         ImGui::MenuItem("Activate Trial", "N/A");
-        ImGui::EndMenu();
-    }
-}
-
-void MenuView::drawDebugMenu()
-{
-    if (ImGui::BeginMenu("Debug"))
-    {
-        if (ImGui::MenuItem("Fetch Access Token", "TDA")) {
-            //premia->tda_interface.fetchAccessToken();
-        }
-        if (ImGui::MenuItem("WebSocket StreamState", "N/A")) {
-
-        }
-        if (ImGui::MenuItem("ImGui/ImPlot Demos", "N/A")) {
-            //premia->change(DemoState::instance());
-        }      
-        if (ImGui::MenuItem("Start WS Session", "N/A")) {
-            //premia->tda_interface.startStreamingSession();
-        }
         ImGui::EndMenu();
     }
 }
@@ -601,10 +565,8 @@ void MenuView::drawScreen()
         drawViewMenu();
         drawTradeMenu();
         drawChartsMenu();
-        drawResearchMenu();
         drawAnalyzeMenu();
         drawAccountMenu();
-        drawDebugMenu();
         drawHelpMenu();
         ImGui::EndMenuBar();
     }
