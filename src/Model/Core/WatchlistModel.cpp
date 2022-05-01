@@ -38,7 +38,7 @@ bool WatchlistModel::isActive() const
     return active;
 }
 
-void WatchlistModel::addLogger(const ConsoleLogger & newLogger)
+void WatchlistModel::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }

@@ -26,7 +26,7 @@ Client::Client()
 {
     this->base_endpoint = "https://cloud.iexapis.com/";
     this->sandbox_endpoint = "https://sandbox.iexapis.com/stable/";
-    this->token_parameter = "?token=" + IEX_KEY;
+    this->token_parameter = "?token=" + api_key;
     this->sandbox_mode = true;
 }
 
@@ -73,7 +73,7 @@ std::string Client::send_authorized_request(std::string endpoint)
     if (curl)
     {
         struct curl_slist *headers = NULL;
-        std::string auth_bearer = "Authorization: Bearer " + IEX_KEY;
+        std::string auth_bearer = "Authorization: Bearer " + api_key;
         headers = curl_slist_append(headers, auth_bearer.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 

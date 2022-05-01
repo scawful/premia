@@ -11,8 +11,8 @@ private:
     bool about = false;
     bool privateBalance = false;
     ImGuiStyle * ref;
-    ConsoleLogger logger;
-    std::unordered_map<std::string, VoidEventHandler> events;
+    Premia::ConsoleLogger logger;
+    std::unordered_map<std::string, Premia::EventHandler> events;
    
     void StyleColorsPremia(ImGuiStyle* dst = nullptr) const;
     void drawStyleEditor();
@@ -28,8 +28,8 @@ private:
 
 public:
     void addAuth(const std::string & key , const std::string & token) override;
-    void addLogger(const ConsoleLogger & logger) override;
-    void addEvent(const std::string &, const VoidEventHandler &) override;
+    void addLogger(const Premia::ConsoleLogger & logger) override;
+    void addEvent(const std::string &, const Premia::EventHandler &) override;
     void update() override;
 };
 

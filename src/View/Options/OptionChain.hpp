@@ -7,19 +7,20 @@
 class OptionChainView: public View 
 {
 private:
-    std::unordered_map<std::string, VoidEventHandler> events;
-    ConsoleLogger logger;
+    std::unordered_map<std::string, Premia::EventHandler> events;
+    Premia::ConsoleLogger logger;
     OptionsModel model;
 
     void drawSearch();
     void drawChain();
     void drawUnderlying();
-    void drawOptionChain();
 
 public:
-    void addAuth(const std::string & key , const std::string & token) override;
-    void addLogger(const ConsoleLogger & logger) override;
-    void addEvent(const std::string & key, const VoidEventHandler & event) override;
+    void addAuth(const std::string & key , const std::string & token) override {
+        // needs to be taken out of the View header as a virtual routine
+    }
+    void addLogger(const Premia::ConsoleLogger & logger) override;
+    void addEvent(const std::string & key, const Premia::EventHandler & event) override;
     void update() override;
 };
 

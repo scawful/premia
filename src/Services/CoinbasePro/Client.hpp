@@ -1,7 +1,9 @@
 #ifndef CBP_Client_hpp
 #define CBP_Client_hpp
 
-#include "core.hpp"
+#include <iostream>
+#include "Boost.hpp"
+#include "Curl.hpp"
 
 namespace cbp
 {

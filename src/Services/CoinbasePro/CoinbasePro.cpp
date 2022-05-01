@@ -3,7 +3,7 @@ namespace cbp
 {
 
     CoinbasePro::CoinbasePro() {
-        http_client = boost::make_shared<Client>( CBP_KEY, CBP_SECRET, CBP_PASSPHRASE, true );
+        http_client = boost::make_shared<Client>( api_key, secret_key, passphrase, true );
     }
 
     CoinbasePro::~CoinbasePro()=default;
@@ -15,11 +15,12 @@ namespace cbp
         boost::property_tree::ptree property_tree;
         try {
             read_json( json_response, property_tree );
-        } catch ( const boost::property_tree::ptree_error & json_parser_error ) {
-            SDL_Log( "%s", json_parser_error.what() );
+        } catch ( const boost::property_tree::ptree_error & e ) {
+            // @todo replace with ConsoleLogger
+            std::cout << e.what() << std::endl;
         }
 
-        boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>( property_tree );
+        boost::shared_ptr<Account> new_account_data = boost::make_shared<Account>();
         return new_account_data;
     }
 
@@ -32,9 +33,10 @@ namespace cbp
         try {
             read_json( json_response, property_tree );
         } catch ( const boost::property_tree::ptree_error & e ) {
-            SDL_Log( "%s", e.what() );
+            // @todo replace with ConsoleLogger
+            std::cout << e.what() << std::endl;
         }
-        boost::shared_ptr<Product> new_product_data = boost::make_shared<Product>( property_tree );
+        boost::shared_ptr<Product> new_product_data = boost::make_shared<Product>();
         return new_product_data;
     }
 
@@ -46,7 +48,8 @@ namespace cbp
         try {
             read_json( json_response, property_tree );
         } catch ( const boost::property_tree::ptree_error & e ) {
-            SDL_Log( "%s", e.what() );
+            // @todo replace with ConsoleLogger
+            std::cout << e.what() << std::endl;
         }
 
         total_deposits_usd = 0.f;

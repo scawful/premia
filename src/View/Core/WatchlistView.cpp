@@ -132,12 +132,12 @@ void WatchlistView::addAuth(const std::string & key , const std::string & token)
     model.addAuth(key, token);
 }
 
-void WatchlistView::addLogger(const ConsoleLogger & newLogger)
+void WatchlistView::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void WatchlistView::addEvent(const std::string & key, const VoidEventHandler & event)
+void WatchlistView::addEvent(const std::string & key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

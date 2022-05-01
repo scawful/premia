@@ -157,15 +157,15 @@ void PrimaryView::drawScreen()
 
 void PrimaryView::addAuth(const std::string & key , const std::string & token)
 {
-    
+    // need to remove this from View
 }
 
-void PrimaryView::addLogger(const ConsoleLogger & newLogger)
+void PrimaryView::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void PrimaryView::addEvent(const std::string & key, const VoidEventHandler & event)
+void PrimaryView::addEvent(const std::string & key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

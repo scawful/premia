@@ -1,7 +1,15 @@
 #ifndef View_hpp
 #define View_hpp
 
-#include "core.hpp"
+#include "Premia.hpp"
+#include "EventInterface.hpp"
+#include <SDL2/SDL.h>
+#include "../libs/imgui/imgui.h"
+#include "../libs/imgui/backends/imgui_impl_sdl.h"
+#include "../libs/imgui/backends/imgui_impl_sdlrenderer.h"
+#include "../libs/imgui/misc/cpp/imgui_stdlib.h"
+#include "../libs/implot/implot.h"
+#include "../libs/implot/implot_internal.h"
 
 class View 
 {
@@ -10,8 +18,8 @@ public:
     virtual ~View()=default;
 
     virtual void addAuth(const std::string &, const std::string &) = 0;
-    virtual void addEvent(const std::string &, const VoidEventHandler &) = 0;
-    virtual void addLogger(const ConsoleLogger &) = 0;
+    virtual void addEvent(const std::string &, const Premia::EventHandler &) = 0;
+    virtual void addLogger(const Premia::ConsoleLogger &) = 0;
     virtual void update() = 0;
 };
 

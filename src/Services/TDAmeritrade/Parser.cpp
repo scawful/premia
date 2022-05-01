@@ -19,7 +19,7 @@ JSONObject::ptree Parser::read_response(const std::string & response) const
     try {
         read_json(json_response, property_tree);
     } catch (JSONObject::ptree_error const & json_parser_error) {
-        SDL_Log("Parser::read_response: %s", json_parser_error.what());
+        std::cout << "Parser::read_response: " << json_parser_error.what() << std::endl;
     }
 
     return property_tree;
@@ -250,7 +250,7 @@ std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::
             watchlist.setId(dataValue.get_child("watchlistId").get_value<int>());
             watchlist.setAccountId(dataValue.get_child("accountId").get_value<std::string>());
         } catch (const JSONObject::ptree_error & e) {
-            SDL_Log("%s", e.what());
+            std::cout << e.what() << std::endl;
         }
         
         for (const auto & [itemKey, itemValue] : dataValue.get_child("watchlistItems") ) { 
@@ -262,7 +262,7 @@ std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::
                         std::string type = item2Value.get_child("assetType").get_value<std::string>();
                         watchlist.addInstrument(symbol, desc, type);
                     } catch (const JSONObject::ptree_error & e) {
-                        SDL_Log("%s", e.what());
+                        std::cout << e.what() << std::endl;
                     }
                 } else {
                     watchlist.addVariable(item2Key, itemValue.get_value<std::string>());

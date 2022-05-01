@@ -1,17 +1,17 @@
-#include "PrimaryController.hpp"
+#include "Controller.hpp"
 
 void
-PrimaryController::initWindow()
+Controller::initWindow()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING)) {
-        SDL_Log("SDL_Init: %s\n", SDL_GetError() );
+        SDL_Log("SDL_Init: %s\n", SDL_GetError());
     } else {
         window = SDL_CreateWindow(
             "Premia",                           // window title
             SDL_WINDOWPOS_UNDEFINED,            // initial x position
             SDL_WINDOWPOS_UNDEFINED,            // initial y position
-            LOGIN_WIDTH,                        // width, in pixels
-            LOGIN_HEIGHT,                       // height, in pixels
+            Premia::LOGIN_WIDTH,                        // width, in pixels
+            Premia::LOGIN_HEIGHT,                       // height, in pixels
             SDL_WINDOW_RESIZABLE                // flags
         );
     }   
@@ -47,21 +47,22 @@ PrimaryController::initWindow()
     io.Fonts->AddFontFromFileTTF("assets/Karla-Regular.ttf", 14.0f);
     io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 14.0f);
 
-
     // Build a new ImGui frame
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);  
 
+    Premia::StyleColorsPremia();
+
 }
 
 void 
-PrimaryController::initCallbacks()
+Controller::initCallbacks()
 {
     viewManager.addEventHandler("login", [this] () -> void { 
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn("test", "token"); 
         viewManager.transferEvents();
-        SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+        SDL_SetWindowSize(window, Premia::SCREEN_WIDTH, Premia::SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
         ImGuiIO & io = ImGui::GetIO();
         io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
@@ -75,7 +76,7 @@ PrimaryController::initCallbacks()
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn(key, token); 
         viewManager.transferEvents();
-        SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+        SDL_SetWindowSize(window, Premia::SCREEN_WIDTH, Premia::SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
         ImGuiIO & io = ImGui::GetIO();
         io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
@@ -96,16 +97,16 @@ PrimaryController::initCallbacks()
     viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
 }
 
-PrimaryController::PrimaryController(const ViewManager & vm) 
+Controller::Controller(const ViewManager & vm) 
     : viewManager(vm) { }
 
 bool
-PrimaryController::isActive() const {
+Controller::isActive() const {
     return active;
 }
 
 void
-PrimaryController::onEntry()
+Controller::onEntry()
 {
     initWindow();
     initCallbacks();
@@ -113,7 +114,7 @@ PrimaryController::onEntry()
 }
 
 void
-PrimaryController::onInput()
+Controller::onInput()
 {
     int wheel = 0;
     SDL_Event event;
@@ -180,13 +181,13 @@ PrimaryController::onInput()
 }
 
 void 
-PrimaryController::onLoad()
+Controller::onLoad()
 {
     this->viewManager.updateCurrentView();
 }
 
 void
-PrimaryController::doRender()
+Controller::doRender()
 {
     SDL_RenderClear(renderer);
     int w = 1920;
@@ -201,7 +202,7 @@ PrimaryController::doRender()
 }
 
 void
-PrimaryController::onExit()
+Controller::onExit()
 {
     ImGui_ImplSDLRenderer_Shutdown();
     ImGui_ImplSDL2_Shutdown();

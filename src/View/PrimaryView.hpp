@@ -7,9 +7,9 @@
 class PrimaryView: public View 
 {
 private:
-    ConsoleLogger logger;
+    Premia::ConsoleLogger logger;
     std::shared_ptr<View> menuView = std::make_shared<MenuView>();
-    std::unordered_map<std::string, VoidEventHandler> events;
+    std::unordered_map<std::string, Premia::EventHandler> events;
 
     void drawInfoPane();
     void drawAccountPane();
@@ -17,8 +17,8 @@ private:
 
 public:
     void addAuth(const std::string & key , const std::string & token) override;
-    void addLogger(const ConsoleLogger & logger) override;
-    void addEvent(const std::string & key, const VoidEventHandler & event) override;
+    void addLogger(const Premia::ConsoleLogger & logger) override;
+    void addEvent(const std::string & key, const Premia::EventHandler & event) override;
     void update() override;
 };
 

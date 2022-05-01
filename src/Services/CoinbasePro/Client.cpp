@@ -70,7 +70,7 @@ size_t Client::json_write_callback(const char * contents, size_t size, size_t nm
     try {
         s->append(contents, new_length);
     } catch(const std::bad_alloc & e) {
-        SDL_Log("%s", e.what());
+        std::cout << e.what() << std::endl;
         return 0;
     }
     return new_length;
@@ -117,15 +117,15 @@ std::string Client::get_server_time() const
 
     try {
         read_json(json_response, property_tree);
-    } catch ( const boost::property_tree::ptree_error & json_parser_error ) {
-        SDL_Log("%s", json_parser_error.what() );
+    } catch ( const boost::property_tree::ptree_error & e ) {
+        std::cout << e.what() << std::endl;
     }
 
     std::string server_time;
     try {
         server_time = property_tree.get_child("epoch.").get_value<std::string>();
-    } catch ( const boost::property_tree::ptree_error & ptree_path_error ) {
-        SDL_Log("%s", ptree_path_error.what() );
+    } catch ( const boost::property_tree::ptree_error & e ) {
+        std::cout << e.what() << std::endl;
     }
     server_time = server_time.substr(0, server_time.find('.'));
 
@@ -187,7 +187,7 @@ std::string Client::send_request(std::string_view request)
     std::string _timestamp = get_server_time();
     std::string _message = _timestamp + _method + request.data() + _body ;
 
-    SDL_Log("%s", _message.c_str() );
+    std::cout << _message << std::endl;
 
     // base64 decode the secret key 
     std::string decoded_key = DecodeBase64( secret_key.data() );

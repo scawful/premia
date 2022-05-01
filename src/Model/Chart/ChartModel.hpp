@@ -8,7 +8,7 @@ class ChartModel: public Model
 private:
     bool active = false;
     std::string tickerSymbol;
-    SocketListener socketListener;
+    Premia::SocketListener socketListener;
     tda::Quote quote;
     tda::PriceHistory priceHistory;
     std::vector<tda::Candle> candles;

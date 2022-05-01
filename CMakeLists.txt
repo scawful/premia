@@ -73,7 +73,7 @@ target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 add_executable(Premia src/Premia.cpp 
                     src/State/Manager.cpp src/State/DemoState.cpp src/State/PrimaryState.cpp
                     src/State/Frames/MenuFrame.cpp src/State/Frames/CandleChartFrame.cpp 
-                    src/State/Frames/LinePlotFrame.cpp src/State/Frames/LoginFrame.cpp
+                    src/State/Frames/LoginFrame.cpp
                     src/State/Frames/View/WatchlistFrame.cpp src/State/Frames/View/PortfolioFrame.cpp
                     src/State/Frames/Trade/OptionChainFrame.cpp src/State/Frames/Tools/ConsoleFrame.cpp
                     src/State/Frames/Trade/TradingFrame.cpp src/State/Frames/MarketOverviewFrame.cpp 
@@ -89,12 +89,11 @@ add_executable(Premia src/Premia.cpp
                     src/View/Core/MenuView.cpp
                     src/View/Core/ConsoleView.cpp
                     src/View/Core/WatchlistView.cpp
-                    src/View/Dev/DebugView.cpp
                     src/View/Chart/ChartView.cpp
                     src/View/Chart/CandleChart.cpp
                     src/View/Chart/LinePlotChart.cpp
                     src/View/Options/OptionChain.cpp
-                    src/Controller/PrimaryController.cpp
+                    src/Controller/Controller.cpp
                     src/Services
                     src/Services/GenericClient.cpp
                     src/Services/CoinbasePro/CoinbasePro.cpp
@@ -123,7 +122,7 @@ add_executable(Premia src/Premia.cpp
 include_directories(Premia "assets")
 target_include_directories(Premia INTERFACE "include")
 target_link_libraries(Premia ${SDL2_LIBRARIES} ${SDL_IMAGE_LIBRARIES} ${SDL_TTF_LIBRARIES}
-                             ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} curl OpenSSL::SSL ImGui ImPlot ws2_32)
+                             ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} curl OpenSSL::SSL ImGui ImPlot)
 
 set (source "${CMAKE_SOURCE_DIR}/assets")
 set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")

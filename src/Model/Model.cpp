@@ -5,17 +5,17 @@ void Model::addAuth(const std::string & key, const std::string & token)
     TDAInterface.addAuth(key, token);
 }
 
-void Model::addLogger(const ConsoleLogger & newLogger)
+void Model::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     this->consoleLogger = newLogger;
 }
 
-ConsoleLogger & Model::getLogger()
+Premia::ConsoleLogger & Model::getLogger()
 {
     return consoleLogger;
 }
 
-void Model::addEventHandler(const std::string & key, const VoidEventHandler & handler) 
+void Model::addEventHandler(const std::string & key, const Premia::EventHandler & handler) 
 {
     this->callbacks[key] = handler;
 }

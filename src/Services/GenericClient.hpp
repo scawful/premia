@@ -1,7 +1,9 @@
 #ifndef GenericClient_hpp
 #define GenericClient_hpp
 
-#include "core.hpp"
+#include <iostream>
+#include <string>
+#include <curl/curl.h>
 
 class GenericClient
 {

@@ -1,10 +1,10 @@
 #define SDL_MAIN_HANDLED
-#include "Controller/PrimaryController.hpp"
+#include "Controller/Controller.hpp"
 #include "State/PrimaryState.hpp"
 
 int main(int argc, char *argv[]) 
 {
-    VoidEventHandler legacyPremia = []() -> void { 
+    Premia::EventHandler legacyPremia = []() -> void { 
         Manager premia;
         premia.init(300,200);
         premia.change(PrimaryState::instance());
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     };
 
     ViewManager vm;
-    PrimaryController controller(vm);
+    Controller controller(vm);
 
     controller.onEntry();
     while (controller.isActive()) 

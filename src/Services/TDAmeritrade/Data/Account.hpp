@@ -5,8 +5,6 @@
 
 namespace tda
 {
-    // ================ Account Class Header ================ //
-
     struct PositionBalances
     {
         std::string symbol;
@@ -21,8 +19,6 @@ namespace tda
     private:
         int num_positions;
 
-        boost::property_tree::ptree accountData;
-
         std::unordered_map<std::string, std::string> account_info;
         std::unordered_map<std::string, std::string> current_balances;  
         std::vector<std::unordered_map<std::string, std::string>> positions_vector;
@@ -30,7 +26,7 @@ namespace tda
         std::vector<PositionBalances> position_balances;
         
     public:
-        Account();
+        Account()=default;
 
         void add_position(std::unordered_map<std::string, std::string> position);
         void add_balance(PositionBalances balance);

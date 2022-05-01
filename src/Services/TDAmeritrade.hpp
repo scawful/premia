@@ -1,8 +1,8 @@
 #ifndef TDAmeritrade_hpp
 #define TDAmeritrade_hpp
 
-#include "core.hpp"
-#include "apikey.hpp"
+#include <curl/curl.h>
+#include "Premia.hpp"
 #include "TDAmeritrade/Client.hpp"
 #include "TDAmeritrade/Parser.hpp"
 #include "TDAmeritrade/Session.hpp"
@@ -27,7 +27,7 @@ namespace tda
         std::string _refresh_token;
         std::string _consumer_key;
 
-        ConsoleLogger consoleLogger;
+        Premia::ConsoleLogger consoleLogger;
         Account current_account;
         Client client;
         Parser parser;
@@ -62,11 +62,10 @@ namespace tda
         void postOrder(const std::string & account_id, const Order & order) const;
 
         void startStreamingSession();
-        Candle processQuoteResponse(const char* response);
         void fetchAccessToken();
         bool is_session_active();
 
-        void addLogger(const ConsoleLogger &);
+        void addLogger(const Premia::ConsoleLogger &);
         void addAuth(const std::string, const std::string);
     };
 

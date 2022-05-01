@@ -58,7 +58,7 @@ size_t Client::json_write_callback(const char * contents, size_t size, size_t nm
     try {
         s->append(contents, new_length);
     } catch(const std::bad_alloc &e) {
-        SDL_Log("%s", e.what());
+        std::cout << e.what() << std::endl;
         return 0;
     }
     return new_length;
@@ -124,13 +124,13 @@ JSONObject::ptree Client::create_login_request()
     // remove the UTC +0000 portion, will adjust for this manually
     found = reformatted_token_timestamp.find('+');
     reformatted_token_timestamp = reformatted_token_timestamp.replace(found, 5, " ");
-    SDL_Log("Reformatted Token Timestamp: %s", reformatted_token_timestamp.c_str());
+    std::cout << "Reformatted Token Timestamp: " << reformatted_token_timestamp.c_str() << std::endl;
 
     // convert string timestamp into time_t
     std::istringstream ss(reformatted_token_timestamp);
     ss >> std::get_time(&token_timestamp, "%Y-%m-%d %H:%M:%S");
     if (ss.fail()) {
-        SDL_Log("Token timestamp parse failed!");
+        std::cout << "Token timestamp parse failed!" << std::endl;
     } else {
         // this is disgusting i'm sorry
         std::time_t token_timestamp_as_sec = std::mktime(&token_timestamp);
@@ -284,7 +284,7 @@ void Client::post_authorized_request(const std::string & endpoint, const std::st
 
     // specify post data, have to url encode the refresh token
     std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + api_key;
 
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
@@ -342,7 +342,7 @@ std::string Client::post_account_order(std::string const &account_id) const
     // specify post data, have to url encode the refresh token
     // @todo set up order request 
     std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + api_key;
 
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
@@ -399,7 +399,7 @@ std::string Client::post_access_token() const
 
     // specify post data, have to url encode the refresh token
     std::string easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+    std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + api_key;
 
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
@@ -523,7 +523,7 @@ std::string Client::get_watchlist_by_account(const std::string  & account_id) co
  */
 std::string Client::get_price_history(const std::string & symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
 {
-    std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + TDA_API_KEY + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+    std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + api_key + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
 
     string_replace(url, "{ticker}", symbol);
     string_replace(url, "{periodType}", get_api_interval_value(ptype));
@@ -559,7 +559,7 @@ std::string Client::get_option_chain(std::string const &ticker, std::string cons
                                      std::string const & expMonth, std::string const &  optionType) const
 {
     OptionChain option_chain;
-    std::string url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + TDA_API_KEY + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+    std::string url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + api_key + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
 
     string_replace(url, "{ticker}", ticker);
     string_replace(url, "{contractType}", contractType);
@@ -587,7 +587,7 @@ std::string Client::get_option_chain(std::string const &ticker, std::string cons
  */
 std::string Client::get_quote(std::string const & symbol) const
 {
-    std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + TDA_API_KEY;
+    std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + api_key;
     string_replace(url, "{ticker}", symbol);
     return send_request(url);
 }
@@ -660,7 +660,7 @@ void Client::start_session()
     try {
         host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
     } catch (JSONObject::ptree_error const & ptree_bad_path) {
-        SDL_Log("Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what());
+        std::cout << "Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: " << ptree_bad_path.what() << std::endl;
     }
 
     JSONObject::ptree login_request = create_login_request();
@@ -694,8 +694,6 @@ void Client::start_session()
 
     websocket_session = std::make_shared<tda::Session>(ioc, context, request_queue);
     websocket_session->run(host.c_str(), port.c_str());
-
-    SDL_Log("~~~");
     session_active = true;
 
     boost::asio::thread_pool sessionPool(5);
@@ -722,7 +720,7 @@ void Client::start_session(std::string const & ticker, std::string const & field
     try {
         host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
     } catch (JSONObject::ptree_error const & ptree_bad_path) {
-        SDL_Log("Start_Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: %s", ptree_bad_path.what());
+        std::cout << "Start_Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: " << ptree_bad_path.what() << std::endl;
     }
 
     pt::ptree login_request = create_login_request();

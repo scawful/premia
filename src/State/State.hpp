@@ -1,7 +1,6 @@
 #ifndef State_hpp
 #define State_hpp
 
-#include "core.hpp"
 #include "Manager.hpp"
 
 class State

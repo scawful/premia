@@ -52,19 +52,19 @@ void LoginView::addAuth(const std::string & key , const std::string & token)
     
 }
 
-void LoginView::addLogger(const ConsoleLogger & newLogger)
+void LoginView::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void LoginView::addEvent(const std::string & key, const VoidEventHandler & event)
+void LoginView::addEvent(const std::string & key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }
 
-void LoginView::addLoginEvent(const TDALoginEvent & event) 
+void LoginView::addLoginEvent(const Premia::TDALoginEvent & event) 
 {
-    this->loginEvent = TDALoginEvent(event);
+    this->loginEvent = Premia::TDALoginEvent(event);
 }
 
 void LoginView::update() 

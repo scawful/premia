@@ -59,12 +59,12 @@ void LinePlotChart::addAuth(const std::string & key , const std::string & token)
     // model.addAuth(key, token);
 }
 
-void LinePlotChart::addLogger(const ConsoleLogger & newLogger)
+void LinePlotChart::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     // this->logger = newLogger;
 }
 
-void LinePlotChart::addEvent(const std::string & key, const VoidEventHandler & event)
+void LinePlotChart::addEvent(const std::string & key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }
@@ -90,7 +90,7 @@ void LinePlotChart::update()
         }
     }
 
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO & io = ImGui::GetIO();
     if (ImPlot::BeginPlot("Equity Curve", ImGui::GetContentRegionAvail())) {
         ImPlot::SetupAxes("Date","Price");
         ImPlot::SetupAxesLimits(1, num + 1, low, high);

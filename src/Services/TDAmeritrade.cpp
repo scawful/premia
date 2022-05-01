@@ -38,7 +38,7 @@ namespace tda
 
             // specify post data, have to url encode the refresh token
             std::string easy_escape = curl_easy_escape(curl, _refresh_token.c_str(), _refresh_token.length());
-            std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + TDA_API_KEY;
+            std::string data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + _consumer_key;
 
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
             curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
@@ -104,7 +104,7 @@ namespace tda
         try {
             read_json(json_file, property_tree);
         } catch (const std::exception & json_parser_error) {
-            SDL_Log("%s", json_parser_error.what());
+            std::cout << json_parser_error.what() << std::endl;
         }
 
         json_file.close();
@@ -131,7 +131,7 @@ namespace tda
         try {
             read_json(jsonFile, propertyTree);
         } catch (const JSONObject::ptree_error & json_parser_error) {
-            SDL_Log("%s", json_parser_error.what());
+            std::cout << json_parser_error.what() << std::endl;
         }
 
         jsonFile.close();
@@ -300,13 +300,6 @@ namespace tda
         client.start_session();
     }
 
-    Candle TDAmeritrade::processQuoteResponse(const char* response)
-    {
-        Candle newCandle;
-        consoleLogger(response);
-        return newCandle;
-    }
-
     void TDAmeritrade::fetchAccessToken()
     {
         client.fetch_access_token();
@@ -317,7 +310,7 @@ namespace tda
         return session_active;
     }
 
-    void TDAmeritrade::addLogger(const ConsoleLogger & logger)
+    void TDAmeritrade::addLogger(const Premia::ConsoleLogger & logger)
     {
         this->consoleLogger = logger;
     }

@@ -1,7 +1,7 @@
 #ifndef IEX_Parser_hpp
 #define IEX_Parser_hpp
 
-#include "core.hpp"
+#include "Boost.hpp"
 #include "Data/FundOwnership.hpp"
 #include "Data/InsiderTransactions.hpp"
 

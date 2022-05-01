@@ -1,7 +1,7 @@
 #ifndef INSTITUTIONALOWNERSHIP_HPP
 #define INSTITUTIONALOWNERSHIP_HPP
 
-#include "core.hpp"
+#include "Premia.hpp"
 
 namespace iex
 {

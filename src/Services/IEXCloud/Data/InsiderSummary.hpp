@@ -1,7 +1,7 @@
 #ifndef INSIDERSUMMARY_HPP
 #define INSIDERSUMMARY_HPP
 
-#include "core.hpp"
+#include "Premia.hpp"
 
 namespace iex
 {

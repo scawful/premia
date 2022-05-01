@@ -1,22 +1,16 @@
 #ifndef Model_hpp
 #define Model_hpp
 
+#include "Premia.hpp"
 #include "../Services/TDAmeritrade.hpp"
-#include "../Services/GenericClient.hpp"
-#include "../Services/IEXCloud.hpp"
-#include "../Services/Halext/Halext.hpp"
-#include "../Services/CoinbasePro/CoinbasePro.hpp"
 
 class Model 
 {
 private:
-    std::unordered_map<std::string, VoidEventHandler> callbacks;
-    ConsoleLogger consoleLogger;
+    std::unordered_map<std::string, Premia::EventHandler> callbacks;
+    Premia::ConsoleLogger consoleLogger;
 
     tda::TDAmeritrade TDAInterface;
-    cbp::CoinbasePro CoinbaseProInterface;
-    iex::IEXCloud IEXCloudInterface;
-    halext::Halext HalextInterface;
     
 public:
     Model()=default;
@@ -24,10 +18,10 @@ public:
     
 
     void addAuth(const std::string &, const std::string &);
-    void addLogger(const ConsoleLogger & logger);
-    void addEventHandler(const std::string & key, const VoidEventHandler & handler);
+    void addLogger(const Premia::ConsoleLogger & logger);
+    void addEventHandler(const std::string & key, const Premia::EventHandler & handler);
 
-    ConsoleLogger & getLogger();
+    Premia::ConsoleLogger & getLogger();
 
     tda::TDAmeritrade & getTDAInterface();
 };

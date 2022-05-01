@@ -6,7 +6,7 @@ size_t GenericClient::json_write_callback(const char * contents, size_t size, si
     try {
         s->append(contents, new_length);
     } catch(const std::bad_alloc & e) {
-        SDL_Log("%s", e.what());
+        std::cout << e.what() << std::endl;
         return 0;
     }
     return new_length;

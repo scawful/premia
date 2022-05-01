@@ -3,7 +3,15 @@
 #ifndef Manager_hpp
 #define Manager_hpp
 
-#include "core.hpp"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include "../libs/imgui/imgui.h"
+#include "../libs/imgui/backends/imgui_impl_sdl.h"
+#include "../libs/imgui/backends/imgui_impl_sdlrenderer.h"
+#include "../libs/imgui/misc/cpp/imgui_stdlib.h"
+#include "../libs/implot/implot.h"
+#include "../libs/implot/implot_internal.h"
 #include "../Services/GenericClient.hpp"
 #include "../Services/TDAmeritrade.hpp"
 #include "../Services/IEXCloud.hpp"
@@ -27,7 +35,7 @@ private:
     SDL_Surface * screen;
 
 public:
-    void init(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT);
+    void init(int width = Premia::SCREEN_WIDTH, int height = Premia::SCREEN_HEIGHT);
     void cleanup();
     
     void change(State * state);

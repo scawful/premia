@@ -115,7 +115,7 @@ ViewManager::displayWatchlist() const
 }
 
 void 
-ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & event)
+ViewManager::addEventHandler(const std::string & key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
     this->menuView->addEvent(key, event);
@@ -133,7 +133,7 @@ ViewManager::addEventHandler(const std::string & key, const VoidEventHandler & e
 //     this->allEvents.insert<T>(key, event);
 // }
 
-void ViewManager::addLoginEvent(const TDALoginEvent & event)
+void ViewManager::addLoginEvent(const Premia::TDALoginEvent & event)
 {
     this->loginView->addLoginEvent(event);
 }

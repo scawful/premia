@@ -21,14 +21,14 @@ void Parser::log_response(std::string title, pt::ptree data)
         write_json(file, data);
     }
     catch (std::exception &json_parser_error) {
-        SDL_Log("iex::Parser - %s", json_parser_error.what());
+        std::cout << "iex::Parser - " << json_parser_error.what() << std::endl;
     }
 
 }
 
 pt::ptree Parser::read_response(std::string response) 
 {
-    SDL_Log("%s", response.c_str());
+    std::cout << response << std::endl;
     std::istringstream json_response(response);
     pt::ptree property_tree;
 
@@ -36,7 +36,7 @@ pt::ptree Parser::read_response(std::string response)
         read_json(json_response, property_tree);
     }
     catch (std::exception &json_parser_error) {
-        SDL_Log("%s", json_parser_error.what());
+        std::cout << json_parser_error.what() << std::endl;
     }
 
     return property_tree; 

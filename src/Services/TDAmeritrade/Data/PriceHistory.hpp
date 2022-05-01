@@ -27,8 +27,8 @@ namespace tda
         std::string tickerSymbol;
         std::vector<std::vector<tda::Candle>> candles;
 
-        std::map<std::string, std::string> priceHistoryVariables;
-        std::map<std::string, std::string> candleData;
+        std::unordered_map<std::string, std::string> priceHistoryVariables;
+        std::unordered_map<std::string, std::string> candleData;
         std::vector< tda::Candle > candleVector;
             
     public:

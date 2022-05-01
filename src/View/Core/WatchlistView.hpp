@@ -8,8 +8,8 @@ class WatchlistView: public View
 {
 private:
     WatchlistModel model;
-    ConsoleLogger logger;
-    std::unordered_map<std::string, VoidEventHandler> events;
+    Premia::ConsoleLogger logger;
+    std::unordered_map<std::string, Premia::EventHandler> events;
 
     void initWatchlist();
     void drawWatchlistTable();
@@ -17,8 +17,8 @@ private:
 
 public:
     void addAuth(const std::string & key , const std::string & token) override;
-    void addLogger(const ConsoleLogger & logger) override;
-    void addEvent(const std::string &, const VoidEventHandler &) override;
+    void addLogger(const Premia::ConsoleLogger & logger) override;
+    void addEvent(const std::string &, const Premia::EventHandler &) override;
     void update() override;
 
 };

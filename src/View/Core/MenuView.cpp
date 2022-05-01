@@ -593,12 +593,12 @@ void MenuView::addAuth(const std::string & key , const std::string & token)
     
 }
 
-void MenuView::addLogger(const ConsoleLogger & newLogger)
+void MenuView::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void MenuView::addEvent(const std::string & key, const VoidEventHandler & event)
+void MenuView::addEvent(const std::string & key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

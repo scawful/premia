@@ -2,6 +2,7 @@
 #define Order_hpp
 
 #include "PricingStructures.hpp"
+#include "Boost.hpp"
 
 namespace tda
 {

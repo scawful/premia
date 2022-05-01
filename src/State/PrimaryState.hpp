@@ -5,7 +5,6 @@
 #include "State.hpp"
 #include "Frames/MenuFrame.hpp"
 #include "Frames/LoginFrame.hpp"
-#include "Frames/LinePlotFrame.hpp"
 #include "Frames/View/WatchlistFrame.hpp"
 #include "Frames/View/PortfolioFrame.hpp"
 #include "Frames/CandleChartFrame.hpp"
@@ -33,7 +32,6 @@ private:
     MenuFrame mainMenu;
     ConsoleFrame console;
     LoginFrame loginFrame;
-    LinePlotFrame linePlot;
     PortfolioFrame portfolioFrame;
     WatchlistFrame watchlistFrame;
     CandleChartFrame candleChart;

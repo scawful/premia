@@ -26,7 +26,7 @@ void PrimaryState::init(Manager * manager)
     fundOwnership.import_manager(premia);
     marketOverview.import_manager(premia);
     
-    SDL_SetWindowSize(premia->getWindow(), SCREEN_WIDTH, SCREEN_HEIGHT);
+    SDL_SetWindowSize(premia->getWindow(), 782, 543);
     SDL_SetWindowPosition(premia->getWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
     ImGuiIO& io = ImGui::GetIO();
@@ -188,9 +188,6 @@ void PrimaryState::update()
             break;
         case MenuFrame::SubFrame::LOGIN:
             loginFrame.update();
-            break;
-        case MenuFrame::SubFrame::LINE_PLOT:
-            linePlot.update();
             break;
         case MenuFrame::SubFrame::CANDLE_CHART:
             candleChart.update();

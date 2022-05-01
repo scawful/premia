@@ -1,7 +1,7 @@
 #ifndef LARGESTTRADES_HPP
 #define LARGESTTRADES_HPP
 
-#include "core.hpp"
+#include "Premia.hpp"
 
 namespace iex
 {

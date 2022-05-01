@@ -1,7 +1,8 @@
 #ifndef Chart_hpp
 #define Chart_hpp
 
-#include "core.hpp"
+#include "Premia.hpp"
+#include "ImPlot.hpp"
 
 class Chart 
 {

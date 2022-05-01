@@ -43,11 +43,11 @@ OptionsModel::getDateTime(int index)
 }
 
 void 
-OptionsModel::fetchOptionChain(const std::string & ticker, const std::string & contractType, const std::string & strikeCount,
-                               bool includeQuotes, const std::string & strategy, const std::string & range,
+OptionsModel::fetchOptionChain(const std::string & ticker, const std::string & strikeCount,
+                               const std::string & strategy, const std::string & range,
                                const std::string & expMonth, const std::string & optionType)
 {
-    optionChainData = getTDAInterface().getOptionChain( ticker, "ALL", strikeCount, true, "SINGLE", "ALL", "ALL", "ALL" );
+    optionChainData = getTDAInterface().getOptionChain( ticker, "ALL", strikeCount, true, strategy, "ALL", "ALL", "ALL" );
     optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
     callOptionArray = optionChainData.getCallOptionArray();
     putOptionArray = optionChainData.getPutOptionArray();

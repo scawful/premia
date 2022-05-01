@@ -7,15 +7,15 @@
 class ChartView : public View
 {
 private:
-    std::unordered_map<std::string, VoidEventHandler> events;
+    std::unordered_map<std::string, Premia::EventHandler> events;
     std::unordered_map<std::string, std::unique_ptr<Chart>> charts;
-    ConsoleLogger logger;
+    Premia::ConsoleLogger logger;
     CandleChart candleChart;
 
 public:
     void addAuth(const std::string & key , const std::string & token) override;
-    void addLogger(const ConsoleLogger & logger) override;
-    void addEvent(const std::string & key, const VoidEventHandler & event) override;
+    void addLogger(const Premia::ConsoleLogger & logger) override;
+    void addEvent(const std::string & key, const Premia::EventHandler & event) override;
     void update() override;
 };
 

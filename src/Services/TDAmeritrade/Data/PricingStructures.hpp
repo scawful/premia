@@ -1,7 +1,9 @@
 #ifndef PricingStructures_hpp
 #define PricingStructures_hpp
 
-#include "core.hpp"
+#include <string>
+#include <vector>
+#include <unordered_map>
 
 namespace tda 
 {

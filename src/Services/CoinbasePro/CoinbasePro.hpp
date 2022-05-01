@@ -1,8 +1,7 @@
 #ifndef CoinbasePro_hpp
 #define CoinbasePro_hpp
 
-#include "core.hpp"
-#include "apikey.hpp"
+#include "Premia.hpp"
 #include "Account.hpp"
 #include "Client.hpp"
 #include "Product.hpp"
@@ -13,6 +12,9 @@ namespace cbp
     {
     private:
         float total_deposits_usd;
+        std::string api_key;
+        std::string secret_key;
+        std::string passphrase;
         boost::shared_ptr<Client> http_client;
 
     public:

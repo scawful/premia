@@ -1,7 +1,7 @@
 #ifndef MARKETVOLUME_HPP
 #define MARKETVOLUME_HPP
 
-#include "core.hpp"
+#include "Premia.hpp"
 
 namespace iex
 {

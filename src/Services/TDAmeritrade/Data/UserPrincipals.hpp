@@ -1,7 +1,10 @@
 #ifndef UserPrincipals_hpp
 #define UserPrincipals_hpp
 
-#include "core.hpp"
+#include "Premia.hpp"
+#include <vector>
+#include <unordered_map>
+#include <string>
 
 namespace tda
 {

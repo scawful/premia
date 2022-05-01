@@ -1,7 +1,8 @@
 #ifndef Quote_hpp
 #define Quote_hpp
 
-#include "core.hpp"
+#include "Premia.hpp"
+#include "Boost.hpp"
 
 namespace tda 
 {

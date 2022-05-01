@@ -3,11 +3,6 @@
 
 using namespace tda;
 
-tda::Account::Account()
-{
-    
-}
-
 size_t tda::Account::get_position_vector_size()
 {
     return positions_vector.size();

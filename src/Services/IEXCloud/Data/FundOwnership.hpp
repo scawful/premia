@@ -1,7 +1,7 @@
 #ifndef IEX_FundOwnership_hpp
 #define IEX_FundOwnership_hpp
 
-#include "core.hpp"
+#include <string>
 
 namespace iex
 {

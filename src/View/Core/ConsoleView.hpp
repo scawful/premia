@@ -22,8 +22,8 @@ private:
 
     void clearLog();
     void executeCommand(const char* command_line);
-    ConsoleLogger logger;
-    std::unordered_map<std::string, VoidEventHandler> events;
+    Premia::ConsoleLogger logger;
+    std::unordered_map<std::string, Premia::EventHandler> events;
 
     void drawScreen();
 
@@ -36,8 +36,8 @@ public:
     void addLog(const char* fmt, ...);
     void addLogStd(const std::string & data);
     void addAuth(const std::string & key , const std::string & token) override;
-    void addLogger(const ConsoleLogger & logger) override;
-    void addEvent(const std::string & key, const VoidEventHandler & event) override;
+    void addLogger(const Premia::ConsoleLogger & logger) override;
+    void addEvent(const std::string & key, const Premia::EventHandler & event) override;
     void update() override;
 };
 

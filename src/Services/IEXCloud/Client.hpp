@@ -1,8 +1,8 @@
 #ifndef IEXClient_hpp
 #define IEXClient_hpp
 
-#include "core.hpp"
-#include "apikey.hpp"
+#include "Boost.hpp"
+#include "Curl.hpp"
 
 namespace iex 
 {
@@ -10,6 +10,7 @@ namespace iex
     {
     private:
         bool sandbox_mode;
+        std::string api_key;
         std::string base_endpoint;
         std::string sandbox_endpoint;
         std::string token_parameter;

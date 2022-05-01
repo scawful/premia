@@ -1,7 +1,6 @@
 #ifndef Frame_hpp
 #define Frame_hpp
 
-#include "core.hpp"
 #include "../Manager.hpp"
 
 class Frame

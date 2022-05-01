@@ -306,12 +306,12 @@ void ConsoleView::addAuth(const std::string & key, const std::string & token)
     
 }
 
-void ConsoleView::addLogger(const ConsoleLogger & newLogger)
+void ConsoleView::addLogger(const Premia::ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void ConsoleView::addEvent(const std::string & key, const VoidEventHandler & event) 
+void ConsoleView::addEvent(const std::string & key, const Premia::EventHandler & event) 
 {
     this->events[key] = event;
 }
