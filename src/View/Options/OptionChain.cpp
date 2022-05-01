@@ -8,14 +8,33 @@ void OptionChainView::drawSearch()
     static std::string ticker;
     static std::string count;
     static std::string strike;
-    ImGui::InputText("Symbol", &ticker, ImGuiInputTextFlags_CharsUppercase);
-    ImGui::InputText("Strike Count", &count);
-    ImGui::InputText("Strike Price", &strike);
-    if (ImGui::Button("Fetch") && !count.empty()) {
-        model.fetchOptionChain( ticker, "ALL", count, true, "SINGLE", "ALL", "ALL", "ALL" );
-        model.calculateGammaExposure();
+    static int current_strategy = 0;
+
+    if (ImGui::BeginTable("SearchTable", 4, ImGuiTableFlags_SizingStretchProp, ImVec2(ImGui::GetContentRegionAvail().x, 0.f))) {
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Strikes", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Strategy", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("---", ImGuiTableColumnFlags_None);
+
+        ImGui::TableNextColumn(); 
+        ImGui::SetNextItemWidth(50.f);
+        ImGui::InputText("##symbol", &ticker, ImGuiInputTextFlags_CharsUppercase);
+        ImGui::TableNextColumn(); 
+        ImGui::SetNextItemWidth(50.f);
+        ImGui::InputText("##strikeCount", &count, ImGuiInputTextFlags_CharsDecimal);
+        ImGui::TableNextColumn(); 
+        ImGui::SetNextItemWidth(75.f);
+        ImGui::Combo("##strategy", &current_strategy, "SINGLE\0ANALYTICAL\0COVERED\0VERTICAL\0CALENDAR\0STRANGLE\0STRADDLE\0BUTTERFLY\0CONDOR\0DIAGONAL\0COLLAR\0ROLL\0");
+        ImGui::TableNextColumn();
+        if (ImGui::Button("Fetch", ImVec2(ImGui::GetContentRegionAvail().x, 0.f)) && !count.empty()) {
+            model.fetchOptionChain( ticker, "ALL", count, true, "SINGLE", "ALL", "ALL", "ALL" );
+            model.calculateGammaExposure();
+        }
+        ImGui::EndTable();
     }
 
+    ImGui::Separator();
 }
 
 void OptionChainView::drawChain()
