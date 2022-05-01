@@ -2,7 +2,7 @@
 #define Client_hpp
 
 #include "Parser.hpp"
-#include "Session.hpp"
+#include "Socket.hpp"
 #include "Data/UserPrincipals.hpp"
 #include "Data/Order.hpp"
 
@@ -82,7 +82,7 @@ namespace tda
 
         // WebSocket session variables 
         boost::asio::io_context ioc;
-        std::shared_ptr<tda::Session> websocket_session;
+        std::shared_ptr<tda::Socket> websocket_session;
         std::shared_ptr<std::vector<std::string>> websocket_buffer;
         std::vector<std::shared_ptr<std::string const>> request_queue;
         std::vector<std::thread> ws_threads;
@@ -92,7 +92,7 @@ namespace tda
         std::string get_api_frequency_type(int value) const;
         std::string get_api_period_amount(int value) const;
         std::string get_api_frequency_amount(int value) const;
-        bool string_replace(std::string & str, const std::string & from, const std::string & to) const;
+        bool string_replace(std::string & str, String from, String to) const;
 
         // Data Retrieval
         static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s);
@@ -104,7 +104,7 @@ namespace tda
 
         // API Functions 
         void get_user_principals();
-        void post_authorized_request(const std::string & endpoint, const std::string & data) const;
+        void post_authorized_request(String endpoint, String data) const;
         std::string post_account_order(std::string const & account_id) const;
         std::string post_access_token() const;
 
@@ -128,7 +128,7 @@ namespace tda
         std::string get_account(std::string const & account_id);
         std::vector<std::string> get_all_account_ids();
 
-        void post_order(const std::string & account_id, const Order & order) const;
+        void post_order(String account_id, const Order & order) const;
 
         void start_session();
         void start_session(std::string const & ticker, std::string const & fields);
@@ -140,7 +140,7 @@ namespace tda
         std::string get_access_token() const;
         void fetch_access_token();
 
-        void addAuth(const std::string &, const std::string &);
+        void addAuth(const std::string, const std::string);
     };
 }
 

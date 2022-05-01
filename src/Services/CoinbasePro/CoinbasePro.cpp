@@ -24,7 +24,7 @@ namespace cbp
         return new_account_data;
     }
 
-    boost::shared_ptr<Product> CoinbasePro::get_product_ticker( const std::string & symbol )
+    boost::shared_ptr<Product> CoinbasePro::get_product_ticker( String symbol )
     {
         std::string request = "/products/" + symbol + "-USD/ticker";
         std::string response = http_client->send_request(request);

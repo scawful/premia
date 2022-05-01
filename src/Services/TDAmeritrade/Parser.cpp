@@ -11,7 +11,7 @@ Parser::Parser()=default;
  * @param response 
  * @return JSONObject::ptree 
  */
-JSONObject::ptree Parser::read_response(const std::string & response) const
+JSONObject::ptree Parser::read_response(String response) const
 {
     std::istringstream json_response(response);
     JSONObject::ptree property_tree;
@@ -32,7 +32,7 @@ JSONObject::ptree Parser::read_response(const std::string & response) const
  * @param response 
  * @return std::string 
  */
-std::string Parser::parse_access_token(const std::string & response) const
+std::string Parser::parse_access_token(String response) const
 {
     std::string access_token;
     JSONObject::ptree data = read_response(response);
@@ -73,7 +73,7 @@ Quote Parser::parse_quote(const JSONObject::ptree & data) const
  * @param freq 
  * @return PriceHistory 
  */
-PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, const std::string & ticker, int freq) const 
+PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, String ticker, int freq) const 
 {
     PriceHistory price_history;
     price_history.setTickerSymbol(ticker);

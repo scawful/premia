@@ -68,7 +68,7 @@ namespace iex
         void setPostShares(double postShares_) { postShares = postShares_; }
 
         std::string getFullName() const { return fullName; }
-        void setFullName(const std::string &fullName_) { fullName = fullName_; }
+        void setFullName(String fullName_) { fullName = fullName_; }
 
         double getConversionOrExercisePrice() const { return conversionOrExercisePrice; }
         void setConversionOrExercisePrice(double conversionOrExercisePrice_) { conversionOrExercisePrice = conversionOrExercisePrice_; }

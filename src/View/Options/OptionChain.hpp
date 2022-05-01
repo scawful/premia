@@ -16,11 +16,11 @@ private:
     void drawUnderlying();
 
 public:
-    void addAuth(const std::string & key , const std::string & token) override {
+    void addAuth(String key , String token) override {
         // needs to be taken out of the View header as a virtual routine
     }
     void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(const std::string & key, const Premia::EventHandler & event) override;
+    void addEvent(String key, const Premia::EventHandler & event) override;
     void update() override;
 };
 

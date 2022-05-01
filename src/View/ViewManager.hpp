@@ -32,17 +32,17 @@ public:
     ViewManager();
 
     void transferEvents() const;
-    void setLoggedIn(const std::string &, const std::string &);
+    void setLoggedIn(String, String);
     void setConsoleView();
     void setWatchlistView();
     void startGuiFrame() const;
     void endGuiFrame() const;
     void displayConsole() const;
     void displayWatchlist() const;
-    void addEventHandler(const std::string & key, const Premia::EventHandler & event);
+    void addEventHandler(String key, const Premia::EventHandler & event);
 
     // template <typename T>
-    // void addEvent(const std::string & key, T event);
+    // void addEvent(String key, T event);
 
     void addLoginEvent(const Premia::TDALoginEvent &);
     void setCurrentView(std::shared_ptr<View> newView);

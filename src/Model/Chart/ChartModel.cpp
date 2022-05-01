@@ -77,7 +77,7 @@ std::string ChartModel::getQuoteDetails()
     return quoteDetails;
 }
 
-void ChartModel::fetchPriceHistory(const std::string & ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext)
+void ChartModel::fetchPriceHistory(String ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext)
 {
     if (active) {
         quote.clear();

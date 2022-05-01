@@ -32,22 +32,22 @@ void tda::Watchlist::setId(int id)
     this->watchlist_id = id;
 }
 
-void tda::Watchlist::setName(const std::string & newName)
+void tda::Watchlist::setName(String newName)
 {
     this->name = newName;
 }
 
-void tda::Watchlist::setAccountId(const std::string & accountId)
+void tda::Watchlist::setAccountId(String accountId)
 {
     this->account_id = accountId;
 }
 
-void tda::Watchlist::addInstrument(const std::string & symbol, const std::string & desc, const std::string & type)
+void tda::Watchlist::addInstrument(String symbol, String desc, String type)
 {
     instruments.emplace_back(symbol, desc, type);
 }
 
-void tda::Watchlist::addVariable(const std::string & key, const std::string & value)
+void tda::Watchlist::addVariable(String key, String value)
 {
     variables[key] = value;
 }

@@ -54,7 +54,7 @@ LinePlotChart::~LinePlotChart()
     delete [] y;
 }
 
-void LinePlotChart::addAuth(const std::string & key , const std::string & token)
+void LinePlotChart::addAuth(String key , String token)
 {
     // model.addAuth(key, token);
 }
@@ -64,7 +64,7 @@ void LinePlotChart::addLogger(const Premia::ConsoleLogger & newLogger)
     // this->logger = newLogger;
 }
 
-void LinePlotChart::addEvent(const std::string & key, const Premia::EventHandler & event)
+void LinePlotChart::addEvent(String key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

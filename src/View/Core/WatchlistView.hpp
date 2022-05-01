@@ -16,9 +16,9 @@ private:
     void drawCustomWatchlistTable();
 
 public:
-    void addAuth(const std::string & key , const std::string & token) override;
+    void addAuth(String key , String token) override;
     void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(const std::string &, const Premia::EventHandler &) override;
+    void addEvent(String, const Premia::EventHandler &) override;
     void update() override;
 
 };

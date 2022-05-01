@@ -7,11 +7,13 @@
 #include <functional>
 #include "ImGui.hpp"
 
+using String = const std::string &;
+
 namespace Premia {
     using EventHandler = std::function<void()>;
-    using ConsoleLogger = std::function<void(const std::string &)>;
+    using ConsoleLogger = std::function<void(String)>;
     using SocketListener = std::function<void(const char*)>;
-    using TDALoginEvent = std::function<void(const std::string &, std::string &)>;
+    using TDALoginEvent = std::function<void(String, std::string &)>;
 
     constexpr int LOGIN_WIDTH = 300;
     constexpr int LOGIN_HEIGHT = 200;
@@ -43,7 +45,6 @@ namespace Premia {
         style->FrameBorderSize = 1;
         style->TabBorderSize = 1;
 
-
         // rounding
         style->WindowRounding = 7;
         style->ChildRounding = 0;
@@ -60,7 +61,6 @@ namespace Premia {
         style->ButtonTextAlign.x = 0.50f;
         style->ButtonTextAlign.y = 0.50f;
         // style->SelectableTextAlign.
-
 
         colors[ImGuiCol_Text]                   = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         colors[ImGuiCol_TextDisabled]           = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);

@@ -15,8 +15,8 @@ namespace tda
     public:
         Quote();
 
-        void setQuoteVariable(const std::string & key, const std::string & value);
-        std::string getQuoteVariable(const std::string & variable);
+        void setQuoteVariable(String key, String value);
+        std::string getQuoteVariable(String variable);
 
         void clear();
     };

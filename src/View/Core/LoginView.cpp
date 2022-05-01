@@ -47,7 +47,7 @@ void LoginView::drawScreen() const
     }
 }
 
-void LoginView::addAuth(const std::string & key , const std::string & token)
+void LoginView::addAuth(String key , String token)
 {
     
 }
@@ -57,7 +57,7 @@ void LoginView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void LoginView::addEvent(const std::string & key, const Premia::EventHandler & event)
+void LoginView::addEvent(String key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

@@ -17,9 +17,9 @@ public:
     ~Model()=default;
     
 
-    void addAuth(const std::string &, const std::string &);
+    void addAuth(String, String);
     void addLogger(const Premia::ConsoleLogger & logger);
-    void addEventHandler(const std::string & key, const Premia::EventHandler & handler);
+    void addEventHandler(String key, const Premia::EventHandler & handler);
 
     Premia::ConsoleLogger & getLogger();
 

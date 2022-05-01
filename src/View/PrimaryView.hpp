@@ -16,9 +16,9 @@ private:
     void drawScreen();
 
 public:
-    void addAuth(const std::string & key , const std::string & token) override;
+    void addAuth(String key , String token) override;
     void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(const std::string & key, const Premia::EventHandler & event) override;
+    void addEvent(String key, const Premia::EventHandler & event) override;
     void update() override;
 };
 

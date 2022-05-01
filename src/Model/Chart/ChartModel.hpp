@@ -28,7 +28,7 @@ public:
     tda::Candle getCandle(int i);
     std::string getTickerSymbol() const;
     std::string getQuoteDetails();
-    void fetchPriceHistory(const std::string & ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext);
+    void fetchPriceHistory(String ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext);
 
 };
 

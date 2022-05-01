@@ -17,8 +17,8 @@ public:
     View()=default;
     virtual ~View()=default;
 
-    virtual void addAuth(const std::string &, const std::string &) = 0;
-    virtual void addEvent(const std::string &, const Premia::EventHandler &) = 0;
+    virtual void addAuth(String, String) = 0;
+    virtual void addEvent(String, const Premia::EventHandler &) = 0;
     virtual void addLogger(const Premia::ConsoleLogger &) = 0;
     virtual void update() = 0;
 };

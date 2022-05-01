@@ -36,7 +36,7 @@ namespace Premia {
     };
 
     template <> void EventInterface::insert(std::string, TDALoginEvent); 
-    template <> void EventInterface::trigger(std::string, const std::string & key, const std::string & token); 
+    template <> void EventInterface::trigger(std::string, String key, String token); 
 }
 
 #endif

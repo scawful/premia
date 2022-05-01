@@ -1,4 +1,4 @@
-#include "Session.hpp"
+#include "Socket.hpp"
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -12,54 +12,54 @@ using tcp = boost::asio::ip::tcp;
 namespace tda
 {
     void 
-    Session::fail(beast::error_code ec, char const* what) const
+    Socket::fail(beast::error_code ec, char const* what) const
     {
         if(ec == net::error::operation_aborted || ec == websocket::error::closed)
             return;
         
-        SDL_Log("Session::fail( %s: %s )", ec.message().c_str(), what);
+        SDL_Log("Socket::fail( %s: %s )", ec.message().c_str(), what);
     }
 
     void 
-    Session::run( char const* host, char const* port )
+    Socket::run( char const* host, char const* port )
     {
         _host = host;
         _queue_size = _queue.size();
 
-        SDL_Log("Session::run( host: %s ) ", _host.c_str() );
+        SDL_Log("Socket::run( host: %s ) ", _host.c_str() );
 
         _resolver.async_resolve( host, port, 
                                  beast::bind_front_handler( 
-                                     &Session::on_resolve, 
+                                     &Socket::on_resolve, 
                                      shared_from_this() ) );
     }
 
     void 
-    Session::on_resolve( beast::error_code ec, tcp::resolver::results_type results )
+    Socket::on_resolve( beast::error_code ec, tcp::resolver::results_type results )
     {
         if (ec)
             return fail(ec, "resolve");
 
-        SDL_Log("Session::on_resolve");
+        SDL_Log("Socket::on_resolve");
 
         beast::get_lowest_layer(_ws).expires_after(std::chrono::seconds(30));
 
         beast::get_lowest_layer(_ws).async_connect(
             results,
             beast::bind_front_handler(
-                    &Session::on_connect,
+                    &Socket::on_connect,
                     shared_from_this()
             )
         );
     }
 
     void 
-    Session::on_connect( beast::error_code ec, tcp::resolver::results_type::endpoint_type ep )
+    Socket::on_connect( beast::error_code ec, tcp::resolver::results_type::endpoint_type ep )
     {
         if(ec)
             return fail(ec, "connect");
 
-        SDL_Log("Session::on_connect");
+        SDL_Log("Socket::on_connect");
 
         // Update the _host string. This will provide the value of the
         // Host HTTP header during the WebSocket handshake.
@@ -82,17 +82,17 @@ namespace tda
         _ws.next_layer().async_handshake(
             ssl::stream_base::client,
             beast::bind_front_handler(
-                &Session::on_ssl_handshake,
+                &Socket::on_ssl_handshake,
                 shared_from_this()));
     }
 
     void
-    Session::on_ssl_handshake( beast::error_code ec )
+    Socket::on_ssl_handshake( beast::error_code ec )
     {
         if (ec)
             return fail(ec, "ssl_handshake");
 
-        SDL_Log("Session::on_ssl_handshake");
+        SDL_Log("Socket::on_ssl_handshake");
 
         // Turn off the timeout on the tcp_stream, because
         // the websocket stream has its own timeout system.
@@ -115,43 +115,43 @@ namespace tda
         // Perform the websocket handshake
         _ws.async_handshake(_host, "/ws",
             beast::bind_front_handler(
-                &Session::on_handshake,
+                &Socket::on_handshake,
                 shared_from_this()));
 
     }
 
     void
-    Session::on_handshake(beast::error_code ec)
+    Socket::on_handshake(beast::error_code ec)
     {
         if(ec)
             return fail(ec, "handshake");
 
-        SDL_Log("Session::on_handshake");
+        SDL_Log("Socket::on_handshake");
 
         // Send the message
         _ws.async_write(
             net::buffer( *_queue.front() ),
             beast::bind_front_handler(
-                &Session::on_write,
+                &Socket::on_write,
                 shared_from_this()));
     }
 
     void
-    Session::on_write(beast::error_code ec, std::size_t bytes_transferred)
+    Socket::on_write(beast::error_code ec, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
         if (ec)
             return fail(ec, "write");
 
-        SDL_Log("Session::on_write");
+        SDL_Log("Socket::on_write");
 
         if (_logged_in) {
             // clear request from the queue
             _queue.erase( _queue.begin() );
 
             if (!_queue.empty()) {
-                SDL_Log("Session::on_write( Queue Not Empty )");
+                SDL_Log("Socket::on_write( Queue Not Empty )");
             }
             else
             {
@@ -160,7 +160,7 @@ namespace tda
                 }
                 else {
                     // logout
-                    SDL_Log("Session::on_write( Logging out ) ");
+                    SDL_Log("Socket::on_write( Logging out ) ");
                     _logged_in = false;
                 }
             }
@@ -169,13 +169,13 @@ namespace tda
         _ws.async_read(
             _buffer,
             beast::bind_front_handler(
-                &Session::on_read,
+                &Socket::on_read,
                 shared_from_this()));
 
     }
 
     void
-    Session::on_read(
+    Socket::on_read(
         beast::error_code ec,
         std::size_t bytes_transferred)
     {
@@ -184,7 +184,7 @@ namespace tda
         if (ec)
             return fail(ec, "read");
 
-        SDL_Log("Session::on_read");
+        SDL_Log("Socket::on_read");
         std::string response(net::buffer_cast<const char*>( _buffer.data()), _buffer.size()); 
         SDL_Log("Server Response: %s", response.c_str() );
         _response_stack.push_back( response );
@@ -209,7 +209,7 @@ namespace tda
                 _ws.async_read(
                     _buffer,
                     beast::bind_front_handler(
-                        &Session::on_read,
+                        &Socket::on_read,
                         shared_from_this()));
             }
             else if ( _subscribed && !_interrupt ) {
@@ -218,14 +218,14 @@ namespace tda
                 _ws.async_read(
                     _buffer,
                     beast::bind_front_handler(
-                        &Session::on_read,
+                        &Socket::on_read,
                         shared_from_this()));
             }
             else {
                 _ws.async_write(
                     net::buffer( *_queue.front() ),
                     beast::bind_front_handler(
-                        &Session::on_write,
+                        &Socket::on_write,
                         shared_from_this()));
             }
 
@@ -234,19 +234,19 @@ namespace tda
             // Close the WebSocket connection
             _ws.async_close(websocket::close_code::normal,
                 beast::bind_front_handler(
-                    &Session::on_close,
+                    &Socket::on_close,
                     shared_from_this()));
         }
 
     }
 
     void
-    Session::on_close(beast::error_code ec)
+    Socket::on_close(beast::error_code ec)
     {
         if (ec)
             return fail(ec, "close");
 
-        SDL_Log("Session::on_close");
+        SDL_Log("Socket::on_close");
 
         // If we get here then the connection is closed gracefully
 
@@ -256,39 +256,39 @@ namespace tda
 
     // sends a message to the queue from the main threads
     void 
-    Session::send_message(const std::shared_ptr<std::string const> & s)
+    Socket::send_message(const std::shared_ptr<std::string const> & s)
     {
-        SDL_Log("Session::send_message");
+        SDL_Log("Socket::send_message");
 
         _queue.push_back( s );
 
         if (_queue.size() > 1) {
-            SDL_Log("Session::send_message( Already Writing )");
+            SDL_Log("Socket::send_message( Already Writing )");
             return;
         }
 
         _ws.async_write(
             net::buffer( *_queue.front() ),
                 beast::bind_front_handler(
-                    &Session::on_write,
+                    &Socket::on_write,
                     shared_from_this()));
     }
 
     // returns the cumulative vector of responses from the server
     std::vector<std::string> 
-    Session::receive_response() const
+    Socket::receive_response() const
     {
         return _response_stack;
     }
 
     std::shared_ptr<std::vector<std::string>> 
-    Session::receive_response_ptr()
+    Socket::receive_response_ptr()
     {
         return std::make_shared<std::vector<std::string>>(_response_stack);
     }
 
     bool 
-    Session::on_login(beast::error_code ec)
+    Socket::on_login(beast::error_code ec)
     {
         std::string response_code;
         std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
@@ -319,15 +319,15 @@ namespace tda
     }
 
     void 
-    Session::on_logout(beast::error_code ec) const
+    Socket::on_logout(beast::error_code ec) const
     {
         // need a callback for this 
     }
 
     void
-    Session::on_notify(beast::error_code ec)
+    Socket::on_notify(beast::error_code ec)
     {
-        SDL_Log("Session::on_notify");
+        SDL_Log("Socket::on_notify");
         std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("notify");
 
@@ -338,9 +338,9 @@ namespace tda
     }
 
     void
-    Session::on_subscription(beast::error_code ec)
+    Socket::on_subscription(beast::error_code ec)
     {
-        SDL_Log("Session::on_subscription");
+        SDL_Log("Socket::on_subscription");
         std::string sub_code;
         std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("code");
@@ -356,25 +356,25 @@ namespace tda
     }
 
     void 
-    Session::interrupt()
+    Socket::interrupt()
     {
         _interrupt = true;
     }
 
     void 
-    Session::clear_buffer()
+    Socket::clear_buffer()
     {
         _buffer.clear();
     }
 
     bool
-    Session::is_logged_in() const
+    Socket::is_logged_in() const
     {
         return _logged_in;
     }
 
     bool
-    Session::is_subscribed() const
+    Socket::is_subscribed() const
     {
         return _subscribed;
     }

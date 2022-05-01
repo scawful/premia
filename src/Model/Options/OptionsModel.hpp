@@ -27,9 +27,9 @@ public:
     tda::OptionsDateTimeObj & getOptionsDateTimeObj(int index);
     std::vector<const char*> & getDateTimeArray();
     std::string getDateTime(int index);
-    void fetchOptionChain(const std::string & ticker, const std::string & strikeCount,
-                            const std::string & strategy, const std::string & range,
-                            const std::string & expMonth, const std::string & optionType);
+    void fetchOptionChain(String ticker, String strikeCount,
+                            String strategy, String range,
+                            String expMonth, String optionType);
     
     void calculateGammaExposure();
     double & getGammaExposure();

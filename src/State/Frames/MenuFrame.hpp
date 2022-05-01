@@ -44,7 +44,7 @@ public:
     bool watchlistView() const;
     bool freeMode() const;
 
-    void set_title(const std::string & title_string);
+    void set_title(String title_string);
     SubFrame get_current_frame() const;
     void update();
     void render();

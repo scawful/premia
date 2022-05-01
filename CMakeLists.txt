@@ -102,7 +102,7 @@ add_executable(Premia src/Premia.cpp
                     src/Services/CoinbasePro/Product.cpp
                     src/Services/TDAmeritrade.cpp 
                     src/Services/TDAmeritrade/Parser.cpp
-                    src/Services/TDAmeritrade/Session.cpp
+                    src/Services/TDAmeritrade/Socket.cpp
                     src/Services/TDAmeritrade/Client.cpp
                     src/Services/TDAmeritrade/Data/Quote.cpp 
                     src/Services/TDAmeritrade/Data/PriceHistory.cpp 
@@ -122,7 +122,7 @@ add_executable(Premia src/Premia.cpp
 include_directories(Premia "assets")
 target_include_directories(Premia INTERFACE "include")
 target_link_libraries(Premia ${SDL2_LIBRARIES} ${SDL_IMAGE_LIBRARIES} ${SDL_TTF_LIBRARIES}
-                             ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} curl OpenSSL::SSL ImGui ImPlot)
+                             ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} curl OpenSSL::SSL ImGui ImPlot ws2_32)
 
 set (source "${CMAKE_SOURCE_DIR}/assets")
 set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")

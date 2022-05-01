@@ -32,7 +32,7 @@ std::string Client::get_api_frequency_amount(int value) const
  * @return true
  * @return false
  */
-bool Client::string_replace(std::string & str, const std::string & from, const std::string & to) const
+bool Client::string_replace(std::string & str, String from, String to) const
 {
     size_t start = str.find(from);
     if (start == std::string::npos)
@@ -266,7 +266,7 @@ void Client::get_user_principals()
  * @param endpoint 
  * @param data 
  */
-void Client::post_authorized_request(const std::string & endpoint, const std::string & data) const 
+void Client::post_authorized_request(String endpoint, String data) const 
 {
     CURL *curl;
     std::string response;
@@ -521,7 +521,7 @@ std::string Client::get_watchlist_by_account(const std::string  & account_id) co
  * @param ext 
  * @return std::string 
  */
-std::string Client::get_price_history(const std::string & symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
+std::string Client::get_price_history(String symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
 {
     std::string url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + api_key + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
 
@@ -641,7 +641,7 @@ std::vector<std::string> Client::get_all_account_ids()
  * @param symbol 
  * @param quantity 
  */
-void Client::post_order(const std::string & account_id, const tda::Order & order) const
+void Client::post_order(String account_id, const tda::Order & order) const
 {
     std::string endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
     string_replace(endpoint, "{accountId}", account_id);
@@ -692,7 +692,7 @@ void Client::start_session()
 
     boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
 
-    websocket_session = std::make_shared<tda::Session>(ioc, context, request_queue);
+    websocket_session = std::make_shared<tda::Socket>(ioc, context, request_queue);
     websocket_session->run(host.c_str(), port.c_str());
     session_active = true;
 
@@ -738,7 +738,7 @@ void Client::start_session(std::string const & ticker, std::string const & field
 
     boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
 
-    websocket_session = std::make_shared<tda::Session>(ioc, context, request_queue);
+    websocket_session = std::make_shared<tda::Socket>(ioc, context, request_queue);
     websocket_session->run(host.c_str(), port.c_str());
 
     session_active = true;
@@ -830,7 +830,7 @@ void Client::fetch_access_token()
     has_access_token = true;
 }
 
-void Client::addAuth(const std::string & key, const std::string & token)
+void Client::addAuth(const std::string key, const std::string token)
 {
     this->api_key = key;
     this->refresh_token = token;

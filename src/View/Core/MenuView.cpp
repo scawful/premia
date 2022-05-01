@@ -588,7 +588,7 @@ void MenuView::drawScreen()
     }
 }
 
-void MenuView::addAuth(const std::string & key , const std::string & token)
+void MenuView::addAuth(String key , String token)
 {
     
 }
@@ -598,7 +598,7 @@ void MenuView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void MenuView::addEvent(const std::string & key, const Premia::EventHandler & event)
+void MenuView::addEvent(String key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

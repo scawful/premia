@@ -5,7 +5,7 @@
  * 
  * @param variable 
  */
-void PortfolioFrame::draw_balance_string(const std::string & variable)
+void PortfolioFrame::draw_balance_string(String variable)
 {
     std::string str = (premia->getHalextInterface().getPrivateBalance()) ? "***" : variable;
     ImGui::Text("%s", str.c_str());
@@ -146,7 +146,7 @@ void PortfolioFrame::init_positions()
  * 
  * @param account_num 
  */
-void PortfolioFrame::load_account(const std::string & account_num)
+void PortfolioFrame::load_account(String account_num)
 {
     account_data = premia->tda_interface.getAccount(account_num);
 

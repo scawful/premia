@@ -15,7 +15,7 @@ private:
     tda::Account account_data;
     std::vector<std::string> positions_vector;
 
-    void draw_balance_string(const std::string & variable);
+    void draw_balance_string(String variable);
 
     void draw_positions();
     void draw_balances();
@@ -27,7 +27,7 @@ public:
     PortfolioFrame();
     
     void init_positions();
-    void load_account(const std::string & account);
+    void load_account(String account);
     void update();
 };
 

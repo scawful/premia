@@ -5,7 +5,7 @@
 #include "Premia.hpp"
 #include "TDAmeritrade/Client.hpp"
 #include "TDAmeritrade/Parser.hpp"
-#include "TDAmeritrade/Session.hpp"
+#include "TDAmeritrade/Socket.hpp"
 #include "TDAmeritrade/Data/Watchlist.hpp"
 #include "TDAmeritrade/Data/PricingStructures.hpp"
 #include "TDAmeritrade/Data/Account.hpp"
@@ -51,15 +51,15 @@ namespace tda
 
         Account getCurrentAccount() const;
         Account getDefaultAccount();
-        std::vector<Watchlist> getWatchlistsByAccount(const std::string & account_num) const;
-        Quote getQuote(const std::string & symbol) const;
-        Account getAccount(const std::string & account_id);
-        PriceHistory getPriceHistory(const std::string & ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const;
-        OptionChain getOptionChain(const std::string & ticker, const std::string & contractType, const std::string & strikeCount,
-                                   bool includeQuotes, const std::string & strategy, const std::string & range,
-                                   const std::string & expMonth, const std::string & optionType) const;
+        std::vector<Watchlist> getWatchlistsByAccount(String account_num) const;
+        Quote getQuote(String symbol) const;
+        Account getAccount(String account_id);
+        PriceHistory getPriceHistory(String ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const;
+        OptionChain getOptionChain(String ticker, String contractType, String strikeCount,
+                                   bool includeQuotes, String strategy, String range,
+                                   String expMonth, String optionType) const;
 
-        void postOrder(const std::string & account_id, const Order & order) const;
+        void postOrder(String account_id, const Order & order) const;
 
         void startStreamingSession();
         void fetchAccessToken();

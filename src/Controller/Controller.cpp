@@ -72,7 +72,7 @@ Controller::initCallbacks()
         io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     });
 
-    viewManager.addLoginEvent([this] (const std::string & key, const std::string & token) -> void {
+    viewManager.addLoginEvent([this] (String key, String token) -> void {
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn(key, token); 
         viewManager.transferEvents();

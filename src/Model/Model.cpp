@@ -1,6 +1,6 @@
 #include "Model.hpp"
 
-void Model::addAuth(const std::string & key, const std::string & token)
+void Model::addAuth(String key, String token)
 {
     TDAInterface.addAuth(key, token);
 }
@@ -15,7 +15,7 @@ Premia::ConsoleLogger & Model::getLogger()
     return consoleLogger;
 }
 
-void Model::addEventHandler(const std::string & key, const Premia::EventHandler & handler) 
+void Model::addEventHandler(String key, const Premia::EventHandler & handler) 
 {
     this->callbacks[key] = handler;
 }

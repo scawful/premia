@@ -127,7 +127,7 @@ void WatchlistView::drawCustomWatchlistTable()
     }
 }
 
-void WatchlistView::addAuth(const std::string & key , const std::string & token)
+void WatchlistView::addAuth(String key , String token)
 {
     model.addAuth(key, token);
 }
@@ -137,7 +137,7 @@ void WatchlistView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void WatchlistView::addEvent(const std::string & key, const Premia::EventHandler & event)
+void WatchlistView::addEvent(String key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

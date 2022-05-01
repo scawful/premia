@@ -48,7 +48,7 @@ std::string WatchlistModel::getWatchlistName(int index)
     return watchlistNames.at(index);
 }
 
-tda::Quote & WatchlistModel::getQuote(const std::string & key)
+tda::Quote & WatchlistModel::getQuote(String key)
 {
     return quotes.at(key);
 }
@@ -58,7 +58,7 @@ tda::Watchlist & WatchlistModel::getWatchlist(int index)
     return watchlists.at(index);
 }
 
-void WatchlistModel::setQuote(const std::string & key, const tda::Quote & quote)
+void WatchlistModel::setQuote(String key, const tda::Quote & quote)
 {
     this->quotes[key] = quote;
 }

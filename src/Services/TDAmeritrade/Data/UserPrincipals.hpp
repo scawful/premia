@@ -23,7 +23,7 @@ namespace tda
         void set_streamer_info(const std::unordered_map<std::string, std::string> & data);
         std::unordered_map<std::string, std::string> get_account_data_array(int i);
 
-        std::string get_account_data(const std::string & key);
+        std::string get_account_data(String key);
     };
 }
 

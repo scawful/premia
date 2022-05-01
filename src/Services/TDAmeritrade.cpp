@@ -213,7 +213,7 @@ namespace tda
      * @param account_num 
      * @return std::vector<Watchlist> 
      */
-    std::vector<Watchlist> TDAmeritrade::getWatchlistsByAccount(const std::string & account_num) const
+    std::vector<Watchlist> TDAmeritrade::getWatchlistsByAccount(String account_num) const
     {
         std::string response = client.get_watchlist_by_account(account_num);
         return parser.parse_watchlist_data(parser.read_response(response));
@@ -226,7 +226,7 @@ namespace tda
      * @param symbol
      * @return FundOwnership
      */
-    Quote TDAmeritrade::getQuote(const std::string & symbol) const
+    Quote TDAmeritrade::getQuote(String symbol) const
     {
         std::string response = client.get_quote(symbol);
         return parser.parse_quote(parser.read_response(response));
@@ -239,7 +239,7 @@ namespace tda
      * @param account_id 
      * @return Account 
      */
-    Account TDAmeritrade::getAccount(const std::string & account_id)
+    Account TDAmeritrade::getAccount(String account_id)
     {
         std::string response = client.get_account(account_id);
         this->current_account = parser.parse_account(parser.read_response(response));
@@ -253,9 +253,9 @@ namespace tda
      * @param ticker 
      * @return tda::OptionChain 
      */
-    OptionChain TDAmeritrade::getOptionChain(const std::string & ticker, const std::string & contractType, const std::string & strikeCount,
-                                            bool includeQuotes, const std::string & strategy, const std::string & range,
-                                            const std::string & expMonth, const std::string & optionType) const
+    OptionChain TDAmeritrade::getOptionChain(String ticker, String contractType, String strikeCount,
+                                            bool includeQuotes, String strategy, String range,
+                                            String expMonth, String optionType) const
     {
         std::string response = client.get_option_chain(ticker, contractType, strikeCount, includeQuotes, strategy, range, expMonth, optionType);
         return parser.parse_option_chain(parser.read_response(response));
@@ -269,7 +269,7 @@ namespace tda
      * @param time 
      * @return PriceHistory 
      */
-    PriceHistory TDAmeritrade::getPriceHistory(const std::string & ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
+    PriceHistory TDAmeritrade::getPriceHistory(String ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
     {
         std::string response = client.get_price_history(ticker, ptype, period_amt, ftype, freq_amt, ext);
         return parser.parse_price_history(parser.read_response(response), ticker, ftype);
@@ -285,7 +285,7 @@ namespace tda
      * @param symbol 
      * @param quantity 
      */
-    void TDAmeritrade::postOrder(const std::string & account_id, const tda::Order & order) const
+    void TDAmeritrade::postOrder(String account_id, const tda::Order & order) const
     {
         client.post_order(account_id, order);
     }

@@ -11,7 +11,7 @@ namespace cbp
         std::vector<std::unordered_map<std::string, std::string >> accounts_vector;
     public:
         Account()=default;
-        std::unordered_map<std::string, std::string> get_position(const std::string & ticker);
+        std::unordered_map<std::string, std::string> get_position(String ticker);
     };
 }
 

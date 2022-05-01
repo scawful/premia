@@ -1,6 +1,7 @@
 #ifndef PricingStructures_hpp
 #define PricingStructures_hpp
 
+#include "Premia.hpp"
 #include <string>
 #include <vector>
 #include <unordered_map>

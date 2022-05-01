@@ -19,7 +19,7 @@ std::unordered_map<std::string, std::string> UserPrincipals::get_account_data_ar
     return accounts_array[i];
 }
 
-std::string UserPrincipals::get_account_data(const std::string & key)
+std::string UserPrincipals::get_account_data(String key)
 {
     return account_data[key];
 }

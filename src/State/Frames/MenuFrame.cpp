@@ -306,7 +306,7 @@ bool MenuFrame::freeMode() const
     return free_mode;
 }
 
-void MenuFrame::set_title(const std::string & title)
+void MenuFrame::set_title(String title)
 {
     this->title_string = title;
 }

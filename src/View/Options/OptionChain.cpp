@@ -197,7 +197,7 @@ void OptionChainView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void OptionChainView::addEvent(const std::string & key, const Premia::EventHandler & event)
+void OptionChainView::addEvent(String key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

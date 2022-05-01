@@ -13,7 +13,7 @@ namespace tda
             std::string description;
             std::string asset_type;
 
-            WatchlistInstrument(const std::string & sym, const std::string & desc, const std::string & type) : symbol(sym), description(desc), asset_type(type) { }
+            WatchlistInstrument(String sym, String desc, String type) : symbol(sym), description(desc), asset_type(type) { }
 
             std::string getSymbol() const {
                 return this->symbol;
@@ -51,12 +51,12 @@ namespace tda
         std::string getInstrumentType(int item_id);
 
         void setId( int id );
-        void setName(const std::string & name);
-        void setAccountId(const std::string & accountId);
-        void setWatchlistVariable(const std::string & variable);
+        void setName(String name);
+        void setAccountId(String accountId);
+        void setWatchlistVariable(String variable);
 
-        void addVariable(const std::string & key, const std::string & value);
-        void addInstrument(const std::string & symbol, const std::string & desc, const std::string & type);
+        void addVariable(String key, String value);
+        void addInstrument(String symbol, String desc, String type);
     };
 }
 

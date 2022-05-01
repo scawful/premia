@@ -24,9 +24,9 @@ public:
     bool getOpenList(int n);
     void setOpenList(int n);
     std::string getWatchlistName(int index);
-    tda::Quote & getQuote(const std::string & key);
+    tda::Quote & getQuote(String key);
     tda::Watchlist & getWatchlist(int index);
-    void setQuote(const std::string & key, const tda::Quote & quote);
+    void setQuote(String key, const tda::Quote & quote);
     std::vector<const char *> getWatchlistNamesCharVec() const;
 };
 

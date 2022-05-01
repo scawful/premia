@@ -21,7 +21,7 @@ ViewManager::transferEvents() const
 }
 
 void 
-ViewManager::setLoggedIn(const std::string & key, const std::string & token)
+ViewManager::setLoggedIn(String key, String token)
 {
     this->currentView->addAuth(key, token);
     this->watchlistView->addAuth(key, token);
@@ -115,7 +115,7 @@ ViewManager::displayWatchlist() const
 }
 
 void 
-ViewManager::addEventHandler(const std::string & key, const Premia::EventHandler & event)
+ViewManager::addEventHandler(String key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
     this->menuView->addEvent(key, event);
@@ -128,7 +128,7 @@ ViewManager::addEventHandler(const std::string & key, const Premia::EventHandler
 }
 
 // template <typename T>
-// void ViewManager::addEvent(const std::string & key, T event)
+// void ViewManager::addEvent(String key, T event)
 // {
 //     this->allEvents.insert<T>(key, event);
 // }

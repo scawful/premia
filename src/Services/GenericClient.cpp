@@ -19,7 +19,7 @@ size_t GenericClient::json_write_callback(const char * contents, size_t size, si
  * @param endpoint 
  * @return std::string 
  */
-std::string GenericClient::send_request(const std::string & endpoint) const
+std::string GenericClient::send_request(String endpoint) const
 {
     CURL *curl;
     CURLcode res;

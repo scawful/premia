@@ -155,7 +155,7 @@ void PrimaryView::drawScreen()
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 
-void PrimaryView::addAuth(const std::string & key , const std::string & token)
+void PrimaryView::addAuth(String key , String token)
 {
     // need to remove this from View
 }
@@ -165,7 +165,7 @@ void PrimaryView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void PrimaryView::addEvent(const std::string & key, const Premia::EventHandler & event)
+void PrimaryView::addEvent(String key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

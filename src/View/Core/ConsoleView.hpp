@@ -34,10 +34,10 @@ public:
     int TextEditCallback(ImGuiInputTextCallbackData* data);
 
     void addLog(const char* fmt, ...);
-    void addLogStd(const std::string & data);
-    void addAuth(const std::string & key , const std::string & token) override;
+    void addLogStd(String data);
+    void addAuth(String key , String token) override;
     void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(const std::string & key, const Premia::EventHandler & event) override;
+    void addEvent(String key, const Premia::EventHandler & event) override;
     void update() override;
 };
 
