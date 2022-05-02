@@ -48,24 +48,14 @@ void LoginView::drawScreen() const
     }
 }
 
-void LoginView::addAuth(CRString key , CRString token)
-{
-    
-}
-
-void LoginView::addLogger(const Premia::ConsoleLogger & newLogger)
+void LoginView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void LoginView::addEvent(CRString key, const Premia::EventHandler & event)
+void LoginView::addEvent(CRString key, const EventHandler & event)
 {
     this->events[key] = event;
-}
-
-void LoginView::addLoginEvent(const Premia::TDALoginEvent & event) 
-{
-    this->loginEvent = Premia::TDALoginEvent(event);
 }
 
 void LoginView::update() 

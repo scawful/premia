@@ -588,17 +588,12 @@ void MenuView::drawScreen()
     }
 }
 
-void MenuView::addAuth(CRString key , CRString token)
-{
-    
-}
-
-void MenuView::addLogger(const Premia::ConsoleLogger & newLogger)
+void MenuView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void MenuView::addEvent(CRString key, const Premia::EventHandler & event)
+void MenuView::addEvent(CRString key, const EventHandler & event)
 {
     this->events[key] = event;
 }

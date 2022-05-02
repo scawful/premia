@@ -9,17 +9,14 @@ class LoginView : public View
 private:
     bool initialized = false;
     
-    Premia::TDALoginEvent loginEvent;
-    Premia::ConsoleLogger logger;
-    std::unordered_map<String, Premia::EventHandler> events;
+    ConsoleLogger logger;
+    std::unordered_map<String, EventHandler> events;
 
     void drawScreen() const;
 
 public:
-    void addAuth(CRString key , CRString token) override;
-    void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(CRString, const Premia::EventHandler &) override;
-    void addLoginEvent(const Premia::TDALoginEvent &);
+    void addLogger(const ConsoleLogger & logger) override;
+    void addEvent(CRString, const EventHandler &) override;
     void update() override;
 };
 

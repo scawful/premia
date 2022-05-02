@@ -192,12 +192,12 @@ void OptionChainView::drawUnderlying()
     }
 }
 
-void OptionChainView::addLogger(const Premia::ConsoleLogger & newLogger)
+void OptionChainView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void OptionChainView::addEvent(CRString key, const Premia::EventHandler & event)
+void OptionChainView::addEvent(CRString key, const EventHandler & event)
 {
     this->events[key] = event;
 }

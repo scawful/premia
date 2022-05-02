@@ -301,17 +301,12 @@ ConsoleView::~ConsoleView()
         free(History[i]);
 }
 
-void ConsoleView::addAuth(CRString key, CRString token)
-{
-    
-}
-
-void ConsoleView::addLogger(const Premia::ConsoleLogger & newLogger)
+void ConsoleView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void ConsoleView::addEvent(CRString key, const Premia::EventHandler & event) 
+void ConsoleView::addEvent(CRString key, const EventHandler & event) 
 {
     this->events[key] = event;
 }

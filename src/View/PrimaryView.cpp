@@ -154,17 +154,12 @@ void PrimaryView::drawScreen()
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 
-void PrimaryView::addAuth(CRString key , CRString token)
-{
-    // need to remove this from View
-}
-
-void PrimaryView::addLogger(const Premia::ConsoleLogger & newLogger)
+void PrimaryView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void PrimaryView::addEvent(CRString key, const Premia::EventHandler & event)
+void PrimaryView::addEvent(CRString key, const EventHandler & event)
 {
     this->events[key] = event;
 }

@@ -7,8 +7,8 @@
 class OptionChainView: public View 
 {
 private:
-    std::unordered_map<String, Premia::EventHandler> events;
-    Premia::ConsoleLogger logger;
+    std::unordered_map<String, EventHandler> events;
+    ConsoleLogger logger;
     OptionsModel model;
 
     void drawSearch();
@@ -16,11 +16,8 @@ private:
     void drawUnderlying();
 
 public:
-    void addAuth(CRString key , CRString token) override {
-        // needs to be taken out of the View header as a virtual routine
-    }
-    void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(CRString key, const Premia::EventHandler & event) override;
+    void addLogger(const ConsoleLogger & logger) override;
+    void addEvent(CRString key, const EventHandler & event) override;
     void update() override;
 };
 

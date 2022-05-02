@@ -26,15 +26,6 @@ ViewManager::setLoggedIn()
     this->isLoggedIn = true;
 }
 
-
-void 
-ViewManager::setLoggedIn(CRString key, CRString token)
-{
-    this->currentView->addAuth(key, token);
-    this->watchlistView->addAuth(key, token);
-    this->isLoggedIn = true;
-}
-
 void
 ViewManager::setConsoleView()
 {
@@ -122,7 +113,7 @@ ViewManager::displayWatchlist() const
 }
 
 void 
-ViewManager::addEventHandler(CRString key, const Premia::EventHandler & event)
+ViewManager::addEventHandler(CRString key, const EventHandler & event)
 {
     this->events[key] = event;
     this->menuView->addEvent(key, event);
@@ -140,10 +131,6 @@ ViewManager::addEventHandler(CRString key, const Premia::EventHandler & event)
 //     this->allEvents.insert<T>(key, event);
 // }
 
-void ViewManager::addLoginEvent(const Premia::TDALoginEvent & event)
-{
-    this->loginView->addLoginEvent(event);
-}
 
 void 
 ViewManager::setCurrentView(std::shared_ptr<View> newView)

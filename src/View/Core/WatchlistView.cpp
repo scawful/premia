@@ -15,7 +15,7 @@ void WatchlistView::drawWatchlistTable()
 
     if (model.getOpenList(n) == 0) {
         for (int j = 0; j < model.getWatchlist(n).getNumInstruments(); j++) {
-           model.setQuote(model.getWatchlist(n).getInstrumentSymbol(j), model.getTDAInterface().getQuote(model.getWatchlist(n).getInstrumentSymbol(j)));
+           model.setQuote(model.getWatchlist(n).getInstrumentSymbol(j), tda::TDA::getInstance().getQuote(model.getWatchlist(n).getInstrumentSymbol(j)));
         }
         model.setOpenList(n);
     }
@@ -127,17 +127,12 @@ void WatchlistView::drawCustomWatchlistTable()
     }
 }
 
-void WatchlistView::addAuth(CRString key , CRString token)
-{
-    model.addAuth(key, token);
-}
-
-void WatchlistView::addLogger(const Premia::ConsoleLogger & newLogger)
+void WatchlistView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }
 
-void WatchlistView::addEvent(CRString key, const Premia::EventHandler & event)
+void WatchlistView::addEvent(CRString key, const EventHandler & event)
 {
     this->events[key] = event;
 }

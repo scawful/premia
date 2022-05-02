@@ -54,17 +54,12 @@ LinePlotChart::~LinePlotChart()
     delete [] y;
 }
 
-void LinePlotChart::addAuth(CRString key , CRString token)
-{
-    // model.addAuth(key, token);
-}
-
-void LinePlotChart::addLogger(const Premia::ConsoleLogger & newLogger)
+void LinePlotChart::addLogger(const ConsoleLogger & newLogger)
 {
     // this->logger = newLogger;
 }
 
-void LinePlotChart::addEvent(CRString key, const Premia::EventHandler & event)
+void LinePlotChart::addEvent(CRString key, const EventHandler & event)
 {
     this->events[key] = event;
 }

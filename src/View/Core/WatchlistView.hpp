@@ -3,22 +3,22 @@
 
 #include "../View.hpp"
 #include "../../Model/Core/WatchlistModel.hpp"
+#include "TDA.hpp"
 
 class WatchlistView: public View 
 {
 private:
     WatchlistModel model;
-    Premia::ConsoleLogger logger;
-    std::unordered_map<String, Premia::EventHandler> events;
+    ConsoleLogger logger;
+    std::unordered_map<String, EventHandler> events;
 
     void initWatchlist();
     void drawWatchlistTable();
     void drawCustomWatchlistTable();
 
 public:
-    void addAuth(CRString key , CRString token) override;
-    void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(CRString, const Premia::EventHandler &) override;
+    void addLogger(const ConsoleLogger & logger) override;
+    void addEvent(CRString, const EventHandler &) override;
     void update() override;
 
 };
