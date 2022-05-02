@@ -2,7 +2,6 @@
 #define View_hpp
 
 #include "Premia.hpp"
-#include "EventInterface.hpp"
 #include "SDL.hpp"
 #include "ImGui.hpp"
 #include "ImPlot.hpp"

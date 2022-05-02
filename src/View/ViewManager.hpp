@@ -23,7 +23,6 @@ private:
     std::shared_ptr<MenuView> menuView = std::make_shared<MenuView>();
     std::shared_ptr<ConsoleView> consoleView = std::make_shared<ConsoleView>();
     std::unordered_map<String, EventHandler> events;
-    Premia::EventInterface allEvents;
 
     void shareEvents();
 

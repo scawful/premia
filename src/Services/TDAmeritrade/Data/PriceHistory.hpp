@@ -25,7 +25,7 @@ namespace tda
     private:
         bool initialized;
         String tickerSymbol;
-        ParallelList<tda::Candle> candles;
+        ListList<tda::Candle> candles;
         ArrayList<tda::Candle> candleVector;
         StringMap priceHistoryVariables;
         StringMap candleData;
