@@ -310,7 +310,7 @@ namespace tda
         return session_active;
     }
 
-    void TDAmeritrade::addLogger(const Premia::ConsoleLogger & logger)
+    void TDAmeritrade::addLogger(const ConsoleLogger & logger)
     {
         this->consoleLogger = logger;
     }

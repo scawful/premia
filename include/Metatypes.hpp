@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <functional>
 
 using String     = std::string;
 using RString    = std::string &;
@@ -15,6 +16,10 @@ using DoubleList = std::vector<double>;
 using StringList = std::vector<String>;
 
 using StringMap  = std::unordered_map<String, String>;
+
+using EventHandler = std::function<void()>;
+using ConsoleLogger = std::function<void(String)>;
+using SocketListener = std::function<void(const char*)>;
 
 template<class K, class V>
     using AbstractMap = std::unordered_map<K, V>; 

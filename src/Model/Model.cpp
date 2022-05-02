@@ -1,26 +1,16 @@
 #include "Model.hpp"
 
-void Model::addAuth(CRString key, CRString token)
-{
-    TDAInterface.addAuth(key, token);
-}
-
-void Model::addLogger(const Premia::ConsoleLogger & newLogger)
+void Model::addLogger(const ConsoleLogger & newLogger)
 {
     this->consoleLogger = newLogger;
 }
 
-Premia::ConsoleLogger & Model::getLogger()
+ConsoleLogger & Model::getLogger()
 {
     return consoleLogger;
 }
 
-void Model::addEventHandler(CRString key, const Premia::EventHandler & handler) 
+void Model::addEventHandler(CRString key, const EventHandler & handler) 
 {
     this->callbacks[key] = handler;
-}
-
-tda::TDAmeritrade & Model::getTDAInterface()
-{
-    return TDAInterface;
 }

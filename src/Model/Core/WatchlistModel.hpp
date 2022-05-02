@@ -12,14 +12,14 @@ private:
     std::vector<tda::Watchlist> watchlists;
     std::vector<String> watchlistNames;
     std::vector<const char*> watchlistNamesChar;
-    Premia::ConsoleLogger logger;
+    ConsoleLogger logger;
     std::unordered_map<String, tda::Quote> quotes;
 
 
 public:
     bool isActive() const;
     
-    void addLogger(const Premia::ConsoleLogger & logger);
+    void addLogger(const ConsoleLogger & logger);
     void initWatchlist();
     bool getOpenList(int n);
     void setOpenList(int n);

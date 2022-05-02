@@ -14,16 +14,11 @@
 
 namespace tda
 {
-    namespace JSONObject = boost::property_tree;
     using Watchlists = std::vector<Watchlist>;
 
-    class TDA
-    {
+    class TDA {
     private:
         TDA() { }
-        String refreshToken;
-        String consumerKey;
-
         Account account;
         Client client;
         Parser parser;
@@ -31,22 +26,19 @@ namespace tda
     public:
         TDA(TDA const&)             = delete;
         void operator=(TDA const&)  = delete;
-        static TDA& getInstance()
-        {
+        static TDA& getInstance() {
             static TDA instance;    
             return instance;
         }
 
         auto authUser(String key, String token) 
             -> void {
-            consumerKey = key;
-            refreshToken = token;
             client.addAuth(key, token);
         }
 
         auto getQuote(String symbol) 
             -> Quote const {
-            std::string response = client.get_quote(symbol);
+            String response = client.get_quote(symbol);
             return parser.parse_quote(parser.read_response(response)); 
         }
 
@@ -63,19 +55,22 @@ namespace tda
             return parser.parse_price_history(parser.read_response(response), ticker, frequencyType);
         }
 
-        auto getOptionChain(String ticker, String strikeCount,
-                            String strategy, String range,
-                            String expMonth, String optionType) 
+        auto getOptionChain(String ticker, String strikeCount, String strategy, 
+                            String range, String expMonth, String optionType) 
             -> OptionChain const {
-            client.addAuth(consumerKey, refreshToken);
             String response = client.get_option_chain(ticker, "ALL", strikeCount, true, strategy, range, expMonth, optionType);
             return parser.parse_option_chain(parser.read_response(response));
         }
 
         auto getWatchlistsByAccount(String account_num) 
             -> Watchlists const {
-            std::string response = client.get_watchlist_by_account(account_num);
+            String response = client.get_watchlist_by_account(account_num);
             return parser.parse_watchlist_data(parser.read_response(response));
+        }
+
+        auto getAllAcountNumbers() -> StringList {
+            auto list = client.get_all_account_ids();
+            return list;
         }
 
         void postOrder(String account_id, const Order & order) {

@@ -33,8 +33,8 @@ namespace Premia {
         
     };
 
-    template <> void EventInterface::insert(String, TDALoginEvent); 
-    template <> void EventInterface::trigger(String, CRString key, CRString token); 
+    // template <> void EventInterface::insert(String, TDALoginEvent); 
+    // template <> void EventInterface::trigger(String, CRString key, CRString token); 
 }
 
 #endif

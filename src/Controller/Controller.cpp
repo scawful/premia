@@ -72,21 +72,6 @@ Controller::initCallbacks()
         io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     });
 
-    viewManager.addLoginEvent([this] (CRString key, CRString token) -> void {
-        viewManager.setCurrentView(std::make_shared<PrimaryView>());
-        viewManager.setLoggedIn(key, token); 
-        viewManager.transferEvents();
-        SDL_SetWindowSize(window, Premia::SCREEN_WIDTH, Premia::SCREEN_HEIGHT);
-        SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-        ImGuiIO & io = ImGui::GetIO();
-        io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
-        io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
-        io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
-        io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
-        io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
-        io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
-    });
-
     viewManager.addEventHandler("toggleConsoleView", [this] () -> void { viewManager.setConsoleView(); });
     viewManager.addEventHandler("toggleWatchlistView", [this] () -> void {viewManager.setWatchlistView(); });
     

@@ -4,12 +4,12 @@ void WatchlistModel::initWatchlist()
 {
     String account_num;
     try {
-        account_num = getTDAInterface().get_all_accounts().at(0);
+        account_num = tda::TDA::getInstance().getAllAcountNumbers().at(0);
     } catch (const std::out_of_range & e) {
         String error(e.what());
         logger("[error] " + error);
     }
-    watchlists = getTDAInterface().getWatchlistsByAccount(account_num);
+    watchlists = tda::TDA::getInstance().getWatchlistsByAccount(account_num);
 
     for ( int i = 0; i < watchlists.size(); i++ ) {
         watchlistNames.push_back(watchlists[i].getName());
@@ -38,7 +38,7 @@ bool WatchlistModel::isActive() const
     return active;
 }
 
-void WatchlistModel::addLogger(const Premia::ConsoleLogger & newLogger)
+void WatchlistModel::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
 }

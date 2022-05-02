@@ -6,11 +6,6 @@
 #include "ImGui.hpp"
 
 namespace Premia {
-    using EventHandler = std::function<void()>;
-    using ConsoleLogger = std::function<void(String)>;
-    using SocketListener = std::function<void(const char*)>;
-    using TDALoginEvent = std::function<void(String, std::string &)>;
-
     constexpr int LOGIN_WIDTH = 300;
     constexpr int LOGIN_HEIGHT = 200;
     constexpr size_t SCREEN_WIDTH = 1200;

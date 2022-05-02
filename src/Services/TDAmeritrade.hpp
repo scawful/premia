@@ -27,7 +27,7 @@ namespace tda
         String _refresh_token;
         String _consumer_key;
 
-        Premia::ConsoleLogger consoleLogger;
+        ConsoleLogger consoleLogger;
         Account current_account;
         Client client;
         Parser parser;
@@ -65,7 +65,7 @@ namespace tda
         void fetchAccessToken();
         bool is_session_active();
 
-        void addLogger(const Premia::ConsoleLogger &);
+        void addLogger(const ConsoleLogger &);
         void addAuth(const String, const String);
     };
 

@@ -85,8 +85,8 @@ void ChartModel::fetchPriceHistory(CRString ticker, tda::PeriodType ptype, int p
         datesVec.clear();
     }
     tickerSymbol = ticker;
-    quote = getTDAInterface().getQuote(ticker);
-    priceHistory = getTDAInterface().getPriceHistory(ticker, ptype, period_amt, ftype, freq_amt, ext);
+    quote = tda::TDA::getInstance().getQuote(ticker);
+    priceHistory = tda::TDA::getInstance().getPriceHistory(ticker, ptype, ftype, period_amt, freq_amt, ext);
     initCandles();
     active = true;
 }
