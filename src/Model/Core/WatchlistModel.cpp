@@ -2,11 +2,11 @@
 
 void WatchlistModel::initWatchlist()
 {
-    std::string account_num;
+    String account_num;
     try {
         account_num = getTDAInterface().get_all_accounts().at(0);
     } catch (const std::out_of_range & e) {
-        std::string error(e.what());
+        String error(e.what());
         logger("[error] " + error);
     }
     watchlists = getTDAInterface().getWatchlistsByAccount(account_num);
@@ -16,7 +16,7 @@ void WatchlistModel::initWatchlist()
         openList.push_back(0);
     }
 
-    for (std::string const& str : watchlistNames) {
+    for (String const& str : watchlistNames) {
         watchlistNamesChar.push_back(str.data());
     }
 
@@ -43,12 +43,12 @@ void WatchlistModel::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-std::string WatchlistModel::getWatchlistName(int index)
+String WatchlistModel::getWatchlistName(int index)
 {
     return watchlistNames.at(index);
 }
 
-tda::Quote & WatchlistModel::getQuote(String key)
+tda::Quote & WatchlistModel::getQuote(CRString key)
 {
     return quotes.at(key);
 }
@@ -58,7 +58,7 @@ tda::Watchlist & WatchlistModel::getWatchlist(int index)
     return watchlists.at(index);
 }
 
-void WatchlistModel::setQuote(String key, const tda::Quote & quote)
+void WatchlistModel::setQuote(CRString key, const tda::Quote & quote)
 {
     this->quotes[key] = quote;
 }

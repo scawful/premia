@@ -8,14 +8,14 @@
 class GenericClient
 {
 private:
-    static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s);
+    static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, String *s);
 
-    std::string send_request(String endpoint) const;
+    String send_request(CRString endpoint) const;
 
 public:
     GenericClient();
 
-    std::string get_spx_gex() const;
+    String get_spx_gex() const;
 
 };
 

@@ -15,13 +15,13 @@ namespace tda
         double low;
         double open;
         double close;
-        std::string datetime;
+        String datetime;
         time_t raw_datetime;
     };
 
     struct OptionsContract
     {
-        std::string putCall;
+        String putCall;
         double bid;
         double ask;
         double bidSize;
@@ -32,14 +32,14 @@ namespace tda
 
     struct StrikePriceMap
     {
-        std::string strikePrice;
-        std::unordered_map<std::string, std::string> raw_option;
-        std::unordered_map<std::string, OptionsContract> options;
+        String strikePrice;
+        StringMap raw_option;
+        std::unordered_map<String, OptionsContract> options;
     };
 
     struct OptionsDateTimeObj
     {
-        std::string datetime;
+        String datetime;
         std::vector<StrikePriceMap> strikePriceObj;
     };
 

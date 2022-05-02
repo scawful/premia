@@ -6,9 +6,9 @@ namespace cbp
      * @brief Get an account positions 
      * 
      * @param ticker 
-     * @return std::unordered_map<std::string, std::string> 
+     * @return StringMap 
      */
-    std::unordered_map<std::string, std::string> Account::get_position(String ticker)
+    StringMap Account::get_position(CRString ticker)
     {
         for (const auto & fields: accounts_vector) {
             for (const auto & [key, value]: fields) {

@@ -7,7 +7,7 @@
 class CandleChart: public Chart
 {
 private:
-    std::string tickerSymbol;
+    String tickerSymbol;
     ChartModel model;
 
     int binary_search(const std::vector<double> arr, int l, int r, double x);

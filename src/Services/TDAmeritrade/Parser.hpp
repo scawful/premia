@@ -17,12 +17,10 @@ namespace tda
     class Parser 
     {
     public:
-        Parser();
-
-        JSONObject::ptree read_response(String response) const;
-        std::string parse_access_token(String response) const;
+        JSONObject::ptree read_response(CRString response) const;
+        String parse_access_token(CRString response) const;
         Quote parse_quote(const JSONObject::ptree & data) const;
-        PriceHistory parse_price_history(const JSONObject::ptree & data, String ticker, int freq) const;
+        PriceHistory parse_price_history(const JSONObject::ptree & data, CRString ticker, int freq) const;
         UserPrincipals parse_user_principals(JSONObject::ptree & data) const;
 
         void parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain, int idx) const;

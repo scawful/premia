@@ -16,14 +16,14 @@ void TradingFrame::update()
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Quick Order", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        static std::string new_ticker = "";
+        static String new_ticker = "";
         static bool active_instrument = false;
         static char buf[64] = "";
         ImGui::InputText("##symbol", buf, 64, ImGuiInputTextFlags_CharsUppercase );
         ImGui::SameLine(); 
         if (ImGui::Button("Search")) {
             if (strcmp(buf, "") != 0) {
-                new_ticker = std::string(buf);
+                new_ticker = String(buf);
                 quotes[new_ticker] = premia->tda_interface.getQuote(new_ticker);
                 active_instrument = true;
             } else {
@@ -44,7 +44,7 @@ void TradingFrame::update()
             ImGui::InputFloat("Quanitity", &order_quantity, 10.f);
 
             double security_cost = 0.0;
-            std::string bidPrice = quotes[new_ticker].getQuoteVariable("bidPrice");
+            String bidPrice = quotes[new_ticker].getQuoteVariable("bidPrice");
             security_cost = std::stod( bidPrice );
             security_cost *= order_quantity;
             ImGui::Text("Cost: %lf", security_cost );

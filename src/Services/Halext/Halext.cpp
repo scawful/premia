@@ -14,7 +14,7 @@ void Halext::setPrivateBalance(bool private_balance)
     privateBalance = private_balance;
 }
 
-bool Halext::login(String username, String password) const
+bool Halext::login(CRString username, CRString password) const
 {
     return true;
 }

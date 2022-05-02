@@ -36,18 +36,18 @@ OptionsModel::getDateTimeArray()
     return this->datetime_array;
 }
 
-std::string 
+String 
 OptionsModel::getDateTime(int index)
 {
     return this->datetimeArray.at(index);
 }
 
 void 
-OptionsModel::fetchOptionChain(String ticker, String strikeCount,
-                               String strategy, String range,
-                               String expMonth, String optionType)
+OptionsModel::fetchOptionChain(CRString ticker, CRString strikeCount,
+                               CRString strategy, CRString range,
+                               CRString expMonth, CRString optionType)
 {
-    optionChainData = getTDAInterface().getOptionChain( ticker, "ALL", strikeCount, true, strategy, "ALL", "ALL", "ALL" );
+    optionChainData = tda::TDA::getInstance().getOptionChain(ticker, strikeCount, strategy, "ALL", "ALL", "ALL");
     optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
     callOptionArray = optionChainData.getCallOptionArray();
     putOptionArray = optionChainData.getPutOptionArray();

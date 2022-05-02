@@ -1,13 +1,9 @@
 #ifndef Premia_hpp
 #define Premia_hpp
 
-#include <string>
-#include <vector>
-#include <unordered_map>
 #include <functional>
+#include "Metatypes.hpp"
 #include "ImGui.hpp"
-
-using String = const std::string &;
 
 namespace Premia {
     using EventHandler = std::function<void()>;

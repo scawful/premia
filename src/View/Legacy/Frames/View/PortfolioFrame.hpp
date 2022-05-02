@@ -1,21 +1,19 @@
 #ifndef PortfolioFrame_hpp
 #define PortfolioFrame_hpp
 
-#include "../Frame.hpp"
-
-class PortfolioFrame : public Frame
+class PortfolioFrame
 {
 private:
-    std::vector<std::string> account_ids_std;
+    std::vector<String> account_ids_std;
     std::vector<const char*> account_ids;
-    std::string default_account;
+    String default_account;
 
-    std::unordered_map<std::string, tda::Quote> quotes;
+    std::unordered_map<String, tda::Quote> quotes;
 
     tda::Account account_data;
-    std::vector<std::string> positions_vector;
+    std::vector<String> positions_vector;
 
-    void draw_balance_string(String variable);
+    void draw_balance_string(CRString variable);
 
     void draw_positions();
     void draw_balances();
@@ -27,7 +25,7 @@ public:
     PortfolioFrame();
     
     void init_positions();
-    void load_account(String account);
+    void load_account(CRString account);
     void update();
 };
 

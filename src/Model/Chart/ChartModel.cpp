@@ -64,20 +64,20 @@ tda::Candle ChartModel::getCandle(int i)
     return candles.at(i);
 }
 
-std::string ChartModel::getTickerSymbol() const
+String ChartModel::getTickerSymbol() const
 {
     return tickerSymbol;
 }
 
-std::string ChartModel::getQuoteDetails()
+String ChartModel::getQuoteDetails()
 {
-    std::string quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") + " | Ask: $" + quote.getQuoteVariable("askPrice") + 
+    String quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") + " | Ask: $" + quote.getQuoteVariable("askPrice") + 
                                 " | Open: $" + quote.getQuoteVariable("openPrice") + " | Close: $" + quote.getQuoteVariable("closePrice") +
                                 " | Total Volume: " + quote.getQuoteVariable("totalVolume");
     return quoteDetails;
 }
 
-void ChartModel::fetchPriceHistory(String ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext)
+void ChartModel::fetchPriceHistory(CRString ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext)
 {
     if (active) {
         quote.clear();

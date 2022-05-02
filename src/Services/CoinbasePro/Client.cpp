@@ -7,9 +7,9 @@ using namespace cbp;
  *        https://stackoverflow.com/questions/5288076/base64-encoding-and-decoding-with-openssl
  * 
  * @param to_encode 
- * @return std::string 
+ * @return String 
  */
-auto EncodeBase64(std::string_view to_encode) -> std::string 
+auto EncodeBase64(std::string_view to_encode) -> String 
 {
     /// @sa https://www.openssl.org/docs/manmaster/man3/EVP_EncodeBlock.html
 
@@ -33,9 +33,9 @@ auto EncodeBase64(std::string_view to_encode) -> std::string
  *        https://stackoverflow.com/questions/5288076/base64-encoding-and-decoding-with-openssl
  * 
  * @param to_decode 
- * @return std::string 
+ * @return String 
  */
-auto DecodeBase64(std::string_view to_decode) -> std::string 
+auto DecodeBase64(std::string_view to_decode) -> String 
 {
     /// @sa https://www.openssl.org/docs/manmaster/man3/EVP_DecodeBlock.html
 
@@ -55,7 +55,7 @@ auto DecodeBase64(std::string_view to_decode) -> std::string
 }
 
 /**
- * @brief Get JSON data from server and store into string 
+ * @brief Get JSON data from server and store into CRString 
  * @author @scawful
  * 
  * @param contents 
@@ -64,7 +64,7 @@ auto DecodeBase64(std::string_view to_decode) -> std::string
  * @param s 
  * @return size_t 
  */
-size_t Client::json_write_callback(const char * contents, size_t size, size_t nmemb, std::string * s) 
+size_t Client::json_write_callback(const char * contents, size_t size, size_t nmemb, String * s) 
 {
     size_t new_length = size * nmemb;
     try {
@@ -80,12 +80,12 @@ size_t Client::json_write_callback(const char * contents, size_t size, size_t nm
  * @brief Get the server time from Coinbase
  * @author @scawful
  * 
- * @return std::string 
+ * @return String 
  */
-std::string Client::get_server_time() const 
+String Client::get_server_time() const 
 {
     CURL *curl;
-    std::string response;
+    String response;
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
@@ -102,7 +102,7 @@ std::string Client::get_server_time() const
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
 
     // specify the request (server time)
-    std::string request_path = endpoint_url + "/time";
+    String request_path = endpoint_url + "/time";
     curl_easy_setopt(curl, CURLOPT_URL, request_path.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
@@ -121,9 +121,9 @@ std::string Client::get_server_time() const
         std::cout << e.what() << std::endl;
     }
 
-    std::string server_time;
+    String server_time;
     try {
-        server_time = property_tree.get_child("epoch.").get_value<std::string>();
+        server_time = property_tree.get_child("epoch.").get_value<String>();
     } catch ( const boost::property_tree::ptree_error & e ) {
         std::cout << e.what() << std::endl;
     }
@@ -141,7 +141,7 @@ std::string Client::get_server_time() const
  * @param passphrase 
  * @param sandbox 
  */
-Client::Client( std::string_view api, std::string_view secret, std::string_view passphrase, bool sandbox ) : api_key(api), secret_key(secret), passphrase(passphrase)
+Client::Client(CRString api, CRString secret, CRString passphrase, bool sandbox) : api_key(api), secret_key(secret), passphrase(passphrase)
 {
     endpoint_url = sandbox ? "https://api.pro.coinbase.com" : "https://api-public.sandbox.pro.coinbase.com";
 }
@@ -155,10 +155,10 @@ Client::~Client() = default;
  * @param filename 
  * @param request 
  */
-std::string Client::send_request(std::string_view request)
+String Client::send_request(CRString request)
 {
     CURL *curl;
-    std::string response;
+    String response;
 
     // initialize libcurl 
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -176,21 +176,21 @@ std::string Client::send_request(std::string_view request)
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     // set the access key 
-    std::string access_key = "CB-ACCESS-KEY: " + api_key;
+    String access_key = "CB-ACCESS-KEY: " + api_key;
     headers = curl_slist_append( headers, access_key.c_str() );
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     // prepare the message contents to be encoded 
-    std::string _body = "";
-    std::string _method = "GET";
-    std::string _request_path = endpoint_url + request.data();
-    std::string _timestamp = get_server_time();
-    std::string _message = _timestamp + _method + request.data() + _body ;
+    String _body = "";
+    String _method = "GET";
+    String _request_path = endpoint_url + request.data();
+    String _timestamp = get_server_time();
+    String _message = _timestamp + _method + request.data() + _body ;
 
     std::cout << _message << std::endl;
 
     // base64 decode the secret key 
-    std::string decoded_key = DecodeBase64( secret_key.data() );
+    String decoded_key = DecodeBase64( secret_key.data() );
     char *hmac_key = strdup( decoded_key.c_str() );
     size_t key_len = strlen(hmac_key);
 
@@ -214,8 +214,8 @@ std::string Client::send_request(std::string_view request)
 
     // base64 encode the hmac signature data 
     const char *pre_encode_signature_c = strdup(reinterpret_cast<const char *>(md));
-    std::string pre_encode_signature( pre_encode_signature_c );
-    std::string post_encode_signature = EncodeBase64( pre_encode_signature );
+    String pre_encode_signature( pre_encode_signature_c );
+    String post_encode_signature = EncodeBase64( pre_encode_signature );
 
     // free data related to encoding signature 
     free( hmac_key );
@@ -223,18 +223,18 @@ std::string Client::send_request(std::string_view request)
     free( (char *) pre_encode_signature_c );
 
     // add the signature to the header
-    std::string access_sign = "CB-ACCESS-SIGN: " + post_encode_signature;
+    String access_sign = "CB-ACCESS-SIGN: " + post_encode_signature;
     headers = curl_slist_append( headers, access_sign.c_str() );
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     // add the timestamp to the header
-    std::string timestamp = "CB-ACCESS-TIMESTAMP: " + _timestamp;
+    String timestamp = "CB-ACCESS-TIMESTAMP: " + _timestamp;
     headers = curl_slist_append( headers, timestamp.c_str() );
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     // add the passphrase to the header
-    std::string _passphrase = passphrase;
-    std::string request_passphrase = "CB-ACCESS-PASSPHRASE: " + _passphrase;
+    String _passphrase = passphrase;
+    String request_passphrase = "CB-ACCESS-PASSPHRASE: " + _passphrase;
     headers = curl_slist_append( headers, request_passphrase.c_str() );
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
@@ -251,7 +251,7 @@ std::string Client::send_request(std::string_view request)
     return response;
 }
 
-// void Client::send_request( std::string filename, std::string request, std::string method, std::string body )
+// void Client::send_request( String filename, String request, String method, String body )
 // {
 
 // }

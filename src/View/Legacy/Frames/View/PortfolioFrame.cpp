@@ -5,9 +5,9 @@
  * 
  * @param variable 
  */
-void PortfolioFrame::draw_balance_string(String variable)
+void PortfolioFrame::draw_balance_string(CRString variable)
 {
-    std::string str = (premia->getHalextInterface().getPrivateBalance()) ? "***" : variable;
+    String str = (premia->getHalextInterface().getPrivateBalance()) ? "***" : variable;
     ImGui::Text("%s", str.c_str());
 }
 
@@ -36,7 +36,7 @@ void PortfolioFrame::draw_positions()
             for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
                 ImGui::TableNextRow();
                 for (int column = 0; column < 6; column++) {
-                    std::string symbol = positions_vector[row];
+                    String symbol = positions_vector[row];
                     ImGui::TableSetColumnIndex(column);
                     switch(column) {
                         case 0:
@@ -131,7 +131,7 @@ void PortfolioFrame::init_positions()
 {
     account_ids_std = premia->tda_interface.get_all_accounts();
     int i = 0;
-    for (std::string const& each_id : account_ids_std) {
+    for (String const& each_id : account_ids_std) {
         account_ids.push_back(each_id.c_str());
         i++;
     }
@@ -146,7 +146,7 @@ void PortfolioFrame::init_positions()
  * 
  * @param account_num 
  */
-void PortfolioFrame::load_account(String account_num)
+void PortfolioFrame::load_account(CRString account_num)
 {
     account_data = premia->tda_interface.getAccount(account_num);
 
@@ -157,7 +157,7 @@ void PortfolioFrame::load_account(String account_num)
     for (int i = 0; i < account_data.get_position_vector_size(); i++) {
         for (const auto & [key, value] : account_data.get_position(i)) {
             if (key == "symbol") {
-                std::string str = value;
+                String str = value;
                 positions_vector.push_back(str);
             }
         }

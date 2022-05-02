@@ -8,10 +8,10 @@ namespace tda
     class OptionChain
     {
     private:
-        std::unordered_map<std::string, std::string> callExpDateMap;
-        std::unordered_map<std::string, std::string> putExpDateMap;
-        std::unordered_map<std::string, std::string> optionChainMap;
-        std::unordered_map<std::string, std::string> underlyingMap;
+        StringMap callExpDateMap;
+        StringMap putExpDateMap;
+        StringMap optionChainMap;
+        StringMap underlyingMap;
         std::vector<OptionsDateTimeObj> callOptionArray;
         std::vector<OptionsDateTimeObj> putOptionArray;
         std::vector<OptionsDateTimeObj> optionsDateTimeVector;
@@ -22,19 +22,19 @@ namespace tda
         std::vector<OptionsDateTimeObj> getCallOptionArray() const;
         std::vector<OptionsDateTimeObj> getPutOptionArray() const;
         std::vector<OptionsDateTimeObj> getOptionsDateTimeObj() const;
-        std::string getCallVariable( String variable );
-        std::string getPutVariable( String variable );
-        std::string getOptionChainDataVariable( String variable );
-        std::string getUnderlyingDataVariable( String variable );
+        String getCallVariable( CRString variable );
+        String getPutVariable( CRString variable );
+        String getOptionChainDataVariable( CRString variable );
+        String getUnderlyingDataVariable( CRString variable );
 
 
 
         void addOptionsDateTimeObj( const OptionsDateTimeObj & obj );
         void addOptionsDateTimeObj( const OptionsDateTimeObj & obj, int idx );
-        void setCallVariable( String key, String value );
-        void setPutVariable( String key, String value );
-        void setOptionChainVariable( String key, String value );
-        void setUnderlyingVariable( String key, String value );
+        void setCallVariable( CRString key, CRString value );
+        void setPutVariable( CRString key, CRString value );
+        void setOptionChainVariable( CRString key, CRString value );
+        void setUnderlyingVariable( CRString key, CRString value );
 
     };
 }

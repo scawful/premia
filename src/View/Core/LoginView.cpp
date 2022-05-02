@@ -1,4 +1,5 @@
 #include "LoginView.hpp"
+#include "TDA.hpp"
 
 static const char* _IMGUIGetClipboardText(void *) { return SDL_GetClipboardText(); }
 
@@ -16,10 +17,10 @@ void LoginView::drawScreen() const
     static char username[128];
     static char password[128];
     
-    static std::string consumer_key;
-    static std::string refresh_token;
+    static String consumer_key;
+    static String refresh_token;
     
-    std::string welcomePrompt = "Welcome to Premia"; 
+    String welcomePrompt = "Welcome to Premia"; 
     auto windowWidth = ImGui::GetWindowSize().x;
     auto textWidth   = ImGui::CalcTextSize(welcomePrompt.c_str()).x;
     ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
@@ -42,12 +43,12 @@ void LoginView::drawScreen() const
         } else {
             std::cout << "fail!" << std::endl;
         }
-        loginEvent(consumer_key, refresh_token);
-        //events.at("login")();
+        tda::TDA::getInstance().authUser(consumer_key, refresh_token);
+        events.at("login")();
     }
 }
 
-void LoginView::addAuth(String key , String token)
+void LoginView::addAuth(CRString key , CRString token)
 {
     
 }
@@ -57,7 +58,7 @@ void LoginView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void LoginView::addEvent(String key, const Premia::EventHandler & event)
+void LoginView::addEvent(CRString key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

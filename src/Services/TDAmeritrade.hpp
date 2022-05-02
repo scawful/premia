@@ -22,10 +22,10 @@ namespace tda
     {
     private:
         bool session_active;
-        std::string _current_ticker;
-        std::string _access_token;
-        std::string _refresh_token;
-        std::string _consumer_key;
+        String _current_ticker;
+        String _access_token;
+        String _refresh_token;
+        String _consumer_key;
 
         Premia::ConsoleLogger consoleLogger;
         Account current_account;
@@ -47,26 +47,26 @@ namespace tda
         TDAmeritrade();
         ~TDAmeritrade();
 
-        std::vector<std::string> get_all_accounts();
+        std::vector<String> get_all_accounts();
 
         Account getCurrentAccount() const;
         Account getDefaultAccount();
-        std::vector<Watchlist> getWatchlistsByAccount(String account_num) const;
-        Quote getQuote(String symbol) const;
-        Account getAccount(String account_id);
-        PriceHistory getPriceHistory(String ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const;
-        OptionChain getOptionChain(String ticker, String contractType, String strikeCount,
-                                   bool includeQuotes, String strategy, String range,
-                                   String expMonth, String optionType) const;
+        std::vector<Watchlist> getWatchlistsByAccount(CRString account_num) const;
+        Quote getQuote(CRString symbol) const;
+        Account getAccount(CRString account_id);
+        PriceHistory getPriceHistory(CRString ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const;
+        OptionChain getOptionChain(CRString ticker, CRString contractType, CRString strikeCount,
+                                   bool includeQuotes, CRString strategy, CRString range,
+                                   CRString expMonth, CRString optionType) const;
 
-        void postOrder(String account_id, const Order & order) const;
+        void postOrder(CRString account_id, const Order & order) const;
 
         void startStreamingSession();
         void fetchAccessToken();
         bool is_session_active();
 
         void addLogger(const Premia::ConsoleLogger &);
-        void addAuth(const std::string, const std::string);
+        void addAuth(const String, const String);
     };
 
 }

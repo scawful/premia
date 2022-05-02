@@ -10,10 +10,10 @@ namespace JSONObject = boost::property_tree;
 
 namespace tda 
 {
-    static const std::string EnumAPIValues[]{ "day", "month", "year", "ytd" };
-    static const std::string EnumAPIFreq[]{ "minute", "daily", "weekly", "monthly" };
-    static const std::string EnumAPIPeriod[]{ "1", "2", "3", "4", "5", "6", "10", "15", "20" };
-    static const std::string EnumAPIFreqAmt[]{ "1", "5", "10", "15", "30" };
+    static const String EnumAPIValues[]{ "day", "month", "year", "ytd" };
+    static const String EnumAPIFreq[]{ "minute", "daily", "weekly", "monthly" };
+    static const String EnumAPIPeriod[]{ "1", "2", "3", "4", "5", "6", "10", "15", "20" };
+    static const String EnumAPIFreqAmt[]{ "1", "5", "10", "15", "30" };
 
     enum ServiceType
     {
@@ -33,7 +33,7 @@ namespace tda
         UNKNOWN,
     };
 
-    static const std::string EnumAPIServiceName[]{
+    static const String EnumAPIServiceName[]{
         "NONE",
         "ADMIN",
         "ACTIVES_NASDAQ", "ACTIVES_NYSE", "ACTIVES_OTCBB", "ACTIVES_OPTIONS",
@@ -71,9 +71,9 @@ namespace tda
         bool session_active = false;
 
         // API Strings 
-        std::string api_key;
-        std::string refresh_token;
-        std::string access_token;
+        String api_key = "";
+        String refresh_token  = "";
+        String access_token  = "";
 
         // API Data 
         Parser parser;
@@ -83,64 +83,64 @@ namespace tda
         // WebSocket session variables 
         boost::asio::io_context ioc;
         std::shared_ptr<tda::Socket> websocket_session;
-        std::shared_ptr<std::vector<std::string>> websocket_buffer;
-        std::vector<std::shared_ptr<std::string const>> request_queue;
+        std::shared_ptr<std::vector<String>> websocket_buffer;
+        std::vector<std::shared_ptr<String const>> request_queue;
         std::vector<std::thread> ws_threads;
 
-        // String Manipulation 
-        std::string get_api_interval_value(int value) const;
-        std::string get_api_frequency_type(int value) const;
-        std::string get_api_period_amount(int value) const;
-        std::string get_api_frequency_amount(int value) const;
-        bool string_replace(std::string & str, String from, String to) const;
+        // CRString Manipulation 
+        String get_api_interval_value(int value) const;
+        String get_api_frequency_type(int value) const;
+        String get_api_period_amount(int value) const;
+        String get_api_frequency_amount(int value) const;
+        bool string_replace(String & str, CRString from, CRString to) const;
 
         // Data Retrieval
-        static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s);
+        static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, String *s);
 
         // WebSocket functions
         JSONObject::ptree create_login_request();
         JSONObject::ptree create_logout_request();
-        JSONObject::ptree create_service_request(ServiceType serv_type, std::string const & keys, std::string const & fields);
+        JSONObject::ptree create_service_request(ServiceType serv_type, String const & keys, String const & fields);
 
         // API Functions 
         void get_user_principals();
-        void post_authorized_request(String endpoint, String data) const;
-        std::string post_account_order(std::string const & account_id) const;
-        std::string post_access_token() const;
+        void post_authorized_request(CRString endpoint, CRString data) const;
+        String post_account_order(String const & account_id) const;
+        String post_access_token() const;
 
     public:
         Client();
 
-        std::string send_request(std::string const & endpoint) const;
-        std::string send_authorized_request(std::string const & endpoint) const;
+        String send_request(String const & endpoint) const;
+        String send_authorized_request(String const & endpoint) const;
 
-        std::string get_watchlist_by_account(std::string const & account_id) const;
-        std::string get_price_history(std::string const & symbol, 
+        String get_watchlist_by_account(String const & account_id) const;
+        String get_price_history(String const & symbol, 
                                       PeriodType ptype, int period_amt, 
                                       FrequencyType ftype, int freq_amt, bool ext) const;
-        std::string get_option_chain(std::string const & ticker, 
-                                     std::string const & contractType, 
-                                     std::string const & strikeCount,
+        String get_option_chain(String const & ticker, 
+                                     String const & contractType, 
+                                     String const & strikeCount,
                                      bool includeQuotes, 
-                                     std::string const & strategy, std::string const & range,
-                                     std::string const & expMonth, std::string const & optionType) const;
-        std::string get_quote(std::string const & symbol) const;
-        std::string get_account(std::string const & account_id);
-        std::vector<std::string> get_all_account_ids();
+                                     String const & strategy, String const & range,
+                                     String const & expMonth, String const & optionType) const;
+        String get_quote(String const & symbol) const;
+        String get_account(String const & account_id);
+        std::vector<String> get_all_account_ids();
 
-        void post_order(String account_id, const Order & order) const;
+        void post_order(CRString account_id, const Order & order) const;
 
         void start_session();
-        void start_session(std::string const & ticker, std::string const & fields);
-        void send_session_request(std::string const & request) const;
+        void start_session(String const & ticker, String const & fields);
+        void send_session_request(String const & request) const;
         void send_logout_request();
         void send_interrupt_signal() const;
         bool is_session_logged_in() const;
-        std::vector<std::string> get_session_responses() const;
-        std::string get_access_token() const;
+        std::vector<String> get_session_responses() const;
+        String get_access_token() const;
         void fetch_access_token();
 
-        void addAuth(const std::string, const std::string);
+        void addAuth(const String, const String);
     };
 }
 

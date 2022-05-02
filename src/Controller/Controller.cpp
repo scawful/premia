@@ -60,7 +60,7 @@ Controller::initCallbacks()
 {
     viewManager.addEventHandler("login", [this] () -> void { 
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
-        viewManager.setLoggedIn("test", "token"); 
+        viewManager.setLoggedIn(); 
         viewManager.transferEvents();
         SDL_SetWindowSize(window, Premia::SCREEN_WIDTH, Premia::SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
@@ -72,7 +72,7 @@ Controller::initCallbacks()
         io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     });
 
-    viewManager.addLoginEvent([this] (String key, String token) -> void {
+    viewManager.addLoginEvent([this] (CRString key, CRString token) -> void {
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn(key, token); 
         viewManager.transferEvents();

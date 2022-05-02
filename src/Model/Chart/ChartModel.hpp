@@ -7,7 +7,7 @@ class ChartModel: public Model
 {
 private:
     bool active = false;
-    std::string tickerSymbol;
+    String tickerSymbol;
     Premia::SocketListener socketListener;
     tda::Quote quote;
     tda::PriceHistory priceHistory;
@@ -26,9 +26,9 @@ public:
     tda::Quote & getQuote();
     int getNumCandles() const;
     tda::Candle getCandle(int i);
-    std::string getTickerSymbol() const;
-    std::string getQuoteDetails();
-    void fetchPriceHistory(String ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext);
+    String getTickerSymbol() const;
+    String getQuoteDetails();
+    void fetchPriceHistory(CRString ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext);
 
 };
 

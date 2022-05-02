@@ -20,7 +20,7 @@ namespace halext
         bool & getPrivateBalance();
         void setPrivateBalance(bool private_balance);
 
-        bool login(String username, String password) const;
+        bool login(CRString username, CRString password) const;
 
     };
 }

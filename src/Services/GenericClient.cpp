@@ -1,6 +1,6 @@
 #include "GenericClient.hpp"
 
-size_t GenericClient::json_write_callback(const char * contents, size_t size, size_t nmemb, std::string *s)
+size_t GenericClient::json_write_callback(const char * contents, size_t size, size_t nmemb, String *s)
 {
     size_t new_length = size * nmemb;
     try {
@@ -17,13 +17,13 @@ size_t GenericClient::json_write_callback(const char * contents, size_t size, si
  * @brief 
  * 
  * @param endpoint 
- * @return std::string 
+ * @return String 
  */
-std::string GenericClient::send_request(String endpoint) const
+String GenericClient::send_request(CRString endpoint) const
 {
     CURL *curl;
     CURLcode res;
-    std::string response;
+    String response;
 
     curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
@@ -44,8 +44,8 @@ std::string GenericClient::send_request(String endpoint) const
 
 GenericClient::GenericClient()=default;
 
-std::string GenericClient::get_spx_gex() const
+String GenericClient::get_spx_gex() const
 {
-    std::string response = send_request("https://squeezemetrics.com/monitor/download/SPX.csv");
+    String response = send_request("https://squeezemetrics.com/monitor/download/SPX.csv");
     return response;
 }

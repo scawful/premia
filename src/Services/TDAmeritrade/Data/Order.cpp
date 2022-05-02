@@ -21,26 +21,26 @@ void Order::prepareOrderString() const
 Order::Order()=default;
 Order::~Order()=default;
 
-std::string Order::getString() const {
+String Order::getString() const {
     return orderJSON;
 }
 
-std::string Order::getOrderType() const {
+String Order::getOrderType() const {
     return orderType;
 }
 
-std::string Order::getSession() const {
+String Order::getSession() const {
     return session;
 }
 
-std::string Order::getDuration() const {
+String Order::getDuration() const {
     return duration;
 }
 
-std::string Order::getOrderStrategyType() const {
+String Order::getOrderStrategyType() const {
     return orderStrategyType;
 }
 
-std::string Order::getPrice() const {
+String Order::getPrice() const {
     return price;
 }

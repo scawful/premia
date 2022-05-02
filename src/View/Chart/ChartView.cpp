@@ -1,6 +1,6 @@
 #include "ChartView.hpp"
 
-void ChartView::addAuth(String key , String token)
+void ChartView::addAuth(CRString key , CRString token)
 {
     
 }
@@ -10,7 +10,7 @@ void ChartView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void ChartView::addEvent(String key, const Premia::EventHandler & event)
+void ChartView::addEvent(CRString key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

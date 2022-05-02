@@ -24,11 +24,11 @@ namespace tda
     {
     private:
         bool initialized;
-        std::string tickerSymbol;
+        String tickerSymbol;
         std::vector<std::vector<tda::Candle>> candles;
 
-        std::unordered_map<std::string, std::string> priceHistoryVariables;
-        std::unordered_map<std::string, std::string> candleData;
+        StringMap priceHistoryVariables;
+        StringMap candleData;
         std::vector< tda::Candle > candleVector;
             
     public:
@@ -41,13 +41,13 @@ namespace tda
         int getNumCandles(int index);
 
         std::vector< tda::Candle > getCandleVector();
-        std::string getCandleDataVariable( std::string variable );
-        std::string getPriceHistoryVariable( std::string variable );
-        std::string getTickerSymbol();
+        String getCandleDataVariable( String variable );
+        String getPriceHistoryVariable( String variable );
+        String getTickerSymbol();
         bool getInitialized();
 
-        void setPriceHistoryVariable(std::string key, std::string value);
-        void setTickerSymbol(std::string ticker);
+        void setPriceHistoryVariable(String key, String value);
+        void setTickerSymbol(String ticker);
         void setInitialized();
 
         void updatePriceHistory();

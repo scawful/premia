@@ -20,8 +20,8 @@ private:
 
     std::vector<double> numDays;
     std::vector<double> balances;
-    std::vector<std::string> dates;
-    std::unordered_map<std::string, Premia::EventHandler> events;
+    std::vector<String> dates;
+    std::unordered_map<String, Premia::EventHandler> events;
 
     void initData();
 
@@ -30,9 +30,9 @@ public:
     ~LinePlotChart() override;
 
     void update() override;
-    void addAuth(String key , String token) override;
+    void addAuth(CRString key , CRString token) override;
     void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(String key, const Premia::EventHandler & event) override;
+    void addEvent(CRString key, const Premia::EventHandler & event) override;
 };
 
 #endif

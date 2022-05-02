@@ -8,10 +8,10 @@ namespace cbp
     class Account 
     {
     private:
-        std::vector<std::unordered_map<std::string, std::string >> accounts_vector;
+        std::vector<StringMap> accounts_vector;
     public:
         Account()=default;
-        std::unordered_map<std::string, std::string> get_position(String ticker);
+        StringMap get_position(CRString ticker);
     };
 }
 

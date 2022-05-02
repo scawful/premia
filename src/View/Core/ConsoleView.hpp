@@ -17,13 +17,13 @@ private:
     ImGuiTextFilter       Filter;
     bool                  AutoScroll;
     bool                  ScrollToBottom;
-    std::string           title;
+    String           title;
     bool                  copy_to_clipboard = false;
 
     void clearLog();
     void executeCommand(const char* command_line);
     Premia::ConsoleLogger logger;
-    std::unordered_map<std::string, Premia::EventHandler> events;
+    std::unordered_map<String, Premia::EventHandler> events;
 
     void drawScreen();
 
@@ -34,10 +34,10 @@ public:
     int TextEditCallback(ImGuiInputTextCallbackData* data);
 
     void addLog(const char* fmt, ...);
-    void addLogStd(String data);
-    void addAuth(String key , String token) override;
+    void addLogStd(CRString data);
+    void addAuth(CRString key , CRString token) override;
     void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(String key, const Premia::EventHandler & event) override;
+    void addEvent(CRString key, const Premia::EventHandler & event) override;
     void update() override;
 };
 

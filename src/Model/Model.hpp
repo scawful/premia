@@ -7,7 +7,7 @@
 class Model 
 {
 private:
-    std::unordered_map<std::string, Premia::EventHandler> callbacks;
+    std::unordered_map<String, Premia::EventHandler> callbacks;
     Premia::ConsoleLogger consoleLogger;
 
     tda::TDAmeritrade TDAInterface;
@@ -17,9 +17,9 @@ public:
     ~Model()=default;
     
 
-    void addAuth(String, String);
+    void addAuth(CRString, CRString);
     void addLogger(const Premia::ConsoleLogger & logger);
-    void addEventHandler(String key, const Premia::EventHandler & handler);
+    void addEventHandler(CRString key, const Premia::EventHandler & handler);
 
     Premia::ConsoleLogger & getLogger();
 

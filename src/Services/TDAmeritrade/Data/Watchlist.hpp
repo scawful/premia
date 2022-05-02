@@ -9,54 +9,54 @@ namespace tda
     {
     public:
         struct WatchlistInstrument {
-            std::string symbol;
-            std::string description;
-            std::string asset_type;
+            String symbol;
+            String description;
+            String asset_type;
 
-            WatchlistInstrument(String sym, String desc, String type) : symbol(sym), description(desc), asset_type(type) { }
+            WatchlistInstrument(CRString sym, CRString desc, CRString type) : symbol(sym), description(desc), asset_type(type) { }
 
-            std::string getSymbol() const {
+            String getSymbol() const {
                 return this->symbol;
             }
 
-            std::string getDescription() const {
+            String getDescription() const {
                 return this->description;
             }
 
-            std::string getType() const {
+            String getType() const {
                 return this->asset_type;
             }
         };
 
     private:
         std::vector<WatchlistInstrument> instruments;
-        std::unordered_map<std::string, std::string> variables;
+        StringMap variables;
 
         // "name": "string",
         // "watchlistId": "string",
         // "accountId": "string",
         // "status": "'UNCHANGED' or 'CREATED' or 'UPDATED' or 'DELETED'",
-        std::string name;
+        String name;
         unsigned int watchlist_id;
-        std::string account_id;
+        String account_id;
 
     public:
         Watchlist();
 
         int getNumInstruments() const;
 
-        std::string getName() const;
-        std::string getInstrumentSymbol(int item_id);
-        std::string getInstrumentDescription(int item_id);
-        std::string getInstrumentType(int item_id);
+        String getName() const;
+        String getInstrumentSymbol(int item_id);
+        String getInstrumentDescription(int item_id);
+        String getInstrumentType(int item_id);
 
         void setId( int id );
-        void setName(String name);
-        void setAccountId(String accountId);
-        void setWatchlistVariable(String variable);
+        void setName(CRString name);
+        void setAccountId(CRString accountId);
+        void setWatchlistVariable(CRString variable);
 
-        void addVariable(String key, String value);
-        void addInstrument(String symbol, String desc, String type);
+        void addVariable(CRString key, CRString value);
+        void addInstrument(CRString symbol, CRString desc, CRString type);
     };
 }
 

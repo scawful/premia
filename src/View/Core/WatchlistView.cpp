@@ -39,7 +39,7 @@ void WatchlistView::drawWatchlistTable()
                 ImGui::TableNextRow();
                 for (int column = 0; column < 5; column++)
                 {
-                    std::string symbol = model.getWatchlist(n).getInstrumentSymbol(row);
+                    String symbol = model.getWatchlist(n).getInstrumentSymbol(row);
                     ImGui::TableSetColumnIndex(column);
                     switch( column )
                     {
@@ -79,7 +79,7 @@ void WatchlistView::drawCustomWatchlistTable()
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
     ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 10);
 
-    static std::string new_instrument = "";
+    static String new_instrument = "";
     ImGui::InputText("Add", &new_instrument);
     std::vector<tda::Watchlist::WatchlistInstrument> instruments;
 
@@ -100,9 +100,9 @@ void WatchlistView::drawCustomWatchlistTable()
                 ImGui::TableNextRow();
                 for (int column = 0; column < 3; column++)
                 {
-                    std::string symbol = instruments[n].getSymbol();
-                    std::string description = instruments[n].getDescription();
-                    std::string assetType = instruments[n].getType();
+                    String symbol = instruments[n].getSymbol();
+                    String description = instruments[n].getDescription();
+                    String assetType = instruments[n].getType();
                     ImGui::TableSetColumnIndex(column);
                     switch( column )
                     {
@@ -127,7 +127,7 @@ void WatchlistView::drawCustomWatchlistTable()
     }
 }
 
-void WatchlistView::addAuth(String key , String token)
+void WatchlistView::addAuth(CRString key , CRString token)
 {
     model.addAuth(key, token);
 }
@@ -137,7 +137,7 @@ void WatchlistView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void WatchlistView::addEvent(String key, const Premia::EventHandler & event)
+void WatchlistView::addEvent(CRString key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

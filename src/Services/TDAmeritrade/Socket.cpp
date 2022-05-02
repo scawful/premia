@@ -108,7 +108,7 @@ namespace tda
             [](websocket::request_type& req)
             {
                 req.set(http::field::user_agent,
-                    std::string(BOOST_BEAST_VERSION_STRING) +
+                    String(BOOST_BEAST_VERSION_STRING) +
                         " websocket-client-async-ssl");
             }));
 
@@ -185,7 +185,7 @@ namespace tda
             return fail(ec, "read");
 
         SDL_Log("Socket::on_read");
-        std::string response(net::buffer_cast<const char*>( _buffer.data()), _buffer.size()); 
+        String response(net::buffer_cast<const char*>( _buffer.data()), _buffer.size()); 
         SDL_Log("Server Response: %s", response.c_str() );
         _response_stack.push_back( response );
 
@@ -256,7 +256,7 @@ namespace tda
 
     // sends a message to the queue from the main threads
     void 
-    Socket::send_message(const std::shared_ptr<std::string const> & s)
+    Socket::send_message(const std::shared_ptr<String const> & s)
     {
         SDL_Log("Socket::send_message");
 
@@ -275,23 +275,23 @@ namespace tda
     }
 
     // returns the cumulative vector of responses from the server
-    std::vector<std::string> 
+    std::vector<String> 
     Socket::receive_response() const
     {
         return _response_stack;
     }
 
-    std::shared_ptr<std::vector<std::string>> 
+    std::shared_ptr<std::vector<String>> 
     Socket::receive_response_ptr()
     {
-        return std::make_shared<std::vector<std::string>>(_response_stack);
+        return std::make_shared<std::vector<String>>(_response_stack);
     }
 
     bool 
     Socket::on_login(beast::error_code ec)
     {
-        std::string response_code;
-        std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
+        String response_code;
+        String s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
         SDL_Log("Login Response Stream: \n%s", s.c_str() );
 
         std::size_t found = s.find("code");
@@ -299,7 +299,7 @@ namespace tda
         SDL_Log("Code: %s", response_code.c_str() );
 
         found = s.find("msg");
-        std::string response_msg = s.substr( found, 4 );
+        String response_msg = s.substr( found, 4 );
 
         if ( response_code == "3" )
         {
@@ -328,7 +328,7 @@ namespace tda
     Socket::on_notify(beast::error_code ec)
     {
         SDL_Log("Socket::on_notify");
-        std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
+        String s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("notify");
 
         if (found != std::string::npos) {
@@ -341,8 +341,8 @@ namespace tda
     Socket::on_subscription(beast::error_code ec)
     {
         SDL_Log("Socket::on_subscription");
-        std::string sub_code;
-        std::string s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
+        String sub_code;
+        String s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
         std::size_t found = s.find("code");
 
         if (found != std::string::npos) {

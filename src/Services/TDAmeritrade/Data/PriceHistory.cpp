@@ -37,17 +37,17 @@ std::vector< tda::Candle > PriceHistory::getCandleVector()
     return candleVector;
 }
 
-std::string PriceHistory::getCandleDataVariable( std::string variable )
+String PriceHistory::getCandleDataVariable( String variable )
 {
     return candleData[ variable ];
 }
 
-std::string PriceHistory::getPriceHistoryVariable( std::string variable )
+String PriceHistory::getPriceHistoryVariable( String variable )
 {
     return priceHistoryVariables[variable];
 }
 
-std::string PriceHistory::getTickerSymbol()
+String PriceHistory::getTickerSymbol()
 {
     return tickerSymbol;
 }
@@ -57,12 +57,12 @@ bool PriceHistory::getInitialized()
     return initialized;
 }
 
-void PriceHistory::setPriceHistoryVariable(std::string key, std::string value)
+void PriceHistory::setPriceHistoryVariable(String key, String value)
 {
     priceHistoryVariables[key] = value;
 }
 
-void PriceHistory::setTickerSymbol(std::string ticker)
+void PriceHistory::setTickerSymbol(String ticker)
 {
     this->tickerSymbol = ticker;
 }

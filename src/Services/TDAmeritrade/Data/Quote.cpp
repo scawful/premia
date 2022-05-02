@@ -5,12 +5,12 @@ using namespace tda;
 Quote::Quote()=default;
 
 
-void Quote::setQuoteVariable(String key, String value)
+void Quote::setQuoteVariable(CRString key, CRString value)
 {
     quoteVariables[key] = value;
 }
 
-std::string Quote::getQuoteVariable(String variable)
+String Quote::getQuoteVariable(CRString variable)
 {
     return quoteVariables[variable];
 }

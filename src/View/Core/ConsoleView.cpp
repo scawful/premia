@@ -25,7 +25,7 @@ void ConsoleView::addLog(const char* fmt, ...)
     Items.push_back(Strdup(buf));
 }
 
-void ConsoleView::addLogStd(String data)
+void ConsoleView::addLogStd(CRString data)
 {
     Items.push_back(Strdup(data.c_str()));
 }
@@ -301,7 +301,7 @@ ConsoleView::~ConsoleView()
         free(History[i]);
 }
 
-void ConsoleView::addAuth(String key, String token)
+void ConsoleView::addAuth(CRString key, CRString token)
 {
     
 }
@@ -311,7 +311,7 @@ void ConsoleView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void ConsoleView::addEvent(String key, const Premia::EventHandler & event) 
+void ConsoleView::addEvent(CRString key, const Premia::EventHandler & event) 
 {
     this->events[key] = event;
 }

@@ -9,22 +9,22 @@ std::vector<OptionsDateTimeObj> OptionChain::getOptionsDateTimeObj() const
     return optionsDateTimeVector;
 }
 
-std::string OptionChain::getCallVariable(String variable)
+String OptionChain::getCallVariable(CRString variable)
 {
     return callExpDateMap[ variable ];
 }
 
-std::string OptionChain::getPutVariable(String variable)
+String OptionChain::getPutVariable(CRString variable)
 {
     return putExpDateMap[ variable ];
 }
 
-std::string OptionChain::getOptionChainDataVariable(String variable)
+String OptionChain::getOptionChainDataVariable(CRString variable)
 {
     return optionChainMap[ variable ];
 }
 
-std::string OptionChain::getUnderlyingDataVariable(String variable)
+String OptionChain::getUnderlyingDataVariable(CRString variable)
 {
     return underlyingMap[ variable ];
 }
@@ -53,22 +53,22 @@ void OptionChain::addOptionsDateTimeObj( const OptionsDateTimeObj & obj, int idx
     }
 }
 
-void OptionChain::setCallVariable(String key, String value)
+void OptionChain::setCallVariable(CRString key, CRString value)
 {
     callExpDateMap[key] = value;
 }
 
-void OptionChain::setPutVariable(String key, String value)
+void OptionChain::setPutVariable(CRString key, CRString value)
 {
     putExpDateMap[key] = value;
 }
 
-void OptionChain::setOptionChainVariable(String key, String value)
+void OptionChain::setOptionChainVariable(CRString key, CRString value)
 {
     optionChainMap[key] = value;
 }
 
-void OptionChain::setUnderlyingVariable(String key, String value)
+void OptionChain::setUnderlyingVariable(CRString key, CRString value)
 {
     underlyingMap[key] = value;
 }

@@ -11,20 +11,20 @@ namespace tda
     private:
         struct OrderLegCollection {
             int quantity;
-            std::string symbol;
-            std::string assetType;
-            std::string instruction;
+            String symbol;
+            String assetType;
+            String instruction;
         };
 
-        std::string orderType;
-        std::string price;
-        std::string session;
-        std::string duration;
-        std::string orderStrategyType;
-        std::string complexOrderStrategyType;
+        String orderType;
+        String price;
+        String session;
+        String duration;
+        String orderStrategyType;
+        String complexOrderStrategyType;
         std::vector<OrderLegCollection> orderLegCollection;
 
-        std::string orderJSON;
+        String orderJSON;
 
         void prepareOrderString() const;
 
@@ -32,12 +32,12 @@ namespace tda
         Order();
         ~Order();
 
-        std::string getString() const;
-        std::string getOrderType() const;
-        std::string getSession() const;
-        std::string getDuration() const;
-        std::string getOrderStrategyType() const;
-        std::string getPrice() const;
+        String getString() const;
+        String getOrderType() const;
+        String getSession() const;
+        String getDuration() const;
+        String getOrderStrategyType() const;
+        String getPrice() const;
     };
 
     // Buy Market: Stock

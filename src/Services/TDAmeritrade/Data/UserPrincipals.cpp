@@ -4,22 +4,22 @@ using namespace tda;
 
 UserPrincipals::UserPrincipals()=default;
 
-void UserPrincipals::add_account_data(const std::unordered_map<std::string, std::string> & data)
+void UserPrincipals::add_account_data(const StringMap & data)
 {
     accounts_array.push_back(data);
 }
 
-void UserPrincipals::set_account_data(const std::unordered_map<std::string, std::string> & data)
+void UserPrincipals::set_account_data(const StringMap & data)
 {
     this->account_data = data;
 }
 
-std::unordered_map<std::string, std::string> UserPrincipals::get_account_data_array(int i)
+StringMap UserPrincipals::get_account_data_array(int i)
 {
     return accounts_array[i];
 }
 
-std::string UserPrincipals::get_account_data(String key)
+String UserPrincipals::get_account_data(CRString key)
 {
     return account_data[key];
 }

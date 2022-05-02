@@ -8,7 +8,7 @@ namespace iex
     class Stats
     {
     private:
-        std::string companyName; // Company name of the security
+        String companyName; // Company name of the security
         double marketcap; // Market cap of the security calculated as shares outstanding * previous day close.
         double week52high; // Highest fully adjusted price observed during trading hours over the past 52 calendar weeks
         double week52low; // Lowest fully adjusted price observed during trading hours over the past 52 calendar weeks
@@ -22,9 +22,9 @@ namespace iex
         double ttmEPS; // Trailing twelve month earnings per share. Investopedia
         double ttmDividendRate; // railing twelve month dividend rate per share
         double dividendYield; // The ratio of trailing twelve month dividend compared to the previous day close price. The dividend yield is represented as a percentage calculated as (ttmDividendRate) / (previous day close price) Investopedia
-        std::string nextDividendDate; //	Announced ex date of the next dividend
-        std::string exDividendDate; // Ex date of the last dividend
-        std::string nextEarningsDate;; // 	string 	Announced next earnings report date
+        String nextDividendDate; //	Announced ex date of the next dividend
+        String exDividendDate; // Ex date of the last dividend
+        String nextEarningsDate;; // 	CRString 	Announced next earnings report date
         double peRatio; // 	number 	Price to earnings ratio calculated as (previous day close price) / (ttmEPS).
         // Note: This endpoint is calculated on a trailing twelve month basis.
         double beta; //	number 	Beta is a measure used in fundamental analysis to determine the volatility of an asset or portfolio in relation to the overall market. Levered beta calculated with 1 year historical data and compared to SPY.

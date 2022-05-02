@@ -2,6 +2,7 @@
 #define OptionsModel_hpp
 
 #include "../Model.hpp"
+#include "TDA.hpp"
 #include <cmath>
 
 class OptionsModel: public Model
@@ -9,13 +10,13 @@ class OptionsModel: public Model
 private:
     bool active = false;
     double naiveGammaExposure = 0.0;
-    std::string tickerSymbol;
+    String tickerSymbol;
     tda::OptionChain optionChainData;
     std::vector<tda::OptionsDateTimeObj> callOptionArray;
     std::vector<tda::OptionsDateTimeObj> putOptionArray;
     std::vector<tda::OptionsDateTimeObj> optionsDateTimeObj;
     std::vector<const char*> datetime_array;
-    std::vector<std::string> datetimeArray;
+    std::vector<String> datetimeArray;
 
 public:
     bool isActive() const;
@@ -26,10 +27,10 @@ public:
 
     tda::OptionsDateTimeObj & getOptionsDateTimeObj(int index);
     std::vector<const char*> & getDateTimeArray();
-    std::string getDateTime(int index);
-    void fetchOptionChain(String ticker, String strikeCount,
-                            String strategy, String range,
-                            String expMonth, String optionType);
+    String getDateTime(int index);
+    void fetchOptionChain(CRString ticker, CRString strikeCount,
+                            CRString strategy, CRString range,
+                            CRString expMonth, CRString optionType);
     
     void calculateGammaExposure();
     double & getGammaExposure();

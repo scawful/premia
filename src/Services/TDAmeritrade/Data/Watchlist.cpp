@@ -7,22 +7,22 @@ int tda::Watchlist::getNumInstruments() const
     return ((int) instruments.size());
 }
 
-std::string tda::Watchlist::getName() const
+String tda::Watchlist::getName() const
 {
     return name;
 }
 
-std::string tda::Watchlist::getInstrumentSymbol(int item_id)
+String tda::Watchlist::getInstrumentSymbol(int item_id)
 {
     return instruments[item_id].getSymbol();
 }
 
-std::string tda::Watchlist::getInstrumentDescription(int item_id)
+String tda::Watchlist::getInstrumentDescription(int item_id)
 {
     return instruments[item_id].getDescription();
 }
 
-std::string tda::Watchlist::getInstrumentType(int item_id)
+String tda::Watchlist::getInstrumentType(int item_id)
 {
     return instruments[item_id].getType();
 }
@@ -32,22 +32,22 @@ void tda::Watchlist::setId(int id)
     this->watchlist_id = id;
 }
 
-void tda::Watchlist::setName(String newName)
+void tda::Watchlist::setName(CRString newName)
 {
     this->name = newName;
 }
 
-void tda::Watchlist::setAccountId(String accountId)
+void tda::Watchlist::setAccountId(CRString accountId)
 {
     this->account_id = accountId;
 }
 
-void tda::Watchlist::addInstrument(String symbol, String desc, String type)
+void tda::Watchlist::addInstrument(CRString symbol, CRString desc, CRString type)
 {
     instruments.emplace_back(symbol, desc, type);
 }
 
-void tda::Watchlist::addVariable(String key, String value)
+void tda::Watchlist::addVariable(CRString key, CRString value)
 {
     variables[key] = value;
 }

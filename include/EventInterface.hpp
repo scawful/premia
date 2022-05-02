@@ -2,8 +2,6 @@
 #define EventInterface_hpp
 
 #include "Premia.hpp"
-#include <string>
-#include <unordered_map>
 #include <typeindex>
 #include <typeinfo>
 #include <cassert>
@@ -12,10 +10,10 @@ namespace Premia {
 
     struct EventInterface 
     {
-        std::unordered_map<std::string, std::pair<EventHandler, std::type_index>> events;
+        std::unordered_map<String, std::pair<EventHandler, std::type_index>> events;
 
         template<typename T>
-        void insert(std::string eventName, T event) 
+        void insert(String eventName, T event) 
         {
             auto eventType = std::type_index(typeid(event));                     
             events.insert(std::make_pair(eventName, 
@@ -23,7 +21,7 @@ namespace Premia {
         }
 
         template<typename T, typename... Args>
-        T trigger(std::string eventName, Args&&... args) 
+        T trigger(String eventName, Args&&... args) 
         {
             auto eventIterator = events.find(eventName);                            
             auto eventValue = eventIterator->second;                                  
@@ -35,8 +33,8 @@ namespace Premia {
         
     };
 
-    template <> void EventInterface::insert(std::string, TDALoginEvent); 
-    template <> void EventInterface::trigger(std::string, String key, String token); 
+    template <> void EventInterface::insert(String, TDALoginEvent); 
+    template <> void EventInterface::trigger(String, CRString key, CRString token); 
 }
 
 #endif

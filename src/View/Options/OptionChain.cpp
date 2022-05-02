@@ -2,9 +2,9 @@
 
 void OptionChainView::drawSearch()
 {
-    static std::string ticker;
-    static std::string count;
-    static std::string strike;
+    static String ticker;
+    static String count;
+    static String strike;
     static int current_strategy = 0;
 
     if (ImGui::BeginTable("SearchTable", 4, ImGuiTableFlags_SizingStretchProp, ImVec2(ImGui::GetContentRegionAvail().x, 0.f))) {
@@ -197,7 +197,7 @@ void OptionChainView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void OptionChainView::addEvent(String key, const Premia::EventHandler & event)
+void OptionChainView::addEvent(CRString key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

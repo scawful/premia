@@ -8,7 +8,7 @@ namespace cbp
     class Product 
     {
     private:
-        std::vector<std::unordered_map<std::string, std::string>> accounts_vector;
+        std::vector<StringMap> accounts_vector;
 
         float current_price;
 

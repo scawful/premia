@@ -12,9 +12,9 @@ namespace cbp
     {
     private:
         float total_deposits_usd;
-        std::string api_key;
-        std::string secret_key;
-        std::string passphrase;
+        String api_key;
+        String secret_key;
+        String passphrase;
         boost::shared_ptr<Client> http_client;
 
     public:
@@ -22,7 +22,7 @@ namespace cbp
         ~CoinbasePro();
 
         boost::shared_ptr<cbp::Account> list_accounts();
-        boost::shared_ptr<cbp::Product> get_product_ticker( String symbol );
+        boost::shared_ptr<cbp::Product> get_product_ticker( CRString symbol );
         float get_deposits();
 
     };

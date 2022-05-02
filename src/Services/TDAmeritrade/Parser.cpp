@@ -2,8 +2,6 @@
 
 using namespace tda;
 
-Parser::Parser()=default;
-
 /**
  * @brief Take a response from the API as argument and read it into a boost::property_tree
  * @author @scawful
@@ -11,7 +9,7 @@ Parser::Parser()=default;
  * @param response 
  * @return JSONObject::ptree 
  */
-JSONObject::ptree Parser::read_response(String response) const
+JSONObject::ptree Parser::read_response(CRString response) const
 {
     std::istringstream json_response(response);
     JSONObject::ptree property_tree;
@@ -30,15 +28,15 @@ JSONObject::ptree Parser::read_response(String response) const
  * @author @scawful
  * 
  * @param response 
- * @return std::string 
+ * @return String 
  */
-std::string Parser::parse_access_token(String response) const
+String Parser::parse_access_token(CRString response) const
 {
-    std::string access_token;
+    String access_token;
     JSONObject::ptree data = read_response(response);
     for (const auto & [key, value] : data) {
         if (key == "access_token") {
-            access_token = value.get_value<std::string>();
+            access_token = value.get_value<String>();
         }
     }
     return access_token;
@@ -57,7 +55,7 @@ Quote Parser::parse_quote(const JSONObject::ptree & data) const
 
     for (const auto & [key, value] : data) {
         for (const auto & [propertyKey, propertyValue] : value) {
-            quote.setQuoteVariable(propertyKey, propertyValue.get_value<std::string>());
+            quote.setQuoteVariable(propertyKey, propertyValue.get_value<String>());
         }
     }
 
@@ -73,7 +71,7 @@ Quote Parser::parse_quote(const JSONObject::ptree & data) const
  * @param freq 
  * @return PriceHistory 
  */
-PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, String ticker, int freq) const 
+PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, CRString ticker, int freq) const 
 {
     PriceHistory price_history;
     price_history.setTickerSymbol(ticker);
@@ -82,22 +80,22 @@ PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, String 
         if (historyKey == "candles") {
             for (const auto & [candleKey, candleValue] : historyValue ) {
                 tda::Candle newCandle;
-                std::string datetime;
+                String datetime;
                 for (const auto & [valueKey, finalValue] : candleValue ) {
                     try {
                         if (valueKey == "open") {
-                            newCandle.open = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                            newCandle.open = boost::lexical_cast<double>(finalValue.get_value<String>());
                         } else if (valueKey == "close") {
-                            newCandle.close = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                            newCandle.close = boost::lexical_cast<double>(finalValue.get_value<String>());
                         } else if (valueKey == "high") {
-                            newCandle.high = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                            newCandle.high = boost::lexical_cast<double>(finalValue.get_value<String>());
                         } else if (valueKey == "low") {
-                            newCandle.low = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                            newCandle.low = boost::lexical_cast<double>(finalValue.get_value<String>());
                         } else if (valueKey == "volume") {
-                            newCandle.volume = boost::lexical_cast<double>(finalValue.get_value<std::string>());
+                            newCandle.volume = boost::lexical_cast<double>(finalValue.get_value<String>());
                         } else if (valueKey == "datetime") {
                             std::stringstream dt_ss;
-                            std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(finalValue.get_value<std::string>());
+                            std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(finalValue.get_value<String>());
                             newCandle.raw_datetime = secsSinceEpoch;
                             secsSinceEpoch *= (time_t) 0.001;
                             // %a %d %b %Y - %I:%M:%S%p,    %H:%M:%S
@@ -130,9 +128,9 @@ UserPrincipals Parser::parse_user_principals(JSONObject::ptree & data) const
     UserPrincipals user_principals;
 
     BOOST_FOREACH (JSONObject::ptree::value_type &v, data.get_child("accounts.")) {
-        std::unordered_map<std::string, std::string> account_data;
+        StringMap account_data;
         for (const auto & [acctKey, acctValue] : v.second) {
-            account_data[acctKey] = acctValue.get_value<std::string>();
+            account_data[acctKey] = acctValue.get_value<String>();
         }
         user_principals.add_account_data(account_data);
     }
@@ -152,7 +150,7 @@ void Parser::parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain,
             imported_strike.strikePrice = strikeKey;
             for (const auto & [contractKey, contractValue]: strikeValue) {
                 for (const auto & [detailsKey, detailsValue]: contractValue) {
-                    imported_strike.raw_option[detailsKey] = detailsValue.get_value< std::string >();
+                    imported_strike.raw_option[detailsKey] = detailsValue.get_value< String >();
                 }
                 options_dt_obj.strikePriceObj.push_back(imported_strike);
             }
@@ -183,11 +181,11 @@ OptionChain Parser::parse_option_chain(const JSONObject::ptree & data) const
 
         if ( optionsKey == "underlying" ) {
             for (const auto & [underlyingKey, underlyingValue]: optionsValue) {
-                optionChain.setUnderlyingVariable(underlyingKey, underlyingValue.get_value<std::string>());
+                optionChain.setUnderlyingVariable(underlyingKey, underlyingValue.get_value<String>());
             }
         }
 
-        optionChain.setOptionChainVariable(optionsKey, optionsValue.get_value< std::string >());
+        optionChain.setOptionChainVariable(optionsKey, optionsValue.get_value<String>());
     }
     return optionChain;
 }
@@ -208,14 +206,14 @@ Account Parser::parse_account(const JSONObject::ptree & data) const
                 for (const auto & [positionListKey, positionListValue] : accountValue) {
                     tda::PositionBalances new_position_balance; // positions and balances
                     for (const auto & [positionsKey, positionsValue] : positionListValue) {
-                        new_position_balance.balances[positionsKey] = positionsValue.get_value<std::string>();
-                        std::unordered_map<std::string, std::string> pos_field;
-                        std::unordered_map<std::string, std::string> instrument;
+                        new_position_balance.balances[positionsKey] = positionsValue.get_value<String>();
+                        StringMap pos_field;
+                        StringMap instrument;
                         for (const auto & [fieldKey, fieldValue] : positionsValue) {
                             if (fieldKey == "symbol") {
-                                new_position_balance.symbol = fieldValue.get_value<std::string>();
+                                new_position_balance.symbol = fieldValue.get_value<String>();
                             }
-                            pos_field[fieldKey] = fieldValue.get_value<std::string>();
+                            pos_field[fieldKey] = fieldValue.get_value<String>();
                         }
                         account.add_position(pos_field);
                     }
@@ -223,10 +221,10 @@ Account Parser::parse_account(const JSONObject::ptree & data) const
                 }
             } else if (accountKey == "currentBalances") {
                 for (const auto & [balanceKey, balanceValue] : accountValue) {
-                    account.set_balance_variable(balanceKey, balanceValue.get_value<std::string>());
+                    account.set_balance_variable(balanceKey, balanceValue.get_value<String>());
                 }
             } else {
-                account.set_account_variable(accountKey, accountValue.get_value<std::string>());
+                account.set_account_variable(accountKey, accountValue.get_value<String>());
             }
         }
     }
@@ -246,9 +244,9 @@ std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::
     for (const auto & [dataKey, dataValue] : data) {
         Watchlist watchlist;
         try {
-            watchlist.setName(dataValue.get_child("name").get_value<std::string>());
+            watchlist.setName(dataValue.get_child("name").get_value<String>());
             watchlist.setId(dataValue.get_child("watchlistId").get_value<int>());
-            watchlist.setAccountId(dataValue.get_child("accountId").get_value<std::string>());
+            watchlist.setAccountId(dataValue.get_child("accountId").get_value<String>());
         } catch (const JSONObject::ptree_error & e) {
             std::cout << e.what() << std::endl;
         }
@@ -257,15 +255,15 @@ std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::
             for (const auto & [item2Key, item2Value] : itemValue ) {
                 if (item2Key == "instrument") {
                     try {
-                        std::string symbol = item2Value.get_child("symbol").get_value<std::string>();
-                        std::string desc = "";
-                        std::string type = item2Value.get_child("assetType").get_value<std::string>();
+                        String symbol = item2Value.get_child("symbol").get_value<String>();
+                        String desc = "";
+                        String type = item2Value.get_child("assetType").get_value<String>();
                         watchlist.addInstrument(symbol, desc, type);
                     } catch (const JSONObject::ptree_error & e) {
                         std::cout << e.what() << std::endl;
                     }
                 } else {
-                    watchlist.addVariable(item2Key, itemValue.get_value<std::string>());
+                    watchlist.addVariable(item2Key, itemValue.get_value<String>());
                 }
             }
         }

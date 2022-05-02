@@ -8,14 +8,14 @@ namespace iex
     // conversionOrExercisePrice 	number 	The conversion or exercise price of the transaction, if available
     // directIndirect 	            letter 	(D)irect or (I)ndirect
     // effectiveDate 	            number 	Effective date of the transaction.
-    // filingDate 	                string 	Date the transaction was filed with the SEC.
-    // fullName 	                string 	Full name of the individual. This field concatenates the individuals First Name, Middle Name, Last Name and Suffix.
+    // filingDate 	                CRString 	Date the transaction was filed with the SEC.
+    // fullName 	                CRString 	Full name of the individual. This field concatenates the individuals First Name, Middle Name, Last Name and Suffix.
     // is10b51 	                    boolean 	Whether the transaction was executed under Rule 10b5-1. Rule 10b5-1 allows company insiders to make predetermined trades while following insider trading laws and avoiding insider trading accusations. Learn more.
     // postShares 	                number 	The reported number of shares held after the transaction.
-    // reportedTitle 	            string 	Insiders job title per the sourced filing if available
-    // symbol 	                    string 	Associated ticker or symbol
+    // reportedTitle 	            CRString 	Insiders job title per the sourced filing if available
+    // symbol 	                    CRString 	Associated ticker or symbol
     // transactionCode 	            letter 	Transaction Codes
-    // transactionDate 	            string 	Date the transaction was executed
+    // transactionDate 	            CRString 	Date the transaction was executed
     // transactionPrice 	        number 	As-reported (unadjusted) unit price at which shares were acquired or disposed, represented in USD.
     // transactionShares 	        number 	As-reported (unadjusted) number of shares acquired or disposedValue of the transaction, calculated as Tran_Shares * Tran_Price, represented in USD. This value is not adjusted for corporate actions.
     // transactionValue 	        number 	Value of the transaction, calculated as Tran_Shares * Tran_Price, represented in USD. This value is not adjusted for corporate actions.
@@ -28,14 +28,14 @@ namespace iex
         double conversionOrExercisePrice; 
         char directIndirect;
         double effectiveDate;
-        std::string filingDate;
-        std::string fullName;
+        String filingDate;
+        String fullName;
         bool is10b51;
         double postShares;
-        std::string reportedTitle;
-        std::string symbol;
+        String reportedTitle;
+        String symbol;
         char transactionCode;
-        std::string transactionDate;
+        String transactionDate;
         double transactionPrice;
         double transactionShares;
         double transactionValue;
@@ -67,8 +67,8 @@ namespace iex
         double getPostShares() const { return postShares; }
         void setPostShares(double postShares_) { postShares = postShares_; }
 
-        std::string getFullName() const { return fullName; }
-        void setFullName(String fullName_) { fullName = fullName_; }
+        String getFullName() const { return fullName; }
+        void setFullName(CRString fullName_) { fullName = fullName_; }
 
         double getConversionOrExercisePrice() const { return conversionOrExercisePrice; }
         void setConversionOrExercisePrice(double conversionOrExercisePrice_) { conversionOrExercisePrice = conversionOrExercisePrice_; }

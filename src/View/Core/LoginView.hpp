@@ -11,14 +11,14 @@ private:
     
     Premia::TDALoginEvent loginEvent;
     Premia::ConsoleLogger logger;
-    std::unordered_map<std::string, Premia::EventHandler> events;
+    std::unordered_map<String, Premia::EventHandler> events;
 
     void drawScreen() const;
 
 public:
-    void addAuth(String key , String token) override;
+    void addAuth(CRString key , CRString token) override;
     void addLogger(const Premia::ConsoleLogger & logger) override;
-    void addEvent(String, const Premia::EventHandler &) override;
+    void addEvent(CRString, const Premia::EventHandler &) override;
     void addLoginEvent(const Premia::TDALoginEvent &);
     void update() override;
 };

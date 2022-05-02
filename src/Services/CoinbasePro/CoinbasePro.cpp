@@ -10,11 +10,11 @@ namespace cbp
 
     boost::shared_ptr<Account> CoinbasePro::list_accounts()
     {
-        std::string response = http_client->send_request("/accounts");
+        String response = http_client->send_request("/accounts");
         std::istringstream json_response(response);
         boost::property_tree::ptree property_tree;
         try {
-            read_json( json_response, property_tree );
+            read_json(json_response, property_tree);
         } catch ( const boost::property_tree::ptree_error & e ) {
             // @todo replace with ConsoleLogger
             std::cout << e.what() << std::endl;
@@ -24,14 +24,14 @@ namespace cbp
         return new_account_data;
     }
 
-    boost::shared_ptr<Product> CoinbasePro::get_product_ticker( String symbol )
+    boost::shared_ptr<Product> CoinbasePro::get_product_ticker( CRString symbol )
     {
-        std::string request = "/products/" + symbol + "-USD/ticker";
-        std::string response = http_client->send_request(request);
+        String request = "/products/" + symbol + "-USD/ticker";
+        String response = http_client->send_request(request);
         std::istringstream json_response(response);
         boost::property_tree::ptree property_tree;
         try {
-            read_json( json_response, property_tree );
+            read_json(json_response, property_tree);
         } catch ( const boost::property_tree::ptree_error & e ) {
             // @todo replace with ConsoleLogger
             std::cout << e.what() << std::endl;
@@ -42,11 +42,11 @@ namespace cbp
 
     float CoinbasePro::get_deposits()
     {
-        std::string response = http_client->send_request("/transfers");
+        String response = http_client->send_request("/transfers");
         std::istringstream json_response(response);
         boost::property_tree::ptree property_tree;
         try {
-            read_json( json_response, property_tree );
+            read_json(json_response, property_tree);
         } catch ( const boost::property_tree::ptree_error & e ) {
             // @todo replace with ConsoleLogger
             std::cout << e.what() << std::endl;

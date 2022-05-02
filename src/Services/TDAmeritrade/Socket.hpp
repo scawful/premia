@@ -1,6 +1,7 @@
 #ifndef Socket_hpp
 #define Socket_hpp
 
+#include "Metatypes.hpp"
 #include "Boost.hpp"
 #include "SDL.hpp"
 #include "Curl.hpp"
@@ -28,16 +29,16 @@ namespace tda
         tcp::resolver _resolver;
         beast::flat_buffer _buffer;
         websocket::stream<beast::ssl_stream <beast::tcp_stream>> _ws;
-        std::vector<std::shared_ptr<std::string const>> _queue;
-        std::vector<std::string> _response_stack;
-        std::string _host;
+        std::vector<std::shared_ptr<CString>> _queue;
+        std::vector<String> _response_stack;
+        String _host;
         std::size_t _queue_size;
 
         void fail( beast::error_code ec, char const* what ) const;
 
     public:
         explicit Socket( net::io_context & ioc, ssl::context & ctx, 
-                          const std::vector<std::shared_ptr<std::string const>> & queue )
+                          const std::vector<std::shared_ptr<String const>> & queue )
             : _resolver(net::make_strand(ioc))
             , _ws(net::make_strand(ioc), ctx)
             , _queue(queue)
@@ -58,9 +59,9 @@ namespace tda
         void on_read( beast::error_code ec, std::size_t bytes_transferred );
         void on_close( beast::error_code ec );
 
-        void send_message( std::shared_ptr<std::string const> const& s );
-        std::vector<std::string> receive_response() const;
-        std::shared_ptr<std::vector<std::string>> receive_response_ptr();
+        void send_message( std::shared_ptr<CString> const& s );
+        std::vector<String> receive_response() const;
+        std::shared_ptr<std::vector<String>> receive_response_ptr();
 
         bool on_login( beast::error_code ec );
         void on_logout( beast::error_code ec ) const;

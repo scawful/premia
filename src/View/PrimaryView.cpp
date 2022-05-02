@@ -1,6 +1,5 @@
 #include "PrimaryView.hpp"
 
-
 void PrimaryView::drawInfoPane()
 {
     ImGui::Text("General");
@@ -155,7 +154,7 @@ void PrimaryView::drawScreen()
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 
-void PrimaryView::addAuth(String key , String token)
+void PrimaryView::addAuth(CRString key , CRString token)
 {
     // need to remove this from View
 }
@@ -165,7 +164,7 @@ void PrimaryView::addLogger(const Premia::ConsoleLogger & newLogger)
     this->logger = newLogger;
 }
 
-void PrimaryView::addEvent(String key, const Premia::EventHandler & event)
+void PrimaryView::addEvent(CRString key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }

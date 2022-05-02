@@ -8,12 +8,12 @@ class WatchlistModel: public Model
 private:
     bool active = false;
     std::vector<int> openList;
-    std::string titleString;
+    String titleString;
     std::vector<tda::Watchlist> watchlists;
-    std::vector<std::string> watchlistNames;
+    std::vector<String> watchlistNames;
     std::vector<const char*> watchlistNamesChar;
     Premia::ConsoleLogger logger;
-    std::unordered_map<std::string, tda::Quote> quotes;
+    std::unordered_map<String, tda::Quote> quotes;
 
 
 public:
@@ -23,10 +23,10 @@ public:
     void initWatchlist();
     bool getOpenList(int n);
     void setOpenList(int n);
-    std::string getWatchlistName(int index);
-    tda::Quote & getQuote(String key);
+    String getWatchlistName(int index);
+    tda::Quote & getQuote(CRString key);
     tda::Watchlist & getWatchlist(int index);
-    void setQuote(String key, const tda::Quote & quote);
+    void setQuote(CRString key, const tda::Quote & quote);
     std::vector<const char *> getWatchlistNamesCharVec() const;
 };
 

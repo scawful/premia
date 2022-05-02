@@ -2,7 +2,7 @@
 
 using namespace iex;
 
-std::string Client::current_endpoint()
+String Client::current_endpoint()
 {
     if (sandbox_mode)
         return this->sandbox_endpoint;
@@ -10,7 +10,7 @@ std::string Client::current_endpoint()
         return this->base_endpoint;
 }
 
-size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, std::string *s)
+size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, String *s)
 {
     size_t new_length = size * nmemb;
     try {
@@ -34,13 +34,13 @@ Client::Client()
  * @brief 
  * 
  * @param endpoint 
- * @return std::string 
+ * @return String 
  */
-std::string Client::send_request(std::string endpoint) 
+String Client::send_request(String endpoint) 
 {
     CURL *curl;
     CURLcode res;
-    std::string response;
+    String response;
 
     curl = curl_easy_init();
     if (curl)
@@ -61,19 +61,19 @@ std::string Client::send_request(std::string endpoint)
  * @brief 
  * 
  * @param endpoint 
- * @return std::string 
+ * @return String 
  */
-std::string Client::send_authorized_request(std::string endpoint) 
+String Client::send_authorized_request(String endpoint) 
 {
     CURL *curl;
     CURLcode res;
-    std::string response;
+    String response;
 
     curl = curl_easy_init();
     if (curl)
     {
         struct curl_slist *headers = NULL;
-        std::string auth_bearer = "Authorization: Bearer " + api_key;
+        String auth_bearer = "Authorization: Bearer " + api_key;
         headers = curl_slist_append(headers, auth_bearer.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
@@ -89,14 +89,14 @@ std::string Client::send_authorized_request(std::string endpoint)
     return response;
 }
 
-std::string Client::get_fund_ownership(std::string symbol)
+String Client::get_fund_ownership(String symbol)
 {
-    std::string endpoint = current_endpoint() + "stock/" + symbol + "/fund-ownership/" + token_parameter;
+    String endpoint = current_endpoint() + "stock/" + symbol + "/fund-ownership/" + token_parameter;
     return send_request(endpoint);
 }
 
-std::string Client::get_insider_transactions(std::string symbol)
+String Client::get_insider_transactions(String symbol)
 {
-    std::string endpoint = current_endpoint() + "stock/" + symbol + "/insider-transactions/" + token_parameter;
+    String endpoint = current_endpoint() + "stock/" + symbol + "/insider-transactions/" + token_parameter;
     return send_request(endpoint);
 }

@@ -1,52 +1,86 @@
 #ifndef TDA_hpp
 #define TDA_hpp
 
-#include "Premia.hpp"
-#include "TDAmeritrade/Client.hpp"
-#include "TDAmeritrade/Parser.hpp"
-#include "TDAmeritrade/Socket.hpp"
-#include "TDAmeritrade/Data/Watchlist.hpp"
-#include "TDAmeritrade/Data/PricingStructures.hpp"
-#include "TDAmeritrade/Data/Account.hpp"
-#include "TDAmeritrade/Data/Quote.hpp"
-#include "TDAmeritrade/Data/Order.hpp"
-#include "TDAmeritrade/Data/PriceHistory.hpp"
-#include "TDAmeritrade/Data/OptionChain.hpp"
+#include "../src/Services/TDAmeritrade/Client.hpp"
+#include "../src/Services/TDAmeritrade/Parser.hpp"
+#include "../src/Services/TDAmeritrade/Socket.hpp"
+#include "../src/Services/TDAmeritrade/Data/Watchlist.hpp"
+#include "../src/Services/TDAmeritrade/Data/PricingStructures.hpp"
+#include "../src/Services/TDAmeritrade/Data/Account.hpp"
+#include "../src/Services/TDAmeritrade/Data/Quote.hpp"
+#include "../src/Services/TDAmeritrade/Data/Order.hpp"
+#include "../src/Services/TDAmeritrade/Data/PriceHistory.hpp"
+#include "../src/Services/TDAmeritrade/Data/OptionChain.hpp"
 
 namespace tda
 {
     namespace JSONObject = boost::property_tree;
+    using Watchlists = std::vector<Watchlist>;
 
-    class TDAmeritrade
+    class TDA
     {
     private:
-        std::string accessToken;
-        std::string refreshToken;
-        std::string consumerKey;
+        TDA() { }
+        String refreshToken;
+        String consumerKey;
 
-        Premia::ConsoleLogger consoleLogger;
         Account account;
         Client client;
         Parser parser;
 
     public:
+        TDA(TDA const&)             = delete;
+        void operator=(TDA const&)  = delete;
+        static TDA& getInstance()
+        {
+            static TDA instance;    
+            return instance;
+        }
 
-        std::vector<Watchlist> getWatchlistsByAccount(String account_num) const;
-        Quote getQuote(String symbol) const;
-        Account getAccount(String account_id);
-        PriceHistory getPriceHistory(String ticker, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const;
-        OptionChain getOptionChain(String ticker, String contractType, String strikeCount,
-                                   bool includeQuotes, String strategy, String range,
-                                   String expMonth, String optionType) const;
+        auto authUser(String key, String token) 
+            -> void {
+            consumerKey = key;
+            refreshToken = token;
+            client.addAuth(key, token);
+        }
 
-        void postOrder(String account_id, const Order & order) const;
+        auto getQuote(String symbol) 
+            -> Quote const {
+            std::string response = client.get_quote(symbol);
+            return parser.parse_quote(parser.read_response(response)); 
+        }
 
-        void startStreamingSession();
-        void fetchAccessToken();
-        bool is_session_active();
+        auto getAccount(String accountNumber) 
+            -> Account const {
+            String response = client.get_account(accountNumber);
+            return parser.parse_account(parser.read_response(response));
+        }
 
-        void addLogger(const Premia::ConsoleLogger &);
-        void addAuth(const std::string, const std::string);
+        auto getPriceHistory(String ticker, PeriodType periodType, FrequencyType frequencyType,
+                             int periodAmount, int frequencyAmount, bool extendedHoursTrading) 
+            -> PriceHistory const {
+            String response = client.get_price_history(ticker, periodType, periodAmount, frequencyType, frequencyAmount, extendedHoursTrading);
+            return parser.parse_price_history(parser.read_response(response), ticker, frequencyType);
+        }
+
+        auto getOptionChain(String ticker, String strikeCount,
+                            String strategy, String range,
+                            String expMonth, String optionType) 
+            -> OptionChain const {
+            client.addAuth(consumerKey, refreshToken);
+            String response = client.get_option_chain(ticker, "ALL", strikeCount, true, strategy, range, expMonth, optionType);
+            return parser.parse_option_chain(parser.read_response(response));
+        }
+
+        auto getWatchlistsByAccount(String account_num) 
+            -> Watchlists const {
+            std::string response = client.get_watchlist_by_account(account_num);
+            return parser.parse_watchlist_data(parser.read_response(response));
+        }
+
+        void postOrder(String account_id, const Order & order) {
+            client.post_order(account_id, order);
+        }
     };
 
 }

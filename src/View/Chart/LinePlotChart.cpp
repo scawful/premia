@@ -9,11 +9,11 @@ void LinePlotChart::initData()
     }
 
     int i = 0;
-    std::string temp, word, line;
+    String temp, word, line;
     if (fileInput.good()) {
         while (std::getline(fileInput, line)) {
-            // Create a stringstream from line
-            std::stringstream ss(line);
+            // Create a std::istringstream from line
+            std::istringstream ss(line);
             std::getline(ss, word, ',');
             std::getline(ss, word);
             i++;
@@ -54,7 +54,7 @@ LinePlotChart::~LinePlotChart()
     delete [] y;
 }
 
-void LinePlotChart::addAuth(String key , String token)
+void LinePlotChart::addAuth(CRString key , CRString token)
 {
     // model.addAuth(key, token);
 }
@@ -64,7 +64,7 @@ void LinePlotChart::addLogger(const Premia::ConsoleLogger & newLogger)
     // this->logger = newLogger;
 }
 
-void LinePlotChart::addEvent(String key, const Premia::EventHandler & event)
+void LinePlotChart::addEvent(CRString key, const Premia::EventHandler & event)
 {
     this->events[key] = event;
 }
