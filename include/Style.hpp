@@ -4,6 +4,10 @@
 #include "ImGui.hpp"
 
 namespace Style {
+    constexpr size_t LOGIN_WIDTH = 300;
+    constexpr size_t LOGIN_HEIGHT = 200;
+    constexpr size_t SCREEN_WIDTH = 1200;
+    constexpr size_t SCREEN_HEIGHT = 800;
     static void ColorsPremia(ImGuiStyle* dst = nullptr) {
         ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
         ImVec4* colors = style->Colors;

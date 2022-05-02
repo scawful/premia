@@ -10,8 +10,8 @@ Controller::initWindow()
             "Premia",                           // window title
             SDL_WINDOWPOS_UNDEFINED,            // initial x position
             SDL_WINDOWPOS_UNDEFINED,            // initial y position
-            Premia::LOGIN_WIDTH,                        // width, in pixels
-            Premia::LOGIN_HEIGHT,                       // height, in pixels
+            Style::LOGIN_WIDTH,                 // width, in pixels
+            Style::LOGIN_HEIGHT,                // height, in pixels
             SDL_WINDOW_RESIZABLE                // flags
         );
     }   
@@ -62,7 +62,7 @@ Controller::initCallbacks()
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn(); 
         viewManager.transferEvents();
-        SDL_SetWindowSize(window, Premia::SCREEN_WIDTH, Premia::SCREEN_HEIGHT);
+        SDL_SetWindowSize(window, Style::SCREEN_WIDTH, Style::SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
         ImGuiIO & io = ImGui::GetIO();
         io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
