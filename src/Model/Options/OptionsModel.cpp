@@ -30,7 +30,7 @@ OptionsModel::getOptionsDateTimeObj(int index)
     return this->optionsDateTimeObj.at(index);    
 }
 
-std::vector<const char*> & 
+ArrayList<const char*> & 
 OptionsModel::getDateTimeArray()
 {
     return this->datetime_array;
@@ -51,7 +51,7 @@ OptionsModel::fetchOptionChain(CRString ticker, CRString strikeCount,
     optionsDateTimeObj = optionChainData.getOptionsDateTimeObj();
     callOptionArray = optionChainData.getCallOptionArray();
     putOptionArray = optionChainData.getPutOptionArray();
-    std::vector<tda::OptionsDateTimeObj> temp_vec = callOptionArray;
+    ArrayList<tda::OptionsDateTimeObj> temp_vec = callOptionArray;
     for ( int i = 0; i < temp_vec.size(); i++) {
         datetime_array.push_back(temp_vec[i].datetime.data());
         datetimeArray.push_back(temp_vec[i].datetime);

@@ -18,7 +18,7 @@ IEXCloud::IEXCloud()
  * @param symbol 
  * @return FundOwnership 
  */
-std::vector<FundOwnership> IEXCloud::getFundOwnership(String symbol)
+ArrayList<FundOwnership> IEXCloud::getFundOwnership(String symbol)
 {
     String response = client.get_fund_ownership(symbol);
     return parser.parse_fund_ownership(response);

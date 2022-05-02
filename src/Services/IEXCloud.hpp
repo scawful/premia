@@ -19,7 +19,7 @@ namespace iex
     public:
         IEXCloud();
 
-        std::vector<FundOwnership> getFundOwnership(String symbol);
+        ArrayList<FundOwnership> getFundOwnership(String symbol);
 
     };
 }

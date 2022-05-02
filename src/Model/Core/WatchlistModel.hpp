@@ -7,11 +7,11 @@ class WatchlistModel: public Model
 {
 private:
     bool active = false;
-    std::vector<int> openList;
+    ArrayList<int> openList;
     String titleString;
-    std::vector<tda::Watchlist> watchlists;
-    std::vector<String> watchlistNames;
-    std::vector<const char*> watchlistNamesChar;
+    ArrayList<tda::Watchlist> watchlists;
+    ArrayList<String> watchlistNames;
+    ArrayList<const char*> watchlistNamesChar;
     ConsoleLogger logger;
     std::unordered_map<String, tda::Quote> quotes;
 
@@ -27,7 +27,7 @@ public:
     tda::Quote & getQuote(CRString key);
     tda::Watchlist & getWatchlist(int index);
     void setQuote(CRString key, const tda::Quote & quote);
-    std::vector<const char *> getWatchlistNamesCharVec() const;
+    ArrayList<const char *> getWatchlistNamesCharVec() const;
 };
 
 #endif 

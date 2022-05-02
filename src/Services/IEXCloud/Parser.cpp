@@ -48,9 +48,9 @@ Parser::Parser()
     
 }
 
-std::vector<FundOwnership> Parser::parse_fund_ownership(String response)
+ArrayList<FundOwnership> Parser::parse_fund_ownership(String response)
 {
-    std::vector<FundOwnership> funds_array;
+    ArrayList<FundOwnership> funds_array;
     pt::ptree fund_ownership_json = read_response(response);
     log_response("fund-ownership", fund_ownership_json);
 
@@ -94,8 +94,8 @@ std::vector<FundOwnership> Parser::parse_fund_ownership(String response)
     return funds_array;
 }
 
-std::vector<InsiderTransactions> Parser::parse_insider_transactions(String response)
+ArrayList<InsiderTransactions> Parser::parse_insider_transactions(String response)
 {
-    std::vector<InsiderTransactions> transactions_array;
+    ArrayList<InsiderTransactions> transactions_array;
     return transactions_array;
 }

@@ -7,7 +7,7 @@ PriceHistory::PriceHistory()
     this->tickerSymbol = "";
     this->initialized = false;
     for (int i = 0; i < 4; i++ ) {
-        std::vector<tda::Candle> vector;
+        ArrayList<tda::Candle> vector;
         candles.push_back(vector);
     }
 }
@@ -22,7 +22,7 @@ void PriceHistory::addCandleByType(Candle candle, int type)
     candles[type].push_back(candle);
 }
 
-std::vector<tda::Candle> PriceHistory::getCandles(int index)
+ArrayList<tda::Candle> PriceHistory::getCandles(int index)
 {
     return candles[index];
 }
@@ -32,7 +32,7 @@ int PriceHistory::getNumCandles(int index)
     return candles[index].size();
 }
 
-std::vector< tda::Candle > PriceHistory::getCandleVector()
+ArrayList< tda::Candle > PriceHistory::getCandleVector()
 {
     return candleVector;
 }

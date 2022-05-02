@@ -21,9 +21,9 @@ namespace tda
 
         StringMap account_info;
         StringMap current_balances;  
-        std::vector<StringMap> positions_vector;
+        ArrayList<StringMap> positions_vector;
 
-        std::vector<PositionBalances> position_balances;
+        ArrayList<PositionBalances> position_balances;
         
     public:
         Account()=default;

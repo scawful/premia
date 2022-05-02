@@ -40,7 +40,7 @@ namespace tda
     struct OptionsDateTimeObj
     {
         String datetime;
-        std::vector<StrikePriceMap> strikePriceObj;
+        ArrayList<StrikePriceMap> strikePriceObj;
     };
 
     enum PeriodType

@@ -560,7 +560,6 @@ String Client::get_option_chain(String const &ticker, String const & contractTyp
 {
     OptionChain option_chain;
     String url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + api_key + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
-    std::cout << "===> " << url << std::endl;
 
     string_replace(url, "{ticker}", ticker);
     string_replace(url, "{contractType}", contractType);
@@ -615,11 +614,11 @@ String Client::get_account(String const & account_id)
  * 
  * @todo make this less smelly 
  * 
- * @return std::vector<String> 
+ * @return ArrayList<String> 
  */
-std::vector<String> Client::get_all_account_ids()
+ArrayList<String> Client::get_all_account_ids()
 {
-    std::vector<String> accounts;
+    ArrayList<String> accounts;
     fetch_access_token();
     get_user_principals();
 
@@ -803,9 +802,9 @@ bool Client::is_session_logged_in() const
  * @brief Get a list of all the responses logged in the WebSocket session
  * @author @scawful
  * 
- * @return std::vector<String> 
+ * @return ArrayList<String> 
  */
-std::vector<String> Client::get_session_responses() const
+ArrayList<String> Client::get_session_responses() const
 {
     return websocket_session->receive_response();
 }
@@ -835,5 +834,4 @@ void Client::addAuth(String key, String token)
 {
     api_key = key;
     refresh_token = token;
-    std::cout << "\n\n" << api_key << " : " << refresh_token << std::endl;
 }

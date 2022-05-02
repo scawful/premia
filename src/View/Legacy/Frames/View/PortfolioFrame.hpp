@@ -4,14 +4,14 @@
 class PortfolioFrame
 {
 private:
-    std::vector<String> account_ids_std;
-    std::vector<const char*> account_ids;
+    ArrayList<String> account_ids_std;
+    ArrayList<const char*> account_ids;
     String default_account;
 
     std::unordered_map<String, tda::Quote> quotes;
 
     tda::Account account_data;
-    std::vector<String> positions_vector;
+    ArrayList<String> positions_vector;
 
     void draw_balance_string(CRString variable);
 

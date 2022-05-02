@@ -29,12 +29,12 @@ void ChartModel::initListener()
     };
 }
 
-std::vector<double> ChartModel::getDates() const
+ArrayList<double> ChartModel::getDates() const
 {
     return datesVec;
 }
 
-std::vector<double> ChartModel::getVolumeVector() const
+ArrayList<double> ChartModel::getVolumeVector() const
 { 
     return volumeVec;
 }

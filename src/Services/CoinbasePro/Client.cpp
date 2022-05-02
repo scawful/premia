@@ -17,7 +17,7 @@ auto EncodeBase64(std::string_view to_encode) -> String
 
     const auto output_buffer{std::make_unique<char[]>(predicted_len + 1)};
 
-    const std::vector<unsigned char> vec_chars{to_encode.begin(), to_encode.end()};  // convert to_encode into uchar container
+    const ArrayList<unsigned char> vec_chars{to_encode.begin(), to_encode.end()};  // convert to_encode into uchar container
 
     const auto output_len = EVP_EncodeBlock(reinterpret_cast<unsigned char*>(output_buffer.get()), vec_chars.data(), static_cast<int>(vec_chars.size()));
 
@@ -43,7 +43,7 @@ auto DecodeBase64(std::string_view to_decode) -> String
 
     const auto output_buffer{std::make_unique<char[]>(predicted_len + 1)};
 
-    const std::vector<unsigned char> vec_chars{to_decode.begin(), to_decode.end()};  // convert to_decode into uchar container
+    const ArrayList<unsigned char> vec_chars{to_decode.begin(), to_decode.end()};  // convert to_decode into uchar container
 
     const auto output_len = EVP_DecodeBlock(reinterpret_cast<unsigned char*>(output_buffer.get()), vec_chars.data(), static_cast<int>(vec_chars.size()));
 

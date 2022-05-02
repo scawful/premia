@@ -29,7 +29,7 @@ namespace tda
         };
 
     private:
-        std::vector<WatchlistInstrument> instruments;
+        ArrayList<WatchlistInstrument> instruments;
         StringMap variables;
 
         // "name": "string",

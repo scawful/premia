@@ -83,9 +83,9 @@ namespace tda
         // WebSocket session variables 
         boost::asio::io_context ioc;
         std::shared_ptr<tda::Socket> websocket_session;
-        std::shared_ptr<std::vector<String>> websocket_buffer;
-        std::vector<std::shared_ptr<String const>> request_queue;
-        std::vector<std::thread> ws_threads;
+        std::shared_ptr<ArrayList<String>> websocket_buffer;
+        ArrayList<std::shared_ptr<String const>> request_queue;
+        ArrayList<std::thread> ws_threads;
 
         // CRString Manipulation 
         String get_api_interval_value(int value) const;
@@ -126,7 +126,7 @@ namespace tda
                                      String const & expMonth, String const & optionType) const;
         String get_quote(String const & symbol) const;
         String get_account(String const & account_id);
-        std::vector<String> get_all_account_ids();
+        ArrayList<String> get_all_account_ids();
 
         void post_order(CRString account_id, const Order & order) const;
 
@@ -136,7 +136,7 @@ namespace tda
         void send_logout_request();
         void send_interrupt_signal() const;
         bool is_session_logged_in() const;
-        std::vector<String> get_session_responses() const;
+        ArrayList<String> get_session_responses() const;
         String get_access_token() const;
         void fetch_access_token();
 

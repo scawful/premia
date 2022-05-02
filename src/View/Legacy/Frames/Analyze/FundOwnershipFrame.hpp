@@ -7,7 +7,7 @@ class FundOwnershipFrame : public Frame
 {
 private:
     bool data_active;
-    std::vector<iex::FundOwnership> fund_ownership;
+    ArrayList<iex::FundOwnership> fund_ownership;
 
 public:
 

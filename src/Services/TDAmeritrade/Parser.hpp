@@ -27,7 +27,7 @@ namespace tda
         
         OptionChain parse_option_chain(const JSONObject::ptree & data) const;
         Account parse_account(const JSONObject::ptree & data) const;
-        std::vector<Watchlist> parse_watchlist_data(const JSONObject::ptree & data) const;
+        ArrayList<Watchlist> parse_watchlist_data(const JSONObject::ptree & data) const;
     };
 
 }

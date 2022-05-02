@@ -12,16 +12,16 @@ namespace tda
         StringMap putExpDateMap;
         StringMap optionChainMap;
         StringMap underlyingMap;
-        std::vector<OptionsDateTimeObj> callOptionArray;
-        std::vector<OptionsDateTimeObj> putOptionArray;
-        std::vector<OptionsDateTimeObj> optionsDateTimeVector;
+        ArrayList<OptionsDateTimeObj> callOptionArray;
+        ArrayList<OptionsDateTimeObj> putOptionArray;
+        ArrayList<OptionsDateTimeObj> optionsDateTimeVector;
 
     public:
         OptionChain();
 
-        std::vector<OptionsDateTimeObj> getCallOptionArray() const;
-        std::vector<OptionsDateTimeObj> getPutOptionArray() const;
-        std::vector<OptionsDateTimeObj> getOptionsDateTimeObj() const;
+        ArrayList<OptionsDateTimeObj> getCallOptionArray() const;
+        ArrayList<OptionsDateTimeObj> getPutOptionArray() const;
+        ArrayList<OptionsDateTimeObj> getOptionsDateTimeObj() const;
         String getCallVariable( CRString variable );
         String getPutVariable( CRString variable );
         String getOptionChainDataVariable( CRString variable );

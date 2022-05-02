@@ -1,7 +1,6 @@
 #ifndef Premia_hpp
 #define Premia_hpp
 
-#include <functional>
 #include "Metatypes.hpp"
 #include "ImGui.hpp"
 

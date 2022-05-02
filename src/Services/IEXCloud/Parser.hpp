@@ -18,9 +18,9 @@ namespace iex
     public:
         Parser();
 
-        std::vector<FundOwnership> parse_fund_ownership(String response);
+        ArrayList<FundOwnership> parse_fund_ownership(String response);
 
-        std::vector<InsiderTransactions> parse_insider_transactions(String response);
+        ArrayList<InsiderTransactions> parse_insider_transactions(String response);
     };
 }
 

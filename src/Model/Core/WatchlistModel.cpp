@@ -63,7 +63,7 @@ void WatchlistModel::setQuote(CRString key, const tda::Quote & quote)
     this->quotes[key] = quote;
 }
 
-std::vector<const char *> WatchlistModel::getWatchlistNamesCharVec() const
+ArrayList<const char *> WatchlistModel::getWatchlistNamesCharVec() const
 {
     return watchlistNamesChar;
 }

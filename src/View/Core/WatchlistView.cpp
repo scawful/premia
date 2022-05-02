@@ -81,7 +81,7 @@ void WatchlistView::drawCustomWatchlistTable()
 
     static String new_instrument = "";
     ImGui::InputText("Add", &new_instrument);
-    std::vector<tda::Watchlist::WatchlistInstrument> instruments;
+    ArrayList<tda::Watchlist::WatchlistInstrument> instruments;
 
     if (ImGui::BeginTable("Watchlist_Table", 3, flags, outer_size))
     {

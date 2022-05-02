@@ -8,7 +8,7 @@ namespace cbp
     class Product 
     {
     private:
-        std::vector<StringMap> accounts_vector;
+        ArrayList<StringMap> accounts_vector;
 
         float current_price;
 

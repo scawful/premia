@@ -29,8 +29,8 @@ namespace tda
         tcp::resolver _resolver;
         beast::flat_buffer _buffer;
         websocket::stream<beast::ssl_stream <beast::tcp_stream>> _ws;
-        std::vector<std::shared_ptr<CString>> _queue;
-        std::vector<String> _response_stack;
+        ArrayList<std::shared_ptr<CString>> _queue;
+        ArrayList<String> _response_stack;
         String _host;
         std::size_t _queue_size;
 
@@ -38,7 +38,7 @@ namespace tda
 
     public:
         explicit Socket( net::io_context & ioc, ssl::context & ctx, 
-                          const std::vector<std::shared_ptr<String const>> & queue )
+                          const ArrayList<std::shared_ptr<String const>> & queue )
             : _resolver(net::make_strand(ioc))
             , _ws(net::make_strand(ioc), ctx)
             , _queue(queue)
@@ -60,8 +60,8 @@ namespace tda
         void on_close( beast::error_code ec );
 
         void send_message( std::shared_ptr<CString> const& s );
-        std::vector<String> receive_response() const;
-        std::shared_ptr<std::vector<String>> receive_response_ptr();
+        ArrayList<String> receive_response() const;
+        std::shared_ptr<ArrayList<String>> receive_response_ptr();
 
         bool on_login( beast::error_code ec );
         void on_logout( beast::error_code ec ) const;

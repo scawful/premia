@@ -65,6 +65,7 @@ Quote Parser::parse_quote(const JSONObject::ptree & data) const
 /**
  * @brief Parse the price history data from the server
  * @author @scawful
+ * @note dt format %a %d %b %Y - %I:%M:%S%p,    %H:%M:%S
  * 
  * @param data 
  * @param ticker 
@@ -98,7 +99,6 @@ PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, CRStrin
                             std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(finalValue.get_value<String>());
                             newCandle.raw_datetime = secsSinceEpoch;
                             secsSinceEpoch *= (time_t) 0.001;
-                            // %a %d %b %Y - %I:%M:%S%p,    %H:%M:%S
                             dt_ss << std::put_time(std::localtime(&secsSinceEpoch), "%a %d %b %Y - %I:%M:%S%p");
                             datetime = dt_ss.str();
                         }
@@ -236,11 +236,11 @@ Account Parser::parse_account(const JSONObject::ptree & data) const
  * @author @scawful
  * 
  * @param data 
- * @return std::vector<tda::Watchlist> 
+ * @return ArrayList<tda::Watchlist> 
  */
-std::vector<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::ptree & data) const
+ArrayList<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::ptree & data) const
 {
-    std::vector<tda::Watchlist> watchlists;
+    ArrayList<tda::Watchlist> watchlists;
     for (const auto & [dataKey, dataValue] : data) {
         Watchlist watchlist;
         try {

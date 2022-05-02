@@ -10,7 +10,7 @@
  * @param x 
  * @return int 
  */
-int CandleChart::binary_search(const std::vector<double> arr, int l, int r, double x) 
+int CandleChart::binary_search(const ArrayList<double> arr, int l, int r, double x) 
 {
     if (r >= l) 
     {

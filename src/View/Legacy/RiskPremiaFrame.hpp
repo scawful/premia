@@ -19,7 +19,7 @@ private:
     double* positions_pie;
     char** positions_labels;
 
-    std::vector<String> symbols_array;
+    ArrayList<String> symbols_array;
 
     double oneYearDix[400];
 

@@ -275,16 +275,16 @@ namespace tda
     }
 
     // returns the cumulative vector of responses from the server
-    std::vector<String> 
+    ArrayList<String> 
     Socket::receive_response() const
     {
         return _response_stack;
     }
 
-    std::shared_ptr<std::vector<String>> 
+    std::shared_ptr<ArrayList<String>> 
     Socket::receive_response_ptr()
     {
-        return std::make_shared<std::vector<String>>(_response_stack);
+        return std::make_shared<ArrayList<String>>(_response_stack);
     }
 
     bool 

@@ -92,7 +92,6 @@ add_executable(Premia src/Premia.cpp
                     src/Services/CoinbasePro/Account.cpp 
                     src/Services/CoinbasePro/Client.cpp 
                     src/Services/CoinbasePro/Product.cpp
-                    src/Services/TDAmeritrade.cpp 
                     src/Services/TDAmeritrade/Parser.cpp
                     src/Services/TDAmeritrade/Socket.cpp
                     src/Services/TDAmeritrade/Client.cpp

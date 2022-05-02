@@ -25,11 +25,10 @@ namespace tda
     private:
         bool initialized;
         String tickerSymbol;
-        std::vector<std::vector<tda::Candle>> candles;
-
+        ParallelList<tda::Candle> candles;
+        ArrayList<tda::Candle> candleVector;
         StringMap priceHistoryVariables;
         StringMap candleData;
-        std::vector< tda::Candle > candleVector;
             
     public:
         PriceHistory();
@@ -37,21 +36,18 @@ namespace tda
         void addCandle(tda::Candle candle);
         void addCandleByType(Candle candle, int type);
 
-        std::vector<tda::Candle> getCandles(int index);
+        ArrayList<tda::Candle> getCandles(int index);
         int getNumCandles(int index);
 
-        std::vector< tda::Candle > getCandleVector();
+        ArrayList<tda::Candle> getCandleVector();
         String getCandleDataVariable( String variable );
         String getPriceHistoryVariable( String variable );
         String getTickerSymbol();
         bool getInitialized();
-
         void setPriceHistoryVariable(String key, String value);
         void setTickerSymbol(String ticker);
         void setInitialized();
-
         void updatePriceHistory();
-
         void clear();
     };
 }

@@ -4,7 +4,7 @@ using namespace tda;
 
 OptionChain::OptionChain()=default;
 
-std::vector<OptionsDateTimeObj> OptionChain::getOptionsDateTimeObj() const
+ArrayList<OptionsDateTimeObj> OptionChain::getOptionsDateTimeObj() const
 {
     return optionsDateTimeVector;
 }
@@ -34,12 +34,12 @@ void OptionChain::addOptionsDateTimeObj(const OptionsDateTimeObj & obj)
     optionsDateTimeVector.push_back(obj);
 }
 
-std::vector<OptionsDateTimeObj> OptionChain::getCallOptionArray() const
+ArrayList<OptionsDateTimeObj> OptionChain::getCallOptionArray() const
 {
     return callOptionArray;
 }
 
-std::vector<OptionsDateTimeObj> OptionChain::getPutOptionArray() const
+ArrayList<OptionsDateTimeObj> OptionChain::getPutOptionArray() const
 {
     return putOptionArray;
 }

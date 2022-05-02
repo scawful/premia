@@ -11,7 +11,7 @@ namespace tda
     class UserPrincipals
     {
     private:
-        std::vector<StringMap> accounts_array;
+        ArrayList<StringMap> accounts_array;
         StringMap account_data;
         StringMap streamer_info;
 

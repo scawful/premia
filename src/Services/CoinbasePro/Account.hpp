@@ -8,7 +8,7 @@ namespace cbp
     class Account 
     {
     private:
-        std::vector<StringMap> accounts_vector;
+        ArrayList<StringMap> accounts_vector;
     public:
         Account()=default;
         StringMap get_position(CRString ticker);

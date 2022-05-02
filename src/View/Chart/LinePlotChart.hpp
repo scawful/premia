@@ -18,9 +18,9 @@ private:
     double *x;
     double *y;
 
-    std::vector<double> numDays;
-    std::vector<double> balances;
-    std::vector<String> dates;
+    ArrayList<double> numDays;
+    ArrayList<double> balances;
+    ArrayList<String> dates;
     std::unordered_map<String, EventHandler> events;
 
     void initData();

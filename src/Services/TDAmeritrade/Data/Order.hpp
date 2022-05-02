@@ -22,7 +22,7 @@ namespace tda
         String duration;
         String orderStrategyType;
         String complexOrderStrategyType;
-        std::vector<OrderLegCollection> orderLegCollection;
+        ArrayList<OrderLegCollection> orderLegCollection;
 
         String orderJSON;
 

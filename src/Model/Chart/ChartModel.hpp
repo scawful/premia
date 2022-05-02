@@ -11,17 +11,17 @@ private:
     SocketListener socketListener;
     tda::Quote quote;
     tda::PriceHistory priceHistory;
-    std::vector<tda::Candle> candles;
-    std::vector<double> datesVec;
-    std::vector<double> volumeVec;
+    ArrayList<tda::Candle> candles;
+    ArrayList<double> datesVec;
+    ArrayList<double> volumeVec;
 
     void initCandles();
     void initListener();
 
 public:
     bool isActive() const;
-    std::vector<double> getDates() const;
-    std::vector<double> getVolumeVector() const;
+    ArrayList<double> getDates() const;
+    ArrayList<double> getVolumeVector() const;
     double getDate(int i);
     tda::Quote & getQuote();
     int getNumCandles() const;

@@ -12,11 +12,11 @@ private:
     double naiveGammaExposure = 0.0;
     String tickerSymbol;
     tda::OptionChain optionChainData;
-    std::vector<tda::OptionsDateTimeObj> callOptionArray;
-    std::vector<tda::OptionsDateTimeObj> putOptionArray;
-    std::vector<tda::OptionsDateTimeObj> optionsDateTimeObj;
-    std::vector<const char*> datetime_array;
-    std::vector<String> datetimeArray;
+    ArrayList<tda::OptionsDateTimeObj> callOptionArray;
+    ArrayList<tda::OptionsDateTimeObj> putOptionArray;
+    ArrayList<tda::OptionsDateTimeObj> optionsDateTimeObj;
+    ArrayList<const char*> datetime_array;
+    ArrayList<String> datetimeArray;
 
 public:
     bool isActive() const;
@@ -26,7 +26,7 @@ public:
     tda::OptionsDateTimeObj & getPutOptionObj(int index);
 
     tda::OptionsDateTimeObj & getOptionsDateTimeObj(int index);
-    std::vector<const char*> & getDateTimeArray();
+    ArrayList<const char*> & getDateTimeArray();
     String getDateTime(int index);
     void fetchOptionChain(CRString ticker, CRString strikeCount,
                             CRString strategy, CRString range,
