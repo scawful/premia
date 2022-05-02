@@ -36,7 +36,7 @@ using StringList           = ArrayList<String>;
 
 template <class... Types>
     using Tuple            = std::tuple<Types ...>;
-    
+
 template <class K, class V>
     using AbstractMap      = std::unordered_map<K, V>; 
 
@@ -84,12 +84,13 @@ void runOnceArgs(Lambda f, Theta t, Args&&... args){
 
     f(); // may return 
 
-    auto pragma = [t] (Args&&... args) {
-        std::bind(std::move(t), 
-                  std::forward<Args>(args)...);
-    }; 
+    // auto pragma = [t] (Args&&... args) {
+    //     std::bind(std::move(t), 
+    //               std::forward<Args>(args)...);
+    // }; 
 
-    std::call_once(once, pragma); // only called if rest of function successful
+    // called iff f successful
+    std::call_once(once, std::bind(std::move(t), std::forward<Args>(args)...)); 
 }
 
 #endif

@@ -30,6 +30,22 @@ namespace PremiaTests
             ASSERT_EQ(std::get<0>(snd_state), 2);
             ASSERT_EQ(std::get<0>(thr_state), 1);
         }
+
+        TEST(TemplateTests, run_once_with_args_template)
+        {
+            // Arrangement
+            String s = "";
+            String p = "f_once,";
+            auto f = [&s] () { s += "f,"; };
+            auto f_once = [&s] (String e) {  s += e; };
+
+            // Action
+            runOnceArgs<>(f, f_once, p);
+            runOnceArgs<>(f, f_once, p);
+
+            // Assertion
+            ASSERT_EQ("f,f_once,f,", s);
+        }
     }
 }
 
