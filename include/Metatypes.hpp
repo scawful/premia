@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 #include <mutex>
 #include <typeindex>
 #include <typeinfo>
@@ -33,6 +34,9 @@ using IntList              = ArrayList<int>;
 using DoubleList           = ArrayList<double>;
 using StringList           = ArrayList<String>;
 
+template <class... Types>
+    using Tuple            = std::tuple<Types ...>;
+    
 template <class K, class V>
     using AbstractMap      = std::unordered_map<K, V>; 
 
