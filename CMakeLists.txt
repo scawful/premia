@@ -70,45 +70,57 @@ add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
 # Executable Linkage --------------------------------------------------------------------------------------------
-add_executable(Premia src/Premia.cpp 
-                    src/Model/Model.cpp
-                    src/Model/Chart/ChartModel.cpp
-                    src/Model/Options/OptionsModel.cpp
-                    src/Model/Core/WatchlistModel.cpp
-                    src/View/ViewManager.cpp
-                    src/View/PrimaryView.cpp
-                    src/View/Core/LoginView.cpp
-                    src/View/Core/MenuView.cpp
-                    src/View/Core/ConsoleView.cpp
-                    src/View/Core/WatchlistView.cpp
-                    src/View/Chart/ChartView.cpp
-                    src/View/Chart/CandleChart.cpp
-                    src/View/Chart/LinePlotChart.cpp
-                    src/View/Options/OptionChain.cpp
-                    src/Controller/Controller.cpp
-                    src/Services
-                    src/Services/GenericClient.cpp
-                    src/Services/CoinbasePro/CoinbasePro.cpp
-                    src/Services/CoinbasePro/Account.cpp 
-                    src/Services/CoinbasePro/Client.cpp 
-                    src/Services/CoinbasePro/Product.cpp
-                    src/Services/TDAmeritrade/Parser.cpp
-                    src/Services/TDAmeritrade/Socket.cpp
-                    src/Services/TDAmeritrade/Client.cpp
-                    src/Services/TDAmeritrade/Data/Quote.cpp 
-                    src/Services/TDAmeritrade/Data/PriceHistory.cpp 
-                    src/Services/TDAmeritrade/Data/OptionChain.cpp 
-                    src/Services/TDAmeritrade/Data/Account.cpp
-                    src/Services/TDAmeritrade/Data/Watchlist.cpp
-                    src/Services/TDAmeritrade/Data/UserPrincipals.cpp
-                    src/Services/TDAmeritrade/Data/Order.cpp
-                    src/Services/IEXCloud.cpp src/Services/IEXCloud/Client.cpp src/Services/IEXCloud/Parser.cpp
-                    src/Services/Halext/Halext.cpp src/Services/Halext/Client.cpp src/Services/Halext/User.cpp
-                    ${IMGUI_PATH}/imgui.cpp ${IMGUI_PATH}/imgui_demo.cpp
-                    ${IMGUI_PATH}/imgui_draw.cpp ${IMGUI_PATH}/imgui_widgets.cpp
-                    ${IMGUI_PATH}/backends/imgui_impl_sdl.cpp
-                    ${IMGUI_PATH}/backends/imgui_impl_sdlrenderer.cpp ${IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp
-                    ${IMPLOT_PATH}/implot.cpp ${IMPLOT_PATH}/implot_items.cpp ${IMPLOT_PATH}/implot_demo.cpp)
+add_executable(
+    Premia 
+    src/Premia.cpp 
+    src/Model/Model.cpp
+    src/Model/Chart/ChartModel.cpp
+    src/Model/Options/OptionsModel.cpp
+    src/Model/Core/WatchlistModel.cpp
+    src/View/ViewManager.cpp
+    src/View/PrimaryView.cpp
+    src/View/Core/LoginView.cpp
+    src/View/Core/MenuView.cpp
+    src/View/Core/ConsoleView.cpp
+    src/View/Core/WatchlistView.cpp
+    src/View/Chart/ChartView.cpp
+    src/View/Chart/CandleChart.cpp
+    src/View/Chart/LinePlotChart.cpp
+    src/View/Options/OptionChain.cpp
+    src/Controller/Controller.cpp
+    src/Services
+    src/Services/GenericClient.cpp
+    src/Services/CoinbasePro/CoinbasePro.cpp
+    src/Services/CoinbasePro/Account.cpp 
+    src/Services/CoinbasePro/Client.cpp 
+    src/Services/CoinbasePro/Product.cpp
+    src/Services/TDAmeritrade/Parser.cpp
+    src/Services/TDAmeritrade/Socket.cpp
+    src/Services/TDAmeritrade/Client.cpp
+    src/Services/TDAmeritrade/Data/Quote.cpp 
+    src/Services/TDAmeritrade/Data/PriceHistory.cpp 
+    src/Services/TDAmeritrade/Data/OptionChain.cpp 
+    src/Services/TDAmeritrade/Data/Account.cpp
+    src/Services/TDAmeritrade/Data/Watchlist.cpp
+    src/Services/TDAmeritrade/Data/UserPrincipals.cpp
+    src/Services/TDAmeritrade/Data/Order.cpp
+    src/Services/IEXCloud.cpp 
+    src/Services/IEXCloud/Client.cpp 
+    src/Services/IEXCloud/Parser.cpp
+    src/Services/Halext/Halext.cpp 
+    src/Services/Halext/Client.cpp 
+    src/Services/Halext/User.cpp
+    ${IMGUI_PATH}/imgui.cpp 
+    ${IMGUI_PATH}/imgui_demo.cpp
+    ${IMGUI_PATH}/imgui_draw.cpp 
+    ${IMGUI_PATH}/imgui_widgets.cpp
+    ${IMGUI_PATH}/backends/imgui_impl_sdl.cpp
+    ${IMGUI_PATH}/backends/imgui_impl_sdlrenderer.cpp 
+    ${IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp
+    ${IMPLOT_PATH}/implot.cpp 
+    ${IMPLOT_PATH}/implot_items.cpp 
+    ${IMPLOT_PATH}/implot_demo.cpp
+)
 
 include_directories(Premia "assets")
 include_directories(Premia "src/Services/")
@@ -123,3 +135,49 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
     DEPENDS ${destination}
     COMMENT "symbolic link resources folder from ${source} => ${destination}")
+
+
+# find_package(GTest REQUIRED)
+# include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(
+  PremiaTest
+  tests/PremiaTest.cpp
+  tests/ServiceTests/TDA.cpp
+  src/Services/TDAmeritrade/Parser.cpp
+  src/Services/TDAmeritrade/Socket.cpp
+  src/Services/TDAmeritrade/Client.cpp
+  src/Services/TDAmeritrade/Data/Quote.cpp 
+  src/Services/TDAmeritrade/Data/PriceHistory.cpp 
+  src/Services/TDAmeritrade/Data/OptionChain.cpp 
+  src/Services/TDAmeritrade/Data/Account.cpp
+  src/Services/TDAmeritrade/Data/Watchlist.cpp
+  src/Services/TDAmeritrade/Data/UserPrincipals.cpp
+  src/Services/TDAmeritrade/Data/Order.cpp
+)
+target_link_libraries(
+  PremiaTest
+  ${SDL2_LIBRARIES} ${SDL_IMAGE_LIBRARIES} ${SDL_TTF_LIBRARIES}
+  ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} 
+  curl 
+  OpenSSL::SSL 
+  ImGui 
+  ImPlot 
+  gtest_main
+  gtest
+  ws2_32
+)
+
+include(GoogleTest)
+gtest_discover_tests(PremiaTest)
