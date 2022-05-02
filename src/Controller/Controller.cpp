@@ -51,7 +51,7 @@ Controller::initWindow()
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);  
 
-    Premia::StyleColorsPremia();
+    Style::ColorsPremia();
 
 }
 

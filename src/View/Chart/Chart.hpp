@@ -2,6 +2,7 @@
 #define Chart_hpp
 
 #include "Premia.hpp"
+#include "ImGui.hpp"
 #include "ImPlot.hpp"
 
 class Chart 
