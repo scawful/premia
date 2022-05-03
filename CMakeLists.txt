@@ -1,41 +1,34 @@
-# CMake Specifications 
+# CMake Specifications -------------------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.10)
 
-# C++ Standard Specifications
+# C++ Standard Specifications ------------------------------------------------------------------------------------
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3")
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
-# Premia by Justin Scofield
+# Premia by Justin Scofield --------------------------------------------------------------------------------------
 project(Premia VERSION 0.40)
 include_directories(include)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-# Boost library --------------------------------------------------------------------------------------------
+# Boost library --------------------------------------------------------------------------------------------------
 set(Boost_USE_STATIC_LIBS ON)
 set(BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM "iostreams thread system filesystem") #required by gnuplot-iostream
 separate_arguments(BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM)
 find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM})
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-# SDL libraries --------------------------------------------------------------------------------------------
+# SDL libraries --------------------------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
 find_package(SDL_image REQUIRED)
 find_package(SDL_ttf REQUIRED)
 
-# cURL library --------------------------------------------------------------------------------------------
+# cURL library ---------------------------------------------------------------------------------------------------
 find_package(CURL REQUIRED)
 
-# MySQL library --------------------------------------------------------------------------------------------
-if(APPLE)
-    set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR "/usr/local/Cellar/mysql-connector-c++/8.0.28")
-    include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
-    link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
-endif()
-
-# OpenSSL library --------------------------------------------------------------------------------------------
+# OpenSSL library ------------------------------------------------------------------------------------------------
 if(APPLE)
     set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1m/include")
     set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1m/lib/libcrypto.dylib")
@@ -55,7 +48,7 @@ if(OPENSSL_FOUND)
     endif()
 endif()
 
-# ImGui library --------------------------------------------------------------------------------------------
+# ImGui library --------------------------------------------------------------------------------------------------
 set(IMGUI_PATH  "libs/imgui")                            # Set where the ImGui files are stored
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)             # Compile as static library 
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
@@ -63,13 +56,13 @@ target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
 target_compile_definitions(ImGui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  GL_GLEXT_PROTOTYPES=1)
 
-# ImPlot library --------------------------------------------------------------------------------------------
+# ImPlot library -------------------------------------------------------------------------------------------------
 set(IMPLOT_PATH "libs/implot")
 file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
-# Executable Linkage --------------------------------------------------------------------------------------------
+# Premia Executable Linkage --------------------------------------------------------------------------------------
 add_executable(
     Premia 
     src/Premia.cpp 
@@ -124,21 +117,22 @@ add_executable(
 
 include_directories(Premia "assets")
 include_directories(Premia "src/Services/")
-target_include_directories(Premia INTERFACE "include")
-target_link_libraries(Premia ${SDL2_LIBRARIES} ${SDL_IMAGE_LIBRARIES} ${SDL_TTF_LIBRARIES}
-                             ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} curl OpenSSL::SSL ImGui ImPlot ws2_32)
+# target_include_directories(Premia INTERFACE "include")
+target_link_libraries(
+    Premia 
+    ${BOOST_LIBRARIES} 
+    ${SDL2_LIBRARIES} 
+    ${SDL_IMAGE_LIBRARIES} 
+    ${SDL_TTF_LIBRARIES}
+    ${OPENGL_LIBRARIES} 
+    ImGui 
+    ImPlot
+    curl
+    OpenSSL::SSL 
+    ws2_32
+)
 
-set (source "${CMAKE_SOURCE_DIR}/assets")
-set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
-    DEPENDS ${destination}
-    COMMENT "symbolic link resources folder from ${source} => ${destination}")
-
-
-# find_package(GTest REQUIRED)
-# include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+# PremiaTest using GoogleTest ------------------------------------------------------------------------------------
 
 include(FetchContent)
 FetchContent_Declare(
@@ -148,13 +142,13 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
-
 enable_testing()
 
 add_executable(
   PremiaTest
   tests/PremiaTest.cpp
-  tests/ServiceTests/TDA.cpp
+  tests/ServiceTestSuite/TDA.cpp
+  # tests/ServiceTests/FRED.cpp
   src/Services/TDAmeritrade/Parser.cpp
   src/Services/TDAmeritrade/Socket.cpp
   src/Services/TDAmeritrade/Client.cpp
@@ -166,14 +160,18 @@ add_executable(
   src/Services/TDAmeritrade/Data/UserPrincipals.cpp
   src/Services/TDAmeritrade/Data/Order.cpp
 )
+
 target_link_libraries(
   PremiaTest
-  ${SDL2_LIBRARIES} ${SDL_IMAGE_LIBRARIES} ${SDL_TTF_LIBRARIES}
-  ${BOOST_LIBRARIES} ${OPENGL_LIBRARIES} 
-  curl 
-  OpenSSL::SSL 
+  ${BOOST_LIBRARIES} 
+  ${SDL2_LIBRARIES} 
+  ${SDL_IMAGE_LIBRARIES} 
+  ${SDL_TTF_LIBRARIES}
+  ${OPENGL_LIBRARIES}
   ImGui 
   ImPlot 
+  curl 
+  OpenSSL::SSL 
   gtest_main
   gtest
   ws2_32
@@ -181,3 +179,12 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(PremiaTest)
+
+# Assets Folder Link ---------------------------------------------------------------------------------------------
+
+set (source "${CMAKE_SOURCE_DIR}/assets")
+set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
+                   DEPENDS ${destination}
+                   COMMENT "symbolic link resources folder from ${source} => ${destination}")

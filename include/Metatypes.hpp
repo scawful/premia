@@ -62,7 +62,6 @@ struct Events {
         assert(eventValue.second == TypeIndex(typeid(typeCastedEvent)));  
         return typeCastedEvent(std::forward<Args>(args)...);                  
     }
-
 };
 
 using std::once_flag;
@@ -83,11 +82,6 @@ void runOnceArgs(Lambda f, Theta t, Args&&... args){
     static once_flag once; 
 
     f(); // may return 
-
-    // auto pragma = [t] (Args&&... args) {
-    //     std::bind(std::move(t), 
-    //               std::forward<Args>(args)...);
-    // }; 
 
     // called iff f successful
     std::call_once(once, std::bind(std::move(t), std::forward<Args>(args)...)); 

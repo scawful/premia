@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "TDA.hpp"
 
-namespace ServiceTests
+namespace ServiceTestSuite
 {
     namespace TDA
     {
