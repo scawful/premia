@@ -4,3 +4,6 @@
 [submodule "libs/implot"]
 	path = libs/implot
 	url = https://github.com/epezent/implot.git
+[submodule "libs/fredcpp"]
+	path = libs/fredcpp
+	url = https://github.com/nomadbyte/fredcpp.git
