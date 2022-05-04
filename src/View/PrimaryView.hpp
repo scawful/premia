@@ -12,7 +12,6 @@ private:
     std::unordered_map<String, EventHandler> events;
 
     void drawInfoPane();
-    void drawAccountPane();
     void drawScreen();
 
 public:

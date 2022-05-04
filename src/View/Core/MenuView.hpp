@@ -14,7 +14,6 @@ private:
     ConsoleLogger logger;
     std::unordered_map<String, EventHandler> events;
    
-    void StyleColorsPremia(ImGuiStyle* dst = nullptr) const;
     void drawStyleEditor();
     void drawFileMenu() const;
     void drawEditMenu();

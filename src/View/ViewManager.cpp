@@ -26,26 +26,6 @@ ViewManager::setLoggedIn()
     this->isLoggedIn = true;
 }
 
-void
-ViewManager::setConsoleView()
-{
-    if (this->consoleActive) {
-        this->consoleActive = false;
-    } else {
-        this->consoleActive = true;
-    }
-}
-
-void 
-ViewManager::setWatchlistView()
-{
-    if (this->watchlistActive) {
-        this->watchlistActive = false;
-    } else {
-        this->watchlistActive = true;
-    }
-}
-
 void 
 ViewManager::startGuiFrame() const
 {    
@@ -56,13 +36,7 @@ ViewManager::startGuiFrame() const
     ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
 
     if (!this->isLoggedIn)
-        dimensions = ImVec2(300,200);
-
-    if (this->consoleActive)
-        dimensions.y = io.DisplaySize.y * 0.75f;
-
-    if (this->watchlistActive)
-        dimensions.x = io.DisplaySize.x * 0.75f;
+        dimensions = ImVec2(400,250);
 
     ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
 
@@ -74,10 +48,15 @@ ViewManager::startGuiFrame() const
     if (isLoggedIn) {
         flags += ImGuiWindowFlags_MenuBar;
     }
-                               
-    if (!ImGui::Begin("Premia", nullptr, flags)) {
+    
+    static bool windowOpen = true;
+    if (!ImGui::Begin("Premia", &windowOpen, flags)) {
         ImGui::End();
         return;
+    }
+
+    if (!windowOpen) {
+        events.at("quit")();
     }
 }
 
@@ -85,31 +64,6 @@ void
 ViewManager::endGuiFrame() const 
 {
     ImGui::End();
-}
-
-void
-ViewManager::displayConsole() const
-{
-    ImGui::End();
-    const ImGuiIO & io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y * 0.75f));
-    ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y * 0.25f);
-    if (watchlistActive)
-        dimensions.x = io.DisplaySize.x * 0.75f;
-        
-    ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
-    this->consoleView->update();
-}
-
-void 
-ViewManager::displayWatchlist() const
-{
-    ImGui::End();    
-    const ImGuiIO & io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.75f, 0));
-    auto size = ImVec2(io.DisplaySize.x * 0.25f, io.DisplaySize.y);
-    ImGui::SetNextWindowSize(size, ImGuiCond_Always);
-    this->watchlistView->update();
 }
 
 void 
@@ -131,7 +85,6 @@ ViewManager::addEventHandler(CRString key, const EventHandler & event)
 //     this->allEvents.insert<T>(key, event);
 // }
 
-
 void 
 ViewManager::setCurrentView(std::shared_ptr<View> newView)
 {
@@ -139,23 +92,45 @@ ViewManager::setCurrentView(std::shared_ptr<View> newView)
 }
 
 void 
-ViewManager::updateCurrentView() const
+ViewManager::update() const
 {
     this->startGuiFrame();
-
     if (menuActive)
         this->menuView->update();
-    
-    if (!isLoggedIn)
-        this->loginView->update();
-    else
-        this->currentView->update();
 
-    if (watchlistActive)
-        this->displayWatchlist();
-    
-    if (consoleActive)
-        this->displayConsole();
+    if (!isLoggedIn) {
+        this->loginView->update();
+    } else {
+        static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | 
+                                        ImGuiTableFlags_BordersH | 
+                                        ImGuiTableFlags_BordersV |
+                                        ImGuiTableFlags_Hideable |
+                                        ImGuiTableFlags_Reorderable |
+                                        ImGuiTableFlags_SizingStretchSame;
+
+        if (ImGui::BeginTable("table1", 3, flags, ImGui::GetContentRegionAvail()))
+        {            
+            ImGui::TableSetupColumn("##left");
+            ImGui::TableSetupColumn("##center");
+            ImGui::TableSetupColumn("##right");
+            ImGui::TableHeadersRow();
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); 
+            ImGui::BeginChild("WatchlistRegion", ImVec2(ImGui::GetContentRegionAvail().x, 0.f), false, ImGuiWindowFlags_None);
+            this->watchlistView->update(); 
+            ImGui::EndChild();
+
+            ImGui::TableSetColumnIndex(1); 
+            this->currentView->update();
+            this->consoleView->update();
+
+            ImGui::TableSetColumnIndex(2); 
+            this->accountView->update();
+
+            ImGui::EndTable();
+        }
+    }
     
     this->endGuiFrame();
 }

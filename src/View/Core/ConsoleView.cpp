@@ -27,7 +27,15 @@ void ConsoleView::addLog(const char* fmt, ...)
 
 void ConsoleView::addLogStd(CRString data)
 {
-    Items.push_back(Strdup(data.c_str()));
+    const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    auto hours = now.time_of_day().hours(); 
+    auto minutes = now.time_of_day().minutes();
+
+    String log = "[";
+    log += std::to_string(hours);
+    log += ":" + std::to_string(minutes) + "] " + data;
+
+    Items.push_back(Strdup(log.c_str()));
 }
 
 
@@ -190,21 +198,9 @@ void ConsoleView::drawScreen()
 {
    const ImGuiIO & io = ImGui::GetIO();
 
-    if (!ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
-        ImGui::End();
-        return;
-    }
-
-    if (ImGui::BeginPopupContextItem())
-    {
-        // if (ImGui::MenuItem("Close Console"))
-        //     p_open = false;
-        ImGui::EndPopup();
-    }
-
     // Reserve enough left-over height for 1 separator + 1 input text
-    const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-    ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
+    const float footer_height_to_reserve = ImGui::GetFrameHeightWithSpacing();
+    ImGui::BeginChild("ScrollingRegion", ImVec2(0, -(footer_height_to_reserve)), false, ImGuiWindowFlags_HorizontalScrollbar);
     if (ImGui::BeginPopupContextWindow())
     {
         if (ImGui::Selectable("Clear")) clearLog();
@@ -247,31 +243,44 @@ void ConsoleView::drawScreen()
     // Command-line
     bool reclaim_focus = false;
     ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-    if (ImGui::InputText("Input", InputBuf, IM_ARRAYSIZE(InputBuf), input_text_flags, &TextEditCallbackStub, (void*)this))
-    {
-        char* s = InputBuf;
-        Strtrim(s);
-        if (s[0])
-            executeCommand(s);
-        strcpy(s, "");
-        reclaim_focus = true;
-    }
-    ImGui::SameLine();
-    if (ImGui::SmallButton("Clear")) { 
-        clearLog(); 
-    }
-    ImGui::SameLine();
-    copy_to_clipboard = ImGui::SmallButton("Copy");
-    ImGui::SameLine(); ImGui::Checkbox("Auto-scroll", &AutoScroll);
 
-    // Options, Filter
-    ImGui::SameLine();
-    Filter.Draw("Filter (\"incl,-excl\") (\"error\")", 180);
+    if (ImGui::BeginTable("##consoleWidget", 5, ImGuiTableFlags_SizingFixedFit)) {
+        ImGui::TableSetupColumn("##first");
+        ImGui::TableSetupColumn("##second");
+        ImGui::TableSetupColumn("##third");
+        ImGui::TableSetupColumn("##fourth");
+        ImGui::TableSetupColumn("##fifth");
 
-    // Auto-focus on window apparition
-    ImGui::SetItemDefaultFocus();
-    if (reclaim_focus)
-        ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+        ImGui::TableNextColumn();
+        if (ImGui::InputText("Input", InputBuf, IM_ARRAYSIZE(InputBuf), input_text_flags, &TextEditCallbackStub, (void*)this))
+        {
+            char* s = InputBuf;
+            Strtrim(s);
+            if (s[0])
+                executeCommand(s);
+            strcpy(s, "");
+            reclaim_focus = true;
+        }
+
+        ImGui::TableNextColumn();
+        if (ImGui::SmallButton("Clear")) { 
+            clearLog(); 
+        }
+
+        ImGui::TableNextColumn();
+        copy_to_clipboard = ImGui::SmallButton("Copy");
+        ImGui::SameLine(); ImGui::Checkbox("Auto-scroll", &AutoScroll);
+
+        ImGui::TableNextColumn();
+        Filter.Draw("Filter", 75);
+
+        ImGui::TableNextColumn();
+        ImGui::SetItemDefaultFocus(); // Auto-focus on window apparition
+        if (reclaim_focus)
+            ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+        
+        ImGui::EndTable();
+    }
 }
 
 ConsoleView::ConsoleView() : View()
@@ -288,8 +297,8 @@ ConsoleView::ConsoleView() : View()
     Commands.push_back("SESSION");
     AutoScroll = true;
     ScrollToBottom = false;
-    addLog("Welcome to Premia!"); 
-    addLog("Enter 'HELP' for help. TAB key for autocomplete, UP/DOWN key for history");
+    addLogStd("Welcome to Premia!"); 
+    addLogStd("Enter 'HELP' for help. TAB key for autocomplete, UP/DOWN key for history");
 
     this->title = "Console";
 }
@@ -319,5 +328,11 @@ void ConsoleView::update()
     if (plotDemo)
         ImPlot::ShowDemoWindow();
 
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
+    ImGui::BeginChild("child", ImVec2(0, ImGui::GetContentRegionAvail().y), false);
     drawScreen();
+    ImGui::EndChild();
+    ImGui::PopStyleVar(2);
 }

@@ -5,6 +5,7 @@
 #include "SDL.hpp"
 #include "ImGui.hpp"
 #include "ImPlot.hpp"
+#include "Boost.hpp"
 
 class View 
 {

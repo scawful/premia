@@ -80,77 +80,9 @@ void PrimaryView::drawInfoPane()
     }
 }
 
-void PrimaryView::drawAccountPane()
-{
-    if (ImGui::BeginMenuBar()) {
-        if (ImGui::BeginMenu("Overview")) {
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
-
-    ImGui::Text("Account ID: " );
-    ImGui::Text("Net Liq: ");
-    ImGui::Text("Available Funds: ");
-    ImGui::Text("Cash: ");
-    ImGui::Separator();
-
-    static double xs2[11], ys2[11], v[11];
-    for (int i = 0; i < 11; ++i) {
-        xs2[i] = i;
-        ys2[i] = xs2[i] * xs2[i];
-        v[i] = i;
-    }
-    if (ImPlot::BeginPlot("Account Performance")) {
-        ImPlot::PlotBars("Value", v, 11);
-        ImPlot::PlotLine("Return", xs2, ys2, 11);
-        ImPlot::EndPlot();
-    }
-
-    ImGui::Separator();
-
-    /**
-     * @brief Button Table
-     * 
-     */
-    if (ImGui::BeginTable("split", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings)) {
-        for (int i = 0; i < 10; i++) {
-            char buf[32];
-            sprintf(buf, "%03d", i);
-            ImGui::TableNextColumn();
-            ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f));
-        }
-        ImGui::EndTable();
-    }
-}
-
 void PrimaryView::drawScreen()
 {
-    const ImGuiIO & io = ImGui::GetIO();
-    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-
-    // Child 1: no border, enable horizontal scrollbar
-    {
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-        ImGui::BeginChild("ChildL", ImVec2(ImGui::GetContentRegionAvail().x * 0.30f, ImGui::GetContentRegionAvail().y), false, window_flags);
-        drawAccountPane();
-        ImGui::EndChild();
-    }
-
-    ImGui::SameLine();
-    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
-    ImGui::SameLine();
-
-    // Child 2: rounded border
-    {
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
-        ImGui::BeginChild("ChildR", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y) , true, window_flags);
-        drawInfoPane();
-        ImGui::EndChild();
-        ImGui::PopStyleVar();
-    }
-
+    drawInfoPane();
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 

@@ -32,7 +32,7 @@ void LoginView::drawScreen() const
     ImGui::Text("Consumer Key: "); ImGui::SameLine(); ImGui::InputText("##username", &consumer_key);
     ImGui::Text("Refresh Token: "); ImGui::SameLine(); ImGui::InputText("##password", &refresh_token);
     
-    if ( ImGui::Button("Login") ) {
+    if ( ImGui::Button("Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
         std::ifstream keyfile("assets/apikey.txt");
         if (keyfile.good()) {
             std::stringstream buffer;
