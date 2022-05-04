@@ -128,8 +128,11 @@ target_link_libraries(
     ImPlot
     curl
     OpenSSL::SSL 
-    ws2_32
 )
+
+if (WIN32) 
+    target_link_libraries(Premia ws2_32)
+endif()
 
 # PremiaTest using GoogleTest ------------------------------------------------------------------------------------
 
