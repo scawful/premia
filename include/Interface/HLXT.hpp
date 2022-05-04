@@ -9,13 +9,13 @@ namespace halext
     class HLXT
     {
     private:
-        IEX() { }
+        HLXT() { }
         Client client;
         User currentUser;
         bool privateBalance = false;
 
     public:
-        HLXT(IEX const&)             = delete;
+        HLXT(HLXT const&)            = delete;
         void operator=(HLXT const&)  = delete;
         static HLXT& getInstance() {
             static HLXT instance;    
@@ -25,6 +25,16 @@ namespace halext
         auto getSqueezeMetricsData()
             -> String const {
             return client.send_request("https://squeezemetrics.com/monitor/download/SPX.csv");
+        }
+
+        auto setPrivateBalance(bool val)
+            -> void {
+            privateBalance = val;
+        }
+
+        auto getPrivateBalance()
+            -> bool {
+            return privateBalance;
         }
 
     };
