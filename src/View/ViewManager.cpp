@@ -9,6 +9,7 @@ ViewManager::ViewManager()
 {
     this->consoleLogger = std::bind(&ConsoleView::addLogStd, consoleView, std::placeholders::_1);
     this->watchlistView->addLogger(this->consoleLogger);
+    this->accountView->addLogger(this->consoleLogger);
 }
 
 void

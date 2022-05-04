@@ -9,6 +9,7 @@ class AccountView: public View
 {
 private:
     bool isInit = false;
+    bool isLoggedIn = false;
     EventMap events;
     ConsoleLogger logger;
     // -----------------------------
@@ -23,6 +24,8 @@ private:
 
     void initPositions();    
     void load_account(CRString account);
+    void load_all_accounts();
+    void draw_symbol_string(CRString symbol);
     void draw_balance_string(CRString variable);
     void draw_positions();
 
@@ -34,6 +37,16 @@ public:
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
     void update() override;
+
+private:
+    ImGuiTableFlags positionFlags = ImGuiTableFlags_ScrollY      | 
+                                    ImGuiTableFlags_Sortable     | 
+                                    ImGuiTableFlags_RowBg        | 
+                                    ImGuiTableFlags_BordersOuter | 
+                                    ImGuiTableFlags_BordersV     | 
+                                    ImGuiTableFlags_Resizable    | 
+                                    ImGuiTableFlags_Reorderable  | 
+                                    ImGuiTableFlags_Hideable;
 
 };
 
