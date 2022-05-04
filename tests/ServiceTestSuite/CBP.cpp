@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Services/CBP.hpp"
+#include "Interface/CBP.hpp"
 
 namespace ServiceTestSuite
 {

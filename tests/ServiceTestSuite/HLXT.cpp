@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Services/HLXT.hpp"
+#include "Interface/HLXT.hpp"
 
 namespace ServiceTestSuite
 {

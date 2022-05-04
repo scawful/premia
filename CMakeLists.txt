@@ -70,16 +70,16 @@ add_executable(
     src/Model/Core/WatchlistModel.cpp
     # View + View Manager 
     src/View/ViewManager.cpp
-    src/View/PrimaryView.cpp
-    src/View/Core/LoginView.cpp
+    src/View/Core/PrimaryView.cpp
     src/View/Core/ConsoleView.cpp
     src/View/Menu/MenuView.cpp
-    src/View/Chart/ChartView.cpp
-    src/View/Chart/CandleChart.cpp
-    src/View/Chart/LinePlotChart.cpp
+    src/View/Login/LoginView.cpp
     src/View/Options/OptionChain.cpp
     src/View/Account/AccountView.cpp
     src/View/Watchlist/WatchlistView.cpp
+    src/View/Chart/ChartView.cpp
+    src/View/Chart/Subview/CandleChart.cpp
+    src/View/Chart/Subview/LinePlotChart.cpp
     # Controller 
     src/Controller/Controller.cpp    
     # Services 
@@ -114,6 +114,7 @@ add_executable(
 )
 include_directories(Premia "assets")
 include_directories(Premia "src/Services/")
+include_directories(Premia "src/")
 target_link_libraries(
     Premia 
     ${BOOST_LIBRARIES} 

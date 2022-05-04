@@ -340,12 +340,8 @@ void MenuView::drawViewMenu() const
 
     if (ImGui::BeginMenu("View"))
     {         
-        if (ImGui::MenuItem("Console")) {
-            events.at("toggleConsoleView")();
-        }
-        if (ImGui::MenuItem("Watchlists")) {
-            events.at("toggleWatchlistView")();
-        }
+        ImGui::MenuItem("Console");
+        ImGui::MenuItem("Watchlists");
 
         ImGui::Separator();
         if (ImGui::BeginMenu("Appearance")) {

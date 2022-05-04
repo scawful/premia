@@ -2,8 +2,8 @@
 #define ViewManager_hpp
 
 #include "View.hpp"
-#include "PrimaryView.hpp"
-#include "Core/LoginView.hpp"
+#include "Core/PrimaryView.hpp"
+#include "Login/LoginView.hpp"
 #include "Menu/MenuView.hpp"
 #include "Core/ConsoleView.hpp"
 #include "Watchlist/WatchlistView.hpp"

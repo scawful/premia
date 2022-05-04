@@ -2,7 +2,7 @@
 #define CandleChart_hpp
 
 #include "Chart.hpp"
-#include "../../Model/Chart/ChartModel.hpp"
+#include "Model/Chart/ChartModel.hpp"
 
 class CandleChart: public Chart
 {

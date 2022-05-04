@@ -2,7 +2,7 @@
 #define PrimaryView_hpp
 
 #include "View.hpp"
-#include "Menu/MenuView.hpp"
+#include "View/Menu/MenuView.hpp"
 
 class PrimaryView: public View 
 {

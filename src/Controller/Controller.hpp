@@ -4,13 +4,13 @@
 #include "Library/SDL.hpp"
 #include "Style.hpp"
 #include "Library/ImPlot.hpp"
-#include "../Model/Model.hpp"
-#include "../View/ViewManager.hpp"
-#include "../View/Core/LoginView.hpp"
-#include "../View/Core/ConsoleView.hpp"
-#include "../View/Chart/ChartView.hpp"
-#include "../View/Chart/LinePlotChart.hpp"
-#include "../View/Options/OptionChain.hpp"
+#include "Model/Model.hpp"
+#include "View/ViewManager.hpp"
+#include "View/Login/LoginView.hpp"
+#include "View/Core/ConsoleView.hpp"
+#include "View/Chart/ChartView.hpp"
+#include "View/Chart/Subview/LinePlotChart.hpp"
+#include "View/Options/OptionChain.hpp"
 
 SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint point, void* data);
 

@@ -1,9 +1,10 @@
 #ifndef WatchlistView_hpp
 #define WatchlistView_hpp
 
-#include "../View.hpp"
-#include "../../Model/Core/WatchlistModel.hpp"
-#include "Services/TDA.hpp"
+#include "View.hpp"
+#include "Interface/TDA.hpp"
+#include "Model/Core/WatchlistModel.hpp"
+
 
 class WatchlistView: public View 
 {
