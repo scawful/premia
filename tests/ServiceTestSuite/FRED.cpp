@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Fred.hpp"
+#include "Library/Fred.hpp"
 
 namespace ServiceTestSuite
 {

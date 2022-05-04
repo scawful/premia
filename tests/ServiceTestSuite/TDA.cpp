@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "TDA.hpp"
+#include "Services/TDA.hpp"
 
 namespace ServiceTestSuite
 {
@@ -9,6 +9,7 @@ namespace ServiceTestSuite
         {
             tda::Client client;
 
+            EXPECT_EQ(false, client.is_session_logged_in());
         }
     }
 }
