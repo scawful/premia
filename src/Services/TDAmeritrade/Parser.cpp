@@ -3,20 +3,47 @@
 using namespace tda;
 
 /**
+ * @brief 
+ * 
+ * @param data 
+ * @param chain 
+ * @param idx 
+ */
+void Parser::parseStrikeMap(const json::ptree & data, OptionChain & chain, int idx) const
+{
+    for (const auto & [dateKey, dateValue]: data) {
+        OptionsDateTimeObj options_dt_obj;
+        options_dt_obj.datetime = dateKey;
+        for (const auto & [strikeKey, strikeValue]: dateValue) {
+            StrikePriceMap imported_strike;
+            imported_strike.strikePrice = strikeKey;
+            for (const auto & [contractKey, contractValue]: strikeValue) {
+                for (const auto & [detailsKey, detailsValue]: contractValue) {
+                    imported_strike.raw_option[detailsKey] = detailsValue.get_value< String >();
+                }
+                options_dt_obj.strikePriceObj.push_back(imported_strike);
+            }
+        }
+        chain.addOptionsDateTimeObj(options_dt_obj);
+        chain.addOptionsDateTimeObj(options_dt_obj, idx);
+    }
+}
+
+/**
  * @brief Take a response from the API as argument and read it into a boost::property_tree
  * @author @scawful
  * 
  * @param response 
- * @return JSONObject::ptree 
+ * @return json::ptree 
  */
-JSONObject::ptree Parser::read_response(CRString response) const
+json::ptree Parser::read_response(CRString response) const
 {
     std::istringstream json_response(response);
-    JSONObject::ptree property_tree;
+    json::ptree property_tree;
 
     try {
         read_json(json_response, property_tree);
-    } catch (JSONObject::ptree_error const & json_parser_error) {
+    } catch (json::ptree_error const & json_parser_error) {
         std::cout << "Parser::read_response: " << json_parser_error.what() << std::endl;
     }
 
@@ -33,7 +60,7 @@ JSONObject::ptree Parser::read_response(CRString response) const
 String Parser::parse_access_token(CRString response) const
 {
     String access_token;
-    JSONObject::ptree data = read_response(response);
+    json::ptree data = read_response(response);
     for (const auto & [key, value] : data) {
         if (key == "access_token") {
             access_token = value.get_value<String>();
@@ -49,7 +76,7 @@ String Parser::parse_access_token(CRString response) const
  * @param data 
  * @return Quote 
  */
-Quote Parser::parse_quote(const JSONObject::ptree & data) const 
+Quote Parser::parse_quote(const json::ptree & data) const 
 {
     Quote quote;
 
@@ -72,7 +99,7 @@ Quote Parser::parse_quote(const JSONObject::ptree & data) const
  * @param freq 
  * @return PriceHistory 
  */
-PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, CRString ticker, int freq) const 
+PriceHistory Parser::parse_price_history(const json::ptree & data, CRString ticker, int freq) const 
 {
     PriceHistory price_history;
     price_history.setTickerSymbol(ticker);
@@ -123,11 +150,11 @@ PriceHistory Parser::parse_price_history(const JSONObject::ptree & data, CRStrin
  * @param data 
  * @return UserPrincipals 
  */
-UserPrincipals Parser::parse_user_principals(JSONObject::ptree & data) const
+UserPrincipals Parser::parse_user_principals(json::ptree & data) const
 {
     UserPrincipals user_principals;
 
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, data.get_child("accounts.")) {
+    BOOST_FOREACH (json::ptree::value_type &v, data.get_child("accounts.")) {
         StringMap account_data;
         for (const auto & [acctKey, acctValue] : v.second) {
             account_data[acctKey] = acctValue.get_value<String>();
@@ -139,27 +166,6 @@ UserPrincipals Parser::parse_user_principals(JSONObject::ptree & data) const
     return user_principals;
 }
 
-
-void Parser::parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain, int idx) const
-{
-    for (const auto & [dateKey, dateValue]: data) {
-        OptionsDateTimeObj options_dt_obj;
-        options_dt_obj.datetime = dateKey;
-        for (const auto & [strikeKey, strikeValue]: dateValue) {
-            StrikePriceMap imported_strike;
-            imported_strike.strikePrice = strikeKey;
-            for (const auto & [contractKey, contractValue]: strikeValue) {
-                for (const auto & [detailsKey, detailsValue]: contractValue) {
-                    imported_strike.raw_option[detailsKey] = detailsValue.get_value< String >();
-                }
-                options_dt_obj.strikePriceObj.push_back(imported_strike);
-            }
-        }
-        chain.addOptionsDateTimeObj(options_dt_obj);
-        chain.addOptionsDateTimeObj(options_dt_obj, idx);
-    }
-}
-
 /**
  * @brief Parse the option chain data from the API
  * @author @scawful
@@ -167,7 +173,7 @@ void Parser::parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain,
  * @param data 
  * @return OptionChain 
  */
-OptionChain Parser::parse_option_chain(const JSONObject::ptree & data) const
+OptionChain Parser::parse_option_chain(const json::ptree & data) const
 {
     OptionChain optionChain;
     for (const auto & [optionsKey, optionsValue]: data) {
@@ -197,7 +203,7 @@ OptionChain Parser::parse_option_chain(const JSONObject::ptree & data) const
  * @param data 
  * @return Account 
  */
-Account Parser::parse_account(const JSONObject::ptree & data) const
+Account Parser::parse_account(const json::ptree & data) const
 {
     Account account;
     for (const auto & [classKey, classValue] : data) {
@@ -238,7 +244,7 @@ Account Parser::parse_account(const JSONObject::ptree & data) const
  * @param data 
  * @return ArrayList<tda::Watchlist> 
  */
-ArrayList<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::ptree & data) const
+ArrayList<tda::Watchlist> tda::Parser::parse_watchlist_data(const json::ptree & data) const
 {
     ArrayList<tda::Watchlist> watchlists;
     for (const auto & [dataKey, dataValue] : data) {
@@ -247,7 +253,7 @@ ArrayList<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::pt
             watchlist.setName(dataValue.get_child("name").get_value<String>());
             watchlist.setId(dataValue.get_child("watchlistId").get_value<int>());
             watchlist.setAccountId(dataValue.get_child("accountId").get_value<String>());
-        } catch (const JSONObject::ptree_error & e) {
+        } catch (const json::ptree_error & e) {
             std::cout << e.what() << std::endl;
         }
         
@@ -259,7 +265,7 @@ ArrayList<tda::Watchlist> tda::Parser::parse_watchlist_data(const JSONObject::pt
                         String desc = "";
                         String type = item2Value.get_child("assetType").get_value<String>();
                         watchlist.addInstrument(symbol, desc, type);
-                    } catch (const JSONObject::ptree_error & e) {
+                    } catch (const json::ptree_error & e) {
                         std::cout << e.what() << std::endl;
                     }
                 } else {

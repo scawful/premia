@@ -1,6 +1,7 @@
 #ifndef Parser_hpp
 #define Parser_hpp
 
+#include "Metatypes.hpp"
 #include "Data/PricingStructures.hpp"
 #include "Data/Watchlist.hpp"
 #include "Data/Account.hpp"
@@ -10,24 +11,22 @@
 #include "Data/PriceHistory.hpp"
 #include "Data/Quote.hpp"
 
-namespace JSONObject = boost::property_tree;
-
 namespace tda 
 {
     class Parser 
     {
-    public:
-        JSONObject::ptree read_response(CRString response) const;
-        String parse_access_token(CRString response) const;
-        Quote parse_quote(const JSONObject::ptree & data) const;
-        PriceHistory parse_price_history(const JSONObject::ptree & data, CRString ticker, int freq) const;
-        UserPrincipals parse_user_principals(JSONObject::ptree & data) const;
+    private:
+        void parseStrikeMap(const json::ptree & data, OptionChain & chain, int idx) const;
 
-        void parseStrikeMap(const JSONObject::ptree & data, OptionChain & chain, int idx) const;
-        
-        OptionChain parse_option_chain(const JSONObject::ptree & data) const;
-        Account parse_account(const JSONObject::ptree & data) const;
-        ArrayList<Watchlist> parse_watchlist_data(const JSONObject::ptree & data) const;
+    public:
+        json::ptree read_response(CRString response) const;
+        String parse_access_token(CRString response) const;
+        Quote parse_quote(const json::ptree & data) const;
+        PriceHistory parse_price_history(const json::ptree & data, CRString ticker, int freq) const;
+        UserPrincipals parse_user_principals(json::ptree & data) const;
+        OptionChain parse_option_chain(const json::ptree & data) const;
+        Account parse_account(const json::ptree & data) const;
+        ArrayList<Watchlist> parse_watchlist_data(const json::ptree & data) const;
     };
 
 }
