@@ -86,6 +86,10 @@ void PrimaryView::drawScreen()
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 
+String PrimaryView::getName() {
+    return "Overview";
+}
+
 void PrimaryView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

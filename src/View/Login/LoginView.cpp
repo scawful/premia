@@ -52,6 +52,11 @@ void LoginView::drawScreen() const
 
 }
 
+String 
+LoginView::getName() {
+    return "Login";
+}
+
 void LoginView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

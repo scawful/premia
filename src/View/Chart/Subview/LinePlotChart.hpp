@@ -30,6 +30,7 @@ public:
     ~LinePlotChart() override;
 
     void update() override;
+    String getName() override;
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
 };

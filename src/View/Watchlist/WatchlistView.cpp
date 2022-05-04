@@ -57,6 +57,11 @@ void WatchlistView::drawWatchlistTable()
     }
 }
 
+String 
+WatchlistView::getName() {
+    return "Watchlists";
+}
+
 void WatchlistView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

@@ -482,6 +482,11 @@ void MenuView::drawScreen()
     }
 }
 
+String 
+MenuView::getName() {
+    return "Menu";
+}
+
 void MenuView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

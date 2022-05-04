@@ -308,6 +308,11 @@ ConsoleView::~ConsoleView()
         free(History[i]);
 }
 
+String 
+ConsoleView::getName() {
+    return "Console";
+}
+
 void ConsoleView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;

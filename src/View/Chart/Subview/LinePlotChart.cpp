@@ -54,6 +54,11 @@ LinePlotChart::~LinePlotChart()
     delete [] y;
 }
 
+String
+LinePlotChart::getName() {
+    return "Line Plot";
+}
+
 void LinePlotChart::addLogger(const ConsoleLogger & newLogger)
 {
     // this->logger = newLogger;

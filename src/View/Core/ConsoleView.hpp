@@ -35,6 +35,7 @@ public:
 
     void addLog(const char* fmt, ...);
     void addLogStd(CRString data);
+        String getName() override;
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
     void update() override;

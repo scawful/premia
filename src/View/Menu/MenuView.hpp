@@ -26,6 +26,7 @@ private:
     void drawScreen();
 
 public:
+        String getName() override;
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(CRString, const EventHandler &) override;
     void update() override;

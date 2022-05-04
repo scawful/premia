@@ -102,11 +102,10 @@ ViewManager::update() const
                                         ImGuiTableFlags_Reorderable |
                                         ImGuiTableFlags_SizingStretchSame;
 
-        if (ImGui::BeginTable("table1", 3, flags, ImGui::GetContentRegionAvail()))
-        {            
-            ImGui::TableSetupColumn("##left");
-            ImGui::TableSetupColumn("##center");
-            ImGui::TableSetupColumn("##right");
+        if (ImGui::BeginTable("table1", 3, flags, ImGui::GetContentRegionAvail())) {            
+            ImGui::TableSetupColumn(this->watchlistView->getName().c_str());
+            ImGui::TableSetupColumn(this->currentView->getName().c_str());
+            ImGui::TableSetupColumn(this->accountView->getName().c_str());
             ImGui::TableHeadersRow();
 
             ImGui::TableNextRow();

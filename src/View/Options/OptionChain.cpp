@@ -192,6 +192,11 @@ void OptionChainView::drawUnderlying()
     }
 }
 
+String 
+OptionChainView::getName() {
+    return "Option Chain";
+}
+
 void OptionChainView::addLogger(const ConsoleLogger & newLogger)
 {
     this->logger = newLogger;
