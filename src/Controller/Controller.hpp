@@ -12,8 +12,6 @@
 #include "View/Chart/Subview/LinePlotChart.hpp"
 #include "View/Options/OptionChain.hpp"
 
-SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint point, void* data);
-
 class Controller {
 private:
     bool active = false;
@@ -25,10 +23,10 @@ private:
     SDL_Renderer * renderer = nullptr;
 
     void initWindow();
-    void initCallbacks();
+    void initEvents();
 
 public:
-    explicit Controller(const ViewManager & vm);
+    Controller()=default;
 
     bool isActive() const;
 

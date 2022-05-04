@@ -40,7 +40,7 @@ template <class... Types>
     using Tuple            = std::tuple<Types ...>;
 
 template <class K, class V>
-    using AbstractMap      = std::unordered_map<K, V>; 
+    using AbstractMap      = std::unordered_map<K, V>;
 
 using StringMap            = AbstractMap<String, String>;
 using EventMap             = AbstractMap<String, EventHandler>;
@@ -51,18 +51,18 @@ struct Events {
 
     template <typename E>
     void insert(String key, E event) {
-        auto eventType = TypeIndex(typeid(event));                     
-        events.insert(std::make_pair(key, 
-                      std::make_pair((EventHandler) event, eventType))); 
+        auto eventType = TypeIndex(typeid(event));
+        events.insert(std::make_pair(key,
+                      std::make_pair((EventHandler) event, eventType)));
     }
 
     template <typename E, typename... Args>
-    E trigger(String key, Args&&... args) {
-        auto eventIt = events.find(key);                            
-        auto eventValue = eventIt->second;                                  
-        auto typeCastedEvent = (E (*) (Args ...)) (eventValue.first);              
-        assert(eventValue.second == TypeIndex(typeid(typeCastedEvent)));  
-        return typeCastedEvent(std::forward<Args>(args)...);                  
+    E trigger(CRString key, Args&&... args) {
+        auto eventIt = events.find(key);
+        auto eventValue = eventIt->second;
+        auto typeCastedEvent = (E (*) (Args ...)) (eventValue.first);
+        assert(eventValue.second == TypeIndex(typeid(typeCastedEvent)));
+        return typeCastedEvent(std::forward<Args>(args)...);
     }
 };
 
@@ -70,8 +70,8 @@ using std::once_flag;
 
 template <typename Lambda, typename Theta>
 void runOnce(Lambda f, Theta t){
-    static once_flag once; 
-    
+    static once_flag once;
+
     f();
 
     std::call_once(once, [t] () {
@@ -81,12 +81,38 @@ void runOnce(Lambda f, Theta t){
 
 template <typename Lambda, typename Theta, typename... Args>
 void runOnceArgs(Lambda f, Theta t, Args&&... args){
-    static once_flag once; 
+    static once_flag once;
 
-    f(); // may return 
+    f(); // may return
 
     // called iff f successful
-    std::call_once(once, std::bind(std::move(t), std::forward<Args>(args)...)); 
+    std::call_once(once, std::bind(std::move(t), std::forward<Args>(args)...));
 }
+
+template <typename Lambda, typename Theta>
+inline auto try_catch_finally(const Lambda &f, const Theta &finally) 
+    noexcept(false)
+    -> void {
+    try {
+        f();
+    } catch (...) {
+        try {
+            finally();
+        } catch (...) { // Maybe stupid check that finally_code mustn't throw.
+            std::terminate();
+        }
+        throw;
+    }
+    finally();
+}
+
+// Please never throw exception below. It is needed to avoid a compilation error
+// in the case when we use "begin_try ... finally" without any "catch" block.
+class never_thrown_exception {};
+
+#define Try          try_catch_finally([&](){ try
+#define finally      catch(never_thrown_exception){throw;} },[&]()
+#define Proceed      ) // sorry for "pascalish" style :(
+
 
 #endif

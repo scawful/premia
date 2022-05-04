@@ -1,47 +1,12 @@
 #include "Controller.hpp"
 
-constexpr size_t TITLE_BORDER = 20;
-constexpr size_t RESIZE_BORDER = 3;
-
-SDL_HitTestResult 
-WindowCallback(SDLWindow win, SDLPoint pt, void* data)
-{
-    int w;
-    int h;
-    SDL_GetWindowSize(win, &w, &h);
-
-    // dragging this pixel moves the window.
-    if (pt->y < TITLE_BORDER && pt->x < (w - TITLE_BORDER)) {
-        return SDL_HITTEST_DRAGGABLE;
-    }
-
-    #define RESIZE_HIT(name) { \
-        return SDL_HITTEST_RESIZE_##name; \
-    }
-    
-    // SDL_HITTEST_RESIZE_* - dragging this pixel resizes a specific edge (or edges) of the window. (Here * is one of: TOPLEFT, TOP, TOPRIGHT, RIGHT, BOTTOMRIGHT, BOTTOM, BOTTOMLEFT, LEFT).
-    if (pt->x < RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-        RESIZE_HIT(TOPLEFT)
-    } else if (pt->x > RESIZE_BORDER && pt->x < w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-        RESIZE_HIT(TOP)
-    } else if (pt->x > w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-        RESIZE_HIT(TOPRIGHT)
-    } else if (pt->x > w - RESIZE_BORDER && pt->y > RESIZE_BORDER && pt->y < h - RESIZE_BORDER) {
-        RESIZE_HIT(RIGHT)
-    } else if (pt->x > w - RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-        RESIZE_HIT(BOTTOMRIGHT)
-    } else if (pt->x < w - RESIZE_BORDER && pt->x > RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-        RESIZE_HIT(BOTTOM)
-    } else if (pt->x < RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-        RESIZE_HIT(BOTTOMLEFT)
-    } else if (pt->x < RESIZE_BORDER && pt->y < h - RESIZE_BORDER && pt->y > RESIZE_BORDER) {
-        RESIZE_HIT(LEFT)
-    }
-
-    // no action.
-    return SDL_HITTEST_NORMAL;
-}
-
+/**
+ * @brief Initializes the SDL_Window and SDL_Renderer
+ *        Starts the ImGui and ImPlot contexts
+ *        Loads default fonts and theme 
+ *        Builds the GUI Frame 
+ * 
+ */
 void
 Controller::initWindow()
 {
@@ -99,8 +64,12 @@ Controller::initWindow()
     Style::ColorsPremia();
 }
 
+/**
+ * @brief Initializes any events the ViewManager may need for modifying the Controller
+ * 
+ */
 void 
-Controller::initCallbacks()
+Controller::initEvents()
 {
     viewManager.addEventHandler("login", [this] () -> void { 
         SDL_SetWindowSize(window, Style::SCREEN_WIDTH, Style::SCREEN_HEIGHT);
@@ -123,18 +92,32 @@ Controller::initCallbacks()
     viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
 }
 
-Controller::Controller(const ViewManager & vm) 
-    : viewManager(vm) { }
+/**
+ * @brief Returns program runtime 
+ * 
+ * @return true 
+ * @return false 
+ */
+bool 
+Controller::isActive() const { 
+    return active; 
+}
 
-bool Controller::isActive() const { return active; }
-
+/**
+ * @brief Entry point of application
+ * 
+ */
 void
-Controller::onEntry() {
+Controller::onEntry() noexcept(false) {
     initWindow();
-    initCallbacks();
+    initEvents();
     active = true;
 }
 
+/**
+ * @brief Handles keyboard and mouse input via SDL_Events 
+ * 
+ */
 void
 Controller::onInput()
 {
@@ -201,11 +184,19 @@ Controller::onInput()
     io.MouseWheel = static_cast<float>(wheel);
 }
 
+/**
+ * @brief Refer to View group and ViewManager class
+ * 
+ */
 void 
 Controller::onLoad() const {
     this->viewManager.update();
 }
 
+/**
+ * @brief Render current contents to the screen
+ * 
+ */
 void
 Controller::doRender()
 {
@@ -215,6 +206,10 @@ Controller::doRender()
     SDL_RenderPresent(renderer);
 }
 
+/**
+ * @brief Cleanup all resources 
+ * 
+ */
 void
 Controller::onExit()
 {
