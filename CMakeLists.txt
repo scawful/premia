@@ -63,24 +63,30 @@ target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 add_executable(
     Premia 
     src/Premia.cpp 
+    # Model
     src/Model/Model.cpp
     src/Model/Chart/ChartModel.cpp
     src/Model/Options/OptionsModel.cpp
     src/Model/Core/WatchlistModel.cpp
+    # View + View Manager 
     src/View/ViewManager.cpp
     src/View/PrimaryView.cpp
     src/View/Core/LoginView.cpp
     src/View/Core/ConsoleView.cpp
-    src/View/Watchlist/WatchlistView.cpp
     src/View/Menu/MenuView.cpp
     src/View/Chart/ChartView.cpp
     src/View/Chart/CandleChart.cpp
     src/View/Chart/LinePlotChart.cpp
     src/View/Options/OptionChain.cpp
     src/View/Account/AccountView.cpp
-    src/Controller/Controller.cpp
-    src/Services
-    src/Services/GenericClient.cpp
+    src/View/Watchlist/WatchlistView.cpp
+    # Controller 
+    src/Controller/Controller.cpp    
+    # Services 
+    src/Services/Halext/Client.cpp 
+    src/Services/Halext/User.cpp    
+    src/Services/IEXCloud/Client.cpp 
+    src/Services/IEXCloud/Parser.cpp
     src/Services/CoinbasePro/Account.cpp 
     src/Services/CoinbasePro/Client.cpp 
     src/Services/CoinbasePro/Product.cpp
@@ -88,17 +94,13 @@ add_executable(
     src/Services/TDAmeritrade/Socket.cpp
     src/Services/TDAmeritrade/Client.cpp
     src/Services/TDAmeritrade/Data/Quote.cpp 
-    src/Services/TDAmeritrade/Data/PriceHistory.cpp 
     src/Services/TDAmeritrade/Data/OptionChain.cpp 
     src/Services/TDAmeritrade/Data/Account.cpp
     src/Services/TDAmeritrade/Data/Watchlist.cpp
-    src/Services/TDAmeritrade/Data/UserPrincipals.cpp
     src/Services/TDAmeritrade/Data/Order.cpp
-    src/Services/IEXCloud/Client.cpp 
-    src/Services/IEXCloud/Parser.cpp
-    src/Services/Halext/Halext.cpp 
-    src/Services/Halext/Client.cpp 
-    src/Services/Halext/User.cpp
+    src/Services/TDAmeritrade/Data/UserPrincipals.cpp
+    src/Services/TDAmeritrade/Data/PriceHistory.cpp 
+    # GUI libraries 
     ${IMGUI_PATH}/imgui.cpp 
     ${IMGUI_PATH}/imgui_demo.cpp
     ${IMGUI_PATH}/imgui_draw.cpp 
@@ -128,7 +130,6 @@ if (WIN32)
 endif()
 
 # PremiaTest using GoogleTest ------------------------------------------------------------------------------------
-
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -143,17 +144,26 @@ add_executable(
   PremiaTest
   tests/PremiaTest.cpp
   tests/ServiceTestSuite/TDA.cpp
-#   tests/ServiceTestSuite/FRED.cpp
+  tests/ServiceTestSuite/CBP.cpp
+  tests/ServiceTestSuite/IEX.cpp
+# tests/ServiceTestSuite/FRED.cpp
+  src/Services/Halext/Client.cpp 
+  src/Services/Halext/User.cpp    
+  src/Services/IEXCloud/Client.cpp 
+  src/Services/IEXCloud/Parser.cpp
+  src/Services/CoinbasePro/Account.cpp 
+  src/Services/CoinbasePro/Client.cpp 
+  src/Services/CoinbasePro/Product.cpp
   src/Services/TDAmeritrade/Parser.cpp
   src/Services/TDAmeritrade/Socket.cpp
   src/Services/TDAmeritrade/Client.cpp
   src/Services/TDAmeritrade/Data/Quote.cpp 
-  src/Services/TDAmeritrade/Data/PriceHistory.cpp 
   src/Services/TDAmeritrade/Data/OptionChain.cpp 
   src/Services/TDAmeritrade/Data/Account.cpp
   src/Services/TDAmeritrade/Data/Watchlist.cpp
-  src/Services/TDAmeritrade/Data/UserPrincipals.cpp
   src/Services/TDAmeritrade/Data/Order.cpp
+  src/Services/TDAmeritrade/Data/UserPrincipals.cpp
+  src/Services/TDAmeritrade/Data/PriceHistory.cpp 
 )
 
 include_directories(PremiaTest PUBLIC libs/fred/include)
@@ -176,7 +186,6 @@ include(GoogleTest)
 gtest_discover_tests(PremiaTest)
 
 # Assets Folder Link ---------------------------------------------------------------------------------------------
-
 set (source "${CMAKE_SOURCE_DIR}/assets")
 set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
