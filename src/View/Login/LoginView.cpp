@@ -2,7 +2,6 @@
 #include "Interface/TDA.hpp"
 
 static const char* _IMGUIGetClipboardText(void *) { return SDL_GetClipboardText(); }
-
 static void _IMGUISetClipboardText(void *, const char *text) { SDL_SetClipboardText(text); }
 
 void LoginView::drawScreen() const
@@ -26,13 +25,19 @@ void LoginView::drawScreen() const
     ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
     ImGui::Text("%s", welcomePrompt.c_str());
 
-    io.SetClipboardTextFn = _IMGUISetClipboardText; 
-    io.GetClipboardTextFn = _IMGUIGetClipboardText;
+    ImGui::Separator();
+
+    if ( ImGui::Button("Guest Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
+        tda::TDA::getInstance().authUser("", "");
+        events.at("login")();
+    }
+
+    ImGui::Separator();
 
     ImGui::Text("Consumer Key: "); ImGui::SameLine(); ImGui::InputText("##username", &consumer_key);
     ImGui::Text("Refresh Token: "); ImGui::SameLine(); ImGui::InputText("##password", &refresh_token);
     
-    if ( ImGui::Button("Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
+    if ( ImGui::Button("TDA Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
         std::ifstream keyfile("assets/apikey.txt");
         if (keyfile.good()) {
             std::stringstream buffer;
@@ -40,12 +45,11 @@ void LoginView::drawScreen() const
             keyfile.close();
             buffer >> consumer_key;
             buffer >> refresh_token;
-        } else {
-            std::cout << "fail!" << std::endl;
         }
         tda::TDA::getInstance().authUser(consumer_key, refresh_token);
         events.at("login")();
     }
+
 }
 
 void LoginView::addLogger(const ConsoleLogger & newLogger)

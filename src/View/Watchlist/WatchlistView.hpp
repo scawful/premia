@@ -9,18 +9,30 @@
 class WatchlistView: public View 
 {
 private:
-    WatchlistModel model;
+    bool isLoggedIn = false;
+    bool isInit = false;
+    EventMap events;
     ConsoleLogger logger;
-    std::unordered_map<String, EventHandler> events;
+    WatchlistModel model;
 
     void initWatchlist();
     void drawWatchlistTable();
-    void drawCustomWatchlistTable();
 
 public:
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(CRString, const EventHandler &) override;
     void update() override;
+
+private:
+
+    ImGuiTableFlags watchlistFlags = ImGuiTableFlags_ScrollY      | 
+                                     ImGuiTableFlags_Sortable     | 
+                                     ImGuiTableFlags_RowBg        | 
+                                     ImGuiTableFlags_BordersOuter | 
+                                     ImGuiTableFlags_BordersV     | 
+                                     ImGuiTableFlags_Resizable    | 
+                                     ImGuiTableFlags_Reorderable  | 
+                                     ImGuiTableFlags_Hideable;
 
 };
 

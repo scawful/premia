@@ -15,8 +15,8 @@ Controller::initWindow()
             SDL_WINDOWPOS_UNDEFINED,            // initial y position
             Style::LOGIN_WIDTH,                 // width, in pixels
             Style::LOGIN_HEIGHT,                // height, in pixels
-            SDL_WINDOW_RESIZABLE                // flags
-            | SDL_WINDOW_BORDERLESS | SDL_WINDOW_SHOWN 
+            SDL_WINDOW_RESIZABLE  |             // flags
+            SDL_WINDOW_BORDERLESS 
         );
     }   
 
@@ -75,9 +75,6 @@ Controller::initCallbacks()
         viewManager.setLoggedIn(); 
         viewManager.transferEvents();
     });
-
-    // viewManager.addEventHandler("toggleConsoleView", [this] () -> void { viewManager.setConsoleView(); });
-    // viewManager.addEventHandler("toggleWatchlistView", [this] () -> void {viewManager.setWatchlistView(); });
     
     viewManager.addEventHandler("goHome", [this] () -> void { viewManager.setCurrentView(std::make_shared<PrimaryView>()); });
     viewManager.addEventHandler("chartView", [this] () -> void { viewManager.setCurrentView(std::make_shared<ChartView>()); });

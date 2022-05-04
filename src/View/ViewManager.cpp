@@ -79,12 +79,6 @@ ViewManager::addEventHandler(CRString key, const EventHandler & event)
     }
 }
 
-// template <typename T>
-// void ViewManager::addEvent(CRString key, T event)
-// {
-//     this->allEvents.insert<T>(key, event);
-// }
-
 void 
 ViewManager::setCurrentView(std::shared_ptr<View> newView)
 {

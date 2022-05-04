@@ -21,6 +21,9 @@ namespace Premia {
             const char * info() const { return info_ex; }
     };
 
+    class NotLoggedInException
+        : public std::exception {};
+
     
 
 }

@@ -15,7 +15,6 @@ private:
     ConsoleLogger logger;
     std::unordered_map<String, tda::Quote> quotes;
 
-
 public:
     bool isActive() const;
     

@@ -35,10 +35,6 @@ public:
     void startGuiFrame() const;
     void endGuiFrame() const;
     void addEventHandler(CRString key, const EventHandler & event);
-
-    // template <typename T>
-    // void addEvent(CRString key, T event);
-
     void setCurrentView(std::shared_ptr<View> newView);
     void update() const;
 };

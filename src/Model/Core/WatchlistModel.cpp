@@ -8,6 +8,11 @@ void WatchlistModel::initWatchlist()
     } catch (const std::out_of_range & e) {
         String error(e.what());
         logger("[error] " + error);
+        throw Premia::NotLoggedInException();
+    } catch (const boost::property_tree::ptree_error & e) {
+        String error(e.what());
+        logger("[error] " + error);
+        throw Premia::NotLoggedInException();
     }
     watchlists = tda::TDA::getInstance().getWatchlistsByAccount(account_num);
 
@@ -49,7 +54,7 @@ String WatchlistModel::getWatchlistName(int index)
 }
 
 tda::Quote & WatchlistModel::getQuote(CRString key)
-{
+{ 
     return quotes.at(key);
 }
 

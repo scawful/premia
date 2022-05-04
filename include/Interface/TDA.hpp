@@ -20,6 +20,7 @@ namespace tda
     {
     private:
         TDA() { }
+        bool auth = false;
         Account account;
         Client client;
         Parser parser;
@@ -34,7 +35,15 @@ namespace tda
 
         auto authUser(String key, String token) 
             -> void {
-            client.addAuth(key, token);
+            if (!key.empty() && !token.empty()) {
+                client.addAuth(key, token);
+                auth = true;
+            }
+        }
+
+        auto isAuth()
+            -> bool {
+            return auth;
         }
 
         auto getQuote(String symbol) 
