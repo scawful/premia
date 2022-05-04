@@ -136,12 +136,15 @@ String Client::get_server_time() const
  * @brief Construct a new Client:: Client object
  * @todo make the entire namespace and object structure into "Coinbase" and just add a flag for Coinbase Pro, since the APIs are identical basically 
  * 
+ * CRString api, CRString secret, CRString passphrase, bool sandbox
+ * : api_key(api), secret_key(secret), passphrase(passphrase)
+ * 
  * @param api 
  * @param secret 
  * @param passphrase 
  * @param sandbox 
  */
-Client::Client(CRString api, CRString secret, CRString passphrase, bool sandbox) : api_key(api), secret_key(secret), passphrase(passphrase)
+Client::Client() 
 {
     endpoint_url = sandbox ? "https://api.pro.coinbase.com" : "https://api-public.sandbox.pro.coinbase.com";
 }

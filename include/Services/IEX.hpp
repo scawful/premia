@@ -5,9 +5,10 @@
 #include "../src/Services/IEXCloud/Parser.hpp"
 #include "../src/Services/IEXCloud/Data/FundOwnership.hpp"
 
-namespace IEX
+namespace iex
 {
-    class IEX {
+    class IEX 
+    {
     private:
         IEX() { }
         Client client;
@@ -28,7 +29,7 @@ namespace IEX
             return parser.parse_fund_ownership(response);
         }
 
-    }
+    };
 
 }
 

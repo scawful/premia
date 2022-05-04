@@ -1,6 +1,7 @@
 #ifndef Metatype_hpp
 #define Metatype_hpp
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <tuple>

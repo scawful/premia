@@ -2,16 +2,20 @@
 #define HalextClient_hpp
 
 #include "Premia.hpp"
+#include "Library/Curl.hpp"
+#include "Metatypes.hpp"
 
 namespace halext 
 {
     class Client 
     {
     private:
-        void establish_connection();
+        String username;
         
     public:
-        Client();
+        Client()=default;
+
+        String send_request(CRString endpoint) const;
     };
 }
 

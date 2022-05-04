@@ -11,6 +11,7 @@ namespace cbp
     class Client 
     {
     private:
+        bool sandbox = true;
         String api_key;
         String secret_key;
         String passphrase;
@@ -23,7 +24,7 @@ namespace cbp
         String get_server_time() const;
 
     public:
-        Client(CRString api, CRString secret, CRString passphrase, bool sandbox);
+        Client();
         ~Client();
 
         String send_request(CRString request);

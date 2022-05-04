@@ -16,7 +16,8 @@ namespace tda
 {
     using Watchlists = std::vector<Watchlist>;
 
-    class TDA {
+    class TDA 
+    {
     private:
         TDA() { }
         Account account;
