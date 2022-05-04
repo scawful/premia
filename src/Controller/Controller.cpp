@@ -1,5 +1,8 @@
 #include "Controller.hpp"
 
+#define TITLE_BORDER 20
+#define RESIZE_BORDER 5
+
 void
 Controller::initWindow()
 {
@@ -13,6 +16,7 @@ Controller::initWindow()
             Style::LOGIN_WIDTH,                 // width, in pixels
             Style::LOGIN_HEIGHT,                // height, in pixels
             SDL_WINDOW_RESIZABLE                // flags
+            | SDL_WINDOW_BORDERLESS | SDL_WINDOW_SHOWN 
         );
     }   
 
@@ -51,17 +55,17 @@ Controller::initWindow()
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);  
 
+    SDL_SetWindowHitTest(this->window, &WindowCallback, nullptr);
+    SDL_SetWindowResizable(this->window, SDL_TRUE);
     Style::ColorsPremia();
-
 }
 
 void 
 Controller::initCallbacks()
 {
-    viewManager.addEventHandler("login", [this] () -> void { 
-        viewManager.setCurrentView(std::make_shared<PrimaryView>());
-        viewManager.setLoggedIn(); 
-        viewManager.transferEvents();
+    viewManager.addEventHandler("login", [this] () -> void { \
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+        SDL_RenderPresent(renderer);
         SDL_SetWindowSize(window, Style::SCREEN_WIDTH, Style::SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
         ImGuiIO & io = ImGui::GetIO();
@@ -70,16 +74,59 @@ Controller::initCallbacks()
         io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
         io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
         io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
+        viewManager.setCurrentView(std::make_shared<PrimaryView>());
+        viewManager.setLoggedIn(); 
+        viewManager.transferEvents();
     });
 
-    viewManager.addEventHandler("toggleConsoleView", [this] () -> void { viewManager.setConsoleView(); });
-    viewManager.addEventHandler("toggleWatchlistView", [this] () -> void {viewManager.setWatchlistView(); });
+    // viewManager.addEventHandler("toggleConsoleView", [this] () -> void { viewManager.setConsoleView(); });
+    // viewManager.addEventHandler("toggleWatchlistView", [this] () -> void {viewManager.setWatchlistView(); });
     
     viewManager.addEventHandler("goHome", [this] () -> void { viewManager.setCurrentView(std::make_shared<PrimaryView>()); });
     viewManager.addEventHandler("chartView", [this] () -> void { viewManager.setCurrentView(std::make_shared<ChartView>()); });
     viewManager.addEventHandler("linePlotView", [this] () -> void { viewManager.setCurrentView(std::make_shared<LinePlotChart>()); });
     viewManager.addEventHandler("optionChainView", [this] () -> void { viewManager.setCurrentView(std::make_shared<OptionChainView>()); });
     viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
+}
+
+SDL_HitTestResult 
+WindowCallback(SDLWindow win, SDLPoint pt, void* data)
+{
+    int w, h;
+    SDL_GetWindowSize(win, &w, &h);
+
+    // // dragging this pixel moves the window.
+    if (pt->y < TITLE_BORDER && pt->x < (w - TITLE_BORDER)) {
+        return SDL_HITTEST_DRAGGABLE;
+    }
+
+    #define REPORT_RESIZE_HIT(name) { \
+        SDL_Log("HIT-TEST: RESIZE_" #name "\n"); \
+        return SDL_HITTEST_RESIZE_##name; \
+    }
+    
+    if (pt->x < RESIZE_BORDER && pt->y < RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(TOPLEFT);
+    } else if (pt->x > RESIZE_BORDER && pt->x < w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(TOP);
+    } else if (pt->x > w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(TOPRIGHT); 
+    } else if (pt->x > w - RESIZE_BORDER && pt->y > RESIZE_BORDER && pt->y < h - RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(RIGHT);
+    } else if (pt->x > w - RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(BOTTOMRIGHT);
+    } else if (pt->x < w - RESIZE_BORDER && pt->x > RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(BOTTOM);
+    } else if (pt->x < RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(BOTTOMLEFT);
+    } else if (pt->x < RESIZE_BORDER && pt->y < h - RESIZE_BORDER && pt->y > RESIZE_BORDER) {
+        REPORT_RESIZE_HIT(LEFT);
+    }
+    // SDL_HITTEST_RESIZE_* - dragging this pixel resizes a specific edge (or edges) of the window. (Here * is one of: TOPLEFT, TOP, TOPRIGHT, RIGHT, BOTTOMRIGHT, BOTTOM, BOTTOMLEFT, LEFT).
+    // TOPLEFT, TOP, TOPRIGHT, RIGHT, BOTTOMRIGHT, BOTTOM, BOTTOMLEFT, LEFT
+
+    // no action.
+    return SDL_HITTEST_NORMAL;
 }
 
 Controller::Controller(const ViewManager & vm) 
@@ -168,7 +215,7 @@ Controller::onInput()
 void 
 Controller::onLoad()
 {
-    this->viewManager.updateCurrentView();
+    this->viewManager.update();
 }
 
 void

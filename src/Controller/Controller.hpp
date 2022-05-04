@@ -12,6 +12,8 @@
 #include "../View/Chart/LinePlotChart.hpp"
 #include "../View/Options/OptionChain.hpp"
 
+SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint point, void* data);
+
 class Controller
 {
 private:
