@@ -4,7 +4,7 @@ void WatchlistModel::initWatchlist()
 {
     String account_num;
     try {
-        account_num = tda::TDA::getInstance().getAllAcountNumbers().at(0);
+        account_num = tda::TDA::getInstance().getDefaultAccount();
     } catch (const std::out_of_range & e) {
         String error(e.what());
         logger("[error] " + error);

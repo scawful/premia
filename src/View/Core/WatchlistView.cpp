@@ -2,15 +2,9 @@
 
 void WatchlistView::drawWatchlistTable()
 {
-    if (!ImGui::Begin("Watchlists", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar )) {
-        ImGui::End();
-        return;
-    }
-
     static int n = 0;
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
-    ImGui::SameLine();
     ImGui::Combo(" ", &n,  model.getWatchlistNamesCharVec().data(), (int) model.getWatchlistNamesCharVec().size()); 
 
     if (model.getOpenList(n) == 0) {
@@ -20,7 +14,7 @@ void WatchlistView::drawWatchlistTable()
         model.setOpenList(n);
     }
 
-    if (ImGui::BeginTable("Watchlist_Table", 5, flags, ImGui::GetContentRegionAvail()))
+    if (ImGui::BeginTable("Watchlist_Table", 5, flags, ImVec2(0,0)))
     {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
         ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthFixed );
@@ -143,5 +137,6 @@ void WatchlistView::update()
         model.addLogger(this->logger);
         model.initWatchlist();
     }
+    
     drawWatchlistTable();
 }
