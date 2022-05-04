@@ -11,7 +11,6 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 # Premia by Justin Scofield --------------------------------------------------------------------------------------
 project(Premia VERSION 0.40)
 include_directories(include)
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # Boost library --------------------------------------------------------------------------------------------------
 set(Boost_USE_STATIC_LIBS ON)
@@ -22,7 +21,6 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # SDL libraries --------------------------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
-find_package(SDL_ttf REQUIRED)
 
 # cURL library ---------------------------------------------------------------------------------------------------
 find_package(CURL REQUIRED)
@@ -120,7 +118,6 @@ target_link_libraries(
     Premia 
     ${BOOST_LIBRARIES} 
     ${SDL2_LIBRARIES} 
-    ${SDL_TTF_LIBRARIES}
     ${OPENGL_LIBRARIES} 
     ImGui 
     ImPlot
@@ -168,7 +165,6 @@ target_link_libraries(
   PremiaTest
   ${BOOST_LIBRARIES} 
   ${SDL2_LIBRARIES} 
-  ${SDL_TTF_LIBRARIES}
   ${OPENGL_LIBRARIES}
 # ${FREDCPP_LIBRARY}
   curl 

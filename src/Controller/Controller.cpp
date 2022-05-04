@@ -30,9 +30,6 @@ Controller::initWindow()
             SDL_Quit();
         } else {
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-            if (TTF_Init() == -1) {
-                SDL_Log("Error initializing SDL_ttf: %s\n", TTF_GetError());
-            }
         }
     }
 
@@ -244,6 +241,5 @@ Controller::onExit()
     SDL_DestroyWindow(window);
     window = nullptr;
     renderer = nullptr;
-    TTF_Quit();
     SDL_Quit();
 }
