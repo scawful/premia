@@ -55,7 +55,14 @@ namespace tda
         auto getAccount(String accountNumber) 
             -> Account const {
             String response = client.get_account(accountNumber);
+            std::cout << response << std::endl;
             return parser.parse_account(parser.read_response(response));
+        }
+
+        auto getAllAccounts() 
+            -> Account const {
+            String response = client.get_all_accounts();
+            return parser.parse_all_accounts(parser.read_response(response));
         }
 
         auto getPriceHistory(String ticker, PeriodType periodType, FrequencyType frequencyType,
@@ -89,6 +96,11 @@ namespace tda
             auto list = getAllAcountNumbers();
             auto num = list.at(0);
             return num;
+        }
+
+        auto parseOptionSymbol(CRString symbol) 
+            -> String {
+            return parser.parse_option_symbol(symbol);
         }
 
         void postOrder(String account_id, const Order & order) {

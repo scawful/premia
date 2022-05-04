@@ -25,7 +25,21 @@ void Account::set_account_variable(String key, String value)
 
 void Account::set_balance_variable(String key, String value)
 {
-    current_balances[key] = value;
+    if (!current_balances.count(key)) {
+        current_balances[key] = value;
+    } else {
+        try {
+            double num;
+            num = boost::lexical_cast<double>(value);
+            double balance = boost::lexical_cast<double>(current_balances[key]);
+            num += balance;
+            String newEntry = std::to_string(num);
+            current_balances[key] = newEntry.substr(0,newEntry.find('.') + 3);
+        } catch (const boost::wrapexcept<boost::bad_lexical_cast> & e) {
+            // it's fine 
+            current_balances[key] = value;
+        }
+    }
 }
 
 String tda::Account::get_account_variable( String variable )

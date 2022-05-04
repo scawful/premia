@@ -512,6 +512,14 @@ Client::get_account(String const & account_id)
     return send_authorized_request(account_url);
 }
 
+String 
+Client::get_all_accounts()
+{
+    get_user_principals();
+    String account_url = "https://api.tdameritrade.com/v1/accounts/?fields=positions,orders";
+    return send_authorized_request(account_url);
+}
+
 /**
  * @brief Create a vector of all the account ids present on the API key 
  * @author @scawful

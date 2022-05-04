@@ -112,6 +112,7 @@ namespace tda
 
         String get_quote(String const & symbol) const;        
         String get_account(String const & account_id);
+        String get_all_accounts();
         String get_watchlist_by_account(String const & account_id) const;
         String get_price_history(String const & symbol, 
                                  PeriodType ptype, int period_amt, 

@@ -50,6 +50,30 @@ json::ptree Parser::read_response(CRString response) const
     return property_tree;
 }
 
+String 
+Parser::parse_option_symbol(CRString symbol) {
+    String underlying;
+    String month;
+    String day;
+    String year;
+    String strike;
+    String type;
+
+    auto start = symbol.find('_');
+    underlying = symbol.substr(0, start);
+    month = symbol.substr(start + 1, 2);
+    month = months[stoi(month)];
+    day = symbol.substr(start + 3, 2);
+    year = symbol.substr(start + 5, 2);
+    type = symbol.substr(start + 7, 1);
+    strike = symbol.substr(start + 8, symbol.size()) + type;
+
+    String date = day + " " + month + " " + year;
+    String output = date + "\n" + underlying + " " + strike; 
+
+    return output;
+}
+
 /**
  * @brief Parse the access token from a response 
  * @author @scawful
@@ -234,6 +258,51 @@ Account Parser::parse_account(const json::ptree & data) const
             }
         }
     }
+    return account;
+}
+
+/**
+ * @brief Parse the users account data from the API
+ * @author @scawful 
+ * 
+ * @param data 
+ * @return Account 
+ */
+Account Parser::parse_all_accounts(const json::ptree & data) const
+{
+    Account account;
+    for (const auto & [key, val] : data) {
+    for (const auto & [classKey, classValue] : val ) {
+        std::cout << "1: " << classKey << " : " << classValue.get_value<String>() << std::endl;
+        for (const auto & [accountKey, accountValue] : classValue) {
+            std::cout << "2: " << accountKey << " : " << accountValue.get_value<String>() << std::endl;
+            if (accountKey == "positions") {
+                for (const auto & [positionListKey, positionListValue] : accountValue) {
+                    std::cout << "3: " << positionListKey << " : " << positionListValue.get_value<String>() << std::endl;
+                    tda::PositionBalances new_position_balance; // positions and balances
+                    for (const auto & [positionsKey, positionsValue] : positionListValue) {
+                        new_position_balance.balances[positionsKey] = positionsValue.get_value<String>();
+                        StringMap pos_field;
+                        StringMap instrument;
+                        for (const auto & [fieldKey, fieldValue] : positionsValue) {
+                            if (fieldKey == "symbol") {
+                                new_position_balance.symbol = fieldValue.get_value<String>();
+                            }
+                            pos_field[fieldKey] = fieldValue.get_value<String>();
+                        }
+                        account.add_position(pos_field);
+                    }
+                    account.add_balance(new_position_balance);
+                }
+            } else if (accountKey == "currentBalances") {
+                for (const auto & [balanceKey, balanceValue] : accountValue) {
+                    account.set_balance_variable(balanceKey, balanceValue.get_value<String>());
+                }
+            } else {
+                account.set_account_variable(accountKey, accountValue.get_value<String>());
+            }
+        }
+    } }
     return account;
 }
 
