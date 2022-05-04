@@ -1,12 +1,12 @@
 #ifndef Client_hpp
 #define Client_hpp
 
+#include "Utils.hpp"
 #include "Parser.hpp"
 #include "Socket.hpp"
+#include "Metatypes.hpp"
 #include "Data/UserPrincipals.hpp"
 #include "Data/Order.hpp"
-
-namespace JSONObject = boost::property_tree;
 
 namespace tda 
 {
@@ -15,8 +15,7 @@ namespace tda
     static const String EnumAPIPeriod[]{ "1", "2", "3", "4", "5", "6", "10", "15", "20" };
     static const String EnumAPIFreqAmt[]{ "1", "5", "10", "15", "30" };
 
-    enum ServiceType
-    {
+    enum ServiceType {
         NONE,
         ADMIN,
         ACTIVES_NASDAQ, ACTIVES_NYSE, ACTIVES_OTCBB, ACTIVES_OPTIONS,
@@ -78,29 +77,25 @@ namespace tda
         // API Data 
         Parser parser;
         UserPrincipals user_principals;
-        boost::property_tree::ptree _user_principals;
+        json::ptree _user_principals;
 
         // WebSocket session variables 
-        boost::asio::io_context ioc;
+        net::io_context ioc;
         std::shared_ptr<tda::Socket> websocket_session;
         std::shared_ptr<ArrayList<String>> websocket_buffer;
         ArrayList<std::shared_ptr<String const>> request_queue;
         ArrayList<std::thread> ws_threads;
 
-        // CRString Manipulation 
+        // String Manipulation 
         String get_api_interval_value(int value) const;
         String get_api_frequency_type(int value) const;
         String get_api_period_amount(int value) const;
         String get_api_frequency_amount(int value) const;
-        bool string_replace(String & str, CRString from, CRString to) const;
-
-        // Data Retrieval
-        static size_t json_write_callback(const char * contents, size_t size, size_t nmemb, String *s);
 
         // WebSocket functions
-        JSONObject::ptree create_login_request();
-        JSONObject::ptree create_logout_request();
-        JSONObject::ptree create_service_request(ServiceType serv_type, String const & keys, String const & fields);
+        json::ptree create_login_request();
+        json::ptree create_logout_request();
+        json::ptree create_service_request(ServiceType serv_type, String const & keys, String const & fields);
 
         // API Functions 
         void get_user_principals();
@@ -110,22 +105,21 @@ namespace tda
 
     public:
         Client();
+        ~Client();
 
         String send_request(String const & endpoint) const;
         String send_authorized_request(String const & endpoint) const;
 
+        String get_quote(String const & symbol) const;        
+        String get_account(String const & account_id);
         String get_watchlist_by_account(String const & account_id) const;
         String get_price_history(String const & symbol, 
-                                      PeriodType ptype, int period_amt, 
-                                      FrequencyType ftype, int freq_amt, bool ext) const;
-        String get_option_chain(String const & ticker, 
-                                     String const & contractType, 
-                                     String const & strikeCount,
-                                     bool includeQuotes, 
-                                     String const & strategy, String const & range,
-                                     String const & expMonth, String const & optionType) const;
-        String get_quote(String const & symbol) const;
-        String get_account(String const & account_id);
+                                 PeriodType ptype, int period_amt, 
+                                 FrequencyType ftype, int freq_amt, bool ext) const;
+        String get_option_chain(String const & ticker, String const & contractType, 
+                                String const & strikeCount, bool includeQuotes, 
+                                String const & strategy, String const & range,
+                                String const & expMonth, String const & optionType) const;
         ArrayList<String> get_all_account_ids();
 
         void post_order(CRString account_id, const Order & order) const;
@@ -140,7 +134,7 @@ namespace tda
         String get_access_token() const;
         void fetch_access_token();
 
-        void addAuth(const String, const String);
+        void addAuth(CRString, CRString);
     };
 }
 

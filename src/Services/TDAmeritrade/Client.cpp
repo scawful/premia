@@ -2,84 +2,28 @@
 
 using namespace tda;
 
-String Client::get_api_interval_value(int value) const
-{
-    return EnumAPIValues[value];
-}
-
-String Client::get_api_frequency_type(int value) const
-{
-    return EnumAPIFreq[value];
-}
-
-String Client::get_api_period_amount(int value) const
-{
-    return EnumAPIPeriod[value];
-}
-
-String Client::get_api_frequency_amount(int value) const
-{
-    return EnumAPIFreqAmt[value];
-}
-
-/**
- * @brief Replace a subCRString within a CRString with given parameter
- * @author @scawful
- *
- * @param str
- * @param from
- * @param to
- * @return true
- * @return false
- */
-bool Client::string_replace(RString str, CRString from, CRString to) const
-{
-    size_t start = str.find(from);
-    if (start == std::string::npos)
-        return false;
-
-    str.replace(start, from.length(), to);
-    return true;
-}
-
-/**
- * @brief Get JSON data from server and store into CRString 
- * @author @scawful
- * 
- * @param contents 
- * @param size 
- * @param nmemb 
- * @param s 
- * @return size_t 
- */
-size_t Client::json_write_callback(const char * contents, size_t size, size_t nmemb, String *s)
-{
-    size_t new_length = size * nmemb;
-    try {
-        s->append(contents, new_length);
-    } catch(const std::bad_alloc &e) {
-        std::cout << e.what() << std::endl;
-        return 0;
-    }
-    return new_length;
-}
+String Client::get_api_interval_value(int value) const { return EnumAPIValues[value]; }
+String Client::get_api_frequency_type(int value) const { return EnumAPIFreq[value]; }
+String Client::get_api_period_amount(int value) const { return EnumAPIPeriod[value]; }
+String Client::get_api_frequency_amount(int value) const { return EnumAPIFreqAmt[value]; }
 
 /**
  * @brief creates ptree with login request for websocket session
  * @author @scawful
  * @todo refactor the _user_principals line with the UserPrincipals class 
  *
- * @return JSONObject::ptree
+ * @return json::ptree
  */
-JSONObject::ptree Client::create_login_request()
+json::ptree 
+Client::create_login_request()
 {
-    JSONObject::ptree credentials;
-    JSONObject::ptree requests;
-    JSONObject::ptree parameters;
+    json::ptree credentials;
+    json::ptree requests;
+    json::ptree parameters;
 
     StringMap account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-        for (const auto& [key, value] : (JSONObject::ptree) v.second) {
+    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (const auto& [key, value] : (json::ptree) v.second) {
             account_data[key] = value.get_value<String>();
         }
         break;
@@ -89,45 +33,28 @@ JSONObject::ptree Client::create_login_request()
     requests.put("requestid", 1);
     requests.put("command", "LOGIN");
     requests.put("account", account_data["accountId"]);
-    requests.put("source", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.appId")));
-
-    // format credentials
-    // "userid": userPrincipalsResponse.accounts[0].accountId,
-    // "token": userPrincipalsResponse.streamerInfo.token,
-    // "company": userPrincipalsResponse.accounts[0].company,
-    // "segment": userPrincipalsResponse.accounts[0].segment,
-    // "cddomain": userPrincipalsResponse.accounts[0].accountCdDomainId,
-    // "usergroup": userPrincipalsResponse.streamerInfo.userGroup,
-    // "accesslevel": userPrincipalsResponse.streamerInfo.accessLevel,
-    // "authorized": "Y",
-    // "timestamp": tokenTimeStampAsMs,
-    // "appid": userPrincipalsResponse.streamerInfo.appId,
-    // "acl": userPrincipalsResponse.streamerInfo.acl
+    requests.put("source", _user_principals.get<String>(json::ptree::path_type("streamerInfo.appId")));
 
     credentials.put("company", account_data["company"]);
     credentials.put("segment", account_data["segment"]);
     credentials.put("cddomain", account_data["accountCdDomainId"]);
     credentials.put("userid", account_data["accountId"]);
-    credentials.put("usergroup", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.userGroup")));
-    credentials.put("accesslevel", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.accessLevel")));
+    credentials.put("usergroup", _user_principals.get<String>(json::ptree::path_type("streamerInfo.userGroup")));
+    credentials.put("accesslevel", _user_principals.get<String>(json::ptree::path_type("streamerInfo.accessLevel")));
     credentials.put("authorized", "Y");
-    credentials.put("acl", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.acl")));
+    credentials.put("acl", _user_principals.get<String>(json::ptree::path_type("streamerInfo.acl")));
 
-    // token timestamp format :: 2021-08-10T14:57:11+0000
-    std::tm token_timestamp = {};
+    std::tm token_timestamp = {}; // token timestamp format :: 2021-08-10T14:57:11+0000
     String original_token_timestamp = _user_principals.get<String>("streamerInfo.tokenTimestamp");
 
-    // remove 'T' character
-    std::size_t found = original_token_timestamp.find('T');
+    std::size_t found = original_token_timestamp.find('T'); // remove 'T' character
     String reformatted_token_timestamp = original_token_timestamp.replace(found, 1, " ");
 
-    // remove the UTC +0000 portion, will adjust for this manually
-    found = reformatted_token_timestamp.find('+');
+    found = reformatted_token_timestamp.find('+'); // remove the UTC +0000 portion, will adjust for this manually
     reformatted_token_timestamp = reformatted_token_timestamp.replace(found, 5, " ");
     std::cout << "Reformatted Token Timestamp: " << reformatted_token_timestamp.c_str() << std::endl;
 
-    // convert CRString timestamp into time_t
-    std::istringstream ss(reformatted_token_timestamp);
+    std::istringstream ss(reformatted_token_timestamp); // convert String timestamp into time_t
     ss >> std::get_time(&token_timestamp, "%Y-%m-%d %H:%M:%S");
     if (ss.fail()) {
         std::cout << "Token timestamp parse failed!" << std::endl;
@@ -141,38 +68,20 @@ JSONObject::ptree Client::create_login_request()
         credentials.put("timestamp", millis);
     }
 
-    credentials.put("appid", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.appId")));
+    credentials.put("appid", _user_principals.get<String>(json::ptree::path_type("streamerInfo.appId")));
 
-    // format parameters
-    String credential_str;
-    for (const auto& [key, value] : (JSONObject::ptree) credentials) {
+    String credential_str; // format parameters
+    for (const auto& [key, value] : (json::ptree) credentials) {
         credential_str += key + "%3D" + value.get_value<String>() + "%26";
     }
     std::size_t end = credential_str.size();
     credential_str.replace(end - 3, 3, "");
 
-    parameters.put("token", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.token")));
+    parameters.put("token", _user_principals.get<String>(json::ptree::path_type("streamerInfo.token")));
     parameters.put("version", "1.0");
     parameters.put("credential", credential_str);
 
-    // include in requests
-    requests.add_child("parameters", parameters);
-
-    // "requests": [
-    //     {
-    //         "service": "ADMIN",
-    //         "command": "LOGIN",
-    //         "requestid": 0,
-    //         "account": userPrincipalsResponse.accounts[0].accountId,
-    //         "source": userPrincipalsResponse.streamerInfo.appId,
-    //         "parameters": {
-    //             "credential": jsonToQueryString(credentials),
-    //             "token": userPrincipalsResponse.streamerInfo.token,
-    //             "version": "1.0"
-    //         }
-    //     }
-    // ]
-
+    requests.add_child("parameters", parameters); // include in requests
     return requests;
 }
 
@@ -180,17 +89,18 @@ JSONObject::ptree Client::create_login_request()
  * @brief create ptree of logout request for websocket session
  * @author @scawful
  *
- * @return JSONObject::ptree
+ * @return json::ptree
  */
-JSONObject::ptree Client::create_logout_request()
+json::ptree 
+Client::create_logout_request()
 {
-    JSONObject::ptree credentials;
-    JSONObject::ptree requests;
-    JSONObject::ptree parameters;
+    json::ptree credentials;
+    json::ptree requests;
+    json::ptree parameters;
 
     StringMap account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-        for (const auto & [key,value] : (JSONObject::ptree) v.second) {
+    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (const auto & [key,value] : (json::ptree) v.second) {
             account_data[key] = value.get_value<String>();
         }
         break;
@@ -200,10 +110,8 @@ JSONObject::ptree Client::create_logout_request()
     requests.put("requestid", 1);
     requests.put("command", "LOGOUT");
     requests.put("account", account_data["accountId"]);
-    requests.put("source", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.appId")));
-
+    requests.put("source", _user_principals.get<String>(json::ptree::path_type("streamerInfo.appId")));
     requests.add_child("parameters", parameters);
-
     return requests;
 }
 
@@ -214,17 +122,18 @@ JSONObject::ptree Client::create_logout_request()
  * @param serv_type
  * @param keys
  * @param fields
- * @return JSONObject::ptree
+ * @return json::ptree
  */
-JSONObject::ptree Client::create_service_request(ServiceType serv_type, String const & keys, String const & fields)
+json::ptree 
+Client::create_service_request(ServiceType serv_type, String const & keys, String const & fields)
 {
-    JSONObject::ptree requests;
-    JSONObject::ptree parameters;
+    json::ptree requests;
+    json::ptree parameters;
 
     // gets first account by default, maybe change later
     StringMap account_data;
-    BOOST_FOREACH (JSONObject::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-        for (const auto & [key,value] : (JSONObject::ptree) v.second) {
+    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (const auto & [key,value] : (json::ptree) v.second) {
             account_data[key] = value.get_value<String>();
         }
         break;
@@ -234,7 +143,7 @@ JSONObject::ptree Client::create_service_request(ServiceType serv_type, String c
     requests.put("requestid", 1);
     requests.put("command", "SUBS");
     requests.put("account", account_data["accountId"]);
-    requests.put("source", _user_principals.get<String>(JSONObject::ptree::path_type("streamerInfo.appId")));
+    requests.put("source", _user_principals.get<String>(json::ptree::path_type("streamerInfo.appId")));
 
     parameters.put("keys", keys);
     parameters.put("fields", fields);
@@ -254,7 +163,7 @@ void Client::get_user_principals()
 {
     String endpoint = "https://api.tdameritrade.com/v1/userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
     String response = send_authorized_request(endpoint);
-    JSONObject::ptree json_principals = parser.read_response(response);
+    json::ptree json_principals = parser.read_response(response);
     _user_principals = parser.read_response(response);
     user_principals = parser.parse_user_principals(json_principals);
     has_user_principals = true;
@@ -266,11 +175,11 @@ void Client::get_user_principals()
  * @param endpoint 
  * @param data 
  */
-void Client::post_authorized_request(CRString endpoint, CRString data) const 
+void 
+Client::post_authorized_request(CRString endpoint, CRString data) const 
 {
     CURL *curl;
     String response;
-    curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
 
     curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
@@ -290,7 +199,7 @@ void Client::post_authorized_request(CRString endpoint, CRString data) const
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
 
     // write data from the url to the function
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
     // specify the user agent
@@ -301,21 +210,21 @@ void Client::post_authorized_request(CRString endpoint, CRString data) const
 
     // cleanup yeah yeah
     curl_easy_cleanup(curl);
-    curl_global_cleanup();
 }
 
 /**
- * @brief @brief Send a POST request for placing an order 
+ * @brief Send a POST request for placing an order 
  * 
  * @return String 
  */
-String Client::post_account_order(String const &account_id) const
+String 
+Client::post_account_order(String const &account_id) const
 {
     CURL *curl;
     CURLcode res;
     String response;
     String endpoint = "https://api.tdameritrade.com/v1/accounts/{account_id}/orders";
-    string_replace(endpoint, "{account_id}", account_id);
+    Utils::string_replace(endpoint, "{account_id}", account_id);
 
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
@@ -348,7 +257,7 @@ String Client::post_account_order(String const &account_id) const
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
 
     // write data from the url to the function
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
     // specify the user agent
@@ -358,12 +267,9 @@ String Client::post_account_order(String const &account_id) const
     res = curl_easy_perform(curl);
 
     if (res != CURLE_OK)
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        throw Premia::TDAClientException("post_account_order() failed", curl_easy_strerror(res));
 
-    // cleanup yeah yeah
     curl_easy_cleanup(curl);
-
-    curl_global_cleanup();
     return response;
 }
 
@@ -405,7 +311,7 @@ String Client::post_access_token() const
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
 
     // write data from the url to the function
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
     // specify the user agent
@@ -414,27 +320,15 @@ String Client::post_access_token() const
     // run the operations
     res = curl_easy_perform(curl);
 
-    if (res != CURLE_OK) {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+    if (res != CURLE_OK)
         throw Premia::TDAClientException("post_access_token() failed", curl_easy_strerror(res));
-    }
 
-    // cleanup yeah yeah
     curl_easy_cleanup(curl);
-
-    curl_global_cleanup();
     return response;
 }
 
-/**
- * @brief Construct a new Client:: Client object
- * @author @scawful
- * 
- */
-Client::Client()
-{
-    //this->refresh_token = REFRESH_TOKEN;
-}
+Client::Client() { curl_global_init(CURL_GLOBAL_SSL); }
+Client::~Client() { curl_global_cleanup(); }
 
 /**
  * @brief Send a request for data from the API using the json callback
@@ -442,7 +336,8 @@ Client::Client()
  * @param endpoint 
  * @return String 
  */
-String Client::send_request(String const & endpoint) const 
+String 
+Client::send_request(String const & endpoint) const 
 {
     CURL *curl;
     CURLcode res;
@@ -450,14 +345,13 @@ String Client::send_request(String const & endpoint) const
 
     curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     res = curl_easy_perform(curl);
 
     if (res != CURLE_OK)
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-
-    /* always cleanup */
+        throw Premia::TDAClientException("send_request() failed", curl_easy_strerror(res));
+    
     curl_easy_cleanup(curl);
     return response;
 }
@@ -469,7 +363,8 @@ String Client::send_request(String const & endpoint) const
  * @param endpoint 
  * @return String 
  */
-String Client::send_authorized_request(String const & endpoint) const
+String 
+Client::send_authorized_request(String const & endpoint) const
 {
     CURL *curl;
     CURLcode res;
@@ -484,10 +379,12 @@ String Client::send_authorized_request(String const & endpoint) const
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
         curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
         res = curl_easy_perform(curl);
+        if (res != CURLE_OK) 
+            throw Premia::TDAClientException("send_authorized_request() failed", curl_easy_strerror(res));
 
         curl_easy_cleanup(curl);
     }
@@ -503,10 +400,11 @@ String Client::send_authorized_request(String const & endpoint) const
  * @param account_id 
  * @return String 
  */
-String Client::get_watchlist_by_account(const String  & account_id) const
+String 
+Client::get_watchlist_by_account(const String  & account_id) const
 {
     String url = "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
-    string_replace(url, "{accountNum}", account_id);
+    Utils::string_replace(url, "{accountNum}", account_id);
     return send_authorized_request(url);
 }
 
@@ -523,20 +421,21 @@ String Client::get_watchlist_by_account(const String  & account_id) const
  * @param ext 
  * @return String 
  */
-String Client::get_price_history(CRString symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
+String 
+Client::get_price_history(CRString symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
 {
     String url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + api_key + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
 
-    string_replace(url, "{ticker}", symbol);
-    string_replace(url, "{periodType}", get_api_interval_value(ptype));
-    string_replace(url, "{period}", get_api_period_amount(period_amt));
-    string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
-    string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
+    Utils::string_replace(url, "{ticker}", symbol);
+    Utils::string_replace(url, "{periodType}", get_api_interval_value(ptype));
+    Utils::string_replace(url, "{period}", get_api_period_amount(period_amt));
+    Utils::string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
+    Utils::string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
 
     if (!ext)
-        string_replace(url, "{ext}", "false");
+        Utils::string_replace(url, "{ext}", "false");
     else
-        string_replace(url, "{ext}", "true");
+        Utils::string_replace(url, "{ext}", "true");
 
     return send_request(url);
 }
@@ -556,25 +455,26 @@ String Client::get_price_history(CRString symbol, PeriodType ptype, int period_a
  * @param optionType 
  * @return String 
  */
-String Client::get_option_chain(String const &ticker, String const & contractType, String const & strikeCount,
-                                     bool includeQuotes, String const & strategy, String const & range,
-                                     String const & expMonth, String const &  optionType) const
+String 
+Client::get_option_chain(String const &ticker, String const & contractType, String const & strikeCount,
+                         bool includeQuotes, String const & strategy, String const & range,
+                         String const & expMonth, String const &  optionType) const
 {
     OptionChain option_chain;
     String url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + api_key + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
 
-    string_replace(url, "{ticker}", ticker);
-    string_replace(url, "{contractType}", contractType);
-    string_replace(url, "{strikeCount}", strikeCount);
-    string_replace(url, "{strategy}", strategy);
-    string_replace(url, "{range}", range);
-    string_replace(url, "{expMonth}", expMonth);
-    string_replace(url, "{optionType}", optionType);
+    Utils::string_replace(url, "{ticker}", ticker);
+    Utils::string_replace(url, "{contractType}", contractType);
+    Utils::string_replace(url, "{strikeCount}", strikeCount);
+    Utils::string_replace(url, "{strategy}", strategy);
+    Utils::string_replace(url, "{range}", range);
+    Utils::string_replace(url, "{expMonth}", expMonth);
+    Utils::string_replace(url, "{optionType}", optionType);
 
     if (!includeQuotes)
-        string_replace(url, "{includeQuotes}", "FALSE");
+        Utils::string_replace(url, "{includeQuotes}", "FALSE");
     else
-        string_replace(url, "{includeQuotes}", "TRUE");
+        Utils::string_replace(url, "{includeQuotes}", "TRUE");
 
     return send_request(url);
 }
@@ -587,10 +487,11 @@ String Client::get_option_chain(String const &ticker, String const & contractTyp
  * @param symbol 
  * @return String 
  */
-String Client::get_quote(String const & symbol) const
+String 
+Client::get_quote(String const & symbol) const
 {
     String url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + api_key;
-    string_replace(url, "{ticker}", symbol);
+    Utils::string_replace(url, "{ticker}", symbol);
     return send_request(url);
 }
 
@@ -602,11 +503,12 @@ String Client::get_quote(String const & symbol) const
  * @param account_id 
  * @return String 
  */
-String Client::get_account(String const & account_id)
+String 
+Client::get_account(String const & account_id)
 {
     get_user_principals();
     String account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
-    string_replace(account_url, "{accountNum}", account_id);
+    Utils::string_replace(account_url, "{accountNum}", account_id);
     return send_authorized_request(account_url);
 }
 
@@ -618,7 +520,8 @@ String Client::get_account(String const & account_id)
  * 
  * @return ArrayList<String> 
  */
-ArrayList<String> Client::get_all_account_ids()
+ArrayList<String> 
+Client::get_all_account_ids()
 {
     ArrayList<String> accounts;
     fetch_access_token();
@@ -647,10 +550,11 @@ ArrayList<String> Client::get_all_account_ids()
  * @param symbol 
  * @param quantity 
  */
-void Client::post_order(CRString account_id, const tda::Order & order) const
+void 
+Client::post_order(CRString account_id, const tda::Order & order) const
 {
     String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
-    string_replace(endpoint, "{accountId}", account_id);
+    Utils::string_replace(endpoint, "{accountId}", account_id);
     post_authorized_request(endpoint, order.getString());
 }
 
@@ -659,22 +563,23 @@ void Client::post_order(CRString account_id, const tda::Order & order) const
  * @todo implement this 
  * 
  */
-void Client::start_session() 
+void 
+Client::start_session() 
 {
     String host;
     String port = "443";
     try {
         host = _user_principals.get<String>("streamerInfo.streamerSocketUrl");
-    } catch (JSONObject::ptree_error const & ptree_bad_path) {
+    } catch (json::ptree_error const & ptree_bad_path) {
         std::cout << "Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: " << ptree_bad_path.what() << std::endl;
     }
 
-    JSONObject::ptree login_request = create_login_request();
-    JSONObject::ptree logout_request = create_logout_request();
+    json::ptree login_request = create_login_request();
+    json::ptree logout_request = create_logout_request();
 
     // for testing
     std::ifstream requests_json("requests_test.json", std::ios::out);
-    JSONObject::write_json("requests_test.json", login_request);
+    write_json("requests_test.json", login_request);
 
     std::stringstream login_text_stream;
     write_json(login_text_stream, login_request);
@@ -685,7 +590,7 @@ void Client::start_session()
     String request_text = requests_text_stream.str();
 
     std::stringstream logout_text_stream;
-    JSONObject::write_json(logout_text_stream, logout_request);
+    write_json(logout_text_stream, logout_request);
     String logout_text = logout_text_stream.str();
 
     std::stringstream chart_request_stream;
@@ -719,13 +624,14 @@ void Client::start_session()
  * @param ticker 
  * @param fields 
  */
-void Client::start_session(String const & ticker, String const & fields)
+void 
+Client::start_session(String const & ticker, String const & fields)
 {
     String host;
     String port = "443";
     try {
         host = _user_principals.get<String>("streamerInfo.streamerSocketUrl");
-    } catch (JSONObject::ptree_error const & ptree_bad_path) {
+    } catch (json::ptree_error const & ptree_bad_path) {
         std::cout << "Start_Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: " << ptree_bad_path.what() << std::endl;
     }
 
@@ -759,8 +665,8 @@ void Client::start_session(String const & ticker, String const & fields)
  * 
  * @param request 
  */
-void Client::send_session_request(String const & request) const
-{
+void 
+Client::send_session_request(String const & request) const {
     websocket_session->send_message(std::make_shared<String const>(request));
 }
 
@@ -769,8 +675,8 @@ void Client::send_session_request(String const & request) const
  * @author @scawful
  * 
  */
-void Client::send_logout_request()
-{
+void 
+Client::send_logout_request() {
     websocket_session->interrupt();
     pt::ptree logout_request = create_logout_request();
     std::stringstream logout_text_stream;
@@ -784,8 +690,8 @@ void Client::send_logout_request()
  * @author @scawful 
  * 
  */
-void Client::send_interrupt_signal() const
-{
+void 
+Client::send_interrupt_signal() const {
     websocket_session->interrupt();
 }
 
@@ -796,8 +702,8 @@ void Client::send_interrupt_signal() const
  * @return true 
  * @return false 
  */
-bool Client::is_session_logged_in() const
-{
+bool 
+Client::is_session_logged_in() const {
     if (session_active)
         return websocket_session->is_logged_in();
     else
@@ -810,8 +716,8 @@ bool Client::is_session_logged_in() const
  * 
  * @return ArrayList<String> 
  */
-ArrayList<String> Client::get_session_responses() const
-{
+ArrayList<String> 
+Client::get_session_responses() const {
     return websocket_session->receive_response();
 }
 
@@ -820,8 +726,8 @@ ArrayList<String> Client::get_session_responses() const
  * 
  * @return String 
  */
-String Client::get_access_token() const
-{
+String 
+Client::get_access_token() const {
     return access_token;
 }
 
@@ -830,14 +736,14 @@ String Client::get_access_token() const
  * @author @scawful
  * 
  */
-void Client::fetch_access_token()
-{
+void 
+Client::fetch_access_token() {
     access_token = parser.parse_access_token(post_access_token());
     has_access_token = true;
 }
 
-void Client::addAuth(String key, String token)
-{
+void 
+Client::addAuth(CRString key, CRString token) {
     api_key = key;
     refresh_token = token;
 }
