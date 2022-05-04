@@ -4,9 +4,9 @@
 #include "View.hpp"
 #include "PrimaryView.hpp"
 #include "Core/LoginView.hpp"
-#include "Core/MenuView.hpp"
+#include "Menu/MenuView.hpp"
 #include "Core/ConsoleView.hpp"
-#include "Core/WatchlistView.hpp"
+#include "Watchlist/WatchlistView.hpp"
 #include "Chart/ChartView.hpp"
 #include "Account/AccountView.hpp"
 

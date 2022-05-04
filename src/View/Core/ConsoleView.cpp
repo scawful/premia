@@ -198,9 +198,7 @@ void ConsoleView::drawScreen()
 {
    const ImGuiIO & io = ImGui::GetIO();
 
-    // Reserve enough left-over height for 1 separator + 1 input text
-    const float footer_height_to_reserve = ImGui::GetFrameHeightWithSpacing();
-    ImGui::BeginChild("ScrollingRegion", ImVec2(0, -(footer_height_to_reserve)), false, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("ScrollingRegion", ImVec2(0, -(ImGui::GetContentRegionAvail().y*0.25f)), false, ImGuiWindowFlags_HorizontalScrollbar);
     if (ImGui::BeginPopupContextWindow())
     {
         if (ImGui::Selectable("Clear")) clearLog();
@@ -329,9 +327,10 @@ void ConsoleView::update()
         ImPlot::ShowDemoWindow();
 
     ImGuiStyle& style = ImGui::GetStyle();
+    ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
-    ImGui::BeginChild("child", ImVec2(0, ImGui::GetContentRegionAvail().y), false);
+    ImGui::BeginChild("child", ImVec2(0, ImGui::GetContentRegionAvail().y), false, ImGuiWindowFlags_NoScrollbar);
     drawScreen();
     ImGui::EndChild();
     ImGui::PopStyleVar(2);

@@ -73,9 +73,9 @@ add_executable(
     src/View/ViewManager.cpp
     src/View/PrimaryView.cpp
     src/View/Core/LoginView.cpp
-    src/View/Core/MenuView.cpp
     src/View/Core/ConsoleView.cpp
-    src/View/Core/WatchlistView.cpp
+    src/View/Watchlist/WatchlistView.cpp
+    src/View/Menu/MenuView.cpp
     src/View/Chart/ChartView.cpp
     src/View/Chart/CandleChart.cpp
     src/View/Chart/LinePlotChart.cpp
