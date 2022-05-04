@@ -36,6 +36,7 @@ Building and installation
 
 5. Build and run.
 
+        make Premia
         cmake --build <premia_root/build> --config Debug --target Premia
 
 API Key Instructions
