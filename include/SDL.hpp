@@ -5,4 +5,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+using SDLWindow = SDL_Window*;
+using SDLPoint = const SDL_Point*;
+
 #endif

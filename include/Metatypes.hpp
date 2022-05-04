@@ -5,6 +5,7 @@
 #include <vector>
 #include <tuple>
 #include <mutex>
+#include <exception>
 #include <typeindex>
 #include <typeinfo>
 #include <cassert>

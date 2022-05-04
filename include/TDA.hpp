@@ -68,9 +68,17 @@ namespace tda
             return parser.parse_watchlist_data(parser.read_response(response));
         }
 
-        auto getAllAcountNumbers() -> StringList {
+        auto getAllAcountNumbers() 
+            -> StringList const {
             auto list = client.get_all_account_ids();
             return list;
+        }
+
+        auto getDefaultAccount()
+            -> String const {
+            auto list = getAllAcountNumbers();
+            auto num = list.at(0);
+            return num;
         }
 
         void postOrder(String account_id, const Order & order) {
