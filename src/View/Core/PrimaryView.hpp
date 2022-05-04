@@ -1,7 +1,7 @@
 #ifndef PrimaryView_hpp
 #define PrimaryView_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 #include "View/Menu/MenuView.hpp"
 
 class PrimaryView: public View 

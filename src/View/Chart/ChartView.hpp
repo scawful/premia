@@ -1,7 +1,7 @@
 #ifndef ChartView_hpp
 #define ChartView_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 #include "Subview/CandleChart.hpp"
 
 class ChartView : public View

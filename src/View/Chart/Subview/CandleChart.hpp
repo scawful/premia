@@ -1,7 +1,7 @@
 #ifndef CandleChart_hpp
 #define CandleChart_hpp
 
-#include "Chart.hpp"
+#include "Virtual/Chart.hpp"
 #include "Model/Chart/ChartModel.hpp"
 
 class CandleChart: public Chart

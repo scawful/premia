@@ -1,7 +1,7 @@
 #ifndef LinePlotChart_hpp
 #define LinePlotChart_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 #include "Library/Boost.hpp"
 #include <fstream>
 

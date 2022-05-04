@@ -1,7 +1,7 @@
 #ifndef WatchlistView_hpp
 #define WatchlistView_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 #include "Interface/TDA.hpp"
 #include "Model/Core/WatchlistModel.hpp"
 

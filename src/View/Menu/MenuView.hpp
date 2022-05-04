@@ -1,7 +1,7 @@
 #ifndef MenuView_hpp
 #define MenuView_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 #include "Model/Model.hpp"
 
 class MenuView : public View

@@ -1,7 +1,7 @@
 #ifndef AccountView_hpp
 #define AccountView_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 #include "Model/Options/OptionsModel.hpp"
 
 class AccountView: public View 

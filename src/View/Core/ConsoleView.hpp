@@ -1,7 +1,7 @@
 #ifndef ConsoleView_hpp
 #define ConsoleView_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 
 class ConsoleView : public View
 {

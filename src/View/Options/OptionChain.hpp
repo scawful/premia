@@ -1,7 +1,7 @@
 #ifndef OptionChainView_hpp
 #define OptionChainView_hpp
 
-#include "View.hpp"
+#include "Virtual/View.hpp"
 #include "Model/Options/OptionsModel.hpp"
 
 class OptionChainView: public View 
