@@ -11,7 +11,7 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 # Premia by Justin Scofield --------------------------------------------------------------------------------------
 project(Premia VERSION 0.40)
 include_directories(include)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # Boost library --------------------------------------------------------------------------------------------------
 set(Boost_USE_STATIC_LIBS ON)
@@ -80,6 +80,7 @@ add_executable(
     src/View/Chart/CandleChart.cpp
     src/View/Chart/LinePlotChart.cpp
     src/View/Options/OptionChain.cpp
+    src/View/Account/AccountView.cpp
     src/Controller/Controller.cpp
     src/Services
     src/Services/GenericClient.cpp
@@ -114,10 +115,8 @@ add_executable(
     ${IMPLOT_PATH}/implot_items.cpp 
     ${IMPLOT_PATH}/implot_demo.cpp
 )
-
 include_directories(Premia "assets")
 include_directories(Premia "src/Services/")
-# target_include_directories(Premia INTERFACE "include")
 target_link_libraries(
     Premia 
     ${BOOST_LIBRARIES} 
@@ -148,7 +147,7 @@ add_executable(
   PremiaTest
   tests/PremiaTest.cpp
   tests/ServiceTestSuite/TDA.cpp
-  # tests/ServiceTests/FRED.cpp
+#   tests/ServiceTestSuite/FRED.cpp
   src/Services/TDAmeritrade/Parser.cpp
   src/Services/TDAmeritrade/Socket.cpp
   src/Services/TDAmeritrade/Client.cpp
@@ -161,6 +160,9 @@ add_executable(
   src/Services/TDAmeritrade/Data/Order.cpp
 )
 
+include_directories(PremiaTest PUBLIC libs/fred/include)
+find_library(FREDCPP_LIBRARY fredcpp HINTS libs/fred)
+
 target_link_libraries(
   PremiaTest
   ${BOOST_LIBRARIES} 
@@ -168,8 +170,7 @@ target_link_libraries(
   ${SDL_IMAGE_LIBRARIES} 
   ${SDL_TTF_LIBRARIES}
   ${OPENGL_LIBRARIES}
-  ImGui 
-  ImPlot 
+#   ${FREDCPP_LIBRARY}
   curl 
   OpenSSL::SSL 
   gtest_main
