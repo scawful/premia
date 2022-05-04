@@ -414,8 +414,10 @@ String Client::post_access_token() const
     // run the operations
     res = curl_easy_perform(curl);
 
-    if (res != CURLE_OK)
+    if (res != CURLE_OK) {
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        throw Premia::TDAClientException("post_access_token() failed", curl_easy_strerror(res));
+    }
 
     // cleanup yeah yeah
     curl_easy_cleanup(curl);
@@ -621,11 +623,15 @@ ArrayList<String> Client::get_all_account_ids()
     ArrayList<String> accounts;
     fetch_access_token();
     get_user_principals();
-
-    for (const auto & [key, value] : _user_principals.get_child("accounts")) {
-        for (const auto & [acctKey, acctValue] : value) {
-            if (key == "accountId") {
-                accounts.push_back(acctValue.get_value<String>());
+    
+    for (const auto & [key, value] : _user_principals) {
+        if (key == "accounts") {
+            for (const auto & [key2, val2] : value) {
+                for (const auto & [elementKey, elementValue] : val2) {
+                    if (elementKey == "accountId") {
+                        accounts.push_back(elementValue.get_value<std::string>());
+                    }
+                }
             }
         }
     }
