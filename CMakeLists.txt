@@ -180,8 +180,12 @@ target_link_libraries(
   OpenSSL::SSL 
   gtest_main
   gtest
-  ws2_32
 )
+
+if (WIN32) 
+    target_link_libraries(PremiaTest ws2_32)
+endif()
+
 
 include(GoogleTest)
 gtest_discover_tests(PremiaTest)

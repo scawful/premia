@@ -1,7 +1,7 @@
 #ifndef IEXClient_hpp
 #define IEXClient_hpp
 
-#include "Metatypes.hpp"
+#include "Premia.hpp"
 #include "Library/Boost.hpp"
 #include "Library/Curl.hpp"
 
@@ -15,9 +15,7 @@ namespace iex
         String base_endpoint;
         String sandbox_endpoint;
         String token_parameter;
-
         String current_endpoint();
-        static size_t json_write_callback(void *contents, size_t size, size_t nmemb, String *s);
 
     public:
         Client();

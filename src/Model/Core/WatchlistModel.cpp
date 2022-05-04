@@ -3,7 +3,7 @@
 void WatchlistModel::initWatchlist()
 {
     String account_num;
-    try {
+    Try {
         account_num = tda::TDA::getInstance().getDefaultAccount();
     } catch (const std::out_of_range & e) {
         String error(e.what());
@@ -13,7 +13,10 @@ void WatchlistModel::initWatchlist()
         String error(e.what());
         logger("[error] " + error);
         throw Premia::NotLoggedInException();
+    } finally {
+        logger("[finally] : WatchlistModel");
     }
+    Proceed;
     watchlists = tda::TDA::getInstance().getWatchlistsByAccount(account_num);
 
     for ( int i = 0; i < watchlists.size(); i++ ) {

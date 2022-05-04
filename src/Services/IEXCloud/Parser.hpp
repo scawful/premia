@@ -19,7 +19,6 @@ namespace iex
         Parser();
 
         ArrayList<FundOwnership> parse_fund_ownership(String response);
-
         ArrayList<InsiderTransactions> parse_insider_transactions(String response);
     };
 }

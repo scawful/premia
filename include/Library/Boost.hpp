@@ -29,4 +29,14 @@ namespace net = boost::asio;
 namespace ssl = boost::asio::ssl;
 using tcp = boost::asio::ip::tcp;
 
+template<typename T>
+auto to_array(const std::string& s)
+    -> std::vector<T> {
+    std::vector<T> result;
+    std::stringstream ss(s);
+    std::string item;
+    while(std::getline(ss, item, ',')) result.push_back(boost::lexical_cast<T>(item));
+    return result;
+}
+
 #endif

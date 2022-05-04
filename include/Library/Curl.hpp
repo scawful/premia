@@ -26,8 +26,7 @@ namespace curlbacks
             s->append(contents, new_length);
         } catch(const std::bad_alloc &e) {
             // @todo attach a logger 
-            std::cout << e.what() << std::endl;
-            return 0;
+            return EXIT_FAILURE;
         }
         return new_length;
     }

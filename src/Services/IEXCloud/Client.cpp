@@ -10,18 +10,6 @@ String Client::current_endpoint()
         return this->base_endpoint;
 }
 
-size_t Client::json_write_callback(void *contents, size_t size, size_t nmemb, String *s)
-{
-    size_t new_length = size * nmemb;
-    try {
-        s->append((char*)contents, new_length);
-    } catch(std::bad_alloc &e) {
-        // handle memory problem
-        return 0;
-    }
-    return new_length;
-}
-
 Client::Client() 
 {
     this->base_endpoint = "https://cloud.iexapis.com/";
@@ -36,20 +24,22 @@ Client::Client()
  * @param endpoint 
  * @return String 
  */
-String Client::send_request(String endpoint) 
+String 
+Client::send_request(String endpoint) 
 {
     CURL *curl;
     CURLcode res;
     String response;
 
     curl = curl_easy_init();
-    if (curl)
-    {
+    if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
         res = curl_easy_perform(curl);
-
+        if (res != CURLE_OK)
+            throw Premia::ClientException();
+        
         /* always cleanup */
         curl_easy_cleanup(curl);
     }
@@ -78,10 +68,12 @@ String Client::send_authorized_request(String endpoint)
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
         curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
         res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            throw Premia::ClientException();
 
         curl_easy_cleanup(curl);
     }

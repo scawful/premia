@@ -98,7 +98,7 @@ inline auto try_catch_finally(const Lambda &f, const Theta &finally)
     } catch (...) {
         try {
             finally();
-        } catch (...) { // Maybe stupid check that finally_code mustn't throw.
+        } catch (...) { 
             std::terminate();
         }
         throw;
@@ -106,13 +106,11 @@ inline auto try_catch_finally(const Lambda &f, const Theta &finally)
     finally();
 }
 
-// Please never throw exception below. It is needed to avoid a compilation error
-// in the case when we use "begin_try ... finally" without any "catch" block.
 class never_thrown_exception {};
 
 #define Try          try_catch_finally([&](){ try
 #define finally      catch(never_thrown_exception){throw;} },[&]()
-#define Proceed      ) // sorry for "pascalish" style :(
+#define Proceed      ) 
 
 
 #endif

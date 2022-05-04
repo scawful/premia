@@ -30,7 +30,7 @@ namespace Premia {
         : public std::exception {};
     
     class TDAClientException 
-        : public ClientException {        
+        : public ClientException {
         private:
             const char * msg_src;
             const char * info_ex;
