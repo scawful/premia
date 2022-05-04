@@ -2,8 +2,8 @@
 #define IEXClient_hpp
 
 #include "Metatypes.hpp"
-#include "Boost.hpp"
-#include "Curl.hpp"
+#include "Library/Boost.hpp"
+#include "Library/Curl.hpp"
 
 namespace iex 
 {

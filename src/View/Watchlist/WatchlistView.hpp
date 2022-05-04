@@ -3,7 +3,7 @@
 
 #include "../View.hpp"
 #include "../../Model/Core/WatchlistModel.hpp"
-#include "TDA.hpp"
+#include "Services/TDA.hpp"
 
 class WatchlistView: public View 
 {

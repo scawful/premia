@@ -2,10 +2,10 @@
 #define View_hpp
 
 #include "Premia.hpp"
-#include "SDL.hpp"
-#include "ImGui.hpp"
-#include "ImPlot.hpp"
-#include "Boost.hpp"
+#include "Library/SDL.hpp"
+#include "Library/ImGui.hpp"
+#include "Library/ImPlot.hpp"
+#include "Library/Boost.hpp"
 
 class View 
 {

@@ -2,7 +2,7 @@
 #define LinePlotChart_hpp
 
 #include "../View.hpp"
-#include "Boost.hpp"
+#include "Library/Boost.hpp"
 #include <fstream>
 
 class LinePlotChart : public View

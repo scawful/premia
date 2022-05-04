@@ -2,9 +2,9 @@
 #define Socket_hpp
 
 #include "Metatypes.hpp"
-#include "Boost.hpp"
-#include "SDL.hpp"
-#include "Curl.hpp"
+#include "Library/Boost.hpp"
+#include "Library/SDL.hpp"
+#include "Library/Curl.hpp"
 
 namespace tda 
 {

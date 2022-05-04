@@ -1,9 +1,9 @@
 #ifndef Controller_hpp
 #define Controller_hpp
 
-#include "SDL.hpp"
+#include "Library/SDL.hpp"
 #include "Style.hpp"
-#include "ImPlot.hpp"
+#include "Library/ImPlot.hpp"
 #include "../Model/Model.hpp"
 #include "../View/ViewManager.hpp"
 #include "../View/Core/LoginView.hpp"

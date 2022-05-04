@@ -1,7 +1,7 @@
 #ifndef Style_hpp
 #define Style_hpp
 
-#include "ImGui.hpp"
+#include "Library/ImGui.hpp"
 
 namespace Style {
     constexpr size_t LOGIN_WIDTH = 400;

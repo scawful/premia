@@ -2,7 +2,7 @@
 #define GenericClient_hpp
 
 #include "Premia.hpp"
-#include "Curl.hpp"
+#include "Library/Curl.hpp"
 #include <iostream>
 
 class GenericClient

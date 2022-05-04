@@ -81,7 +81,6 @@ add_executable(
     src/Controller/Controller.cpp
     src/Services
     src/Services/GenericClient.cpp
-    src/Services/CoinbasePro/CoinbasePro.cpp
     src/Services/CoinbasePro/Account.cpp 
     src/Services/CoinbasePro/Client.cpp 
     src/Services/CoinbasePro/Product.cpp
@@ -95,7 +94,6 @@ add_executable(
     src/Services/TDAmeritrade/Data/Watchlist.cpp
     src/Services/TDAmeritrade/Data/UserPrincipals.cpp
     src/Services/TDAmeritrade/Data/Order.cpp
-    src/Services/IEXCloud.cpp 
     src/Services/IEXCloud/Client.cpp 
     src/Services/IEXCloud/Parser.cpp
     src/Services/Halext/Halext.cpp 
