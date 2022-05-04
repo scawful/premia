@@ -1,7 +1,7 @@
 #include "Controller.hpp"
 
 constexpr size_t TITLE_BORDER = 20;
-constexpr size_t RESIZE_BORDER = 2;
+constexpr size_t RESIZE_BORDER = 3;
 
 static SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint point, void* data);
 

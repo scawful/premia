@@ -9,7 +9,6 @@ class MenuView : public View
 private:
     bool initialized = false;
     bool about = false;
-    bool privateBalance = false;
     ImGuiStyle * ref;
     ConsoleLogger logger;
     std::unordered_map<String, EventHandler> events;

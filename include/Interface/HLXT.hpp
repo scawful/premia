@@ -1,4 +1,4 @@
-#ifndef HXLT_hpp
+#ifndef HLXT_hpp
 #define HLXT_hpp
 
 #include "../src/Services/Halext/Client.hpp"
@@ -6,8 +6,7 @@
 
 namespace halext 
 {
-    class HLXT
-    {
+    class HLXT {
     private:
         HLXT() { }
         Client client;

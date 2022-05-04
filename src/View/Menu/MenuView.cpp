@@ -270,7 +270,10 @@ void MenuView::drawFileMenu() const
         ImGui::Separator();
         if (ImGui::BeginMenu("Preferences"))
         {
-            ImGui::MenuItem("Private Balances", "", privateBalance);
+            static bool privateBalance = false;
+            if (ImGui::MenuItem("Private Balances", "", &privateBalance)) {
+                halext::HLXT::getInstance().setPrivateBalance(privateBalance);
+            }
             ImGui::Separator();
 
             static int n = 0;
