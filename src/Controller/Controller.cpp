@@ -1,7 +1,46 @@
 #include "Controller.hpp"
 
-#define TITLE_BORDER 20
-#define RESIZE_BORDER 5
+constexpr size_t TITLE_BORDER = 20;
+constexpr size_t RESIZE_BORDER = 3;
+
+SDL_HitTestResult 
+WindowCallback(SDLWindow win, SDLPoint pt, void* data)
+{
+    int w;
+    int h;
+    SDL_GetWindowSize(win, &w, &h);
+
+    // dragging this pixel moves the window.
+    if (pt->y < TITLE_BORDER && pt->x < (w - TITLE_BORDER)) {
+        return SDL_HITTEST_DRAGGABLE;
+    }
+
+    #define RESIZE_HIT(name) { \
+        return SDL_HITTEST_RESIZE_##name; \
+    }
+    
+    // SDL_HITTEST_RESIZE_* - dragging this pixel resizes a specific edge (or edges) of the window. (Here * is one of: TOPLEFT, TOP, TOPRIGHT, RIGHT, BOTTOMRIGHT, BOTTOM, BOTTOMLEFT, LEFT).
+    if (pt->x < RESIZE_BORDER && pt->y < RESIZE_BORDER) {
+        RESIZE_HIT(TOPLEFT)
+    } else if (pt->x > RESIZE_BORDER && pt->x < w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
+        RESIZE_HIT(TOP)
+    } else if (pt->x > w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
+        RESIZE_HIT(TOPRIGHT)
+    } else if (pt->x > w - RESIZE_BORDER && pt->y > RESIZE_BORDER && pt->y < h - RESIZE_BORDER) {
+        RESIZE_HIT(RIGHT)
+    } else if (pt->x > w - RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
+        RESIZE_HIT(BOTTOMRIGHT)
+    } else if (pt->x < w - RESIZE_BORDER && pt->x > RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
+        RESIZE_HIT(BOTTOM)
+    } else if (pt->x < RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
+        RESIZE_HIT(BOTTOMLEFT)
+    } else if (pt->x < RESIZE_BORDER && pt->y < h - RESIZE_BORDER && pt->y > RESIZE_BORDER) {
+        RESIZE_HIT(LEFT)
+    }
+
+    // no action.
+    return SDL_HITTEST_NORMAL;
+}
 
 void
 Controller::initWindow()
@@ -23,13 +62,16 @@ Controller::initWindow()
     if (window == nullptr) {
         SDL_Log("SDL_CreateWindow: %s\n", SDL_GetError());
         SDL_Quit();
+        throw Premia::FatalException();
     } else {
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         if (renderer == nullptr) {
             SDL_Log("SDL_CreateRenderer: %s\n", SDL_GetError());
             SDL_Quit();
+            throw Premia::FatalException();
         } else {
-            SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
         }
     }
 
@@ -60,9 +102,7 @@ Controller::initWindow()
 void 
 Controller::initCallbacks()
 {
-    viewManager.addEventHandler("login", [this] () -> void { \
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-        SDL_RenderPresent(renderer);
+    viewManager.addEventHandler("login", [this] () -> void { 
         SDL_SetWindowSize(window, Style::SCREEN_WIDTH, Style::SCREEN_HEIGHT);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
         ImGuiIO & io = ImGui::GetIO();
@@ -83,57 +123,13 @@ Controller::initCallbacks()
     viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
 }
 
-SDL_HitTestResult 
-WindowCallback(SDLWindow win, SDLPoint pt, void* data)
-{
-    int w, h;
-    SDL_GetWindowSize(win, &w, &h);
-
-    // // dragging this pixel moves the window.
-    if (pt->y < TITLE_BORDER && pt->x < (w - TITLE_BORDER)) {
-        return SDL_HITTEST_DRAGGABLE;
-    }
-
-    #define REPORT_RESIZE_HIT(name) { \
-        SDL_Log("HIT-TEST: RESIZE_" #name "\n"); \
-        return SDL_HITTEST_RESIZE_##name; \
-    }
-    
-    if (pt->x < RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(TOPLEFT);
-    } else if (pt->x > RESIZE_BORDER && pt->x < w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(TOP);
-    } else if (pt->x > w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(TOPRIGHT); 
-    } else if (pt->x > w - RESIZE_BORDER && pt->y > RESIZE_BORDER && pt->y < h - RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(RIGHT);
-    } else if (pt->x > w - RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(BOTTOMRIGHT);
-    } else if (pt->x < w - RESIZE_BORDER && pt->x > RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(BOTTOM);
-    } else if (pt->x < RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(BOTTOMLEFT);
-    } else if (pt->x < RESIZE_BORDER && pt->y < h - RESIZE_BORDER && pt->y > RESIZE_BORDER) {
-        REPORT_RESIZE_HIT(LEFT);
-    }
-    // SDL_HITTEST_RESIZE_* - dragging this pixel resizes a specific edge (or edges) of the window. (Here * is one of: TOPLEFT, TOP, TOPRIGHT, RIGHT, BOTTOMRIGHT, BOTTOM, BOTTOMLEFT, LEFT).
-    // TOPLEFT, TOP, TOPRIGHT, RIGHT, BOTTOMRIGHT, BOTTOM, BOTTOMLEFT, LEFT
-
-    // no action.
-    return SDL_HITTEST_NORMAL;
-}
-
 Controller::Controller(const ViewManager & vm) 
     : viewManager(vm) { }
 
-bool
-Controller::isActive() const {
-    return active;
-}
+bool Controller::isActive() const { return active; }
 
 void
-Controller::onEntry()
-{
+Controller::onEntry() {
     initWindow();
     initCallbacks();
     active = true;
@@ -172,9 +168,8 @@ Controller::onInput()
                 break;
             }
             case SDL_WINDOWEVENT:
-                switch ( event.window.event ) 
-                {
-                    case SDL_WINDOWEVENT_CLOSE:   // exit game
+                switch ( event.window.event )  {
+                    case SDL_WINDOWEVENT_CLOSE:
                         active = false;
                         break;
                     case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -207,8 +202,7 @@ Controller::onInput()
 }
 
 void 
-Controller::onLoad()
-{
+Controller::onLoad() const {
     this->viewManager.update();
 }
 
@@ -216,12 +210,6 @@ void
 Controller::doRender()
 {
     SDL_RenderClear(renderer);
-    int w = 1920;
-    int h = 1080;
-    SDL_SetRenderDrawColor(renderer, 55, 55, 55, 0);
-    SDL_GetWindowSize(window, &w, &h);
-    SDL_Rect f = {0, 0, 1920, 1080};
-    SDL_RenderFillRect(renderer, &f);
     ImGui::Render();
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(renderer);
@@ -236,7 +224,7 @@ Controller::onExit()
     ImGui::DestroyContext();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    window = nullptr;
-    renderer = nullptr;
     SDL_Quit();
+    renderer = nullptr;
+    window = nullptr;
 }

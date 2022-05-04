@@ -2,8 +2,8 @@
 #define Controller_hpp
 
 #include "Library/SDL.hpp"
-#include "Style.hpp"
 #include "Library/ImPlot.hpp"
+#include "Style.hpp"
 #include "Model/Model.hpp"
 #include "View/ViewManager.hpp"
 #include "View/Login/LoginView.hpp"
@@ -14,19 +14,15 @@
 
 SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint point, void* data);
 
-class Controller
-{
+class Controller {
 private:
     bool active = false;
-    void quit() {
-        active = false;
-    }
-
-    SDL_Window * window = nullptr;
-    SDL_Renderer * renderer = nullptr;
+    void quit() { active = false; }
 
     Model model;
     ViewManager viewManager;
+    SDL_Window * window = nullptr;
+    SDL_Renderer * renderer = nullptr;
 
     void initWindow();
     void initCallbacks();
@@ -38,7 +34,7 @@ public:
 
     void onEntry();
     void onInput();
-    void onLoad();
+    void onLoad() const;
     void doRender();
     void onExit();
 };
