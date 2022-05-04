@@ -22,7 +22,6 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # SDL libraries --------------------------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
-find_package(SDL_image REQUIRED)
 find_package(SDL_ttf REQUIRED)
 
 # cURL library ---------------------------------------------------------------------------------------------------
@@ -121,7 +120,6 @@ target_link_libraries(
     Premia 
     ${BOOST_LIBRARIES} 
     ${SDL2_LIBRARIES} 
-    ${SDL_IMAGE_LIBRARIES} 
     ${SDL_TTF_LIBRARIES}
     ${OPENGL_LIBRARIES} 
     ImGui 
@@ -170,10 +168,9 @@ target_link_libraries(
   PremiaTest
   ${BOOST_LIBRARIES} 
   ${SDL2_LIBRARIES} 
-  ${SDL_IMAGE_LIBRARIES} 
   ${SDL_TTF_LIBRARIES}
   ${OPENGL_LIBRARIES}
-#   ${FREDCPP_LIBRARY}
+# ${FREDCPP_LIBRARY}
   curl 
   OpenSSL::SSL 
   gtest_main
