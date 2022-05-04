@@ -5,7 +5,6 @@
 #include <vector>
 #include <tuple>
 #include <mutex>
-#include <exception>
 #include <typeindex>
 #include <typeinfo>
 #include <cassert>
@@ -49,16 +48,18 @@ struct Events {
     AbstractEventMap events;
 
     template <typename E>
-    void insert(String key, E event) {
-        auto eventType = TypeIndex(typeid(event));                     
-        events.insert(std::make_pair(key, 
-                      std::make_pair((EventHandler) event, eventType))); 
+    auto insert(String key, E event) const
+        -> void {
+        auto type = TypeIndex(typeid(event));     
+        auto pair = std::make_pair(std::make_pair(key, 
+                                   std::make_pair((EventHandler) event, type)))                
+        events.insert(pair); 
     }
 
     template <typename E, typename... Args>
-    E trigger(String key, Args&&... args) {
+    E trigger(CRString key, Args&&... args) {
         auto eventIt = events.find(key);                            
-        auto eventValue = eventIt->second;                                  
+        auto [evk, eventValue] = eventIt->second;                                  
         auto typeCastedEvent = (E (*) (Args ...)) (eventValue.first);              
         assert(eventValue.second == TypeIndex(typeid(typeCastedEvent)));  
         return typeCastedEvent(std::forward<Args>(args)...);                  
@@ -71,8 +72,9 @@ template <typename Lambda, typename Theta>
 void runOnce(Lambda f, Theta t){
     static once_flag once; 
     
-    f();
+    f(); // might return (who knows)
 
+    // called iff f successful
     std::call_once(once, [t] () {
         t();
     });
@@ -82,10 +84,15 @@ template <typename Lambda, typename Theta, typename... Args>
 void runOnceArgs(Lambda f, Theta t, Args&&... args){
     static once_flag once; 
 
-    f(); // may return 
+    f(); 
 
-    // called iff f successful
     std::call_once(once, std::bind(std::move(t), std::forward<Args>(args)...)); 
 }
+
+// template <typename Delta, typename >
+// auto dirac(Delta d) 
+//     -> void {
+    
+// }
 
 #endif
