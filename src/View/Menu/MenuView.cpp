@@ -67,7 +67,12 @@ void MenuView::drawViewMenu() const
 
     if (ImGui::BeginMenu(ICON_MD_TUNE))
     {         
-        ImGui::MenuItem("Watchlists");
+        if (ImGui::BeginMenu("Right Column")) {
+            if (ImGui::MenuItem("Option Chain")) {
+                events.at("optionChainRightCol")();
+            }
+            ImGui::EndMenu();
+        }
 
         ImGui::Separator();
         if (ImGui::BeginMenu("Appearance")) {

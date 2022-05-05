@@ -83,7 +83,6 @@ void PrimaryView::drawInfoPane()
 void PrimaryView::drawScreen()
 {
     drawInfoPane();
-    ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
 }
 
 String PrimaryView::getName() {

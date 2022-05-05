@@ -40,6 +40,7 @@ void OptionChainView::drawChain()
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingStretchProp;
 
     static int current_item = 0;
+    ImGui::Text("Gamma at Expiry $%d", model.getGammaAtExpiry(current_item));
     if (ImGui::BeginCombo("Expiration Date", model.getDateTime(current_item).c_str(), ImGuiComboFlags_None))
     {
         for (int n = 0; n < model.getDateTimeArray().size(); n++)
@@ -54,8 +55,9 @@ void OptionChainView::drawChain()
         }
         ImGui::EndCombo();
     }
+    
 
-    if (ImGui::BeginTable("OptionChainTable", 19, flags, ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y * 0.75f))) {
+    if (ImGui::BeginTable("OptionChainTable", 19, flags, ImGui::GetContentRegionAvail())) {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 
         ImGui::TableSetupColumn("Bid", ImGuiTableColumnFlags_None);
@@ -157,25 +159,6 @@ void OptionChainView::drawChain()
 
 void OptionChainView::drawUnderlying()
 {
-    ImGui::Text( "%s | %s (%s)", model.getOptionChainData().getUnderlyingDataVariable("description").c_str(), 
-                                   model.getOptionChainData().getOptionChainDataVariable("symbol").c_str(), 
-                                   model.getOptionChainData().getUnderlyingDataVariable("markPercentChange").c_str());
-
-    ImGui::Text("Bid: %s | Ask: %s", model.getOptionChainData().getUnderlyingDataVariable("bid").c_str(), model.getOptionChainData().getUnderlyingDataVariable("ask").c_str());
-    ImGui::Text("Open: %s | Close: %s", model.getOptionChainData().getUnderlyingDataVariable("openPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("close").c_str());
-    ImGui::Text("High: %s | Low: %s", model.getOptionChainData().getUnderlyingDataVariable("highPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("lowPrice").c_str());
-    ImGui::Text("Total Volume: %s", model.getOptionChainData().getUnderlyingDataVariable("totalVolume").c_str());
-    ImGui::Text("Exchange: %s", model.getOptionChainData().getUnderlyingDataVariable("exchangeName").c_str());
-
-    ImGui::Separator();
-    ImGui::Text("Implied Volatility: %s", model.getOptionChainData().getOptionChainDataVariable("volatility").c_str());
-    ImGui::Text("Naive Gamma Exposure: $%.2f", model.getGammaExposure());
-    ImGui::Text("Skew-Adjusted Gamma Exposure: N/A");
-    ImGui::Text("GEX Flip Point: N/A");
-    ImGui::Text("Distance to Flip: N/A");
-    ImGui::Text("$ GEX @ Next Expiry: N/A");
-    ImGui::Separator();
-
     static double xs2[10], ys2[10];
     for (int i = 0; i < 10; ++i) {
         xs2[i] = i;
@@ -184,10 +167,39 @@ void OptionChainView::drawUnderlying()
         else
             ys2[i] = 0;
     }
-    if (ImPlot::BeginPlot("Risk Chart", ImVec2(-1, 225.f))) {
-        ImPlot::PlotLine("Return", xs2, ys2, 10);
-        ImPlot::EndPlot();
+
+    if (ImGui::BeginTable("UnderlyingTable", 2, ImGuiTableFlags_NoBordersInBody)) {
+        ImGui::TableSetupColumn("##optionsdata", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("##quickchart", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableNextColumn(); 
+        if (ImGui::TreeNode("Underlying")) {
+            ImGui::Text( "%s | %s (%s)", model.getOptionChainData().getUnderlyingDataVariable("description").c_str(), 
+                                    model.getOptionChainData().getOptionChainDataVariable("symbol").c_str(), 
+                                    model.getOptionChainData().getUnderlyingDataVariable("markPercentChange").c_str());
+            ImGui::Text("Bid: %s | Ask: %s", model.getOptionChainData().getUnderlyingDataVariable("bid").c_str(), model.getOptionChainData().getUnderlyingDataVariable("ask").c_str());
+            ImGui::Text("Open: %s | Close: %s", model.getOptionChainData().getUnderlyingDataVariable("openPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("close").c_str());
+            ImGui::Text("High: %s | Low: %s", model.getOptionChainData().getUnderlyingDataVariable("highPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("lowPrice").c_str());
+            ImGui::Text("Total Volume: %s", model.getOptionChainData().getUnderlyingDataVariable("totalVolume").c_str());
+            ImGui::Text("Exchange: %s", model.getOptionChainData().getUnderlyingDataVariable("exchangeName").c_str());
+            ImGui::TreePop();
+        }
+        ImGui::Separator();
+        if (ImGui::TreeNode("Chain Analytics")) {
+            ImGui::Text("Implied Volatility: %s", model.getOptionChainData().getOptionChainDataVariable("volatility").c_str());
+            ImGui::Text("Naive Gamma Exposure: $%.2f", model.getGammaExposure());
+            ImGui::Text("Skew-Adjusted Gamma Exposure: N/A");
+            ImGui::Text("GEX Flip Point: N/A");
+            ImGui::Text("Distance to Flip: N/A");
+            ImGui::TreePop();
+        }
+        ImGui::TableNextColumn();
+        if (ImPlot::BeginPlot("Risk Chart", ImVec2(-1, 225.f))) {
+            ImPlot::PlotLine("Return", xs2, ys2, 10);
+            ImPlot::EndPlot();
+        }
+        ImGui::EndTable();
     }
+    ImGui::Separator();
 }
 
 String 
@@ -208,11 +220,12 @@ void OptionChainView::addEvent(CRString key, const EventHandler & event)
 void OptionChainView::update() 
 {
     if (model.isActive()) {
-        if (ImGui::BeginTable("OptionChainTable", 2, ImGuiTableFlags_NoBordersInBody)) {
-            ImGui::TableSetupColumn("Underlying", ImGuiTableColumnFlags_WidthFixed);
+        if (ImGui::BeginTable("OptionChainTable", 1, ImGuiTableFlags_NoBordersInBody)) {
             ImGui::TableSetupColumn("Option Chain", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableNextColumn(); drawSearch(); drawUnderlying();
-            ImGui::TableNextColumn(); drawChain();
+            ImGui::TableNextColumn(); 
+            drawSearch(); 
+            drawUnderlying(); 
+            drawChain();
             ImGui::EndTable();
         }
     } else {

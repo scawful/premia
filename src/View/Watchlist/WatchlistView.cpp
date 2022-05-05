@@ -2,7 +2,7 @@
 
 void WatchlistView::drawWatchlistTable()
 {
-    static int n = 5;
+    static int n = 0;
 
     ImGui::Combo(" ", &n,  model.getWatchlistNamesCharVec().data(), (int) model.getWatchlistNamesCharVec().size()); 
 
