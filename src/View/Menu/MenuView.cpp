@@ -2,9 +2,17 @@
 
 void MenuView::drawFileMenu() const
 {
+    static bool show_console = false;
+
+    if (show_console) {
+        ImGui::SetNextWindowSize(ImVec2(400,300), ImGuiCond_Appearing);
+        ImGui::Begin("Console", &show_console);
+        events.at("consoleView")();
+        ImGui::End();
+    }
+
     if (ImGui::BeginMenu(ICON_MD_DASHBOARD)) {
-        if (ImGui::MenuItem("Home"))
-            events.at("goHome")();
+
         ImGui::MenuItem("New Workspace", "CTRL + N");
         ImGui::Separator();
         ImGui::MenuItem("Open Workspace", "CTRL + O");
@@ -14,6 +22,8 @@ void MenuView::drawFileMenu() const
         }
         ImGui::Separator();
         ImGui::MenuItem("Save Workspace", "CTRL + S");
+        ImGui::Separator();
+        ImGui::MenuItem("Open Console", ICON_MD_TERMINAL, &show_console);
         ImGui::Separator();
         if (ImGui::BeginMenu("Preferences")) {
             static bool privateBalance = false;
@@ -57,7 +67,6 @@ void MenuView::drawViewMenu() const
 
     if (ImGui::BeginMenu(ICON_MD_TUNE))
     {         
-        ImGui::MenuItem("Console");
         ImGui::MenuItem("Watchlists");
 
         ImGui::Separator();
@@ -114,6 +123,9 @@ void MenuView::drawAnalyzeMenu() const
 {
     if (ImGui::BeginMenu(ICON_MD_TOPIC))
     {
+        if (ImGui::MenuItem("Risk Premia Hub"))
+            events.at("goHome")();
+        ImGui::Separator();
         ImGui::MenuItem("Fundamentals", "N/A");
         ImGui::MenuItem("Market Movers", "N/A");
         ImGui::Separator();

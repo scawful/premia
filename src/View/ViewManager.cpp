@@ -39,6 +39,9 @@ ViewManager::ViewManager() {
                                     consoleView, std::placeholders::_1);
     this->watchlistView->addLogger(this->consoleLogger);
     this->accountView->addLogger(this->consoleLogger);
+    this->menuView->addEvent("consoleView", [this] () -> void {
+        this->consoleView->update();
+    });
 }
 
 void
@@ -103,7 +106,6 @@ ViewManager::update() const
 
             ImGui::TableSetColumnIndex(1); 
             this->currentView->update();
-            this->consoleView->update();
 
             ImGui::TableSetColumnIndex(2); 
             this->accountView->update();
