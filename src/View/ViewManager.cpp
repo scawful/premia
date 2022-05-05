@@ -1,32 +1,5 @@
 #include "ViewManager.hpp"
 
-void ViewManager::shareEvents()
-{
-
-}
-
-ViewManager::ViewManager()
-{
-    this->consoleLogger = std::bind(&ConsoleView::addLogStd, consoleView, std::placeholders::_1);
-    this->watchlistView->addLogger(this->consoleLogger);
-    this->accountView->addLogger(this->consoleLogger);
-}
-
-void
-ViewManager::transferEvents() const
-{
-    for (const auto & [key, event] : this->events) {
-        this->menuView->addEvent(key, event);
-        this->currentView->addEvent(key, event);
-    }
-}
-
-void 
-ViewManager::setLoggedIn()
-{
-    this->isLoggedIn = true;
-}
-
 void 
 ViewManager::startGuiFrame() const
 {    
@@ -61,15 +34,29 @@ ViewManager::startGuiFrame() const
     }
 }
 
-void 
-ViewManager::endGuiFrame() const 
-{
-    ImGui::End();
+ViewManager::ViewManager() {
+    this->consoleLogger = std::bind(&ConsoleView::addLogStd, 
+                                    consoleView, std::placeholders::_1);
+    this->watchlistView->addLogger(this->consoleLogger);
+    this->accountView->addLogger(this->consoleLogger);
+}
+
+void
+ViewManager::transferEvents() const {
+    for (const auto & [key, event] : this->events) {
+        this->menuView->addEvent(key, event);
+        this->currentView->addEvent(key, event);
+    }
 }
 
 void 
-ViewManager::addEventHandler(CRString key, const EventHandler & event)
-{
+ViewManager::setLoggedIn() {
+    this->isLoggedIn = true;
+}
+
+
+void 
+ViewManager::addEventHandler(CRString key, const EventHandler & event) {
     this->events[key] = event;
     this->menuView->addEvent(key, event);
     if (!isLoggedIn) {
@@ -81,8 +68,7 @@ ViewManager::addEventHandler(CRString key, const EventHandler & event)
 }
 
 void 
-ViewManager::setCurrentView(std::shared_ptr<View> newView)
-{
+ViewManager::setCurrentView(std::shared_ptr<View> newView) {
     this->currentView = newView;
 }
 
@@ -126,5 +112,5 @@ ViewManager::update() const
         }
     }
     
-    this->endGuiFrame();
+    ImGui::End();
 }
