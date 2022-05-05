@@ -16,6 +16,7 @@ private:
     ArrayList<tda::OptionsDateTimeObj> putOptionArray;
     ArrayList<tda::OptionsDateTimeObj> optionsDateTimeObj;
     ArrayList<const char*> datetime_array;
+    ArrayList<double> gammaAtExpiryArray;
     ArrayList<String> datetimeArray;
 
 public:
@@ -34,6 +35,7 @@ public:
     
     void calculateGammaExposure();
     double & getGammaExposure();
+    double & getGammaAtExpiry(int i);
 };
 
 #endif 

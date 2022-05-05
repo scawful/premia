@@ -72,10 +72,12 @@ OptionsModel::calculateGammaExposure()
             strikeGammaExposure *= gamma;
             strikeGammaExposure *= boost::lexical_cast<double>(eachStrike.raw_option.at("openInterest"));
             naiveGammaExposure += strikeGammaExposure;
+            gammaAtExpiryArray.push_back(naiveGammaExposure);
         }
     }
 
     for (const auto & eachOption : putOptionArray) {
+        int i = 0;
         for (const auto & eachStrike : eachOption.strikePriceObj) {
             double strikeGammaExposure = -100;
             double gamma = boost::lexical_cast<double>(eachStrike.raw_option.at("gamma"));
@@ -85,12 +87,18 @@ OptionsModel::calculateGammaExposure()
             strikeGammaExposure *= gamma;
             strikeGammaExposure *= boost::lexical_cast<double>(eachStrike.raw_option.at("openInterest"));
             naiveGammaExposure += strikeGammaExposure;
+            gammaAtExpiryArray[i] += naiveGammaExposure;
+            i++;
         }
     }
 }
 
 double & 
-OptionsModel::getGammaExposure()
-{
+OptionsModel::getGammaExposure() {
     return naiveGammaExposure;
+}
+
+double & 
+OptionsModel::getGammaAtExpiry(int i) {
+    return gammaAtExpiryArray.at(i);
 }
