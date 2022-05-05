@@ -2,7 +2,7 @@
 
 void MenuView::drawFileMenu() const
 {
-    if (ImGui::BeginMenu("File")) {
+    if (ImGui::BeginMenu(ICON_MD_DASHBOARD)) {
         if (ImGui::MenuItem("Home"))
             events.at("goHome")();
         ImGui::MenuItem("New Workspace", "CTRL + N");
@@ -31,19 +31,6 @@ void MenuView::drawFileMenu() const
     }
 }
 
-void MenuView::drawEditMenu() {
-    if (ImGui::BeginMenu("Edit")) {
-        ImGui::MenuItem("Undo", "CTRL + Z");
-        ImGui::MenuItem("Redo", "CTRL + Y");
-        ImGui::Separator();
-        ImGui::MenuItem("Cut", "CTRL + X");
-        ImGui::MenuItem("Copy", "CTRL + C");
-        ImGui::MenuItem("Paste", "CTRL + V");
-        ImGui::MenuItem("Delete", "DEL");
-        ImGui::EndMenu();
-    }
-}
-
 void MenuView::drawViewMenu() const
 {
     static bool show_imgui_metrics       = false;
@@ -68,7 +55,7 @@ void MenuView::drawViewMenu() const
         ImGui::End();
     }
 
-    if (ImGui::BeginMenu("View"))
+    if (ImGui::BeginMenu(ICON_MD_TUNE))
     {         
         ImGui::MenuItem("Console");
         ImGui::MenuItem("Watchlists");
@@ -94,7 +81,7 @@ void MenuView::drawViewMenu() const
 
 void MenuView::drawTradeMenu() const
 {
-    if (ImGui::BeginMenu("Trade"))
+    if (ImGui::BeginMenu(ICON_MD_SYNC_ALT))
     {
         ImGui::MenuItem("Place Order", "N/A");
         ImGui::MenuItem("Replace Order", "N/A");
@@ -111,22 +98,21 @@ void MenuView::drawTradeMenu() const
 
 void MenuView::drawChartsMenu() const
 {
-    if (ImGui::BeginMenu("Charts")) {
-        if (ImGui::MenuItem("Line Chart")) {
+    if (ImGui::BeginMenu(ICON_MD_ADD_CHART)) {
+        if (ImGui::MenuItem("Line Plot", ICON_MD_SHOW_CHART)) {
             events.at("linePlotView")();
         }
-        if (ImGui::MenuItem("Candle Chart")) {
+        if (ImGui::MenuItem("Candlestick", ICON_MD_CANDLESTICK_CHART)) {
             events.at("chartView")();
         } 
-        ImGui::Separator();     
-        ImGui::MenuItem("Market Overview", "N/A");
+
         ImGui::EndMenu();
     }
 }
 
 void MenuView::drawAnalyzeMenu() const
 {
-    if (ImGui::BeginMenu("Analyis"))
+    if (ImGui::BeginMenu(ICON_MD_TOPIC))
     {
         ImGui::MenuItem("Fundamentals", "N/A");
         ImGui::MenuItem("Market Movers", "N/A");
@@ -157,7 +143,7 @@ void MenuView::drawAnalyzeMenu() const
 
 void MenuView::drawAccountMenu() const
 {
-    if (ImGui::BeginMenu("Account")) {
+    if (ImGui::BeginMenu(ICON_MD_ACCOUNT_BALANCE)) {
         ImGui::MenuItem("Sync Data", "N/A");
         ImGui::Separator();
         ImGui::MenuItem("General Settings", "N/A");
@@ -170,7 +156,7 @@ void MenuView::drawAccountMenu() const
 
 void MenuView::drawHelpMenu()
 {
-    if ( ImGui::BeginMenu("Help") )
+    if ( ImGui::BeginMenu(ICON_MD_HELP) )
     {
         ImGui::MenuItem("Get Started");
         ImGui::MenuItem("Tips and Tricks");
@@ -185,12 +171,11 @@ void MenuView::drawScreen()
 {
     if (ImGui::BeginMenuBar()) {
         drawFileMenu();
-        drawEditMenu();
-        drawViewMenu();
         drawTradeMenu();
         drawChartsMenu();
         drawAnalyzeMenu();
         drawAccountMenu();
+        drawViewMenu();
         drawHelpMenu();
         ImGui::EndMenuBar();
     }

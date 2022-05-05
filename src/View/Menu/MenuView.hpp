@@ -17,7 +17,6 @@ private:
     ConsoleLogger logger;
    
     void drawFileMenu() const;
-    void drawEditMenu();
     void drawViewMenu() const;
     void drawTradeMenu() const;
     void drawChartsMenu() const;
