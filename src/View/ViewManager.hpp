@@ -17,7 +17,7 @@ private:
     // Local Variables 
     bool isLoggedIn = false;
     bool menuActive = true;
-    bool fontLoaded = false;    
+    bool fontLoaded = false;
     
     // Premia Context Utilities 
     EventMap events;
@@ -25,6 +25,8 @@ private:
 
     // Views 
     std::shared_ptr<View> currentView;
+    std::shared_ptr<View> rightColView;
+
     std::unordered_map<String, std::shared_ptr<View>> viewMap;
 
     std::shared_ptr<LoginView> loginView = std::make_shared<LoginView>();

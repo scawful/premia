@@ -8,6 +8,7 @@ class CandleChart: public Chart
 {
 private:
     String tickerSymbol;
+    String quoteDetails;
     ChartModel model;
 
     int binary_search(const ArrayList<double> arr, int l, int r, double x);
@@ -15,6 +16,7 @@ private:
     void drawCandleChart();
 
 public:
+    void fetchData(CRString ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext) override;
     void update() override;
 
 };

@@ -114,9 +114,11 @@ void MenuView::drawChartsMenu() const
 {
     if (ImGui::BeginMenu(ICON_MD_ADD_CHART)) {
         if (ImGui::MenuItem("Line Plot", ICON_MD_SHOW_CHART)) {
+            halext::HLXT::getInstance().setSelectedChart(0);
             events.at("linePlotView")();
         }
         if (ImGui::MenuItem("Candlestick", ICON_MD_CANDLESTICK_CHART)) {
+            halext::HLXT::getInstance().setSelectedChart(1);
             events.at("chartView")();
         } 
 
