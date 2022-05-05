@@ -7,13 +7,15 @@
 class MenuView : public View
 {
 private:
+    // Local Variables 
+    ImGuiStyle * ref = nullptr;
     bool initialized = false;
     bool about = false;
-    ImGuiStyle * ref;
+
+    // Premia Context Utilities 
+    EventMap events;
     ConsoleLogger logger;
-    std::unordered_map<String, EventHandler> events;
    
-    void drawStyleEditor();
     void drawFileMenu() const;
     void drawEditMenu();
     void drawViewMenu() const;
@@ -25,7 +27,7 @@ private:
     void drawScreen();
 
 public:
-        String getName() override;
+    String getName() override;
     void addLogger(const ConsoleLogger & logger) override;
     void addEvent(CRString, const EventHandler &) override;
     void update() override;
