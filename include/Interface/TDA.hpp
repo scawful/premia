@@ -55,7 +55,6 @@ namespace tda
         auto getAccount(String accountNumber) 
             -> Account const {
             String response = client.get_account(accountNumber);
-            std::cout << response << std::endl;
             return parser.parse_account(parser.read_response(response));
         }
 

@@ -40,7 +40,7 @@ void OptionChainView::drawChain()
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingStretchProp;
 
     static int current_item = 0;
-    if (ImGui::BeginCombo("Expiration Date", model.getDateTime(0).c_str(), ImGuiComboFlags_None))
+    if (ImGui::BeginCombo("Expiration Date", model.getDateTime(current_item).c_str(), ImGuiComboFlags_None))
     {
         for (int n = 0; n < model.getDateTimeArray().size(); n++)
         {
@@ -55,27 +55,27 @@ void OptionChainView::drawChain()
         ImGui::EndCombo();
     }
 
-    if (ImGui::BeginTable("table_scrolly", 19, flags, ImGui::GetContentRegionAvail())) {
+    if (ImGui::BeginTable("OptionChainTable", 19, flags, ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y * 0.75f))) {
         ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 
         ImGui::TableSetupColumn("Bid", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Ask", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Last", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Chng", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Delta", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Gamma", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Theta", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Vega", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Delta", ImGuiTableColumnFlags_DefaultHide);
+        ImGui::TableSetupColumn("Gamma", ImGuiTableColumnFlags_DefaultHide);
+        ImGui::TableSetupColumn("Theta", ImGuiTableColumnFlags_DefaultHide);
+        ImGui::TableSetupColumn("Vega", ImGuiTableColumnFlags_DefaultHide);
         ImGui::TableSetupColumn("Open Int", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Strike", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Bid", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Ask", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Last", ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Chng", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Delta", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Gamma", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Theta", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Vega", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Delta", ImGuiTableColumnFlags_DefaultHide);
+        ImGui::TableSetupColumn("Gamma", ImGuiTableColumnFlags_DefaultHide);
+        ImGui::TableSetupColumn("Theta", ImGuiTableColumnFlags_DefaultHide);
+        ImGui::TableSetupColumn("Vega", ImGuiTableColumnFlags_DefaultHide);
         ImGui::TableSetupColumn("Open Int", ImGuiTableColumnFlags_None);
         ImGui::TableHeadersRow();
 
@@ -157,24 +157,22 @@ void OptionChainView::drawChain()
 
 void OptionChainView::drawUnderlying()
 {
-    ImGui::Text( "%s | %s - (%s)", model.getOptionChainData().getUnderlyingDataVariable("description").c_str(), 
+    ImGui::Text( "%s | %s (%s)", model.getOptionChainData().getUnderlyingDataVariable("description").c_str(), 
                                    model.getOptionChainData().getOptionChainDataVariable("symbol").c_str(), 
                                    model.getOptionChainData().getUnderlyingDataVariable("markPercentChange").c_str());
 
     ImGui::Text("Bid: %s | Ask: %s", model.getOptionChainData().getUnderlyingDataVariable("bid").c_str(), model.getOptionChainData().getUnderlyingDataVariable("ask").c_str());
-    ImGui::Text("Open: %s | Close: %s", model.getOptionChainData().getUnderlyingDataVariable("open").c_str(), model.getOptionChainData().getUnderlyingDataVariable("close").c_str());
+    ImGui::Text("Open: %s | Close: %s", model.getOptionChainData().getUnderlyingDataVariable("openPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("close").c_str());
     ImGui::Text("High: %s | Low: %s", model.getOptionChainData().getUnderlyingDataVariable("highPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("lowPrice").c_str());
     ImGui::Text("Total Volume: %s", model.getOptionChainData().getUnderlyingDataVariable("totalVolume").c_str());
     ImGui::Text("Exchange: %s", model.getOptionChainData().getUnderlyingDataVariable("exchangeName").c_str());
 
     ImGui::Separator();
     ImGui::Text("Implied Volatility: %s", model.getOptionChainData().getOptionChainDataVariable("volatility").c_str());
-    ImGui::Text("Interest Rate: %s", model.getOptionChainData().getOptionChainDataVariable("interestRate").c_str());
     ImGui::Text("Naive Gamma Exposure: $%.2f", model.getGammaExposure());
     ImGui::Text("Skew-Adjusted Gamma Exposure: N/A");
     ImGui::Text("GEX Flip Point: N/A");
     ImGui::Text("Distance to Flip: N/A");
-    ImGui::Text("Call Skew: N/A");
     ImGui::Text("$ GEX @ Next Expiry: N/A");
     ImGui::Separator();
 
@@ -186,7 +184,7 @@ void OptionChainView::drawUnderlying()
         else
             ys2[i] = 0;
     }
-    if (ImPlot::BeginPlot("Risk Chart")) {
+    if (ImPlot::BeginPlot("Risk Chart", ImVec2(-1, 225.f))) {
         ImPlot::PlotLine("Return", xs2, ys2, 10);
         ImPlot::EndPlot();
     }

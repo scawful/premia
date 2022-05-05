@@ -137,7 +137,7 @@ CandleChart::drawCandleChart()
     }
 
     ImPlot::GetStyle().UseLocalTime = true;
-    if (ImPlot::BeginPlot(model.getQuoteDetails().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y * 0.70f),0))  {
+    if (ImPlot::BeginPlot(model.getQuoteDetails().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y * 0.75f),0))  {
         ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
         ImPlot::SetupAxes("Date","Price", ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit);
         
