@@ -23,6 +23,7 @@ private:
     EventMap events;
     ChartMap charts;
     IndicatorMap indicators;
+    std::shared_ptr<ChartModel> model = std::make_shared<ChartModel>();
 
     ConsoleLogger logger;
 

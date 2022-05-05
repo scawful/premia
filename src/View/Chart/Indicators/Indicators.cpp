@@ -10,7 +10,7 @@ Volume::importData(ArrayList<double> data) {
 void 
 Volume::update() {
     if (ImPlot::BeginPlot("Volume")) {
-        ImPlot::PlotBars("Bars", volume.data(), 10, 0.7, 1);
+        ImPlot::PlotBars("Bars", volume.data(), volume.size(), 0.7, 1);
         ImPlot::EndPlot();
     }
 }
