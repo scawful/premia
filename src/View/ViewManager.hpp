@@ -8,6 +8,7 @@
 #include "Core/ConsoleView.hpp"
 #include "Watchlist/WatchlistView.hpp"
 #include "Chart/ChartView.hpp"
+#include "Options/OptionChain.hpp"
 #include "Account/AccountView.hpp"
 
 class ViewManager
@@ -24,6 +25,8 @@ private:
 
     // Views 
     std::shared_ptr<View> currentView;
+    std::unordered_map<String, std::shared_ptr<View>> viewMap;
+
     std::shared_ptr<LoginView> loginView = std::make_shared<LoginView>();
     std::shared_ptr<AccountView> accountView = std::make_shared<AccountView>();
     std::shared_ptr<WatchlistView> watchlistView = std::make_shared<WatchlistView>();

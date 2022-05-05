@@ -42,6 +42,10 @@ ViewManager::ViewManager() {
     this->menuView->addEvent("consoleView", [this] () -> void {
         this->consoleView->update();
     });
+    this->viewMap.emplace("rightCol", accountView);
+    this->menuView->addEvent("optionChainRightCol", [this] () -> void {
+        this->viewMap.at("rightCol") = std::make_shared<OptionChainView>();
+    });
 }
 
 void
@@ -95,7 +99,7 @@ ViewManager::update() const
         if (ImGui::BeginTable("table1", 3, flags, ImGui::GetContentRegionAvail())) {            
             ImGui::TableSetupColumn(this->watchlistView->getName().c_str());
             ImGui::TableSetupColumn(this->currentView->getName().c_str());
-            ImGui::TableSetupColumn(this->accountView->getName().c_str());
+            ImGui::TableSetupColumn(this->viewMap.at("rightCol")->getName().c_str());
             ImGui::TableHeadersRow();
 
             ImGui::TableNextRow();
@@ -108,7 +112,8 @@ ViewManager::update() const
             this->currentView->update();
 
             ImGui::TableSetColumnIndex(2); 
-            this->accountView->update();
+            this->viewMap.at("rightCol")->update();
+            // this->accountView->update();
 
             ImGui::EndTable();
         }
