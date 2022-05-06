@@ -86,25 +86,26 @@ OptionsModel::calculateGammaExposure() {
             naiveGammaExposure += strikeGammaExposure;
             callGammaAtExpiryArray.push_back(naiveGammaExposure);
             gammaAtExpiryArray.push_back(naiveGammaExposure);
-            vegaExposureArray.push_back(boost::lexical_cast<double>(eachStrike.raw_option.at("vega")));
+            double vega = boost::lexical_cast<double>(eachStrike.raw_option.at("vega"));
+            vegaExposureArray.push_back(vega);
 
             // vanna 
-            double high = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("highPrice"));
-            double low = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("lowPrice"));
-            double stockPrice = (high + low) / 2;
-            std::cout << stockPrice << std::endl;
+            double stockPrice = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("mark"));
             double volatility =  boost::lexical_cast<double>(eachStrike.raw_option.at("volatility"));
-            std::cout << volatility << std::endl;
             double strikePrice = boost::lexical_cast<double>(eachStrike.strikePrice);
-            std::cout << strikePrice << std::endl;
             double vannaPartOne = (log(stockPrice / strikePrice) + (volatility / 2) * daysTilExpiry) / (volatility * sqrt(daysTilExpiry));
-            std::cout << vannaPartOne << std::endl;
-            double vannaPartTwo = exp(-((pow(vannaPartOne, 2)/2))) * (1/2 * M_1_PI);
-            std::cout << vannaPartTwo << std::endl;
+            double partOneSqr = pow(vannaPartOne, 2) / 2;
+            double vannaPartTwo = exp(-partOneSqr) * (1/(2*3.14));
             double vannaPartThree = sqrt(daysTilExpiry) * vannaPartTwo * (1 - vannaPartTwo);
-            std::cout << vannaPartThree << std::endl;
-            naiveVannaExposureArray.push_back(vannaPartThree);
-            // callVannaExposureArray.push_back(vannaPartThree); 
+            if (vannaPartThree != 0) {
+                naiveVannaExposureArray.push_back(vannaPartThree);
+            }
+
+            double volgaPartOne = vannaPartOne - (volatility * sqrt(daysTilExpiry));
+            double volgaPartTwo = vega * (volgaPartOne / volatility);
+            if (volgaPartTwo != 0 && !isinf(volgaPartTwo)) {
+                volgaExposureArray.push_back(volgaPartTwo);
+            }
         }
     }
 
@@ -125,15 +126,6 @@ OptionsModel::calculateGammaExposure() {
             gammaAtExpiryArray[i] += naiveGammaExposure;
             double vol = boost::lexical_cast<double>(eachStrike.raw_option.at("vega"));
             vegaExposureArray[i] = (vol + vegaExposureArray[i]) / 2;
-            double high = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("highPrice"));
-            double low = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("lowPrice"));
-            double stockPrice = (high + low) / 2;
-            double volatility =  boost::lexical_cast<double>(eachStrike.raw_option.at("volatility"));
-            double strikePrice = boost::lexical_cast<double>(eachStrike.strikePrice);
-            double vannaPartOne = (log(stockPrice / strikePrice) + (volatility / 2) * daysTilExpiry) / (volatility * sqrt(daysTilExpiry));
-            double vannaPartTwo = pow(M_E, (-((pow(vannaPartOne, 2)/2)))) * (1/2 * M_1_PI);
-            double vannaPartThree = sqrt(daysTilExpiry) * vannaPartTwo * (1 - vannaPartTwo);
-            naiveVannaExposureArray[i] += vannaPartThree;
             i++;
         }
     }
@@ -172,16 +164,6 @@ OptionsModel::getNaiveVannaExposureList() {
 }
 
 ArrayList<double> & 
-OptionsModel::getCallVannaExposureList() {
-    return callVannaExposureArray;
-}
-
-ArrayList<double> & 
-OptionsModel::getPutVannaExposureList() {
-    return putVannaExposureArray;
-}
-
-ArrayList<double> & 
 OptionsModel::getDatetimeEpochArray() {
     return datetimeEpochArray;
 }
@@ -189,4 +171,9 @@ OptionsModel::getDatetimeEpochArray() {
 ArrayList<double> & 
 OptionsModel::getVegaExposureArray() {
     return vegaExposureArray;
+}
+
+ArrayList<double> & 
+OptionsModel::getVolgaExposureArray() {
+    return volgaExposureArray;
 }

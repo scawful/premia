@@ -25,8 +25,7 @@ private:
     ArrayList<double> datetimeEpochArray;
 
     ArrayList<double> naiveVannaExposureArray;
-    ArrayList<double> callVannaExposureArray;
-    ArrayList<double> putVannaExposureArray;
+    ArrayList<double> volgaExposureArray;
 
     ArrayList<double> vegaExposureArray;
 
@@ -51,12 +50,12 @@ public:
     ArrayList<double> & getPutGammaAtExpiryList();
 
     ArrayList<double> & getNaiveVannaExposureList();
-    ArrayList<double> & getCallVannaExposureList();
-    ArrayList<double> & getPutVannaExposureList();
 
     ArrayList<double> & getDatetimeEpochArray();
 
     ArrayList<double> & getVegaExposureArray();
+
+    ArrayList<double> & getVolgaExposureArray();
 };
 
 #endif 

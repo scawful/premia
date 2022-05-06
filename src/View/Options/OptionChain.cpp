@@ -214,29 +214,28 @@ void OptionChainView::drawUnderlying() {
         }
 
         if (ImPlot::BeginPlot("Vega Exposure", ImVec2(-1, -1))) {
-            ImPlot::SetupAxisFormat(ImAxis_Y1, "%.4f");
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "%.2f");
             ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
             GEXEpochPair volPair(model.getDatetimeEpochArray().data(), model.getVegaExposureArray().data());
             ImPlot::PlotLineG("##vega", func, &volPair, size);
             ImPlot::EndPlot();
         }
 
-        if (ImPlot::BeginPlot("Vanna", ImVec2(-1, -1))) {
-            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
+        if (ImPlot::BeginPlot("Vanna Exposure", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "%.4f");
             ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
             GEXEpochPair vannaPair(model.getDatetimeEpochArray().data(), model.getNaiveVannaExposureList().data());
             ImPlot::PlotLineG("##vanna", func, &vannaPair, size);
             ImPlot::EndPlot();
         }
 
-        // if (ImPlot::BeginPlot("##vannaPut", ImVec2(-1, -1))) {
-        //     ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
-        //     ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
-        //     ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-        //     GEXEpochPair putVanna(model.getDatetimeEpochArray().data(), model.getPutVannaExposureList().data());
-        //     ImPlot::PlotLineG("Put", func, &putVanna, size);
-        //     ImPlot::EndPlot();
-        // }
+        if (ImPlot::BeginPlot("Volga Exposure", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "%.2f");
+            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+            GEXEpochPair volgaPair(model.getDatetimeEpochArray().data(), model.getVolgaExposureArray().data());
+            ImPlot::PlotLineG("##volga", func, &volgaPair, size);
+            ImPlot::EndPlot();
+        }
 
         ImPlot::EndSubplots();
     }
