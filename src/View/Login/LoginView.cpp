@@ -13,18 +13,10 @@ void LoginView::drawScreen() const
     io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
     io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
-    static char username[128];
-    static char password[128];
-    
     static String consumer_key;
     static String refresh_token;
     
-    String welcomePrompt = "Welcome to Premia"; 
-    auto windowWidth = ImGui::GetWindowSize().x;
-    auto textWidth   = ImGui::CalcTextSize(welcomePrompt.c_str()).x;
-    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
-    ImGui::Text("%s", welcomePrompt.c_str());
-
+    ImGui::Text("%s %s", ICON_MD_SHOW_CHART, ICON_MD_BAR_CHART);
     ImGui::Separator();
 
     if ( ImGui::Button("Guest Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {

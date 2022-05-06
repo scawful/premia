@@ -72,8 +72,7 @@ String ChartModel::getTickerSymbol() const
 String ChartModel::getQuoteDetails()
 {
     String quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") + " | Ask: $" + quote.getQuoteVariable("askPrice") + 
-                                " | Open: $" + quote.getQuoteVariable("openPrice") + " | Close: $" + quote.getQuoteVariable("closePrice") +
-                                " | Total Volume: " + quote.getQuoteVariable("totalVolume");
+                          " | Open: $" + quote.getQuoteVariable("openPrice") + " | Close: $" + quote.getQuoteVariable("closePrice");
     return quoteDetails;
 }
 
