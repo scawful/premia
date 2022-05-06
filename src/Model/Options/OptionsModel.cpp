@@ -74,49 +74,66 @@ void
 OptionsModel::calculateGammaExposure() {
     for (const auto & eachOption : callOptionArray) {
         auto date = eachOption.datetime;
-        auto daysTilExpiry = stoi(date.substr(11,date.size()));
+        auto daysTilExpiry = boost::lexical_cast<int>(date.substr(11,date.size()));
         for (const auto & eachStrike : eachOption.strikePriceObj) {
             double strikeGammaExposure = 100;
             double gamma = boost::lexical_cast<double>(eachStrike.raw_option.at("gamma"));
             if (isnan(gamma)) {
-                naiveGammaExposure = callGammaAtExpiryArray.at(callGammaAtExpiryArray.size() - 1);
-            } else {
-                strikeGammaExposure *= gamma;
-                strikeGammaExposure *= boost::lexical_cast<double>(eachStrike.raw_option.at("openInterest"));
-                naiveGammaExposure += strikeGammaExposure;
+                gamma = 0.0;
             }
+            strikeGammaExposure *= gamma;
+            strikeGammaExposure *= boost::lexical_cast<double>(eachStrike.raw_option.at("openInterest"));
+            naiveGammaExposure += strikeGammaExposure;
             callGammaAtExpiryArray.push_back(naiveGammaExposure);
             gammaAtExpiryArray.push_back(naiveGammaExposure);
             vegaExposureArray.push_back(boost::lexical_cast<double>(eachStrike.raw_option.at("vega")));
 
             // vanna 
-            // double stockPrice = stod(optionChainData.getUnderlyingDataVariable("lastPrice"));
-            // double volatility = stod(optionChainData.getUnderlyingDataVariable("volatility"));
-            // double strikePrice = stod(eachStrike.strikePrice);
-            // double vannaPartOne = (log(stockPrice / strikePrice) + (volatility / 2) * daysTilExpiry) / (volatility * sqrt(daysTilExpiry));
-            // double vannaPartTwo = pow(M_E, (-((pow(vannaPartOne, 2)/2)))) * (1/2 * M_1_PI);
-            // double vannaPartThree = sqrt(daysTilExpiry) * vannaPartTwo * (1 - vannaPartTwo);
-            // naiveVannaExposureArray.push_back(vannaPartThree);
+            double high = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("highPrice"));
+            double low = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("lowPrice"));
+            double stockPrice = (high + low) / 2;
+            std::cout << stockPrice << std::endl;
+            double volatility =  boost::lexical_cast<double>(eachStrike.raw_option.at("volatility"));
+            std::cout << volatility << std::endl;
+            double strikePrice = boost::lexical_cast<double>(eachStrike.strikePrice);
+            std::cout << strikePrice << std::endl;
+            double vannaPartOne = (log(stockPrice / strikePrice) + (volatility / 2) * daysTilExpiry) / (volatility * sqrt(daysTilExpiry));
+            std::cout << vannaPartOne << std::endl;
+            double vannaPartTwo = exp(-((pow(vannaPartOne, 2)/2))) * (1/2 * M_1_PI);
+            std::cout << vannaPartTwo << std::endl;
+            double vannaPartThree = sqrt(daysTilExpiry) * vannaPartTwo * (1 - vannaPartTwo);
+            std::cout << vannaPartThree << std::endl;
+            naiveVannaExposureArray.push_back(vannaPartThree);
             // callVannaExposureArray.push_back(vannaPartThree); 
         }
     }
 
     for (const auto & eachOption : putOptionArray) {
         int i = 0;
+        auto date = eachOption.datetime;
+        auto daysTilExpiry = boost::lexical_cast<int>(date.substr(11,date.size()));
         for (const auto & eachStrike : eachOption.strikePriceObj) {
             double strikeGammaExposure = -100;
             double gamma = boost::lexical_cast<double>(eachStrike.raw_option.at("gamma"));
             if (isnan(gamma)) {
-                naiveGammaExposure = putGammaAtExpiryArray.at(putGammaAtExpiryArray.size() - 1);
-            } else {
-                strikeGammaExposure *= gamma;
-                strikeGammaExposure *= boost::lexical_cast<double>(eachStrike.raw_option.at("openInterest"));
-                naiveGammaExposure += strikeGammaExposure;
+                gamma = 0.0;
             }
+            strikeGammaExposure *= gamma;
+            strikeGammaExposure *= boost::lexical_cast<double>(eachStrike.raw_option.at("openInterest"));
+            naiveGammaExposure += strikeGammaExposure;
             putGammaAtExpiryArray.push_back(naiveGammaExposure);
             gammaAtExpiryArray[i] += naiveGammaExposure;
             double vol = boost::lexical_cast<double>(eachStrike.raw_option.at("vega"));
             vegaExposureArray[i] = (vol + vegaExposureArray[i]) / 2;
+            double high = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("highPrice"));
+            double low = boost::lexical_cast<double>(optionChainData.getUnderlyingDataVariable("lowPrice"));
+            double stockPrice = (high + low) / 2;
+            double volatility =  boost::lexical_cast<double>(eachStrike.raw_option.at("volatility"));
+            double strikePrice = boost::lexical_cast<double>(eachStrike.strikePrice);
+            double vannaPartOne = (log(stockPrice / strikePrice) + (volatility / 2) * daysTilExpiry) / (volatility * sqrt(daysTilExpiry));
+            double vannaPartTwo = pow(M_E, (-((pow(vannaPartOne, 2)/2)))) * (1/2 * M_1_PI);
+            double vannaPartThree = sqrt(daysTilExpiry) * vannaPartTwo * (1 - vannaPartTwo);
+            naiveVannaExposureArray[i] += vannaPartThree;
             i++;
         }
     }

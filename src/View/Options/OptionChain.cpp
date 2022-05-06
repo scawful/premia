@@ -158,98 +158,89 @@ void OptionChainView::drawChain()
 }
 
 void OptionChainView::drawUnderlying() {
-    if (ImGui::BeginTable("UnderlyingTable", 2, ImGuiTableFlags_NoBordersInBody)) {
-        ImGui::TableSetupColumn("##optionsdata", ImGuiTableColumnFlags_WidthFixed);
-        ImGui::TableSetupColumn("##quickchart", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableNextColumn(); 
-        if (ImGui::TreeNode("Underlying")) {
-            ImGui::Text( "%s | %s (%s)", model.getOptionChainData().getUnderlyingDataVariable("description").c_str(), 
-                                    model.getOptionChainData().getOptionChainDataVariable("symbol").c_str(), 
-                                    model.getOptionChainData().getUnderlyingDataVariable("markPercentChange").c_str());
-            ImGui::Text("Bid: %s | Ask: %s", model.getOptionChainData().getUnderlyingDataVariable("bid").c_str(), model.getOptionChainData().getUnderlyingDataVariable("ask").c_str());
-            ImGui::Text("Open: %s | Close: %s", model.getOptionChainData().getUnderlyingDataVariable("openPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("close").c_str());
-            ImGui::Text("High: %s | Low: %s", model.getOptionChainData().getUnderlyingDataVariable("highPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("lowPrice").c_str());
-            ImGui::Text("Total Volume: %s", model.getOptionChainData().getUnderlyingDataVariable("totalVolume").c_str());
-            ImGui::Text("Exchange: %s", model.getOptionChainData().getUnderlyingDataVariable("exchangeName").c_str());
-            ImGui::TreePop();
-        }
-        ImGui::Separator();
-        if (ImGui::TreeNode("Chain Analytics")) {
-            ImGui::Text("Implied Volatility: %s", model.getOptionChainData().getOptionChainDataVariable("volatility").c_str());
-            ImGui::Text("Naive Gamma Exposure: $%.2f", model.getGammaExposure());
-            ImGui::Text("Skew-Adjusted Gamma Exposure: N/A");
-            ImGui::Text("GEX Flip Point: N/A");
-            ImGui::Text("Distance to Flip: N/A");
-            ImGui::TreePop();
-        }
-        ImGui::TableNextColumn();
-
-        ImGuiStyle& style = ImGui::GetStyle();
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
-
-        if (ImPlot::BeginSubplots("##priceHistoryChart", 2, 2, ImVec2(-1,275.f), ImPlotSubplotFlags_LinkAllX)) {
-            auto size = model.getDatetimeEpochArray().size();
-            auto func = [](void * data, int idx) -> ImPlotPoint {
-                GEXEpochPair* dataPair = (GEXEpochPair*) data;
-                double* epochArray = dataPair->epochArray;
-                double* gammaArray = dataPair->gammaArray;
-                return ImPlotPoint(epochArray[idx], gammaArray[idx]);
-            }; 
-
-            ImPlot::GetStyle().UseLocalTime = true;
-            if (ImPlot::BeginPlot("Total GEX", ImVec2(-1, -1))) {
-                ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
-                ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
-                ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-                GEXEpochPair dataPairing(model.getDatetimeEpochArray().data(), model.getGammaAtExpiryList().data());
-                ImPlot::PlotLineG("##totalGex", func, &dataPairing, size);
-                ImPlot::EndPlot();
-            }
-            if (ImPlot::BeginPlot("Call GEX", ImVec2(-1, -1))) {
-                ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
-                ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-                GEXEpochPair callGamma(model.getDatetimeEpochArray().data(), model.getCallGammaAtExpiryList().data());
-                ImPlot::PlotLineG("##call", func, &callGamma, size);
-                ImPlot::EndPlot();
-            }
-            if (ImPlot::BeginPlot("Put GEX", ImVec2(-1, -1))) {
-                ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
-                ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-                GEXEpochPair putGamma(model.getDatetimeEpochArray().data(), model.getPutGammaAtExpiryList().data());
-                ImPlot::PlotLineG("##put", func, &putGamma, size);
-                ImPlot::EndPlot();
-            }
-
-            if (ImPlot::BeginPlot("Vega Exposure", ImVec2(-1, -1))) {
-                ImPlot::SetupAxisFormat(ImAxis_Y1, "%.4f");
-                ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-                GEXEpochPair volPair(model.getDatetimeEpochArray().data(), model.getVegaExposureArray().data());
-                ImPlot::PlotLineG("##vega", func, &volPair, size);
-                ImPlot::EndPlot();
-            }
-
-            // if (ImPlot::BeginPlot("##vannaCall", ImVec2(-1, -1))) {
-            //     ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
-            //     ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-            //     GEXEpochPair callVanna(model.getDatetimeEpochArray().data(), model.getCallVannaExposureList().data());
-            //     ImPlot::PlotLineG("Call", func, &callVanna, size);
-            //     ImPlot::EndPlot();
-            // }
-            // if (ImPlot::BeginPlot("##vannaPut", ImVec2(-1, -1))) {
-            //     ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
-            //     ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
-            //     ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-            //     GEXEpochPair putVanna(model.getDatetimeEpochArray().data(), model.getPutVannaExposureList().data());
-            //     ImPlot::PlotLineG("Put", func, &putVanna, size);
-            //     ImPlot::EndPlot();
-            // }
-
-            ImPlot::EndSubplots();
-        }
-        ImGui::PopStyleVar(2);
-        ImGui::EndTable();
+    if (ImGui::TreeNode("Underlying")) {
+        ImGui::Text( "%s | %s (%s)", model.getOptionChainData().getUnderlyingDataVariable("description").c_str(), 
+                                model.getOptionChainData().getOptionChainDataVariable("symbol").c_str(), 
+                                model.getOptionChainData().getUnderlyingDataVariable("markPercentChange").c_str());
+        ImGui::Text("Bid: %s | Ask: %s", model.getOptionChainData().getUnderlyingDataVariable("bid").c_str(), model.getOptionChainData().getUnderlyingDataVariable("ask").c_str());
+        ImGui::Text("Open: %s | Close: %s", model.getOptionChainData().getUnderlyingDataVariable("openPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("close").c_str());
+        ImGui::Text("High: %s | Low: %s", model.getOptionChainData().getUnderlyingDataVariable("highPrice").c_str(), model.getOptionChainData().getUnderlyingDataVariable("lowPrice").c_str());
+        ImGui::Text("Total Volume: %s", model.getOptionChainData().getUnderlyingDataVariable("totalVolume").c_str());
+        ImGui::Text("Exchange: %s", model.getOptionChainData().getUnderlyingDataVariable("exchangeName").c_str());
+        ImGui::Text("Implied Volatility: %s", model.getOptionChainData().getOptionChainDataVariable("volatility").c_str());
+        ImGui::Text("Naive Gamma Exposure: $%.2f", model.getGammaExposure());
+        ImGui::Text("Skew-Adjusted Gamma Exposure: N/A");
+        ImGui::Text("GEX Flip Point: N/A");
+        ImGui::Text("Distance to Flip: N/A");
+        ImGui::TreePop();
     }
+    ImGui::Separator();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
+
+    if (ImPlot::BeginSubplots("##priceHistoryChart", 2, 3, ImVec2(-1,275.f), ImPlotSubplotFlags_LinkAllX)) {
+        auto size = model.getDatetimeEpochArray().size();
+        auto func = [](void * data, int idx) -> ImPlotPoint {
+            GEXEpochPair* dataPair = (GEXEpochPair*) data;
+            double* epochArray = dataPair->epochArray;
+            double* gammaArray = dataPair->gammaArray;
+            return ImPlotPoint(epochArray[idx], gammaArray[idx]);
+        }; 
+
+        ImPlot::GetStyle().UseLocalTime = true;
+        if (ImPlot::BeginPlot("Total GEX", ImVec2(-1, -1))) {
+            ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
+            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+            GEXEpochPair dataPairing(model.getDatetimeEpochArray().data(), model.getGammaAtExpiryList().data());
+            ImPlot::PlotLineG("##totalGex", func, &dataPairing, size);
+            ImPlot::EndPlot();
+        }
+        if (ImPlot::BeginPlot("Call GEX", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
+            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+            GEXEpochPair callGamma(model.getDatetimeEpochArray().data(), model.getCallGammaAtExpiryList().data());
+            ImPlot::PlotLineG("##call", func, &callGamma, size);
+            ImPlot::EndPlot();
+        }
+        if (ImPlot::BeginPlot("Put GEX", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
+            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+            GEXEpochPair putGamma(model.getDatetimeEpochArray().data(), model.getPutGammaAtExpiryList().data());
+            ImPlot::PlotLineG("##put", func, &putGamma, size);
+            ImPlot::EndPlot();
+        }
+
+        if (ImPlot::BeginPlot("Vega Exposure", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "%.4f");
+            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+            GEXEpochPair volPair(model.getDatetimeEpochArray().data(), model.getVegaExposureArray().data());
+            ImPlot::PlotLineG("##vega", func, &volPair, size);
+            ImPlot::EndPlot();
+        }
+
+        if (ImPlot::BeginPlot("Vanna", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
+            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+            GEXEpochPair vannaPair(model.getDatetimeEpochArray().data(), model.getNaiveVannaExposureList().data());
+            ImPlot::PlotLineG("##vanna", func, &vannaPair, size);
+            ImPlot::EndPlot();
+        }
+
+        // if (ImPlot::BeginPlot("##vannaPut", ImVec2(-1, -1))) {
+        //     ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
+        //     ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
+        //     ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+        //     GEXEpochPair putVanna(model.getDatetimeEpochArray().data(), model.getPutVannaExposureList().data());
+        //     ImPlot::PlotLineG("Put", func, &putVanna, size);
+        //     ImPlot::EndPlot();
+        // }
+
+        ImPlot::EndSubplots();
+    }
+    ImGui::PopStyleVar(2);
     ImGui::Separator();
 }
 
