@@ -114,16 +114,37 @@ CandleChart::drawCandleChart()
     }
 
     ImPlot::GetStyle().UseLocalTime = true;
-    if (ImPlot::BeginPlot(quoteDetails.c_str(), ImGui::GetContentRegionAvail(),0))  {
-        ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
-        ImPlot::SetupAxes("Date","Price", ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit);
-        
-        if (model->isActive()) {
-            ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(model->getQuote().getQuoteVariable("52WkLow")), 
-                                           boost::lexical_cast<double>(model->getQuote().getQuoteVariable("52WkHigh")));
-            drawCandles(0.25, model->getNumCandles(), bullCol, bearCol, tooltip);
+
+    if (ImPlot::BeginSubplots("##priceHistoryChart", 2, 1, ImVec2(-1,-1), ImPlotSubplotFlags_LinkAllX)) {
+
+        if (ImPlot::BeginPlot(quoteDetails.c_str(), ImVec2(-1,-1),0))  {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
+            ImPlot::SetupAxes("Date","Price", ImPlotAxisFlags_Time,ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit);
+            
+            if (model->isActive()) {
+                ImPlot::SetupAxesLimits(0,100, boost::lexical_cast<double>(model->getQuote().getQuoteVariable("52WkLow")), 
+                                               boost::lexical_cast<double>(model->getQuote().getQuoteVariable("52WkHigh")));
+                drawCandles(0.25, model->getNumCandles(), bullCol, bearCol, tooltip);
+            }
+            ImPlot::EndPlot();
         }
-        ImPlot::EndPlot();
+
+        if (ImPlot::BeginPlot("##volume", ImVec2(-1, 200.f))) {
+            ImPlot::SetupAxes("Date", "Volume", ImPlotAxisFlags_Time | ImPlotAxisFlags_NoLabel, ImPlotAxisFlags_NoLabel | 
+                                                                                                ImPlotAxisFlags_AutoFit | 
+                                                                                                ImPlotAxisFlags_RangeFit);
+            ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
+            auto size = model->getVolumeVector().size();
+            // VolumeTimePair dataPairing(model->getVolumeVector().data(), model->getDates().data());
+            // auto func = [](void * data, int idx) -> ImPlotPoint {
+            //     VolumeTimePair* dataPair = (VolumeTimePair*) data;
+            //     return ImPlotPoint(dataPair->timeArray[idx], dataPair->volumeArray[idx]);
+            // }; 
+            ImPlot::PlotBars("Volume", model->getDates().data(), model->getVolumeVector().data(), size, 0.5f);
+            ImPlot::EndPlot();
+        }
+
+        ImPlot::EndSubplots();
     }
 }
 

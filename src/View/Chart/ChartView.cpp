@@ -8,8 +8,6 @@ ChartView::initChart()
         this->currentChart = "CANDLESTICK";
         this->charts["CANDLESTICK"] = std::make_shared<CandleChart>();
         this->charts["CANDLESTICK"]->importModel(model);
-        this->indicators["VOLUME"] = std::make_shared<Volume>();
-        this->indicators["VOLUME"]->importData(model->getVolumeVector());
     } else if (chartType == halext::ChartType::LINEPLOT) {
         this->currentChart = "LINEPLOT";
         //this->charts["currentChart"] = std::make_unique<LinePlotChart>();
@@ -63,5 +61,4 @@ ChartView::update() {
     }
     drawChartSettings();
     charts.at(currentChart)->update();
-    indicators["VOLUME"]->update();
 }

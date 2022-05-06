@@ -9,7 +9,6 @@ class CandleChart: public Chart
 private:
     String tickerSymbol;
     String quoteDetails;
-    //ChartModel model;
     std::shared_ptr<ChartModel> model;
 
     int binary_search(const ArrayList<double> arr, int l, int r, double x);
