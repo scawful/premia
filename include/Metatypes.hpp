@@ -1,7 +1,9 @@
 #ifndef Metatype_hpp
 #define Metatype_hpp
+#define _USE_MATH_DEFINES
 
 #include <iostream>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <tuple>
@@ -111,6 +113,5 @@ class never_thrown_exception {};
 #define Try          try_catch_finally([&](){ try
 #define finally      catch(never_thrown_exception){throw;} },[&]()
 #define Proceed      ) 
-
 
 #endif
