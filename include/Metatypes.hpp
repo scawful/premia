@@ -112,6 +112,34 @@ class never_thrown_exception {};
 
 #define Try          try_catch_finally([&](){ try
 #define finally      catch(never_thrown_exception){throw;} },[&]()
-#define Proceed      ) 
+#define proceed      ) 
+
+class Destruction 
+    : public std::exception {};
+
+template <typename C, typename I, typename D>
+inline auto cons_ins_des(const C &c, const I &i, const D &d)
+    noexcept(false)
+    -> void {
+    static once_flag once;
+    try {
+        std::call_once(once, [c] () { 
+            c(); 
+        });
+        
+        i();
+    } catch (const Destruction & e) {
+        d();
+    }
+}
+
+#define Construct   cons_ins_des([&]()
+#define Instruct    ,[&]()
+#define Destruct    ,[&]()
+
+#define canDestroy  catch (const Premia::FatalException & e) { \
+                        std::cout << e.what() << std::endl; \
+                        throw Destruction(); \
+                    } \
 
 #endif
