@@ -49,7 +49,7 @@ Alternatively, you can create an apikey.txt and place it in the assets/ folder w
 Screenshots
 --------
 ![image](https://user-images.githubusercontent.com/47263509/167268560-f56c5394-9b8e-4a10-adb2-d6e03f1c3516.png)
-![image](https://user-images.githubusercontent.com/47263509/167268567-6250ee97-dc53-4f76-ad97-a16d94a23405.png)
+![image](https://user-images.githubusercontent.com/47263509/167268589-1dfc254c-91cd-4106-b7cc-1684eec7b9f6.png)
 
 <!-- ![image](https://user-images.githubusercontent.com/47263509/166610671-b83f32a4-bf72-46ef-a86b-17f7af3cc56b.png) -->
 <!-- ![](https://i.ibb.co/99SsWWb/Screen-Shot-2022-03-06-at-3-46-48-PM.png)
