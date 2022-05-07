@@ -74,21 +74,23 @@ void WatchlistView::addEvent(CRString key, const EventHandler & event)
 
 void WatchlistView::update() 
 {
-    if (!model.isActive() && !isInit) {
+    Construct { // runs once 
         model.addLogger(this->logger);
-        try {
+        Try {
             model.initWatchlist();
             isLoggedIn = true;
-        } catch (Premia::NotLoggedInException) {
-            logger("User not logged in, loading empty watchlist pane");
-        } 
-        isInit = true;
-    }
-    
-    if (isLoggedIn) {
-        drawWatchlistTable();
-    } else {
-        ImGui::Text("empty watchlist pane goes here");
-    }
-
+        } catch (Premia::NotLoggedInException) {       // non-fatal exceptions can log and continue 
+            logger("[Watchlist] User not logged in!");
+        } canDestroy finally {
+            isInit = true;
+        } proceed;
+    } Instruct { // runs each frame 
+        if (isLoggedIn) {
+            drawWatchlistTable();
+        } else {
+            ImGui::Text("empty watchlist pane goes here");
+        }
+    } Destruct { // runs on throw Destruction, can be used for errors and memory managment 
+        // cleanup 
+    } proceed;
 }
