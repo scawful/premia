@@ -2,6 +2,7 @@
 #define ConsoleView_hpp
 
 #include "Virtual/View.hpp"
+#include "Interface/TDA.hpp"
 
 class ConsoleView : public View
 {

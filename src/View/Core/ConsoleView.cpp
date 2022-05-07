@@ -76,6 +76,7 @@ void ConsoleView::executeCommand(const char* command_line)
     }
     else if (Stricmp(command_line, "SESSION") == 0) {
         addLog("Starting WebSocket session...");
+        tda::TDA::getInstance().startSession();
     }
     else {
         addLog("Unknown command: '%s'\n", command_line);
@@ -199,8 +200,7 @@ void ConsoleView::drawScreen()
    const ImGuiIO & io = ImGui::GetIO();
 
     ImGui::BeginChild("ScrollingRegion", ImVec2(0, -(ImGui::GetContentRegionAvail().y*0.25f)), false, ImGuiWindowFlags_HorizontalScrollbar);
-    if (ImGui::BeginPopupContextWindow())
-    {
+    if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::Selectable("Clear")) clearLog();
         ImGui::EndPopup();
     }

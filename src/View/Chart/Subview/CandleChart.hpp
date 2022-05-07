@@ -16,7 +16,7 @@ private:
     void drawCandleChart();
 
 public:
-    void importModel(std::shared_ptr<ChartModel> newModel);
+    void importModel(std::shared_ptr<ChartModel> newModel) override;
     void fetchData(CRString ticker, tda::PeriodType ptype, int period_amt, tda::FrequencyType ftype, int freq_amt, bool ext) override;
     void update() override;
 

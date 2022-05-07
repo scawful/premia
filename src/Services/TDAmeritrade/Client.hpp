@@ -76,11 +76,13 @@ namespace tda
 
         // API Data 
         Parser parser;
+        StringMap account_data;
         UserPrincipals user_principals;
         json::ptree _user_principals;
 
         // WebSocket session variables 
         net::io_context ioc;
+        boost::asio::thread_pool ioc_pool;
         std::shared_ptr<tda::Socket> websocket_session;
         std::shared_ptr<ArrayList<String>> websocket_buffer;
         ArrayList<std::shared_ptr<String const>> request_queue;
@@ -129,9 +131,6 @@ namespace tda
         void start_session(String const & ticker, String const & fields);
         void send_session_request(String const & request) const;
         void send_logout_request();
-        void send_interrupt_signal() const;
-        bool is_session_logged_in() const;
-        ArrayList<String> get_session_responses() const;
         String get_access_token() const;
         void fetch_access_token();
 
