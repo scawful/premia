@@ -21,13 +21,21 @@ Client::create_login_request()
     json::ptree requests;
     json::ptree parameters;
 
-    StringMap account_data;
-    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-        for (const auto& [key, value] : (json::ptree) v.second) {
-            account_data[key] = value.get_value<String>();
+    for (const auto & [key, value] : _user_principals) {
+        if (key == "accounts") {
+            for (const auto & [key2, val2] : value) {
+                account_data[key2] = val2.get_value<String>();
+            }
+            break;
         }
-        break;
     }
+
+    // BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+    //     for (const auto& [key, value] : (json::ptree) v.second) {
+    //         account_data[key] = value.get_value<String>();
+    //     }
+    //     break;
+    // }
 
     requests.put("service", "ADMIN");
     requests.put("requestid", 1);
@@ -98,13 +106,13 @@ Client::create_logout_request()
     json::ptree requests;
     json::ptree parameters;
 
-    StringMap account_data;
-    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-        for (const auto & [key,value] : (json::ptree) v.second) {
-            account_data[key] = value.get_value<String>();
-        }
-        break;
-    }
+    // StringMap account_data;
+    // BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+    //     for (const auto & [key,value] : (json::ptree) v.second) {
+    //         account_data[key] = value.get_value<String>();
+    //     }
+    //     break;
+    // }
 
     requests.put("service", "ADMIN");
     requests.put("requestid", 1);
@@ -131,13 +139,13 @@ Client::create_service_request(ServiceType serv_type, String const & keys, Strin
     json::ptree parameters;
 
     // gets first account by default, maybe change later
-    StringMap account_data;
-    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-        for (const auto & [key,value] : (json::ptree) v.second) {
-            account_data[key] = value.get_value<String>();
-        }
-        break;
-    }
+    // StringMap account_data;
+    // BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+    //     for (const auto & [key,value] : (json::ptree) v.second) {
+    //         account_data[key] = value.get_value<String>();
+    //     }
+    //     break;
+    // }
 
     requests.put("service", EnumAPIServiceName[serv_type]);
     requests.put("requestid", 1);
@@ -226,7 +234,6 @@ Client::post_account_order(String const &account_id) const
     String endpoint = "https://api.tdameritrade.com/v1/accounts/{account_id}/orders";
     Utils::string_replace(endpoint, "{account_id}", account_id);
 
-    curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
     // set the url to receive the POST
     curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
@@ -285,7 +292,6 @@ String Client::post_access_token() const
     CURLcode res;
     String response;
 
-    curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
     // set the url to receive the POST
     curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
@@ -572,8 +578,9 @@ Client::post_order(CRString account_id, const tda::Order & order) const
  * 
  */
 void 
-Client::start_session() 
-{
+Client::start_session() {
+
+    get_user_principals();
     String host;
     String port = "443";
     try {
@@ -610,19 +617,15 @@ Client::start_session()
     request_queue.push_back(std::make_shared<String const>(logout_text));
 
     boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
-
-    websocket_session = std::make_shared<tda::Socket>(ioc, context, request_queue);
-    websocket_session->run(host.c_str(), port.c_str());
+    websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context);
+    websocket_session->open(host.c_str(), port.c_str());
     session_active = true;
-
-    boost::asio::thread_pool sessionPool(5);
-    boost::asio::post(sessionPool, boost::bind(&boost::asio::io_context::run, &ioc));
-
-    //std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
-    //session_thread.detach();
-
+    
     // send an initial message to get price data from AAPL
-    websocket_session->send_message( std::make_shared<String const>(chart_equity_text) );
+    websocket_session->write(login_text);
+    websocket_session->write(chart_equity_text);
+
+    ioc_pool.join();
 }
 
 /**
@@ -658,13 +661,12 @@ Client::start_session(String const & ticker, String const & fields)
 
     boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
 
-    websocket_session = std::make_shared<tda::Socket>(ioc, context, request_queue);
-    websocket_session->run(host.c_str(), port.c_str());
-
+    websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context);
+    websocket_session->open(host.c_str(), port.c_str());
     session_active = true;
 
-    std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
-    session_thread.detach();
+    // std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
+    // session_thread.detach();
 }
 
 /**
@@ -674,8 +676,8 @@ Client::start_session(String const & ticker, String const & fields)
  * @param request 
  */
 void 
-Client::send_session_request(String const & request) const {
-    websocket_session->send_message(std::make_shared<String const>(request));
+Client::send_session_request(CRString request) const {
+    websocket_session->write(request);
 }
 
 /**
@@ -685,48 +687,12 @@ Client::send_session_request(String const & request) const {
  */
 void 
 Client::send_logout_request() {
-    websocket_session->interrupt();
+    websocket_session->close();
     pt::ptree logout_request = create_logout_request();
     std::stringstream logout_text_stream;
     pt::write_json(logout_text_stream, logout_request);
     String logout_text = logout_text_stream.str();
-    websocket_session->send_message(std::make_shared<String const>(logout_text));
-}
-
-/**
- * @brief Send an interrupt signal to the current WebSocket session
- * @author @scawful 
- * 
- */
-void 
-Client::send_interrupt_signal() const {
-    websocket_session->interrupt();
-}
-
-/**
- * @brief Check if user is logged into the current WebSocket session
- * @author @scawful
- * 
- * @return true 
- * @return false 
- */
-bool 
-Client::is_session_logged_in() const {
-    if (session_active)
-        return websocket_session->is_logged_in();
-    else
-        return false;
-}
-
-/**
- * @brief Get a list of all the responses logged in the WebSocket session
- * @author @scawful
- * 
- * @return ArrayList<String> 
- */
-ArrayList<String> 
-Client::get_session_responses() const {
-    return websocket_session->receive_response();
+    websocket_session->write(logout_text);
 }
 
 /**

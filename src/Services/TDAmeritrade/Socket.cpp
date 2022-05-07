@@ -12,19 +12,22 @@ using tcp = boost::asio::ip::tcp;
 namespace tda
 {
     void 
-    Socket::fail(beast::error_code ec, char const* what) const
-    {
-        if(ec == net::error::operation_aborted || ec == websocket::error::closed)
+    Socket::fail(beast::error_code ec, char const* what) const {
+        if (ec == net::error::operation_aborted || ec == websocket::error::closed)
             return;
         
         SDL_Log("Socket::fail( %s: %s )", ec.message().c_str(), what);
     }
 
+    bool 
+    Socket::io_in_progress() const { 
+        return _io_in_progress; 
+    }
+
     void 
-    Socket::run( char const* host, char const* port )
-    {
+    Socket::open(char const* host, char const* port) {
         _host = host;
-        _queue_size = _queue.size();
+        _port = port;
 
         SDL_Log("Socket::run( host: %s ) ", _host.c_str() );
 
@@ -35,8 +38,7 @@ namespace tda
     }
 
     void 
-    Socket::on_resolve( beast::error_code ec, tcp::resolver::results_type results )
-    {
+    Socket::on_resolve(beast::error_code ec, tcp::resolver::results_type results) {
         if (ec)
             return fail(ec, "resolve");
 
@@ -126,48 +128,39 @@ namespace tda
         if(ec)
             return fail(ec, "handshake");
 
-        SDL_Log("Socket::on_handshake");
-
-        // Send the message
-        _ws.async_write(
-            net::buffer( *_queue.front() ),
-            beast::bind_front_handler(
-                &Socket::on_write,
-                shared_from_this()));
+        SDL_Log("Socket::on_handshake: success!");
     }
 
-    void
-    Socket::on_write(beast::error_code ec, std::size_t bytes_transferred)
+    /**
+     * @brief Write/Read Sequence 
+     * 
+     * @param s 
+     */
+    void 
+    Socket::write(CRString request)
     {
-        boost::ignore_unused(bytes_transferred);
+        SDL_Log("Socket::send_message");
+        _io_in_progress = true;
+
+        _ws.async_write(
+            net::buffer(request),
+                beast::bind_front_handler(
+                    &Socket::on_write,
+                    shared_from_this()));
+    }
+
+    
+    void
+    Socket::on_write(beast::error_code ec, std::size_t bytes) {
+        boost::ignore_unused(bytes);
 
         if (ec)
             return fail(ec, "write");
 
         SDL_Log("Socket::on_write");
-
-        if (_logged_in) {
-            // clear request from the queue
-            _queue.erase( _queue.begin() );
-
-            if (!_queue.empty()) {
-                SDL_Log("Socket::on_write( Queue Not Empty )");
-            }
-            else
-            {
-                if (_interrupt == false) {
-                    SDL_Log( "Uninterrupted stream");
-                }
-                else {
-                    // logout
-                    SDL_Log("Socket::on_write( Logging out ) ");
-                    _logged_in = false;
-                }
-            }
-        }
-
-        _ws.async_read(
-            _buffer,
+        
+        // read a message into our buffer 
+        _ws.async_read(_buffer,
             beast::bind_front_handler(
                 &Socket::on_read,
                 shared_from_this()));
@@ -175,145 +168,42 @@ namespace tda
     }
 
     void
-    Socket::on_read(
-        beast::error_code ec,
-        std::size_t bytes_transferred)
-    {
-        boost::ignore_unused(bytes_transferred);
+    Socket::on_read(beast::error_code ec, std::size_t bytes) {
+        boost::ignore_unused(bytes);
 
         if (ec)
             return fail(ec, "read");
-
-        SDL_Log("Socket::on_read");
-        String response(net::buffer_cast<const char*>( _buffer.data()), _buffer.size()); 
-        SDL_Log("Server Response: %s", response.c_str() );
-        _response_stack.push_back( response );
-
-        // check login first
-        // originally checked the boolean but this had a weird logical byproduct on subsequent streams
-        // so now we check the queue size, first request is always login 
-        if ( _queue_size == _queue.size() ) {
-            on_login( ec );
-            _buffer.consume( _buffer.size() );
-        }
-        else if (!_notified) {
-            on_notify( ec );
-        }
-        else if (!_subscribed) {
-            on_subscription( ec );
-        }
-
-        if (_logged_in) {
-            if (_notified && !_subscribed) {
-                SDL_Log("Notified, but not subscribed!");
-                _ws.async_read(
-                    _buffer,
-                    beast::bind_front_handler(
-                        &Socket::on_read,
-                        shared_from_this()));
-            }
-            else if ( _subscribed && !_interrupt ) {
-                SDL_Log("Subscribed but not finished");
-                _sub_count++;
-                _ws.async_read(
-                    _buffer,
-                    beast::bind_front_handler(
-                        &Socket::on_read,
-                        shared_from_this()));
-            }
-            else {
-                _ws.async_write(
-                    net::buffer( *_queue.front() ),
-                    beast::bind_front_handler(
-                        &Socket::on_write,
-                        shared_from_this()));
-            }
-
-        }
-        else {
-            // Close the WebSocket connection
-            _ws.async_close(websocket::close_code::normal,
-                beast::bind_front_handler(
-                    &Socket::on_close,
-                    shared_from_this()));
-        }
-
-    }
-
-    void
-    Socket::on_close(beast::error_code ec)
-    {
-        if (ec)
-            return fail(ec, "close");
-
-        SDL_Log("Socket::on_close");
-
-        // If we get here then the connection is closed gracefully
-
-        // The make_printable() function helps print a ConstBufferSequence
+        
+        // handle the server response here 
+        SDL_Log("Socket::on_read: ");
         std::cout << beast::make_printable(_buffer.data()) << std::endl;
-    }
 
-    // sends a message to the queue from the main threads
-    void 
-    Socket::send_message(const std::shared_ptr<String const> & s)
-    {
-        SDL_Log("Socket::send_message");
-
-        _queue.push_back( s );
-
-        if (_queue.size() > 1) {
-            SDL_Log("Socket::send_message( Already Writing )");
-            return;
-        }
-
-        _ws.async_write(
-            net::buffer( *_queue.front() ),
-                beast::bind_front_handler(
-                    &Socket::on_write,
-                    shared_from_this()));
-    }
-
-    // returns the cumulative vector of responses from the server
-    ArrayList<String> 
-    Socket::receive_response() const
-    {
-        return _response_stack;
-    }
-
-    std::shared_ptr<ArrayList<String>> 
-    Socket::receive_response_ptr()
-    {
-        return std::make_shared<ArrayList<String>>(_response_stack);
+        // clear the buffer 
+        _buffer.consume(_buffer.size());
+        _ws.async_read(_buffer,
+            beast::bind_front_handler(
+                &Socket::on_read,
+                shared_from_this()));
     }
 
     bool 
-    Socket::on_login(beast::error_code ec)
-    {
+    Socket::on_login(beast::error_code ec) {
         String response_code;
-        String s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
-        SDL_Log("Login Response Stream: \n%s", s.c_str() );
+        // response_code = s[found + 6];
+        // SDL_Log("Code: %s", response_code.c_str() );
 
-        std::size_t found = s.find("code");
-        response_code = s[found + 6];
-        SDL_Log("Code: %s", response_code.c_str() );
+        // found = s.find("msg");
+        // String response_msg = s.substr(found, 4);
 
-        found = s.find("msg");
-        String response_msg = s.substr( found, 4 );
-
-        if ( response_code == "3" )
-        {
-            // login failed
-            _logged_in = false;
-        }
-        else if ( response_code == "0" )
-        {
-            // login success
-            _logged_in = true;
-        }
-
-        // clear request from stream 
-        _queue.erase( _queue.begin() );
+        // if ( response_code == "3" ) {
+        //     // login failed
+        //     _logged_in = false;
+        // }
+        // else if ( response_code == "0" )
+        // {
+        //     // login success
+        //     _logged_in = true;
+        // }
 
         return _logged_in;
     }
@@ -324,59 +214,29 @@ namespace tda
         // need a callback for this 
     }
 
-    void
-    Socket::on_notify(beast::error_code ec)
-    {
-        SDL_Log("Socket::on_notify");
-        String s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
-        std::size_t found = s.find("notify");
-
-        if (found != std::string::npos) {
-            _notified = true;
-            _buffer.consume( _buffer.size() );
-        }
-    }
-
-    void
-    Socket::on_subscription(beast::error_code ec)
-    {
-        SDL_Log("Socket::on_subscription");
-        String sub_code;
-        String s(net::buffer_cast<const char*>(_buffer.data()), _buffer.size());
-        std::size_t found = s.find("code");
-
-        if (found != std::string::npos) {
-            sub_code = s[found + 6];
-            SDL_Log("SUBS code %s", sub_code.c_str() );
-            if (sub_code == "0") {
-                _subscribed = true;
-            }
-            _buffer.consume(_buffer.size());
-        }
-    }
-
     void 
-    Socket::interrupt()
-    {
-        _interrupt = true;
+    Socket::close() {
+        _io_in_progress = true;
+        _ws.async_close(websocket::close_code::normal, beast::bind_front_handler(&Socket::on_close, shared_from_this()));
     }
 
-    void 
-    Socket::clear_buffer()
+    /**
+     * @brief Closing the WebSocket Stream 
+     * 
+     * @param ec 
+     */
+    void
+    Socket::on_close(beast::error_code ec)
     {
-        _buffer.clear();
-    }
+        _io_in_progress = false;
 
-    bool
-    Socket::is_logged_in() const
-    {
-        return _logged_in;
-    }
+        if (ec)
+            return fail(ec, "close");
 
-    bool
-    Socket::is_subscribed() const
-    {
-        return _subscribed;
-    }
+        SDL_Log("Socket::on_close: ");
 
+        // If we get here then the connection is closed gracefully
+        // The make_printable() function helps print a ConstBufferSequence
+        std::cout << beast::make_printable(_buffer.data()) << std::endl;
+    }
 }

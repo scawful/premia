@@ -6,12 +6,20 @@
 
 namespace halext 
 {
+    enum class 
+    ChartType {
+        LINEPLOT,
+        CANDLESTICK
+    }; 
+
     class HLXT {
     private:
         HLXT() { }
         Client client;
         User currentUser;
         bool privateBalance = false;
+
+        ChartType selectedChart;
 
     public:
         HLXT(HLXT const&)            = delete;
@@ -34,6 +42,16 @@ namespace halext
         auto getPrivateBalance()
             -> bool {
             return privateBalance;
+        }
+
+        auto setSelectedChart(int i)
+            -> void {
+            selectedChart = ChartType(i);
+        }
+
+        auto getSelectedChart()
+            -> ChartType {
+            return selectedChart;
         }
 
     };

@@ -16,7 +16,7 @@ void WatchlistModel::initWatchlist()
     } finally {
         logger("[finally] : WatchlistModel");
     }
-    Proceed;
+    proceed;
     watchlists = tda::TDA::getInstance().getWatchlistsByAccount(account_num);
 
     for ( int i = 0; i < watchlists.size(); i++ ) {

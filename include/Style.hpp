@@ -12,16 +12,16 @@ namespace Style {
         ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
         ImVec4* colors = style->Colors;
 
-        style->WindowPadding.x = 11.0f;
-        style->WindowPadding.y = 15.0f;
-        style->FramePadding.x = 12.0f;
-        style->FramePadding.x = 2.0f;
-        style->CellPadding.x = 6.0f;
+        style->WindowPadding.x = 5.0f;
+        style->WindowPadding.y = 10.0f;
+        style->FramePadding.x = 5.0f;
+        style->FramePadding.y = 5.0f;
+        style->CellPadding.x = 5.0f;
         style->CellPadding.y = 5.0f;
-        style->ItemSpacing.x = 18.f;
-        style->ItemSpacing.y = 5.0f;
+        style->ItemSpacing.x = 15.f;
+        style->ItemSpacing.y = 10.0f;
         style->ItemInnerSpacing.x = 8.0f;
-        style->TouchExtraPadding.x = 0.0f;
+        style->TouchExtraPadding.x = 4.0f;
         style->IndentSpacing = 0.0f;
         style->ScrollbarSize = 13.0f;
         style->GrabMinSize = 11.0f;
@@ -34,13 +34,13 @@ namespace Style {
         style->TabBorderSize = 1;
 
         // rounding
-        style->WindowRounding = 7;
+        style->WindowRounding = 0;
         style->ChildRounding = 0;
         style->FrameRounding = 10;
         style->PopupRounding = 0;
-        style->ScrollbarRounding = 11;
+        style->ScrollbarRounding = 6;
         style->GrabRounding = 6;
-        style->LogSliderDeadzone = 4;
+        style->LogSliderDeadzone = 5;
         style->TabRounding = 4;
 
         // alignment

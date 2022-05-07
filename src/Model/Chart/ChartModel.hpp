@@ -3,8 +3,8 @@
 
 #include "../Model.hpp"
 
-class ChartModel: public Model
-{
+class ChartModel 
+    : public Model {
 private:
     bool active = false;
     String tickerSymbol;

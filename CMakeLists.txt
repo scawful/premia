@@ -80,6 +80,7 @@ add_executable(
     src/View/Chart/ChartView.cpp
     src/View/Chart/Subview/CandleChart.cpp
     src/View/Chart/Subview/LinePlotChart.cpp
+    src/View/Chart/Indicators/Indicators.cpp
     # Controller 
     src/Controller/Controller.cpp    
     # Services 
