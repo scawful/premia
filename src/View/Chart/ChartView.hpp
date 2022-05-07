@@ -28,6 +28,7 @@ private:
     ConsoleLogger logger;
 
     void initChart();
+    void drawChart();
     void drawChartSettings();
 
 public:

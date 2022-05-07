@@ -15,6 +15,11 @@ ChartView::initChart()
     isInit = true;
 }
 
+void 
+ChartView::drawChart() {
+    charts.at(currentChart)->update();
+}
+
 void
 ChartView::drawChartSettings()
 {
@@ -56,9 +61,14 @@ ChartView::addEvent(CRString key, const EventHandler & event) {
 
 void 
 ChartView::update() {
-    if (!isInit) {
+    Construct {
+        logger("[ChartView] Instruct");
         initChart();
-    }
-    drawChartSettings();
-    charts.at(currentChart)->update();
+    } Instruct {
+        drawChartSettings();
+        drawChart();
+    } Destruct {
+        logger("[ChartView] Destruct");
+        // cleanup 
+    } proceed;
 }

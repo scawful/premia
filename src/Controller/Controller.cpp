@@ -145,7 +145,6 @@ Controller::initEvents()
         io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn(); 
-        viewManager.transferEvents();
     });
     
     viewManager.addEventHandler("goHome", [this] () -> void { viewManager.setCurrentView(std::make_shared<PrimaryView>()); });

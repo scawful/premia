@@ -83,7 +83,7 @@ void AccountView::initPositions()
         throw Premia::NotLoggedInException();
     } finally {
         logger("[finally] : AccountView init");
-    } Proceed;
+    } proceed;
     account_ids_std = tda::TDA::getInstance().getAllAcountNumbers();
     int i = 0;
     for (String const& each_id : account_ids_std) {
@@ -303,7 +303,7 @@ void AccountView::update()
             logger("User not logged in, loading empty account pane");
         } finally {
             isInit = true;
-        } Proceed;
+        } proceed;
     } else {
         if (isLoggedIn) {
             drawAccountPane();

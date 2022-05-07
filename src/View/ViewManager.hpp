@@ -11,8 +11,8 @@
 #include "Options/OptionChain.hpp"
 #include "Account/AccountView.hpp"
 
-class ViewManager
-{
+class ViewManager {
+    using ViewMap = std::unordered_map<String, std::shared_ptr<View>>;
 private:
     // Local Variables 
     bool isLoggedIn = false;
@@ -27,7 +27,7 @@ private:
     std::shared_ptr<View> currentView;
     std::shared_ptr<View> rightColView;
 
-    std::unordered_map<String, std::shared_ptr<View>> viewMap;
+    ViewMap viewMap;
 
     std::shared_ptr<LoginView> loginView = std::make_shared<LoginView>();
     std::shared_ptr<AccountView> accountView = std::make_shared<AccountView>();
