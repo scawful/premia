@@ -130,6 +130,8 @@ namespace tda
         void start_session();
         void start_session(String const & ticker, String const & fields);
         void send_session_request(String const & request) const;
+        void send_login_request();
+        void send_basic_quote_request(String ticker);
         void send_logout_request();
         String get_access_token() const;
         void fetch_access_token();

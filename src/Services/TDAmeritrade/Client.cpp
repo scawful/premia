@@ -579,7 +579,6 @@ Client::post_order(CRString account_id, const tda::Order & order) const
  */
 void 
 Client::start_session() {
-
     get_user_principals();
     String host;
     String port = "443";
@@ -591,10 +590,6 @@ Client::start_session() {
 
     json::ptree login_request = create_login_request();
     json::ptree logout_request = create_logout_request();
-
-    // for testing
-    std::ifstream requests_json("requests_test.json", std::ios::out);
-    write_json("requests_test.json", login_request);
 
     std::stringstream login_text_stream;
     write_json(login_text_stream, login_request);
@@ -612,18 +607,14 @@ Client::start_session() {
     write_json(chart_request_stream, create_service_request(CHART_EQUITY, "AAPL", "0,1,2,3,4,5,6,7,8"));
     String chart_equity_text = chart_request_stream.str();
 
-    request_queue.push_back(std::make_shared<String const>(login_text));
-    request_queue.push_back(std::make_shared<String const>(request_text));
-    request_queue.push_back(std::make_shared<String const>(logout_text));
-
     boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
     websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context);
     websocket_session->open(host.c_str(), port.c_str());
     session_active = true;
     
     // send an initial message to get price data from AAPL
-    websocket_session->write(login_text);
-    websocket_session->write(chart_equity_text);
+    // websocket_session->write(login_text);
+    // websocket_session->write(chart_equity_text);
 
     ioc_pool.join();
 }
@@ -678,6 +669,24 @@ Client::start_session(String const & ticker, String const & fields)
 void 
 Client::send_session_request(CRString request) const {
     websocket_session->write(request);
+}
+
+void 
+Client::send_login_request() {
+    pt::ptree login_request = create_login_request();
+    std::stringstream login_text_stream;
+    pt::write_json(login_text_stream, login_request);
+    String login_text = login_text_stream.str();
+    websocket_session->write(login_text);
+}
+
+void 
+Client::send_basic_quote_request(String ticker)
+{
+    std::stringstream requests_text_stream;
+    write_json(requests_text_stream, create_service_request(QUOTE, ticker, "0,1,2,3,4,5,6,7,8"));
+    String request_text = requests_text_stream.str();
+    websocket_session->write(request_text);
 }
 
 /**

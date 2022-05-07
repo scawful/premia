@@ -109,6 +109,18 @@ namespace tda
         void startSession() {
             client.start_session();
         }
+
+        void sendSocketLogin() {
+            client.send_login_request();
+        }
+
+        void sendChartRequestToSocket(String ticker) {
+            client.send_basic_quote_request(ticker);
+        }
+
+        void sendSocketLogout() {
+            client.send_logout_request();
+        }
     };
 
 }
