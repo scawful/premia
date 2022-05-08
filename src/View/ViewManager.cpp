@@ -39,6 +39,7 @@ ViewManager::ViewManager() {
                                     consoleView, std::placeholders::_1);
     watchlistView->addLogger(consoleLogger);
     accountView->addLogger(consoleLogger);
+    consoleView->addLogger(consoleLogger); // you're be surprised, but this is necessary 
     menuView->addEvent("consoleView", [this] () -> void {
         consoleView->update();
     });

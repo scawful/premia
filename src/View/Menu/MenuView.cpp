@@ -5,8 +5,8 @@ void MenuView::drawFileMenu() const
     static bool show_console = false;
 
     if (show_console) {
-        ImGui::SetNextWindowSize(ImVec2(400,300), ImGuiCond_Appearing);
-        ImGui::Begin("Console", &show_console);
+        ImGui::SetNextWindowSize(ImVec2(500,300), ImGuiCond_Appearing);
+        ImGui::Begin("Console", &show_console, ImGuiWindowFlags_NoScrollbar);
         events.at("consoleView")();
         ImGui::End();
     }

@@ -106,8 +106,8 @@ namespace tda
             client.post_order(account_id, order);
         }
 
-        void startSession() {
-            client.start_session();
+        void startSession(ConsoleLogger logger) {
+            client.start_session(logger);
         }
 
         void sendSocketLogin() {
@@ -116,6 +116,10 @@ namespace tda
 
         void sendChartRequestToSocket(String ticker) {
             client.send_basic_quote_request(ticker);
+        }
+
+        void sendChartRequestToSocket(ConsoleLogger logger, String ticker) {
+            client.start_session(logger, ticker);
         }
 
         void sendSocketLogout() {
