@@ -27,16 +27,16 @@ find_package(CURL REQUIRED)
 
 # OpenSSL library ------------------------------------------------------------------------------------------------
 if(APPLE)
-    set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1m/include")
-    set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1m/lib/libcrypto.dylib")
-    set(OPENSSL_SSL_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1m/lib/libssl.dylib")
+    set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1n/include")
+    set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1n/lib/libcrypto.dylib")
+    set(OPENSSL_SSL_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1n/lib/libssl.dylib")
 endif()
 find_package(OpenSSL REQUIRED)
 if(OPENSSL_FOUND)
     if(APPLE)
-        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1m/include)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1m/lib/libssl.dylib)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1m/lib/libcrypto.dylib)
+        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1n/include)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1n/lib/libssl.dylib)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1n/lib/libcrypto.dylib)
         message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
     else()
         include_directories(${OPENSSL_INCLUDE_DIR})
@@ -90,6 +90,7 @@ add_executable(
     src/Services/IEXCloud/Parser.cpp
     src/Services/CoinbasePro/Account.cpp 
     src/Services/CoinbasePro/Client.cpp 
+    src/Services/CoinbasePro/Parser.cpp 
     src/Services/CoinbasePro/Product.cpp
     src/Services/TDAmeritrade/Parser.cpp
     src/Services/TDAmeritrade/Socket.cpp
@@ -124,7 +125,7 @@ target_link_libraries(
     ImGui 
     ImPlot
     curl
-    OpenSSL::SSL 
+    OpenSSL::SSL
 )
 
 if (WIN32) 
@@ -178,7 +179,7 @@ target_link_libraries(
   ${OPENGL_LIBRARIES}
 # ${FREDCPP_LIBRARY}
   curl 
-  OpenSSL::SSL 
+  OpenSSL::SSL
   gtest_main
   gtest
 )
