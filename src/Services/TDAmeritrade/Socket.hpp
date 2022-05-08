@@ -22,10 +22,13 @@ namespace tda
     private:
         String _host;
         String _port;
+        String _login_request;
+        String _service_request;
         bool _logged_in;
         bool _subscribed;
         bool _notified;
         bool _interrupt;
+        ConsoleLogger _logger;
         net::io_context _ioc;
         tcp::resolver _resolver;
         beast::multi_buffer _buffer;
@@ -38,28 +41,23 @@ namespace tda
 
     public:
         template <typename Executor>
-        explicit Socket(Executor executor, ssl::context & ctx)
-            : _resolver(executor) ,_ws(executor, ctx) { }
+        explicit Socket(Executor executor, ssl::context & ctx, ConsoleLogger logger, CRString login_request)
+            : _resolver(executor) ,_ws(executor, ctx), _logger(logger), _login_request(login_request) { }
 
 
         bool io_in_progress() const;
 
         // connect sequence 
-        void open( char const* host, char const* port );
+        void open( char const* host, char const* port);
         void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
         void on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type ep);
         void on_ssl_handshake(beast::error_code ec);
         void on_handshake(beast::error_code ec);
 
         // read/write sequence 
-        void write(CRString request);
+        void write(String request);
         void on_write(beast::error_code ec, std::size_t bytes);
         void on_read(beast::error_code ec, std::size_t bytes);
-
-        bool on_login(beast::error_code ec);
-        void on_logout(beast::error_code ec) const;
-        void on_notify(beast::error_code ec);
-        void on_subscription(beast::error_code ec);
 
         void close();
         void on_close(beast::error_code ec);

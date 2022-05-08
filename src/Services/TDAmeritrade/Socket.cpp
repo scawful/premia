@@ -16,7 +16,7 @@ namespace tda
         if (ec == net::error::operation_aborted || ec == websocket::error::closed)
             return;
         
-        SDL_Log("Socket::fail( %s: %s )", ec.message().c_str(), what);
+        _logger("WebSocket::fail(error: " + ec.message() + ", what: " + what + ")");
     }
 
     bool 
@@ -29,7 +29,7 @@ namespace tda
         _host = host;
         _port = port;
 
-        SDL_Log("Socket::run( host: %s ) ", _host.c_str() );
+        _logger("WebSocket::open(host: " + _host + ", port: " + _port + ")");
 
         _resolver.async_resolve( host, port, 
                                  beast::bind_front_handler( 
@@ -42,7 +42,7 @@ namespace tda
         if (ec)
             return fail(ec, "resolve");
 
-        SDL_Log("Socket::on_resolve");
+        _logger("WebSocket::on_resolve");
 
         beast::get_lowest_layer(_ws).expires_after(std::chrono::seconds(30));
 
@@ -61,7 +61,7 @@ namespace tda
         if(ec)
             return fail(ec, "connect");
 
-        SDL_Log("Socket::on_connect");
+        _logger("WebSocket::on_connect");
 
         // Update the _host string. This will provide the value of the
         // Host HTTP header during the WebSocket handshake.
@@ -94,7 +94,7 @@ namespace tda
         if (ec)
             return fail(ec, "ssl_handshake");
 
-        SDL_Log("Socket::on_ssl_handshake");
+        _logger("WebSocket::on_ssl_handshake");
 
         // Turn off the timeout on the tcp_stream, because
         // the websocket stream has its own timeout system.
@@ -128,7 +128,10 @@ namespace tda
         if(ec)
             return fail(ec, "handshake");
 
-        SDL_Log("Socket::on_handshake: success!");
+        _logger("WebSocket::on_handshake: success!");
+        
+        // Send the message
+        write(_login_request);
     }
 
     /**
@@ -137,9 +140,9 @@ namespace tda
      * @param s 
      */
     void 
-    Socket::write(CRString request)
+    Socket::write(String request)
     {
-        SDL_Log("Socket::send_message");
+        _logger("WebSocket::write");
         _io_in_progress = true;
 
         _ws.async_write(
@@ -157,7 +160,7 @@ namespace tda
         if (ec)
             return fail(ec, "write");
 
-        SDL_Log("Socket::on_write");
+        _logger("WebSocket::on_write");
         
         // read a message into our buffer 
         _ws.async_read(_buffer,
@@ -175,48 +178,22 @@ namespace tda
             return fail(ec, "read");
         
         // handle the server response here 
-        SDL_Log("Socket::on_read: ");
-        std::cout << beast::make_printable(_buffer.data()) << std::endl;
+        _logger("WebSocket::on_read: ");
+        _logger(beast::buffers_to_string(_buffer.data()));
 
         // clear the buffer 
         _buffer.consume(_buffer.size());
+
         _ws.async_read(_buffer,
             beast::bind_front_handler(
                 &Socket::on_read,
                 shared_from_this()));
     }
 
-    bool 
-    Socket::on_login(beast::error_code ec) {
-        String response_code;
-        // response_code = s[found + 6];
-        // SDL_Log("Code: %s", response_code.c_str() );
-
-        // found = s.find("msg");
-        // String response_msg = s.substr(found, 4);
-
-        // if ( response_code == "3" ) {
-        //     // login failed
-        //     _logged_in = false;
-        // }
-        // else if ( response_code == "0" )
-        // {
-        //     // login success
-        //     _logged_in = true;
-        // }
-
-        return _logged_in;
-    }
-
-    void 
-    Socket::on_logout(beast::error_code ec) const
-    {
-        // need a callback for this 
-    }
-
     void 
     Socket::close() {
         _io_in_progress = true;
+        _logger("WebSocket::close");
         _ws.async_close(websocket::close_code::normal, beast::bind_front_handler(&Socket::on_close, shared_from_this()));
     }
 
@@ -233,7 +210,8 @@ namespace tda
         if (ec)
             return fail(ec, "close");
 
-        SDL_Log("Socket::on_close: ");
+        _logger("WebSocket::on_close: ");
+        _logger(beast::buffers_to_string(_buffer.data()));
 
         // If we get here then the connection is closed gracefully
         // The make_printable() function helps print a ConstBufferSequence

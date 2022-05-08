@@ -15,34 +15,27 @@ String Client::get_api_frequency_amount(int value) const { return EnumAPIFreqAmt
  * @return json::ptree
  */
 json::ptree 
-Client::create_login_request()
-{
+Client::create_login_request() {
     json::ptree credentials;
     json::ptree requests;
     json::ptree parameters;
 
-    for (const auto & [key, value] : _user_principals) {
-        if (key == "accounts") {
-            for (const auto & [key2, val2] : value) {
-                account_data[key2] = val2.get_value<String>();
-            }
-            break;
+    StringMap account_data;
+    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (auto &acct_it : v.second)
+        {
+            account_data[acct_it.first] = acct_it.second.get_value<std::string>();
         }
+        break;
     }
 
-    // BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-    //     for (const auto& [key, value] : (json::ptree) v.second) {
-    //         account_data[key] = value.get_value<String>();
-    //     }
-    //     break;
-    // }
-
     requests.put("service", "ADMIN");
-    requests.put("requestid", 1);
     requests.put("command", "LOGIN");
+    requests.put("requestid", 1);
     requests.put("account", account_data["accountId"]);
-    requests.put("source", _user_principals.get<String>(json::ptree::path_type("streamerInfo.appId")));
-
+    requests.put("source", _user_principals.get<std::string>(json::ptree::path_type("streamerInfo.appId")));
+    
+    credentials.put("userid", account_data["accountId"]);
     credentials.put("company", account_data["company"]);
     credentials.put("segment", account_data["segment"]);
     credentials.put("cddomain", account_data["accountCdDomainId"]);
@@ -52,20 +45,23 @@ Client::create_login_request()
     credentials.put("authorized", "Y");
     credentials.put("acl", _user_principals.get<String>(json::ptree::path_type("streamerInfo.acl")));
 
+    
     std::tm token_timestamp = {}; // token timestamp format :: 2021-08-10T14:57:11+0000
-    String original_token_timestamp = _user_principals.get<String>("streamerInfo.tokenTimestamp");
+    std::string original_token_timestamp = _user_principals.get<String>("streamerInfo.tokenTimestamp");
 
-    std::size_t found = original_token_timestamp.find('T'); // remove 'T' character
-    String reformatted_token_timestamp = original_token_timestamp.replace(found, 1, " ");
+    // remove 'T' character
+    std::size_t found = original_token_timestamp.find('T');
+    std::string reformatted_token_timestamp = original_token_timestamp.replace(found, 1, " ");
 
-    found = reformatted_token_timestamp.find('+'); // remove the UTC +0000 portion, will adjust for this manually
+    // remove the UTC +0000 portion, will adjust for this manually
+    found = reformatted_token_timestamp.find('+');
     reformatted_token_timestamp = reformatted_token_timestamp.replace(found, 5, " ");
-    std::cout << "Reformatted Token Timestamp: " << reformatted_token_timestamp.c_str() << std::endl;
 
-    std::istringstream ss(reformatted_token_timestamp); // convert String timestamp into time_t
+    // convert string timestamp into time_t
+    std::istringstream ss(reformatted_token_timestamp);
     ss >> std::get_time(&token_timestamp, "%Y-%m-%d %H:%M:%S");
     if (ss.fail()) {
-        std::cout << "Token timestamp parse failed!" << std::endl;
+        SDL_Log("Token timestamp parse failed!");
     } else {
         // this is disgusting i'm sorry
         std::time_t token_timestamp_as_sec = std::mktime(&token_timestamp);
@@ -73,6 +69,7 @@ Client::create_login_request()
         auto duration = token_timestamp_point.time_since_epoch();
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
         millis -= 18000000;
+        millis -= 3600000;
         credentials.put("timestamp", millis);
     }
 
@@ -106,13 +103,13 @@ Client::create_logout_request()
     json::ptree requests;
     json::ptree parameters;
 
-    // StringMap account_data;
-    // BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-    //     for (const auto & [key,value] : (json::ptree) v.second) {
-    //         account_data[key] = value.get_value<String>();
-    //     }
-    //     break;
-    // }
+    StringMap account_data;
+    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (const auto & [key,value] : (json::ptree) v.second) {
+            account_data[key] = value.get_value<String>();
+        }
+        break;
+    }
 
     requests.put("service", "ADMIN");
     requests.put("requestid", 1);
@@ -138,17 +135,16 @@ Client::create_service_request(ServiceType serv_type, String const & keys, Strin
     json::ptree requests;
     json::ptree parameters;
 
-    // gets first account by default, maybe change later
-    // StringMap account_data;
-    // BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-    //     for (const auto & [key,value] : (json::ptree) v.second) {
-    //         account_data[key] = value.get_value<String>();
-    //     }
-    //     break;
-    // }
+    StringMap account_data;
+    BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
+        for (const auto & [key,value] : (json::ptree) v.second) {
+            account_data[key] = value.get_value<String>();
+        }
+        break;
+    }
 
     requests.put("service", EnumAPIServiceName[serv_type]);
-    requests.put("requestid", 1);
+    requests.put("requestid", 2);
     requests.put("command", "SUBS");
     requests.put("account", account_data["accountId"]);
     requests.put("source", _user_principals.get<String>(json::ptree::path_type("streamerInfo.appId")));
@@ -578,53 +574,34 @@ Client::post_order(CRString account_id, const tda::Order & order) const
  * 
  */
 void 
-Client::start_session() {
-
+Client::start_session(ConsoleLogger logger) {
+    get_access_token();
     get_user_principals();
     String host;
     String port = "443";
-    try {
+    Try {
         host = _user_principals.get<String>("streamerInfo.streamerSocketUrl");
     } catch (json::ptree_error const & ptree_bad_path) {
         std::cout << "Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: " << ptree_bad_path.what() << std::endl;
-    }
+    } finally {
+        json::ptree login_request = create_login_request();
+        std::stringstream login_text_stream;
+        write_json(login_text_stream, login_request);
+        String login_text = login_text_stream.str();
 
-    json::ptree login_request = create_login_request();
-    json::ptree logout_request = create_logout_request();
+        boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
+        websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context, logger, login_text);
+        websocket_session->open(host.c_str(), port.c_str());
+        session_active = true;
+    } proceed;
 
-    // for testing
-    std::ifstream requests_json("requests_test.json", std::ios::out);
-    write_json("requests_test.json", login_request);
+    // json::ptree logout_request = create_logout_request();
+    // std::stringstream logout_text_stream;
+    // write_json(logout_text_stream, logout_request);
+    // String logout_text = logout_text_stream.str();
+}
 
-    std::stringstream login_text_stream;
-    write_json(login_text_stream, login_request);
-    String login_text = login_text_stream.str();
-
-    std::stringstream requests_text_stream;
-    write_json(requests_text_stream, create_service_request(QUOTE, "TLT", "0,1,2,3,4,5,6,7,8"));
-    String request_text = requests_text_stream.str();
-
-    std::stringstream logout_text_stream;
-    write_json(logout_text_stream, logout_request);
-    String logout_text = logout_text_stream.str();
-
-    std::stringstream chart_request_stream;
-    write_json(chart_request_stream, create_service_request(CHART_EQUITY, "AAPL", "0,1,2,3,4,5,6,7,8"));
-    String chart_equity_text = chart_request_stream.str();
-
-    request_queue.push_back(std::make_shared<String const>(login_text));
-    request_queue.push_back(std::make_shared<String const>(request_text));
-    request_queue.push_back(std::make_shared<String const>(logout_text));
-
-    boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
-    websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context);
-    websocket_session->open(host.c_str(), port.c_str());
-    session_active = true;
-    
-    // send an initial message to get price data from AAPL
-    websocket_session->write(login_text);
-    websocket_session->write(chart_equity_text);
-
+void Client::join_thread_pool() {
     ioc_pool.join();
 }
 
@@ -636,7 +613,7 @@ Client::start_session() {
  * @param fields 
  */
 void 
-Client::start_session(String const & ticker, String const & fields)
+Client::start_session(ConsoleLogger logger, String ticker)
 {
     String host;
     String port = "443";
@@ -647,26 +624,26 @@ Client::start_session(String const & ticker, String const & fields)
     }
 
     pt::ptree login_request = create_login_request();
+    pt::ptree service_request = create_service_request(QUOTE, ticker, "0,1,2,3,4,5,6,7,8");
 
     std::stringstream login_text_stream;
     write_json(login_text_stream, login_request);
     String login_text = login_text_stream.str();
 
+    json::ptree requests;
+    json::ptree children;
     std::stringstream requests_text_stream;
-    write_json(requests_text_stream, create_service_request(QUOTE, ticker, fields));
-    String request_text = requests_text_stream.str();
-
-    request_queue.push_back(std::make_shared<String const>(login_text));
-    request_queue.push_back(std::make_shared<String const>(request_text));
+    children.push_back(std::make_pair("", service_request));
+    children.push_back(std::make_pair("", login_request));
+    requests.add_child("requests", children);
+    write_json(requests_text_stream, requests);
+    String requestsString = requests_text_stream.str();
+    std::cout << requestsString << std::endl;
 
     boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
-
-    websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context);
+    websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context, logger, requestsString);
     websocket_session->open(host.c_str(), port.c_str());
     session_active = true;
-
-    // std::thread session_thread(boost::bind(&boost::asio::io_context::run, &ioc));
-    // session_thread.detach();
 }
 
 /**
@@ -676,8 +653,27 @@ Client::start_session(String const & ticker, String const & fields)
  * @param request 
  */
 void 
-Client::send_session_request(CRString request) const {
+Client::send_session_request(String request) const {
     websocket_session->write(request);
+}
+
+void 
+Client::send_login_request() {
+    get_user_principals();
+    pt::ptree login_request = create_login_request();
+    std::stringstream login_text_stream;
+    pt::write_json(login_text_stream, login_request);
+    String login_text = login_text_stream.str();
+    websocket_session->write(login_text);
+}
+
+void 
+Client::send_basic_quote_request(String ticker)
+{
+    std::stringstream requests_text_stream;
+    write_json(requests_text_stream, create_service_request(QUOTE, ticker, "0,1,2,3,4,5,6,7,8"));
+    String request_text = requests_text_stream.str();
+    websocket_session->write(request_text);
 }
 
 /**

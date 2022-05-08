@@ -54,6 +54,7 @@ void ConsoleView::executeCommand(const char* command_line)
             break;
         }
     History.push_back(Strdup(command_line));
+    String commandString = command_line;
 
     // Process command
     if (Stricmp(command_line, "CLEAR") == 0) {
@@ -73,10 +74,13 @@ void ConsoleView::executeCommand(const char* command_line)
         guiDemo = true;
     } else if (Stricmp(command_line, "PLOTDEMO") == 0) {
         plotDemo = true;
-    }
-    else if (Stricmp(command_line, "SESSION") == 0) {
-        addLog("Starting WebSocket session...");
-        tda::TDA::getInstance().startSession();
+    } else if (Stricmp(command_line, "CLOSE_SOCKET") == 0) {
+        addLogStd("Ending WebSocket session...");
+        tda::TDA::getInstance().sendSocketLogout();
+    } else if (commandString.substr(0,10) == "LOAD_QUOTE") {
+        String ticker = commandString.substr(11, commandString.size());
+        addLogStd("Opening WebSocket session and requesting QUOTE for " + ticker);
+        tda::TDA::getInstance().sendChartRequestToSocket(logger, ticker);
     }
     else {
         addLog("Unknown command: '%s'\n", command_line);
@@ -199,7 +203,7 @@ void ConsoleView::drawScreen()
 {
    const ImGuiIO & io = ImGui::GetIO();
 
-    ImGui::BeginChild("ScrollingRegion", ImVec2(0, -(ImGui::GetContentRegionAvail().y*0.25f)), false, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("ScrollingRegion", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.8f), false, ImGuiWindowFlags_None);
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::Selectable("Clear")) clearLog();
         ImGui::EndPopup();
@@ -223,7 +227,7 @@ void ConsoleView::drawScreen()
         else if (strncmp(item, "# ", 2) == 0) { color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f); has_color = true; }
         if (has_color)
             ImGui::PushStyleColor(ImGuiCol_Text, color);
-        ImGui::TextUnformatted(item);
+        ImGui::TextWrapped(item);
         if (has_color)
             ImGui::PopStyleColor();
     }
@@ -242,7 +246,7 @@ void ConsoleView::drawScreen()
     bool reclaim_focus = false;
     ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
 
-    if (ImGui::BeginTable("##consoleWidget", 5, ImGuiTableFlags_SizingFixedFit)) {
+    if (ImGui::BeginTable("##consoleWidget", 5, ImGuiTableFlags_SizingStretchProp, ImVec2(0, ImGui::GetContentRegionAvail().y * 0.2f))) {
         ImGui::TableSetupColumn("##first");
         ImGui::TableSetupColumn("##second");
         ImGui::TableSetupColumn("##third");
@@ -250,6 +254,7 @@ void ConsoleView::drawScreen()
         ImGui::TableSetupColumn("##fifth");
 
         ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(100.f);
         if (ImGui::InputText("Input", InputBuf, IM_ARRAYSIZE(InputBuf), input_text_flags, &TextEditCallbackStub, (void*)this))
         {
             char* s = InputBuf;
@@ -292,7 +297,8 @@ ConsoleView::ConsoleView() : View()
     Commands.push_back("HISTORY");
     Commands.push_back("CLEAR");
     Commands.push_back("CLASSIFY");
-    Commands.push_back("SESSION");
+    Commands.push_back("LOAD_QUOTE");
+    Commands.push_back("CLOSE_SOCKET");
     AutoScroll = true;
     ScrollToBottom = false;
     addLogStd("Welcome to Premia!"); 
@@ -335,8 +341,6 @@ void ConsoleView::update()
     ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
-    ImGui::BeginChild("child", ImVec2(0, ImGui::GetContentRegionAvail().y), false, ImGuiWindowFlags_NoScrollbar);
     drawScreen();
-    ImGui::EndChild();
     ImGui::PopStyleVar(2);
 }
