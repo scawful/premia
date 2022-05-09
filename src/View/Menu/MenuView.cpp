@@ -121,6 +121,28 @@ void MenuView::drawChartsMenu() const
             halext::HLXT::getInstance().setSelectedChart(1);
             events.at("chartView")();
         } 
+        if (ImGui::MenuItem("Multi Plot", ICON_MD_STACKED_LINE_CHART)) {
+            halext::HLXT::getInstance().setSelectedChart(1);
+            events.at("chartView")();
+        } 
+        if (ImGui::MenuItem("Advanced", ICON_MD_MULTILINE_CHART)) {
+            halext::HLXT::getInstance().setSelectedChart(1);
+            events.at("chartView")();
+        } 
+
+        if (ImGui::MenuItem("Futures", ICON_MD_AUTO_GRAPH)) {
+            
+        }
+
+        ImGui::Separator();
+        if (ImGui::MenuItem("Movers Up", ICON_MD_TRENDING_UP)) {
+
+        }
+
+        if (ImGui::MenuItem("Movers Down", ICON_MD_TRENDING_DOWN)) {
+            
+        }
+
 
         ImGui::EndMenu();
     }
@@ -134,7 +156,6 @@ void MenuView::drawAnalyzeMenu() const
             events.at("goHome")();
         ImGui::Separator();
         ImGui::MenuItem("Fundamentals", "N/A");
-        ImGui::MenuItem("Market Movers", "N/A");
         ImGui::Separator();
         ImGui::MenuItem("Insider Roster", "PRO");
         ImGui::MenuItem("Insider Summary", "PRO");
