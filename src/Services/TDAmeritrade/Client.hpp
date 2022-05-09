@@ -67,7 +67,6 @@ namespace tda
         // Flags
         bool has_access_token = false;
         bool has_user_principals = false;
-        bool session_active = false;
 
         // API Strings 
         String api_key = "";
@@ -97,43 +96,38 @@ namespace tda
         // WebSocket functions
         json::ptree create_login_request();
         json::ptree create_logout_request();
-        json::ptree create_service_request(ServiceType serv_type, String const & keys, String const & fields);
+        json::ptree create_service_request(ServiceType serv_type, CRString keys, CRString fields);
 
         // API Functions 
         void get_user_principals();
         void post_authorized_request(CRString endpoint, CRString data) const;
-        String post_account_order(String const & account_id) const;
         String post_access_token() const;
 
     public:
         Client();
         ~Client();
 
-        String send_request(String const & endpoint) const;
-        String send_authorized_request(String const & endpoint) const;
+        String send_request(CRString endpoint) const;
+        String send_authorized_request(CRString endpoint) const;
 
-        String get_quote(String const & symbol) const;        
-        String get_account(String const & account_id);
+        String get_quote(CRString symbol) const;        
+        String get_account(CRString account_id);
         String get_all_accounts();
-        String get_watchlist_by_account(String const & account_id) const;
-        String get_price_history(String const & symbol, 
+        String get_watchlist_by_account(CRString account_id) const;
+        String get_price_history(CRString symbol, 
                                  PeriodType ptype, int period_amt, 
                                  FrequencyType ftype, int freq_amt, bool ext) const;
-        String get_option_chain(String const & ticker, String const & contractType, 
-                                String const & strikeCount, bool includeQuotes, 
-                                String const & strategy, String const & range,
-                                String const & expMonth, String const & optionType) const;
+        String get_option_chain(CRString ticker, CRString contractType, 
+                                CRString strikeCount, bool includeQuotes, 
+                                CRString strategy, CRString range,
+                                CRString expMonth, CRString optionType) const;
         ArrayList<String> get_all_account_ids();
 
         void post_order(CRString account_id, const Order & order) const;
 
-        void start_session(ConsoleLogger logger);
         void start_session(ConsoleLogger logger, String ticker);
-        void send_session_request(String request) const;
-        void send_login_request();
         void send_basic_quote_request(String ticker);
         void send_logout_request();
-        void join_thread_pool();
         String get_access_token() const;
         void fetch_access_token();
 
