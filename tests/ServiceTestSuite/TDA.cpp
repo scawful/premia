@@ -8,6 +8,7 @@ namespace ServiceTestSuite
         TEST(TDATest, websocket_session_test)
         {
             tda::Client client;
+            ConsoleLogger logger;
             String consumer_key;
             String refresh_token;
             std::ifstream keyfile("../assets/apikey.txt");
@@ -21,8 +22,7 @@ namespace ServiceTestSuite
                 std::cout << "noooo" << std::endl;
             }
             client.addAuth(consumer_key, refresh_token);
-            client.fetch_access_token();
-            client.start_session();
+            client.start_session(logger);
         }
     }
 }
