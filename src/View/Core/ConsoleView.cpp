@@ -81,8 +81,7 @@ void ConsoleView::executeCommand(const char* command_line)
         String ticker = commandString.substr(11, commandString.size());
         addLogStd("Opening WebSocket session and requesting QUOTE for " + ticker);
         tda::TDA::getInstance().sendChartRequestToSocket(logger, ticker);
-    }
-    else {
+    } else {
         addLog("Unknown command: '%s'\n", command_line);
     }
 

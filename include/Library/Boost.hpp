@@ -29,14 +29,16 @@ namespace net = boost::asio;
 namespace ssl = boost::asio::ssl;
 using tcp = boost::asio::ip::tcp;
 
-template<typename T>
-auto to_array(const std::string& s)
-    -> std::vector<T> {
-    std::vector<T> result;
-    std::stringstream ss(s);
-    std::string item;
-    while(std::getline(ss, item, ',')) result.push_back(boost::lexical_cast<T>(item));
-    return result;
+inline json::ptree 
+bind_requests(std::vector<json::ptree> requests_array)
+{
+    json::ptree requests;
+    json::ptree children;
+    for (const auto & each_request : requests_array) {
+        children.push_back(std::make_pair("", each_request));
+    }
+    requests.add_child("requests", children);
+    return requests;
 }
 
 #endif
