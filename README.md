@@ -19,12 +19,7 @@ Building and installation
 
 1. Clone the repository
 
-        git clone https://github.com/scawful/premia.git
- 
-2. Move to the libs directory and clone both [ImGui](https://github.com/ocornut/imgui) and [ImPlot](https://github.com/epezent/implot) as they are built static.
-
-        git clone https://github.com/ocornut/imgui.git
-        git clone https://github.com/epezent/implot.git
+        git clone --recurse-submodules https://github.com/scawful/premia.git 
 
 3. Create a build directory in the root workspace folder
 
