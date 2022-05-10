@@ -8,7 +8,6 @@ namespace ServiceTestSuite
         TEST(TDATest, websocket_session_test)
         {
             tda::Client client;
-            ConsoleLogger logger;
             String consumer_key;
             String refresh_token;
             ConsoleLogger logger;
@@ -24,7 +23,7 @@ namespace ServiceTestSuite
             }
             client.addAuth(consumer_key, refresh_token);
             client.fetch_access_token();
-            client.start_session(logger);
+            client.start_session(logger, "QQQ");
         }
     }
 }
