@@ -180,7 +180,7 @@ void OptionChainView::drawUnderlying() {
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
 
-    if (ImPlot::BeginSubplots("##priceHistoryChart", 2, 3, ImVec2(-1,275.f), ImPlotSubplotFlags_LinkAllX)) {
+    if (ImPlot::BeginSubplots("##priceHistoryChart", 3, 2, ImVec2(-1,475.f), ImPlotSubplotFlags_LinkAllX)) {
         auto size = model.getDatetimeEpochArray().size();
         auto func = [](void * data, int idx) -> ImPlotPoint {
             GEXEpochPair* dataPair = (GEXEpochPair*) data;
@@ -190,7 +190,7 @@ void OptionChainView::drawUnderlying() {
         }; 
 
         ImPlot::GetStyle().UseLocalTime = true;
-        if (ImPlot::BeginPlot("Total GEX", ImVec2(-1, -1))) {
+        if (ImPlot::BeginPlot("Gamma Exposure", ImVec2(-1, -1))) {
             ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
             ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
             ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
@@ -198,18 +198,20 @@ void OptionChainView::drawUnderlying() {
             ImPlot::PlotLineG("##totalGex", func, &dataPairing, size);
             ImPlot::EndPlot();
         }
+        
+        if (ImPlot::BeginPlot("Vanna Exposure", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "%.4f");
+            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
+            GEXEpochPair vannaPair(model.getDatetimeEpochArray().data(), model.getNaiveVannaExposureList().data());
+            ImPlot::PlotLineG("##vanna", func, &vannaPair, size);
+            ImPlot::EndPlot();
+        }
+
         if (ImPlot::BeginPlot("Call GEX", ImVec2(-1, -1))) {
             ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
             ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
             GEXEpochPair callGamma(model.getDatetimeEpochArray().data(), model.getCallGammaAtExpiryList().data());
             ImPlot::PlotLineG("##call", func, &callGamma, size);
-            ImPlot::EndPlot();
-        }
-        if (ImPlot::BeginPlot("Put GEX", ImVec2(-1, -1))) {
-            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
-            ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-            GEXEpochPair putGamma(model.getDatetimeEpochArray().data(), model.getPutGammaAtExpiryList().data());
-            ImPlot::PlotLineG("##put", func, &putGamma, size);
             ImPlot::EndPlot();
         }
 
@@ -221,11 +223,11 @@ void OptionChainView::drawUnderlying() {
             ImPlot::EndPlot();
         }
 
-        if (ImPlot::BeginPlot("Vanna Exposure", ImVec2(-1, -1))) {
-            ImPlot::SetupAxisFormat(ImAxis_Y1, "%.4f");
+        if (ImPlot::BeginPlot("Put GEX", ImVec2(-1, -1))) {
+            ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.0f");
             ImPlot::SetupAxes("Date", "Price", dateFlags, priceFlags);
-            GEXEpochPair vannaPair(model.getDatetimeEpochArray().data(), model.getNaiveVannaExposureList().data());
-            ImPlot::PlotLineG("##vanna", func, &vannaPair, size);
+            GEXEpochPair putGamma(model.getDatetimeEpochArray().data(), model.getPutGammaAtExpiryList().data());
+            ImPlot::PlotLineG("##put", func, &putGamma, size);
             ImPlot::EndPlot();
         }
 
