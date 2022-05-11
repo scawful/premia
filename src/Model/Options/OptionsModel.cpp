@@ -60,7 +60,7 @@ OptionsModel::fetchOptionChain(CRString ticker, CRString strikeCount,
         std::tm t = {};
         std::istringstream ss(eachOption.datetime.substr(0,11));
         if (ss >> std::get_time(&t, "%Y-%m-%d")) {
-            datetimeEpochArray.push_back(std::mktime(&t));
+            datetimeEpochArray.push_back((double) std::mktime(&t));
         } else {
             std::cout << "expiration date parsing failed for " << eachOption.datetime << std::endl;
         }
@@ -73,7 +73,7 @@ OptionsModel::fetchOptionChain(CRString ticker, CRString strikeCount,
 void 
 OptionsModel::calculateGammaExposure() {
     for (const auto & eachOption : callOptionArray) {
-        auto date = eachOption.datetime;
+        auto const& date = eachOption.datetime;
         auto daysTilExpiry = boost::lexical_cast<int>(date.substr(11,date.size()));
         for (const auto & eachStrike : eachOption.strikePriceObj) {
             double strikeGammaExposure = 100;
@@ -111,8 +111,7 @@ OptionsModel::calculateGammaExposure() {
 
     for (const auto & eachOption : putOptionArray) {
         int i = 0;
-        auto date = eachOption.datetime;
-        auto daysTilExpiry = boost::lexical_cast<int>(date.substr(11,date.size()));
+        auto const& date = eachOption.datetime;
         for (const auto & eachStrike : eachOption.strikePriceObj) {
             double strikeGammaExposure = -100;
             double gamma = boost::lexical_cast<double>(eachStrike.raw_option.at("gamma"));

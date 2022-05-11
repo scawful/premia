@@ -40,7 +40,7 @@ void OptionChainView::drawChain()
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingStretchProp;
 
     static int current_item = 0;
-    ImGui::Text("Gamma at Expiry $%d", model.getGammaAtExpiry(current_item));
+    ImGui::Text("Gamma at Expiry $%.0f", model.getGammaAtExpiry(current_item));
     if (ImGui::BeginCombo("Expiration Date", model.getDateTime(current_item).c_str(), ImGuiComboFlags_None))
     {
         for (int n = 0; n < model.getDateTimeArray().size(); n++)
@@ -181,11 +181,11 @@ void OptionChainView::drawUnderlying() {
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
 
     if (ImPlot::BeginSubplots("##priceHistoryChart", 3, 2, ImVec2(-1,475.f), ImPlotSubplotFlags_LinkAllX)) {
-        auto size = model.getDatetimeEpochArray().size();
+        auto size = (int) model.getDatetimeEpochArray().size();
         auto func = [](void * data, int idx) -> ImPlotPoint {
-            GEXEpochPair* dataPair = (GEXEpochPair*) data;
-            double* epochArray = dataPair->epochArray;
-            double* gammaArray = dataPair->gammaArray;
+            GEXEpochPair const* dataPair = (GEXEpochPair*) data;
+            double const* epochArray = dataPair->epochArray;
+            double const* gammaArray = dataPair->gammaArray;
             return ImPlotPoint(epochArray[idx], gammaArray[idx]);
         }; 
 
