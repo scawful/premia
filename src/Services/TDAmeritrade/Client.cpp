@@ -7,16 +7,174 @@ String Client::get_api_frequency_type(int value) const { return EnumAPIFreq[valu
 String Client::get_api_period_amount(int value) const { return EnumAPIPeriod[value]; }
 String Client::get_api_frequency_amount(int value) const { return EnumAPIFreqAmt[value]; }
 
+/**
+ * @brief Send a request for data from the API using the json callback
+ * 
+ * @param endpoint 
+ * @return String 
+ */
+String 
+Client::send_request(CRString endpoint) const {
+    CURL *curl;
+    CURLcode res;
+    String response;
+
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2); 
+    res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK)
+        throw Premia::TDAClientException("send_request() failed", curl_easy_strerror(res));
+    
+    curl_easy_cleanup(curl);
+    return response;
+}
+
+/**
+ * @brief Send an authorized request for data from the API using the json callback
+ * @author @scawful
+ * 
+ * @param endpoint 
+ * @return String 
+ */
+String 
+Client::send_authorized_request(CRString endpoint) const {
+    CURL *curl;
+    CURLcode res;
+    CURLHeader headers = nullptr;
+    String response;
+    String auth_bearer = "Authorization: Bearer " + access_token;
+
+    curl = curl_easy_init();
+    headers = curl_slist_append(headers, auth_bearer.c_str());
+
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2); 
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK) 
+        throw Premia::TDAClientException("send_authorized_request() failed", curl_easy_strerror(res));
+
+    curl_easy_cleanup(curl);
+    return response;
+}
+
+
+/**
+ * @brief POST Request using access token 
+ * 
+ * @param endpoint 
+ * @param data 
+ */
+void 
+Client::post_authorized_request(CRString endpoint, CRString data) const 
+{
+    CURL *curl;
+    CURLcode res;
+    CURLHeader headers = nullptr;
+    String response;
+
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
+
+    String auth_bearer = "Authorization: Bearer " + access_token;
+    curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+    curl_slist_append(headers, auth_bearer.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2); 
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+
+    String easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
+    String data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + api_key;
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+    res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK)
+        throw Premia::TDAClientException("post_authorized_request() failed", curl_easy_strerror(res));
+
+    curl_easy_cleanup(curl);
+}
+
+/**
+ * @brief Send a POST request using the consumer key and refresh token to get the access token
+ * @author @scawful
+ * 
+ * @return String 
+ */
+String Client::post_access_token() const
+{
+    CURL *curl;
+    CURLcode res;
+    CURLHeader headers = nullptr;
+    String response;
+
+    curl = curl_easy_init();
+
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
+    headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    CURLHeader chunk = nullptr; // chunked request for http1.1/200 ok
+    chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+
+    // specify post data, have to url encode the refresh token
+    String easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
+    String data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + api_key;
+
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2); 
+
+    // run the operations
+    res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK)
+        throw Premia::TDAClientException("post_access_token() failed", curl_easy_strerror(res));
+
+    curl_easy_cleanup(curl);
+    return response;
+}
+
+/**
+ * @brief Get User Principals from API endpoint
+ *        Parse and store in UserPrincipals object for local use
+ */
+void 
+Client::get_user_principals() {
+    String endpoint = "https://api.tdameritrade.com/v1/userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
+    String response = send_authorized_request(endpoint);
+    _user_principals = parser.read_response(response);
+    user_principals = parser.parse_user_principals(_user_principals);
+    has_user_principals = true;
+}
+
+
 json::ptree 
 Client::create_login_request() {
     json::ptree credentials;
     json::ptree requests;
     json::ptree parameters;
 
-    StringMap account_data;
     BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
-        for (auto &acct_it : v.second)
-        {
+        for (auto const & acct_it : v.second) {
             account_data[acct_it.first] = acct_it.second.get_value<std::string>();
         }
         break;
@@ -110,341 +268,10 @@ Client::create_service_request(ServiceType type, CRString keys, CRString fields)
     return requests;
 }
 
-/**
- * @brief Get User Principals from API endpoint
- *        Parse and store in UserPrincipals object for local use
- */
-void Client::get_user_principals() {
-    String endpoint = "https://api.tdameritrade.com/v1/userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
-    String response = send_authorized_request(endpoint);
-    _user_principals = parser.read_response(response);
-    user_principals = parser.parse_user_principals(_user_principals);
-    has_user_principals = true;
-}
-
-/**
- * @brief POST Request using access token 
- * 
- * @param endpoint 
- * @param data 
- */
-void 
-Client::post_authorized_request(CRString endpoint, CRString data) const 
-{
-    CURL *curl;
-    CURLcode res;
-    String response;
-
-    curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
-
-    struct curl_slist *headers = nullptr;
-    String auth_bearer = "Authorization: Bearer " + access_token;
-    curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-    curl_slist_append(headers, auth_bearer.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2); 
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
-
-    String easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-    String data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + api_key;
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-    res = curl_easy_perform(curl);
-
-    if (res != CURLE_OK)
-        throw Premia::TDAClientException("post_authorized_request() failed", curl_easy_strerror(res));
-
-    curl_easy_cleanup(curl);
-}
-
-/**
- * @brief Send a POST request using the consumer key and refresh token to get the access token
- * @author @scawful
- * 
- * @return String 
- */
-String Client::post_access_token() const
-{
-    CURL *curl;
-    CURLcode res;
-    String response;
-
-    curl = curl_easy_init();
-    // set the url to receive the POST
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tdameritrade.com/v1/oauth2/token");
-
-    // specify we want to post
-    curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
-
-    // set the headers for the request
-    struct curl_slist *headers = nullptr;
-    headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-    // chunked request for http1.1/200 ok
-    struct curl_slist *chunk = nullptr;
-    chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
-
-    // specify post data, have to url encode the refresh token
-    String easy_escape = curl_easy_escape(curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-    String data_post = "grant_type=refresh_token&refresh_token=" + easy_escape + "&client_id=" + api_key;
-
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
-
-    // write data from the url to the function
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-    // specify the user agent
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
-
-    // run the operations
-    res = curl_easy_perform(curl);
-
-    if (res != CURLE_OK)
-        throw Premia::TDAClientException("post_access_token() failed", curl_easy_strerror(res));
-
-    curl_easy_cleanup(curl);
-    return response;
-}
-
 Client::Client() { curl_global_init(CURL_GLOBAL_SSL); }
 Client::~Client() { curl_global_cleanup(); }
-
-/**
- * @brief Send a request for data from the API using the json callback
- * 
- * @param endpoint 
- * @return String 
- */
-String 
-Client::send_request(CRString endpoint) const 
-{
-    CURL *curl;
-    CURLcode res;
-    String response;
-
-    curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    res = curl_easy_perform(curl);
-
-    if (res != CURLE_OK)
-        throw Premia::TDAClientException("send_request() failed", curl_easy_strerror(res));
-    
-    curl_easy_cleanup(curl);
-    return response;
-}
-
-/**
- * @brief Send an authorized request for data from the API using the json callback
- * @author @scawful
- * 
- * @param endpoint 
- * @return String 
- */
-String 
-Client::send_authorized_request(CRString endpoint) const
-{
-    CURL *curl;
-    CURLcode res;
-    String response;
-
-    curl = curl_easy_init();
-    if (curl)
-    {
-        struct curl_slist *headers = nullptr;
-        String auth_bearer = "Authorization: Bearer " + access_token;
-        headers = curl_slist_append(headers, auth_bearer.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK) 
-            throw Premia::TDAClientException("send_authorized_request() failed", curl_easy_strerror(res));
-
-        curl_easy_cleanup(curl);
-    }
-
-    return response;
-}
-
-/**
- * @brief Prepare a request for watchlist data by an account number
- *        Return the API response
- * @author @scawful
- * 
- * @param account_id 
- * @return String 
- */
-String 
-Client::get_watchlist_by_account(CRString account_id) const
-{
-    String url = "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
-    Utils::string_replace(url, "{accountNum}", account_id);
-    return send_authorized_request(url);
-}
-
-/**
- * @brief Prepare a request from the API for price history information 
- *        Return the API response
- * @author @scawful
- * 
- * @param symbol 
- * @param ptype 
- * @param period_amt 
- * @param ftype 
- * @param freq_amt 
- * @param ext 
- * @return String 
- */
-String 
-Client::get_price_history(CRString symbol, PeriodType ptype, int period_amt, FrequencyType ftype, int freq_amt, bool ext) const
-{
-    String url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + api_key + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
-
-    Utils::string_replace(url, "{ticker}", symbol);
-    Utils::string_replace(url, "{periodType}", get_api_interval_value(ptype));
-    Utils::string_replace(url, "{period}", get_api_period_amount(period_amt));
-    Utils::string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
-    Utils::string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
-
-    if (!ext)
-        Utils::string_replace(url, "{ext}", "false");
-    else
-        Utils::string_replace(url, "{ext}", "true");
-
-    return send_request(url);
-}
-
-/**
- * @brief Prepare a request from the API for option chain data 
- *        Return the API response
- * @author @scawful
- * 
- * @param ticker 
- * @param contractType 
- * @param strikeCount 
- * @param includeQuotes 
- * @param strategy 
- * @param range 
- * @param expMonth 
- * @param optionType 
- * @return String 
- */
-String 
-Client::get_option_chain(CRString ticker, CRString contractType, CRString strikeCount,
-                         bool includeQuotes, CRString strategy, CRString range,
-                         CRString expMonth, CRString  optionType) const
-{
-    OptionChain option_chain;
-    String url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + api_key + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
-
-    Utils::string_replace(url, "{ticker}", ticker);
-    Utils::string_replace(url, "{contractType}", contractType);
-    Utils::string_replace(url, "{strikeCount}", strikeCount);
-    Utils::string_replace(url, "{strategy}", strategy);
-    Utils::string_replace(url, "{range}", range);
-    Utils::string_replace(url, "{expMonth}", expMonth);
-    Utils::string_replace(url, "{optionType}", optionType);
-
-    if (!includeQuotes)
-        Utils::string_replace(url, "{includeQuotes}", "FALSE");
-    else
-        Utils::string_replace(url, "{includeQuotes}", "TRUE");
-
-    return send_request(url);
-}
-
-/**
- * @brief Request quote data by the instrument symbol
- *        Return the API response
- * @author @scawful
- * 
- * @param symbol 
- * @return String 
- */
-String 
-Client::get_quote(CRString symbol) const
-{
-    String url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + api_key;
-    Utils::string_replace(url, "{ticker}", symbol);
-    return send_request(url);
-}
-
-/**
- * @brief Request account data by the account id
- *        Return the API response after authorization
- * @author @scawful
- * 
- * @param account_id 
- * @return String 
- */
-String 
-Client::get_account(CRString account_id)
-{
-    get_user_principals();
-    String account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
-    Utils::string_replace(account_url, "{accountNum}", account_id);
-    return send_authorized_request(account_url);
-}
-
-String 
-Client::get_all_accounts()
-{
-    get_user_principals();
-    String account_url = "https://api.tdameritrade.com/v1/accounts/?fields=positions,orders";
-    return send_authorized_request(account_url);
-}
-
-/**
- * @brief Create a vector of all the account ids present on the API key 
- * @author @scawful
- * 
- * @todo make this less smelly 
- * 
- * @return ArrayList<String> 
- */
-ArrayList<String> 
-Client::get_all_account_ids()
-{
-    ArrayList<String> accounts;
-    fetch_access_token();
-    get_user_principals();
-    
-    for (const auto & [key, value] : _user_principals) {
-        if (key == "accounts") {
-            for (const auto & [key2, val2] : value) {
-                for (const auto & [elementKey, elementValue] : val2) {
-                    if (elementKey == "accountId") {
-                        accounts.push_back(elementValue.get_value<std::string>());
-                    }
-                }
-            }
-        }
-    }
-
-    return accounts;
-}
-
-void 
-Client::post_order(CRString account_id, const tda::Order & order) const
-{
-    String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
-    Utils::string_replace(endpoint, "{accountId}", account_id);
-    post_authorized_request(endpoint, order.getString());
-}
+void Client::api_login() { fetch_access_token(); 
+                           get_user_principals(); }
 
 /**
  * @brief Start a WebSocket session quickly with a ticker and fields
@@ -454,8 +281,7 @@ Client::post_order(CRString account_id, const tda::Order & order) const
  * @param fields 
  */
 void 
-Client::start_session(ConsoleLogger logger, String ticker)
-{
+Client::start_session(ConsoleLogger logger, CRString ticker) {
     String host;
     String port = "443";
     Try {
@@ -477,36 +303,210 @@ Client::start_session(ConsoleLogger logger, String ticker)
     } proceed;
 }
 
+/**
+ * @brief WebSocket session logout request 
+ * 
+ */
 void 
-Client::send_basic_quote_request(String ticker) 
-{
-    std::stringstream requests_text_stream;
-    write_json(requests_text_stream, create_service_request(QUOTE, ticker, "0,1,2,3,4,5,6,7,8"));
-    String request_text = requests_text_stream.str();
-    websocket_session->write(request_text);
-}
-
-void 
-Client::send_logout_request() 
-{
-    websocket_session->close();
+Client::send_logout_request() {
     pt::ptree logout_request = create_logout_request();
     std::stringstream logout_text_stream;
     pt::write_json(logout_text_stream, logout_request);
     String logout_text = logout_text_stream.str();
     websocket_session->write(logout_text);
+    websocket_session->close();
+}
+
+/**
+ * @brief API Access Token retrieval 
+ * 
+ */
+void 
+Client::fetch_access_token() {
+    access_token = parser.parse_access_token(post_access_token());
+    has_access_token = true;
+}
+
+
+/**
+ * @brief Request account data by the account id
+ *        Return the API response after authorization
+ * 
+ * @param account_id 
+ * @return String 
+ */
+String 
+Client::get_account(CRString account_id) {
+    get_user_principals();
+    String account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
+    Utils::string_replace(account_url, "{accountNum}", account_id);
+    return send_authorized_request(account_url);
+}
+
+/**
+ * @brief Get all account data as a response 
+ * 
+ * @return String 
+ */
+String 
+Client::get_all_accounts() {
+    get_user_principals();
+    String account_url = "https://api.tdameritrade.com/v1/accounts/?fields=positions,orders";
+    return send_authorized_request(account_url);
+}
+
+/**
+ * @brief Create a vector of all the account ids present on the API key 
+ * 
+ * @return StringList
+ */
+StringList
+Client::get_all_account_ids() {
+    StringList accounts;
+    api_login();
+    
+    for (const auto & [key, value] : _user_principals) {
+        if (key == "accounts") {
+            for (const auto & [key2, val2] : value) {
+                for (const auto & [elementKey, elementValue] : val2) {
+                    if (elementKey == "accountId") {
+                        accounts.push_back(elementValue.get_value<std::string>());
+                    }
+                }
+            }
+        }
+    }
+
+    return accounts;
+}
+
+/**
+ * @brief Request quote data by the instrument symbol
+ *        Return the API response
+ * 
+ * @param symbol 
+ * @return String 
+ */
+String 
+Client::get_quote(CRString symbol) const {
+    String url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" + api_key;
+    Utils::string_replace(url, "{ticker}", symbol);
+    return send_request(url);
+}
+
+/**
+ * @brief Prepare a request for watchlist data by an account number
+ *        Return the API response
+ * 
+ * @param account_id 
+ * @return String 
+ */
+String 
+Client::get_watchlist_by_account(CRString account_id) const {
+    String url = "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
+    Utils::string_replace(url, "{accountNum}", account_id);
+    return send_authorized_request(url);
+}
+
+/**
+ * @brief Prepare a request from the API for price history information 
+ *        Return the API response
+ * 
+ * @param symbol 
+ * @param ptype 
+ * @param period_amt 
+ * @param ftype 
+ * @param freq_amt 
+ * @param ext 
+ * @return String 
+ */
+String 
+Client::get_price_history(CRString symbol, 
+                          PeriodType ptype, int period_amt, 
+                          FrequencyType ftype, int freq_amt, 
+                          bool ext) const {
+    String url = "https://api.tdameritrade.com/v1/marketdata/{ticker}/pricehistory?apikey=" + api_key + "&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&needExtendedHoursData={ext}";
+
+    Utils::string_replace(url, "{ticker}", symbol);
+    Utils::string_replace(url, "{periodType}", get_api_interval_value(ptype));
+    Utils::string_replace(url, "{period}", get_api_period_amount(period_amt));
+    Utils::string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
+    Utils::string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
+
+    if (!ext)
+        Utils::string_replace(url, "{ext}", "false");
+    else
+        Utils::string_replace(url, "{ext}", "true");
+
+    return send_request(url);
+}
+
+/**
+ * @brief Prepare a request from the API for option chain data 
+ *        Return the API response
+ * 
+ * @param ticker 
+ * @param contractType 
+ * @param strikeCount 
+ * @param includeQuotes 
+ * @param strategy 
+ * @param range 
+ * @param expMonth 
+ * @param optionType 
+ * @return String 
+ */
+String 
+Client::get_option_chain(CRString ticker, CRString contractType, CRString strikeCount,
+                         bool includeQuotes, CRString strategy, CRString range,
+                         CRString expMonth, CRString  optionType) const {
+    OptionChain option_chain;
+    String url = "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + api_key + "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&includeQuotes={includeQuotes}&strategy={strategy}&range={range}&expMonth={expMonth}&optionType={optionType}";
+
+    Utils::string_replace(url, "{ticker}", ticker);
+    Utils::string_replace(url, "{contractType}", contractType);
+    Utils::string_replace(url, "{strikeCount}", strikeCount);
+    Utils::string_replace(url, "{strategy}", strategy);
+    Utils::string_replace(url, "{range}", range);
+    Utils::string_replace(url, "{expMonth}", expMonth);
+    Utils::string_replace(url, "{optionType}", optionType);
+
+    if (!includeQuotes)
+        Utils::string_replace(url, "{includeQuotes}", "FALSE");
+    else
+        Utils::string_replace(url, "{includeQuotes}", "TRUE");
+
+    return send_request(url);
+}
+
+
+String 
+Client::get_order(CRString account_id, CRString order_id) const
+{
+    String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders/{orderId}";
+    Utils::string_replace(endpoint, "{accountId}", account_id);
+    Utils::string_replace(endpoint, "{orderId}", order_id);
+    return send_authorized_request(endpoint);
 }
 
 String 
-Client::get_access_token() const {
-    return access_token;
+Client::get_orders_by_query(CRString account_id, int maxResults, 
+                            double fromEnteredTime, double toEnteredTime, 
+                            OrderStatus status) const 
+{
+    String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders?maxResults={maxResults}&fromEnteredTime={from}&toEnteredTime={to}&status={status}";
+    Utils::string_replace(endpoint, "{accountId}", account_id);
+    Utils::string_replace(endpoint, "{maxResults}", std::to_string(maxResults));
+    Utils::string_replace(endpoint, "{from}", std::to_string(fromEnteredTime));
+    Utils::string_replace(endpoint, "{to}", std::to_string(toEnteredTime));
+    Utils::string_replace(endpoint, "{status}", "status");
+    return send_authorized_request(endpoint);
 }
 
 void 
-Client::fetch_access_token() 
-{
-    access_token = parser.parse_access_token(post_access_token());
-    has_access_token = true;
+Client::place_order(CRString account_id, const Order & order) const {
+    String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
+    Utils::string_replace(endpoint, "{accountId}", account_id);
+    post_authorized_request(endpoint, order.getString());
 }
 
 void 

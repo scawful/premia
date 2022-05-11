@@ -101,10 +101,6 @@ namespace tda
             -> String {
             return parser.parse_option_symbol(symbol);
         }
-
-        void postOrder(CRString account_id, const Order & order) {
-            client.post_order(account_id, order);
-        }
         
         void sendChartRequestToSocket(ConsoleLogger logger, String ticker) {
             client.start_session(logger, ticker);

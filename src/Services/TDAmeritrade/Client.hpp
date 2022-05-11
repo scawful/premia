@@ -15,26 +15,8 @@ namespace tda
     static const String EnumAPIPeriod[]{ "1", "2", "3", "4", "5", "6", "10", "15", "20" };
     static const String EnumAPIFreqAmt[]{ "1", "5", "10", "15", "30" };
 
-    enum ServiceType {
-        NONE,
-        ADMIN,
-        ACTIVES_NASDAQ, ACTIVES_NYSE, ACTIVES_OTCBB, ACTIVES_OPTIONS,
-        CHART_EQUITY, CHART_FOREX, CHART_FUTURES, CHART_OPTIONS,
-        QUOTE,
-        LEVELONE_FUTURES, LEVELONE_FOREX, LEVELONE_FUTURES_OPTIONS,
-        OPTION,
-        NEWS_HEADLINE,
-        TIMESALE_EQUITY, TIMESALE_FUTURES, TIMESALE_FOREX, TIMESALE_OPTIONS,
-        ACCT_ACTIVITY,
-        CHART_HISTORY_FUTURES,
-        FOREX_BOOK, FUTURES_BOOK, LISTED_BOOK, NASDAQ_BOOK, OPTIONS_BOOK, FUTURES_OPTIONS_BOOK,
-        NEWS_STORY, NEWS_HEADLINE_LIST,
-        UNKNOWN,
-    };
-
     static const String EnumAPIServiceName[]{
-        "NONE",
-        "ADMIN",
+        "NONE", "ADMIN",
         "ACTIVES_NASDAQ", "ACTIVES_NYSE", "ACTIVES_OTCBB", "ACTIVES_OPTIONS",
         "CHART_EQUITY", "CHART_FOREX", "CHART_FUTURES", "CHART_OPTIONS",
         "QUOTE",
@@ -48,6 +30,8 @@ namespace tda
         "NEWS_STORY", "NEWS_HEADLINE_LIST",
         "UNKNOWN",
     };
+
+    using CURLHeader = struct curl_slist *;
 
     class Client 
     {
@@ -93,43 +77,57 @@ namespace tda
         String get_api_period_amount(int value) const;
         String get_api_frequency_amount(int value) const;
 
+        // API Functions 
+        String send_request(CRString endpoint) const;
+        String send_authorized_request(CRString endpoint) const;
+        void post_authorized_request(CRString endpoint, CRString data) const;
+        String post_access_token() const;
+        void get_user_principals();
+
         // WebSocket functions
         json::ptree create_login_request();
         json::ptree create_logout_request();
         json::ptree create_service_request(ServiceType serv_type, CRString keys, CRString fields);
 
-        // API Functions 
-        void get_user_principals();
-        void post_authorized_request(CRString endpoint, CRString data) const;
-        String post_access_token() const;
 
     public:
         Client();
         ~Client();
+        void api_login();
 
-        String send_request(CRString endpoint) const;
-        String send_authorized_request(CRString endpoint) const;
+        // WebSocket Controls
+        void start_session(ConsoleLogger logger, CRString ticker);
+        void send_logout_request();
+        void fetch_access_token();
 
-        String get_quote(CRString symbol) const;        
+        // Accounts
         String get_account(CRString account_id);
         String get_all_accounts();
+        StringList get_all_account_ids();
+
+        // Quotes
+        String get_quote(CRString symbol) const;
+
+        // Watchlists 
         String get_watchlist_by_account(CRString account_id) const;
+
+        // Price History 
         String get_price_history(CRString symbol, 
                                  PeriodType ptype, int period_amt, 
                                  FrequencyType ftype, int freq_amt, bool ext) const;
+
+        // Option Chain
         String get_option_chain(CRString ticker, CRString contractType, 
                                 CRString strikeCount, bool includeQuotes, 
                                 CRString strategy, CRString range,
                                 CRString expMonth, CRString optionType) const;
-        ArrayList<String> get_all_account_ids();
 
-        void post_order(CRString account_id, const Order & order) const;
-
-        void start_session(ConsoleLogger logger, String ticker);
-        void send_basic_quote_request(String ticker);
-        void send_logout_request();
-        String get_access_token() const;
-        void fetch_access_token();
+        // Orders 
+        String get_order(CRString account_id, CRString order_id) const;
+        String get_orders_by_query(CRString account_id, int maxResults, 
+                                   double fromEnteredTime, double toEnteredTime, 
+                                   OrderStatus status) const;
+        void place_order(CRString account_id, const Order & order) const;
 
         void addAuth(CRString, CRString);
     };

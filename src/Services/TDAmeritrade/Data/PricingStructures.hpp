@@ -26,8 +26,15 @@ namespace tda
         double ask;
         double bidSize;
         double askSize;
-        double open, close, high, low;
-        double delta, gamma, theta, vega, rho;
+        double open;
+        double close;
+        double high;
+        double low;
+        double delta;
+        double gamma;
+        double theta;
+        double vega; 
+        double rho;
     };
 
     struct StrikePriceMap
@@ -72,6 +79,31 @@ namespace tda
         NET_DEBIT,
         NET_CREDIT,
         NET_ZERO
+    };
+
+    enum OrderStatus
+    {
+        ACCEPTED,
+        WORKING,
+        REJECTED,
+        CANCELED
+    };
+
+    enum ServiceType {
+        NONE,
+        ADMIN,
+        ACTIVES_NASDAQ, ACTIVES_NYSE, ACTIVES_OTCBB, ACTIVES_OPTIONS,
+        CHART_EQUITY, CHART_FOREX, CHART_FUTURES, CHART_OPTIONS,
+        QUOTE,
+        LEVELONE_FUTURES, LEVELONE_FOREX, LEVELONE_FUTURES_OPTIONS,
+        OPTION,
+        NEWS_HEADLINE,
+        TIMESALE_EQUITY, TIMESALE_FUTURES, TIMESALE_FOREX, TIMESALE_OPTIONS,
+        ACCT_ACTIVITY,
+        CHART_HISTORY_FUTURES,
+        FOREX_BOOK, FUTURES_BOOK, LISTED_BOOK, NASDAQ_BOOK, OPTIONS_BOOK, FUTURES_OPTIONS_BOOK,
+        NEWS_STORY, NEWS_HEADLINE_LIST,
+        UNKNOWN,
     };
 
 
