@@ -1,52 +1,39 @@
 #include "ViewManager.hpp"
 
 void 
-ViewManager::startGuiFrame() const
-{    
+ViewManager::startGuiFrame() const {    
     const ImGuiIO & io = ImGui::GetIO();
     ImGui::NewFrame();  
-    ImGui::SetNextWindowPos( ImVec2(0, 0) );
-
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
-
     if (!isLoggedIn)
         dimensions = ImVec2(400,250);
 
     ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
-
     ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize |
                              ImGuiWindowFlags_NoCollapse | 
                              ImGuiWindowFlags_NoBringToFrontOnFocus | 
                              ImGuiWindowFlags_NoScrollbar;
 
-    if (isLoggedIn) {
+    if (isLoggedIn)
         flags += ImGuiWindowFlags_MenuBar;
-    }
     
     static bool windowOpen = true;
-    if (!ImGui::Begin("Premia", &windowOpen, flags)) {
-        ImGui::End();
-        return;
-    }
+    if (!ImGui::Begin("Premia", &windowOpen, flags)) { ImGui::End(); return; }
 
-    if (!windowOpen) {
+    if (!windowOpen)
         events.at("quit")();
-    }
 }
 
 ViewManager::ViewManager() {
     consoleLogger = std::bind(&ConsoleView::addLogStd, 
-                                    consoleView, std::placeholders::_1);
+                              consoleView, std::placeholders::_1);
+    rightColView = accountView;
     watchlistView->addLogger(consoleLogger);
     accountView->addLogger(consoleLogger);
     consoleView->addLogger(consoleLogger); // you're be surprised, but this is necessary 
-    menuView->addEvent("consoleView", [this] () -> void {
-        consoleView->update();
-    });
-    rightColView = accountView;
-    menuView->addEvent("optionChainRightCol", [this] () -> void {
-        rightColView = std::make_shared<OptionChainView>();
-    });
+    menuView->addEvent("consoleView", [this]() -> void { consoleView->update(); });
+    menuView->addEvent("optionChainRightCol", [this] () -> void { rightColView = std::make_shared<OptionChainView>(); });
 }
 
 void
@@ -79,11 +66,11 @@ ViewManager::addEventHandler(CRString key, const EventHandler & event) {
 void 
 ViewManager::setCurrentView(std::shared_ptr<View> newView) {
     auto viewName = newView->getName();
-    if (!viewMap.count(viewName)) {
-        viewMap[newView->getName()] = newView;
+    if (!views.count(viewName)) {
+        views[newView->getName()] = newView;
         currentView = newView;
     } else {
-        currentView = viewMap[newView->getName()];
+        currentView = views[newView->getName()];
     }
     transferEvents();
 }
@@ -98,19 +85,11 @@ ViewManager::update() const
     if (!isLoggedIn) {
         loginView->update();
     } else {
-        static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | 
-                                        ImGuiTableFlags_BordersH | 
-                                        ImGuiTableFlags_BordersV |
-                                        ImGuiTableFlags_Hideable |
-                                        ImGuiTableFlags_Reorderable |
-                                        ImGuiTableFlags_SizingStretchSame;
-
-        if (ImGui::BeginTable("table1", 3, flags, ImGui::GetContentRegionAvail())) {            
+        if (ImGui::BeginTable("Main", 3, viewColumnFlags, ImGui::GetContentRegionAvail())) {            
             ImGui::TableSetupColumn(watchlistView->getName().c_str());
             ImGui::TableSetupColumn(currentView->getName().c_str());
             ImGui::TableSetupColumn(rightColView->getName().c_str());
             ImGui::TableHeadersRow();
-
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0); 
             ImGui::BeginChild("WatchlistRegion", ImVec2(ImGui::GetContentRegionAvail().x, 0.f), false, ImGuiWindowFlags_None);

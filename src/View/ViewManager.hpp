@@ -12,14 +12,22 @@
 #include "Account/AccountView.hpp"
 
 class ViewManager {
-    using ViewMap = std::unordered_map<String, std::shared_ptr<View>>;
 private:
+    using ViewMap = std::unordered_map<String, std::shared_ptr<View>>;
+    ImGuiTableFlags viewColumnFlags  = ImGuiTableFlags_Resizable | 
+                                        ImGuiTableFlags_BordersH | 
+                                        ImGuiTableFlags_BordersV |
+                                        ImGuiTableFlags_Hideable |
+                                        ImGuiTableFlags_Reorderable |
+                                        ImGuiTableFlags_SizingStretchSame;
+    
     // Local Variables 
     bool isLoggedIn = false;
     bool menuActive = true;
     bool fontLoaded = false;
     
     // Premia Context Utilities 
+    ViewMap views;
     EventMap events;
     ConsoleLogger consoleLogger;
 
@@ -27,7 +35,6 @@ private:
     std::shared_ptr<View> currentView;
     std::shared_ptr<View> rightColView;
 
-    ViewMap viewMap;
 
     std::shared_ptr<LoginView> loginView = std::make_shared<LoginView>();
     std::shared_ptr<AccountView> accountView = std::make_shared<AccountView>();
