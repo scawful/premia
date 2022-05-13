@@ -24,6 +24,7 @@ template<typename... Args>
     using MetaFunc         = std::function<void(Args&&...)>;
 
 using EventHandler         = MetaFunc<>;
+using Logger               = MetaFunc<String>;
 using ConsoleLogger        = MetaFunc<String>;
 using SocketListener       = MetaFunc<const char*>;
 

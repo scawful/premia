@@ -286,8 +286,8 @@ Client::start_session(ConsoleLogger logger, CRString ticker) {
     String port = "443";
     Try {
         host = _user_principals.get<String>("streamerInfo.streamerSocketUrl");
-    } catch (json::ptree_error const & ptree_bad_path) {
-        std::cout << "Start_Session (ptree_bad_path)[streamerInfo.streamerSocketUrl]: " << ptree_bad_path.what() << std::endl;
+    } catch (const json::ptree_error &) {
+        logger("Client::start_session::ptree_bad_path@[streamerInfo.streamerSocketUrl]");
     } finally {
         ArrayList<json::ptree> requests_array;
         requests_array.push_back(create_login_request());
@@ -297,7 +297,7 @@ Client::start_session(ConsoleLogger logger, CRString ticker) {
         write_json(requests_text_stream, requests);
         String all_requests = requests_text_stream.str();
 
-        boost::asio::ssl::context context{boost::asio::ssl::context::tlsv12_client};
+        ssl::context context{ssl::context::tlsv12_client};
         websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context, logger, all_requests);
         websocket_session->open(host.c_str(), port.c_str());
     } proceed;
@@ -309,7 +309,7 @@ Client::start_session(ConsoleLogger logger, CRString ticker) {
  */
 void 
 Client::send_logout_request() {
-    pt::ptree logout_request = create_logout_request();
+    json::ptree logout_request = create_logout_request();
     std::stringstream logout_text_stream;
     pt::write_json(logout_text_stream, logout_request);
     String logout_text = logout_text_stream.str();
@@ -326,7 +326,6 @@ Client::fetch_access_token() {
     access_token = parser.parse_access_token(post_access_token());
     has_access_token = true;
 }
-
 
 /**
  * @brief Request account data by the account id

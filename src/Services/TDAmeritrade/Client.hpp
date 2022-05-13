@@ -14,21 +14,23 @@ namespace tda
     static const String EnumAPIFreq[]{ "minute", "daily", "weekly", "monthly" };
     static const String EnumAPIPeriod[]{ "1", "2", "3", "4", "5", "6", "10", "15", "20" };
     static const String EnumAPIFreqAmt[]{ "1", "5", "10", "15", "30" };
-
     static const String EnumAPIServiceName[]{
         "NONE", "ADMIN",
-        "ACTIVES_NASDAQ", "ACTIVES_NYSE", "ACTIVES_OTCBB", "ACTIVES_OPTIONS",
-        "CHART_EQUITY", "CHART_FOREX", "CHART_FUTURES", "CHART_OPTIONS",
-        "QUOTE",
-        "LEVELONE_FUTURES", "LEVELONE_FOREX", "LEVELONE_FUTURES_OPTIONS",
-        "OPTION",
-        "NEWS_HEADLINE",
-        "TIMESALE_EQUITY", "TIMESALE_FUTURES", "TIMESALE_FOREX", "TIMESALE_OPTIONS",
-        "ACCT_ACTIVITY",
-        "CHART_HISTORY_FUTURES",
-        "FOREX_BOOK", "FUTURES_BOOK", "LISTED_BOOK", "NASDAQ_BOOK", "OPTIONS_BOOK", "FUTURES_OPTIONS_BOOK",
-        "NEWS_STORY", "NEWS_HEADLINE_LIST",
-        "UNKNOWN",
+        "ACTIVES_NASDAQ", "ACTIVES_NYSE", 
+        "ACTIVES_OTCBB", "ACTIVES_OPTIONS",
+        "CHART_EQUITY", "CHART_FOREX", 
+        "CHART_FUTURES", "CHART_OPTIONS",
+        "QUOTE", "LEVELONE_FUTURES", 
+        "LEVELONE_FOREX", 
+        "LEVELONE_FUTURES_OPTIONS",
+        "OPTION", "NEWS_HEADLINE",
+        "TIMESALE_EQUITY", "TIMESALE_FUTURES", 
+        "TIMESALE_FOREX", "TIMESALE_OPTIONS",
+        "ACCT_ACTIVITY", "CHART_HISTORY_FUTURES",
+        "FOREX_BOOK", "FUTURES_BOOK", 
+        "LISTED_BOOK", "NASDAQ_BOOK", 
+        "OPTIONS_BOOK", "FUTURES_OPTIONS_BOOK",
+        "NEWS_STORY", "NEWS_HEADLINE_LIST", "UNKNOWN",
     };
 
     using CURLHeader = struct curl_slist *;
@@ -88,7 +90,6 @@ namespace tda
         json::ptree create_login_request();
         json::ptree create_logout_request();
         json::ptree create_service_request(ServiceType serv_type, CRString keys, CRString fields);
-
 
     public:
         Client();

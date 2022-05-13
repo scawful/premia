@@ -273,14 +273,12 @@ Account Parser::parse_all_accounts(const json::ptree & data) const
     Account account;
     for (const auto & [key, val] : data) {
     for (const auto & [classKey, classValue] : val ) {
-        std::cout << "1: " << classKey << " : " << classValue.get_value<String>() << std::endl;
         for (const auto & [accountKey, accountValue] : classValue) {
-            std::cout << "2: " << accountKey << " : " << accountValue.get_value<String>() << std::endl;
             if (accountKey == "positions") {
                 for (const auto & [positionListKey, positionListValue] : accountValue) {
-                    std::cout << "3: " << positionListKey << " : " << positionListValue.get_value<String>() << std::endl;
                     tda::PositionBalances new_position_balance; // positions and balances
                     for (const auto & [positionsKey, positionsValue] : positionListValue) {
+                        std::cout << "Positions List: " << positionListKey << " : " << positionListValue.get_value<String>() << std::endl;
                         new_position_balance.balances[positionsKey] = positionsValue.get_value<String>();
                         StringMap pos_field;
                         StringMap instrument;
