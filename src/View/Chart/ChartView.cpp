@@ -10,7 +10,6 @@ ChartView::initChart()
         this->charts["CANDLESTICK"]->importModel(model);
     } else if (chartType == halext::ChartType::LINEPLOT) {
         this->currentChart = "LINEPLOT";
-        //this->charts["currentChart"] = std::make_unique<LinePlotChart>();
     }
     isInit = true;
 }

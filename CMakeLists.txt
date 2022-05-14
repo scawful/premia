@@ -25,18 +25,18 @@ find_package(SDL2 REQUIRED)
 # cURL library ---------------------------------------------------------------------------------------------------
 find_package(CURL REQUIRED)
 
-# OpenSSL library ------------------------------------------------------------------------------------------------
+# OpenSSL library ----------------------------------------------------x--------------------------------------------
 if(APPLE)
-    set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1m/include")
-    set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1m/lib/libcrypto.dylib")
-    set(OPENSSL_SSL_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1m/lib/libssl.dylib")
+    set(OPENSSL_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1o/include")
+    set(OPENSSL_CRYPTO_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1o/lib/libcrypto.dylib")
+    set(OPENSSL_SSL_LIBRARY "/usr/local/Cellar/openssl@1.1/1.1.1o/lib/libssl.dylib")
 endif()
 find_package(OpenSSL REQUIRED)
 if(OPENSSL_FOUND)
     if(APPLE)
-        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1m/include)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1m/lib/libssl.dylib)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1m/lib/libcrypto.dylib)
+        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1o/include)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1o/lib/libssl.dylib)
+        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1o/lib/libcrypto.dylib)
         message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
     else()
         include_directories(${OPENSSL_INCLUDE_DIR})
@@ -80,7 +80,6 @@ add_executable(
     src/View/Chart/ChartView.cpp
     src/View/Chart/Subview/CandleChart.cpp
     src/View/Chart/Subview/LinePlotChart.cpp
-    src/View/Chart/Indicators/Indicators.cpp
     # Controller 
     src/Controller/Controller.cpp    
     # Services 

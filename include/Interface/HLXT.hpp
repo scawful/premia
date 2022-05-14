@@ -9,28 +9,28 @@ namespace halext
     enum class 
     ChartType {
         LINEPLOT,
-        CANDLESTICK
+        CANDLESTICK,
+        MULTIPLOT
     }; 
 
     class HLXT {
     private:
-        HLXT() { }
+        HLXT()=default;
+        User user;
         Client client;
-        User currentUser;
+        ChartType chartType;
         bool privateBalance = false;
-
-        ChartType selectedChart;
 
     public:
         HLXT(HLXT const&)            = delete;
         void operator=(HLXT const&)  = delete;
-        static HLXT& getInstance() {
-            static HLXT instance;    
+        static HLXT & getInstance() {
+            static HLXT instance;
             return instance;
         }
 
-        auto getSqueezeMetricsData()
-            -> String const {
+        auto getSqueezeMetricsData() const
+            -> String {
             return client.send_request("https://squeezemetrics.com/monitor/download/SPX.csv");
         }
 
@@ -39,19 +39,19 @@ namespace halext
             privateBalance = val;
         }
 
-        auto getPrivateBalance()
+        auto getPrivateBalance() const
             -> bool {
             return privateBalance;
         }
 
         auto setSelectedChart(int i)
             -> void {
-            selectedChart = ChartType(i);
+            chartType = ChartType(i);
         }
 
-        auto getSelectedChart()
+        auto getSelectedChart() const
             -> ChartType {
-            return selectedChart;
+            return chartType;
         }
 
     };

@@ -3,14 +3,16 @@
 
 #include "Virtual/View.hpp"
 #include "Subview/CandleChart.hpp"
-#include "Indicators/Indicators.hpp"
-
-using namespace Indicators;
 
 class ChartView 
     : public View {
-    using ChartMap     = std::unordered_map<String, std::shared_ptr<Chart>>;
-    using IndicatorMap = std::unordered_map<String, std::shared_ptr<Indicator>>;
+    using ChartMap  = std::unordered_map<String, std::shared_ptr<Chart>>;
+public:
+    String getName() override;
+    void addLogger(const ConsoleLogger & logger) override;
+    void addEvent(CRString key, const EventHandler & event) override;
+    void update() override;
+
 private:
     int period_type = 2; 
     int period_amount = 0;
@@ -22,7 +24,6 @@ private:
 
     EventMap events;
     ChartMap charts;
-    IndicatorMap indicators;
     std::shared_ptr<ChartModel> model = std::make_shared<ChartModel>();
 
     ConsoleLogger logger;
@@ -30,12 +31,6 @@ private:
     void initChart();
     void drawChart();
     void drawChartSettings();
-
-public:
-    String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
-    void addEvent(CRString key, const EventHandler & event) override;
-    void update() override;
 };
 
 #endif
