@@ -9,8 +9,9 @@ using namespace tda;
  * @param chain 
  * @param idx 
  */
-void Parser::parseStrikeMap(const json::ptree & data, OptionChain & chain, int idx) const
-{
+void 
+Parser::parseStrikeMap(const json::ptree & data, 
+                       OptionChain & chain, int idx) const {
     for (const auto & [dateKey, dateValue]: data) {
         OptionsDateTimeObj options_dt_obj;
         options_dt_obj.datetime = dateKey;
@@ -36,22 +37,26 @@ void Parser::parseStrikeMap(const json::ptree & data, OptionChain & chain, int i
  * @param response 
  * @return json::ptree 
  */
-json::ptree Parser::read_response(CRString response) const
-{
+json::ptree 
+Parser::read_response(CRString response) const {
     std::istringstream json_response(response);
     json::ptree property_tree;
-
     try {
         read_json(json_response, property_tree);
     } catch (json::ptree_error const & json_parser_error) {
         std::cout << "Parser::read_response: " << json_parser_error.what() << std::endl;
     }
-
     return property_tree;
 }
 
+/**
+ * @brief Return a human friendly string of the option contract
+ * 
+ * @param symbol 
+ * @return String 
+ */
 String 
-Parser::parse_option_symbol(CRString symbol) {
+Parser::parse_option_symbol(CRString symbol) const {
     String underlying;
     String month;
     String day;

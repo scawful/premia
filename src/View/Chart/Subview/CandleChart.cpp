@@ -10,7 +10,7 @@
  * @param x 
  * @return int 
  */
-int CandleChart::binary_search(const ArrayList<double> arr, int l, int r, double x) 
+int CandleChart::binary_search(const ArrayList<double> & arr, int l, int r, double x) 
 {
     if (r >= l) 
     {
@@ -134,12 +134,7 @@ CandleChart::drawCandleChart()
                                                                                                 ImPlotAxisFlags_AutoFit | 
                                                                                                 ImPlotAxisFlags_RangeFit);
             ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
-            auto size = model->getVolumeVector().size();
-            // VolumeTimePair dataPairing(model->getVolumeVector().data(), model->getDates().data());
-            // auto func = [](void * data, int idx) -> ImPlotPoint {
-            //     VolumeTimePair* dataPair = (VolumeTimePair*) data;
-            //     return ImPlotPoint(dataPair->timeArray[idx], dataPair->volumeArray[idx]);
-            // }; 
+            auto size = (int) model->getVolumeVector().size();
             ImPlot::PlotBars("Volume", model->getDates().data(), model->getVolumeVector().data(), size, 0.5f);
             ImPlot::EndPlot();
         }

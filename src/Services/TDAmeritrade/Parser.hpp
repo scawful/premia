@@ -21,7 +21,7 @@ namespace tda
 
     public:
         json::ptree read_response(CRString response) const;
-        String parse_option_symbol(CRString symbol);
+        String parse_option_symbol(CRString symbol) const;
         String parse_access_token(CRString response) const;
         Quote parse_quote(const json::ptree & data) const;
         PriceHistory parse_price_history(const json::ptree & data, CRString ticker, int freq) const;

@@ -11,7 +11,7 @@ private:
     String quoteDetails;
     std::shared_ptr<ChartModel> model;
 
-    int binary_search(const ArrayList<double> arr, int l, int r, double x);
+    int binary_search(const ArrayList<double> & arr, int l, int r, double x);
     void drawCandles(float width_percent, int count, ImVec4 bullCol, ImVec4 bearCol, bool tooltip);
     void drawCandleChart();
 
