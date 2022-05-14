@@ -17,11 +17,11 @@ private:
     ConsoleLogger logger;
    
     void drawFileMenu() const;
-    void drawViewMenu() const;
     void drawTradeMenu() const;
     void drawChartsMenu() const;
     void drawAnalyzeMenu() const;
-    void drawAccountMenu() const;
+    void drawColumnOptions(int x) const;
+    void drawViewMenu() const;
     void drawHelpMenu();
     void drawScreen();
 
