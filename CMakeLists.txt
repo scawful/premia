@@ -69,6 +69,7 @@ add_executable(
     src/Model/Options/OptionsModel.cpp
     src/Model/Core/WatchlistModel.cpp
     # View + View Manager 
+    src/View/Workspace.cpp
     src/View/ViewManager.cpp
     src/View/Core/PrimaryView.cpp
     src/View/Core/ConsoleView.cpp
