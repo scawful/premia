@@ -103,7 +103,6 @@ Controller::initWindow()
 
     // Load available fonts 
     const ImGuiIO & io = ImGui::GetIO();
-    //io.Fonts->AddFontDefault();
     io.Fonts->AddFontFromFileTTF("assets/Cousine-Regular.ttf", 13.0f);
     // merge in icons from Google Material Design
     static const ImWchar icons_ranges[] = { ICON_MIN_MD, 0xf900, 0 };
@@ -113,7 +112,6 @@ Controller::initWindow()
     icons_config.GlyphMinAdvanceX = 13.0f;
     icons_config.PixelSnapH = true;
     io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_MD, 18.0f, &icons_config, icons_ranges );
-    
     io.Fonts->AddFontFromFileTTF("assets/DroidSans.ttf", 13.0f);
     io.Fonts->AddFontFromFileTTF("assets/Karla-Regular.ttf", 12.0f);
     io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 12.0f);
@@ -146,11 +144,6 @@ Controller::initEvents()
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn(); 
     });
-    
-    viewManager.addEventHandler("goHome", [this] () -> void { viewManager.setCurrentView(std::make_shared<PrimaryView>()); });
-    viewManager.addEventHandler("chartView", [this] () -> void { viewManager.setCurrentView(std::make_shared<ChartView>()); });
-    viewManager.addEventHandler("linePlotView", [this] () -> void { viewManager.setCurrentView(std::make_shared<LinePlotChart>()); });
-    viewManager.addEventHandler("optionChainView", [this] () -> void { viewManager.setCurrentView(std::make_shared<OptionChainView>()); });
     viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
 }
 

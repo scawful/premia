@@ -9,7 +9,6 @@
 #include "View/Login/LoginView.hpp"
 #include "View/Core/ConsoleView.hpp"
 #include "View/Chart/ChartView.hpp"
-#include "View/Chart/Subview/LinePlotChart.hpp"
 #include "View/Options/OptionChain.hpp"
 
 class Controller {

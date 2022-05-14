@@ -10,6 +10,7 @@
 #include "Chart/ChartView.hpp"
 #include "Options/OptionChain.hpp"
 #include "Account/AccountView.hpp"
+#include "View/Chart/Subview/LinePlotChart.hpp"
 
 class ViewManager {
 private:
@@ -32,17 +33,17 @@ private:
     ConsoleLogger consoleLogger;
 
     // Views 
+    std::shared_ptr<View> leftColView;
     std::shared_ptr<View> currentView;
     std::shared_ptr<View> rightColView;
 
-
     std::shared_ptr<LoginView> loginView = std::make_shared<LoginView>();
-    std::shared_ptr<AccountView> accountView = std::make_shared<AccountView>();
-    std::shared_ptr<WatchlistView> watchlistView = std::make_shared<WatchlistView>();
     std::shared_ptr<MenuView> menuView = std::make_shared<MenuView>();
     std::shared_ptr<ConsoleView> consoleView = std::make_shared<ConsoleView>();
 
     void startGuiFrame() const;
+    void setLeftColumnView(std::shared_ptr<View> view);
+    void setRightColumnView(std::shared_ptr<View> view);
 
 public:
     ViewManager();

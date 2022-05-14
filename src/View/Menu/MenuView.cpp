@@ -1,6 +1,7 @@
 #include "MenuView.hpp"
 
-void MenuView::drawFileMenu() const
+void 
+MenuView::drawFileMenu() const
 {
     static bool show_console = false;
 
@@ -41,59 +42,8 @@ void MenuView::drawFileMenu() const
     }
 }
 
-void MenuView::drawViewMenu() const
-{
-    static bool show_imgui_metrics       = false;
-    static bool show_implot_metrics      = false;
-    static bool show_imgui_style_editor  = false;
-    static bool show_implot_style_editor = false;
-    if (show_imgui_metrics) {
-        ImGui::ShowMetricsWindow(&show_imgui_metrics);
-    }
-    if (show_implot_metrics) {
-        ImPlot::ShowMetricsWindow(&show_implot_metrics);
-    }
-    if (show_imgui_style_editor) {
-        ImGui::Begin("Style Editor (ImGui)", &show_imgui_style_editor);
-        ImGui::ShowStyleEditor();
-        ImGui::End();
-    }
-    if (show_implot_style_editor) {
-        ImGui::SetNextWindowSize(ImVec2(415,762), ImGuiCond_Appearing);
-        ImGui::Begin("Style Editor (ImPlot)", &show_implot_style_editor);
-        ImPlot::ShowStyleEditor();
-        ImGui::End();
-    }
-
-    if (ImGui::BeginMenu(ICON_MD_TUNE))
-    {         
-        if (ImGui::BeginMenu("Right Column")) {
-            if (ImGui::MenuItem("Option Chain")) {
-                events.at("optionChainRightCol")();
-            }
-            ImGui::EndMenu();
-        }
-
-        ImGui::Separator();
-        if (ImGui::BeginMenu("Appearance")) {
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Window Layout")) {
-            ImGui::EndMenu();
-        }
-        ImGui::Separator();
-        if (ImGui::BeginMenu("GUI Tools")) {
-            ImGui::MenuItem("Metrics (ImGui)",       nullptr, &show_imgui_metrics);
-            ImGui::MenuItem("Metrics (ImPlot)",      nullptr, &show_implot_metrics);
-            ImGui::MenuItem("Style Editor (ImGui)",  nullptr, &show_imgui_style_editor);
-            ImGui::MenuItem("Style Editor (ImPlot)", nullptr, &show_implot_style_editor);
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenu();
-    }
-}
-
-void MenuView::drawTradeMenu() const
+void 
+MenuView::drawTradeMenu() const
 {
     if (ImGui::BeginMenu(ICON_MD_SYNC_ALT))
     {
@@ -110,7 +60,8 @@ void MenuView::drawTradeMenu() const
     }
 }
 
-void MenuView::drawChartsMenu() const
+void 
+MenuView::drawChartsMenu() const
 {
     if (ImGui::BeginMenu(ICON_MD_ADD_CHART)) {
         if (ImGui::MenuItem("Line Plot", ICON_MD_SHOW_CHART)) {
@@ -122,33 +73,39 @@ void MenuView::drawChartsMenu() const
             events.at("chartView")();
         } 
         if (ImGui::MenuItem("Multi Plot", ICON_MD_STACKED_LINE_CHART)) {
-            halext::HLXT::getInstance().setSelectedChart(1);
+            halext::HLXT::getInstance().setSelectedChart(2);
             events.at("chartView")();
         } 
         if (ImGui::MenuItem("Advanced", ICON_MD_MULTILINE_CHART)) {
-            halext::HLXT::getInstance().setSelectedChart(1);
+            halext::HLXT::getInstance().setSelectedChart(3);
             events.at("chartView")();
         } 
 
         if (ImGui::MenuItem("Futures", ICON_MD_AUTO_GRAPH)) {
-            
+            halext::HLXT::getInstance().setSelectedChart(4);
+            events.at("chartView")();
+        }
+
+        if (ImGui::MenuItem("Crypto", ICON_MD_CURRENCY_BITCOIN)) {
+            halext::HLXT::getInstance().setSelectedChart(5);
+            events.at("chartView")();
         }
 
         ImGui::Separator();
         if (ImGui::MenuItem("Movers Up", ICON_MD_TRENDING_UP)) {
-
+            events.at("moversUpView")();
         }
 
         if (ImGui::MenuItem("Movers Down", ICON_MD_TRENDING_DOWN)) {
-            
+            events.at("moversDownView")();
         }
-
 
         ImGui::EndMenu();
     }
 }
 
-void MenuView::drawAnalyzeMenu() const
+void 
+MenuView::drawAnalyzeMenu() const
 {
     if (ImGui::BeginMenu(ICON_MD_TOPIC))
     {
@@ -181,15 +138,75 @@ void MenuView::drawAnalyzeMenu() const
     }
 }
 
-void MenuView::drawAccountMenu() const
+void 
+MenuView::drawColumnOptions(int x) const
 {
-    if (ImGui::BeginMenu(ICON_MD_ACCOUNT_BALANCE)) {
-        ImGui::MenuItem("Sync Data", "N/A");
+    String column = "LeftCol";
+    if (x)
+        column = "RightCol";
+
+    if (ImGui::MenuItem("Option Chain")) {
+        events.at("optionChain" + column)();
+    }
+}
+
+void 
+MenuView::drawViewMenu() const
+{
+    static bool show_imgui_metrics       = false;
+    static bool show_implot_metrics      = false;
+    static bool show_imgui_style_editor  = false;
+    static bool show_implot_style_editor = false;
+    if (show_imgui_metrics) {
+        ImGui::ShowMetricsWindow(&show_imgui_metrics);
+    }
+    if (show_implot_metrics) {
+        ImPlot::ShowMetricsWindow(&show_implot_metrics);
+    }
+    if (show_imgui_style_editor) {
+        ImGui::Begin("Style Editor (ImGui)", &show_imgui_style_editor);
+        ImGui::ShowStyleEditor();
+        ImGui::End();
+    }
+    if (show_implot_style_editor) {
+        ImGui::SetNextWindowSize(ImVec2(415,762), ImGuiCond_Appearing);
+        ImGui::Begin("Style Editor (ImPlot)", &show_implot_style_editor);
+        ImPlot::ShowStyleEditor();
+        ImGui::End();
+    }
+
+    if (ImGui::BeginMenu(ICON_MD_TUNE))
+    {       
+        if (ImGui::BeginMenu("Left Column")) {
+            drawColumnOptions(0);
+            ImGui::EndMenu();
+        }  
+
+        if (ImGui::BeginMenu("Right Column")) {
+            drawColumnOptions(1);
+            ImGui::EndMenu();
+        }
+
         ImGui::Separator();
-        ImGui::MenuItem("General Settings", "N/A");
-        ImGui::MenuItem("Graphical Settings", "N/A");
+
+        if (ImGui::BeginMenu("Appearance")) {
+            if(ImGui::MenuItem("Fullscreen")) {
+                events.at("toggleFullscreenMode")();
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Window Layout")) {
+            ImGui::EndMenu();
+        }
+
         ImGui::Separator();
-        ImGui::MenuItem("Activate Trial", "N/A");
+        if (ImGui::BeginMenu("GUI Tools")) {
+            ImGui::MenuItem("Metrics (ImGui)",       nullptr, &show_imgui_metrics);
+            ImGui::MenuItem("Metrics (ImPlot)",      nullptr, &show_implot_metrics);
+            ImGui::MenuItem("Style Editor (ImGui)",  nullptr, &show_imgui_style_editor);
+            ImGui::MenuItem("Style Editor (ImPlot)", nullptr, &show_implot_style_editor);
+            ImGui::EndMenu();
+        }
         ImGui::EndMenu();
     }
 }
@@ -214,7 +231,6 @@ void MenuView::drawScreen()
         drawTradeMenu();
         drawChartsMenu();
         drawAnalyzeMenu();
-        drawAccountMenu();
         drawViewMenu();
         drawHelpMenu();
         ImGui::EndMenuBar();
