@@ -102,7 +102,7 @@ namespace tda
             return parser.parse_option_symbol(symbol);
         }
         
-        void sendChartRequestToSocket(ConsoleLogger logger, String ticker) {
+        void sendChartRequestToSocket(Logger logger, String ticker) {
             client.start_session(logger, ticker);
         }
 

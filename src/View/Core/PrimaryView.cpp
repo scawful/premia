@@ -89,7 +89,7 @@ String PrimaryView::getName() {
     return "Overview";
 }
 
-void PrimaryView::addLogger(const ConsoleLogger & newLogger)
+void PrimaryView::addLogger(const Logger& newLogger)
 {
     this->logger = newLogger;
 }

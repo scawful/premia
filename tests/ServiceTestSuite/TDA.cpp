@@ -10,7 +10,7 @@ namespace ServiceTestSuite
             tda::Client client;
             String consumer_key;
             String refresh_token;
-            ConsoleLogger logger;
+            Logger logger;
             std::ifstream keyfile("../assets/apikey.txt");
             if (keyfile.good()) {
                 std::stringstream buffer;

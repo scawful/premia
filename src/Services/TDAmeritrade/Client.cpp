@@ -281,7 +281,7 @@ void Client::api_login() { fetch_access_token();
  * @param fields 
  */
 void 
-Client::start_session(ConsoleLogger logger, CRString ticker) {
+Client::start_session(Logger logger, CRString ticker) {
     String host;
     String port = "443";
     Try {

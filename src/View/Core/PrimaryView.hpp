@@ -7,7 +7,7 @@
 class PrimaryView: public View 
 {
 private:
-    ConsoleLogger logger;
+    Logger logger;
     std::shared_ptr<View> menuView = std::make_shared<MenuView>();
     std::unordered_map<String, EventHandler> events;
 
@@ -16,7 +16,7 @@ private:
 
 public:
     String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
     void update() override;
 };

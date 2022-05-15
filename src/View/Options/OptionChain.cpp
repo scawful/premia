@@ -250,7 +250,7 @@ OptionChainView::getName() {
     return "Option Chain";
 }
 
-void OptionChainView::addLogger(const ConsoleLogger & newLogger)
+void OptionChainView::addLogger(const Logger& newLogger)
 {
     this->logger = newLogger;
 }

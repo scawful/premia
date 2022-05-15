@@ -31,7 +31,7 @@ public:
 
     void update() override;
     String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
 };
 

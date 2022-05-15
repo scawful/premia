@@ -49,7 +49,7 @@ ChartView::getName() {
 }
 
 void 
-ChartView::addLogger(const ConsoleLogger & newLogger) {
+ChartView::addLogger(const Logger& newLogger) {
     this->logger = newLogger;
 }
 

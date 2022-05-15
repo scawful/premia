@@ -46,7 +46,7 @@ bool WatchlistModel::isActive() const
     return active;
 }
 
-void WatchlistModel::addLogger(const ConsoleLogger & newLogger)
+void WatchlistModel::addLogger(const Logger& newLogger)
 {
     this->logger = newLogger;
 }

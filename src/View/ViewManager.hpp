@@ -30,7 +30,7 @@ private:
     // Premia Context Utilities 
     ViewMap views;
     EventMap events;
-    ConsoleLogger consoleLogger;
+    Logger consoleLogger;
 
     // Views 
     std::shared_ptr<View> leftColView;

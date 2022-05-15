@@ -49,7 +49,7 @@ LoginView::getName() {
     return "Login";
 }
 
-void LoginView::addLogger(const ConsoleLogger & newLogger)
+void LoginView::addLogger(const Logger& newLogger)
 {
     this->logger = newLogger;
 }

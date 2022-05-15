@@ -97,7 +97,7 @@ namespace tda
         void api_login();
 
         // WebSocket Controls
-        void start_session(ConsoleLogger logger, CRString ticker);
+        void start_session(Logger logger, CRString ticker);
         void send_logout_request();
         void fetch_access_token();
 

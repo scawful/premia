@@ -33,7 +33,7 @@
 class Workspace {
 private:
     EventMap events;
-    ConsoleLogger logger;
+    Logger logger;
     std::shared_ptr<View> rootView;
 
     // load workspace configurations from files ? 

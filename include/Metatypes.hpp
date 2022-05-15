@@ -25,7 +25,6 @@ template<typename... Args>
 
 using EventHandler         = MetaFunc<>;
 using Logger               = MetaFunc<String>;
-using ConsoleLogger        = MetaFunc<String>;
 using SocketListener       = MetaFunc<const char*>;
 
 using TypeIndex            = std::type_index;

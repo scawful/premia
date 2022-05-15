@@ -9,14 +9,14 @@ class LoginView : public View
 private:
     bool initialized = false;
     
-    ConsoleLogger logger;
+    Logger logger;
     std::unordered_map<String, EventHandler> events;
 
     void drawScreen() const;
 
 public:
         String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString, const EventHandler &) override;
     void update() override;
 };

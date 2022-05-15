@@ -1,7 +1,7 @@
 #include "WatchlistView.hpp"
 
-void WatchlistView::drawWatchlistTable()
-{
+void 
+WatchlistView::drawWatchlistTable() {
     static int n = 0;
 
     ImGui::Combo(" ", &n,  model.getWatchlistNamesCharVec().data(), (int) model.getWatchlistNamesCharVec().size()); 
@@ -62,18 +62,17 @@ WatchlistView::getName() {
     return "Watchlists";
 }
 
-void WatchlistView::addLogger(const ConsoleLogger & newLogger)
-{
+void 
+WatchlistView::addLogger(const Logger& newLogger) {
     this->logger = newLogger;
 }
 
-void WatchlistView::addEvent(CRString key, const EventHandler & event)
-{
+void 
+WatchlistView::addEvent(CRString key, const EventHandler & event) {
     this->events[key] = event;
 }
 
-void WatchlistView::update() 
-{
+void WatchlistView::update() {
     Construct { // runs once 
         model.addLogger(this->logger);
         Try {

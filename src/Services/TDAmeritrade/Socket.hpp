@@ -28,7 +28,7 @@ namespace tda
         bool _subscribed;
         bool _notified;
         bool _interrupt;
-        ConsoleLogger _logger;
+        Logger _logger;
         net::io_context _ioc;
         tcp::resolver _resolver;
         beast::multi_buffer _buffer;
@@ -41,7 +41,7 @@ namespace tda
 
     public:
         template <typename Executor>
-        explicit Socket(Executor executor, ssl::context & ctx, ConsoleLogger logger, CRString login_request)
+        explicit Socket(Executor executor, ssl::context & ctx, Logger logger, CRString login_request)
             : _resolver(executor) ,_ws(executor, ctx), _logger(logger), _login_request(login_request) { }
 
 

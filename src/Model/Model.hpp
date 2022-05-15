@@ -8,17 +8,17 @@ class Model
 {
 private:
     std::unordered_map<String, EventHandler> callbacks;
-    ConsoleLogger consoleLogger;
+    Logger consoleLogger;
     
 public:
     Model()=default;
     ~Model()=default;
     
 
-    void addLogger(const ConsoleLogger & logger);
+    void addLogger(const Logger& logger);
     void addEventHandler(CRString key, const EventHandler & handler);
 
-    ConsoleLogger & getLogger();
+    Logger& getLogger();
 };
 
 #endif

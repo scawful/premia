@@ -1,11 +1,11 @@
 #include "Model.hpp"
 
-void Model::addLogger(const ConsoleLogger & newLogger)
+void Model::addLogger(const Logger& newLogger)
 {
     this->consoleLogger = newLogger;
 }
 
-ConsoleLogger & Model::getLogger()
+Logger& Model::getLogger()
 {
     return consoleLogger;
 }

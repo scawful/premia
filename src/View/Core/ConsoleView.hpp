@@ -23,7 +23,7 @@ private:
 
     void clearLog();
     void executeCommand(const char* command_line);
-    ConsoleLogger logger;
+    Logger logger;
     std::unordered_map<String, EventHandler> events;
 
     void drawScreen();
@@ -37,7 +37,7 @@ public:
     void addLog(const char* fmt, ...);
     void addLogStd(CRString data);
         String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
     void update() override;
 };

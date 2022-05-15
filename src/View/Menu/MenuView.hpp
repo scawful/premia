@@ -14,7 +14,7 @@ private:
 
     // Premia Context Utilities 
     EventMap events;
-    ConsoleLogger logger;
+    Logger logger;
    
     void drawFileMenu() const;
     void drawTradeMenu() const;
@@ -27,7 +27,7 @@ private:
 
 public:
     String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString, const EventHandler &) override;
     void update() override;
 };

@@ -12,13 +12,13 @@ private:
     ArrayList<tda::Watchlist> watchlists;
     ArrayList<String> watchlistNames;
     ArrayList<const char*> watchlistNamesChar;
-    ConsoleLogger logger;
+    Logger logger;
     std::unordered_map<String, tda::Quote> quotes;
 
 public:
     bool isActive() const;
     
-    void addLogger(const ConsoleLogger & logger);
+    void addLogger(const Logger& logger);
     void initWatchlist();
     bool getOpenList(int n);
     void setOpenList(int n);

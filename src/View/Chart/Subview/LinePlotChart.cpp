@@ -59,7 +59,7 @@ LinePlotChart::getName() {
     return "Line Plot";
 }
 
-void LinePlotChart::addLogger(const ConsoleLogger & newLogger)
+void LinePlotChart::addLogger(const Logger& newLogger)
 {
     // this->logger = newLogger;
 }

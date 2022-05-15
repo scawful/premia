@@ -15,7 +15,7 @@ private:
     };
     String symbol;
     EventMap events;
-    ConsoleLogger logger;
+    Logger logger;
     OptionsModel model;
 
     void drawSearch();
@@ -24,7 +24,7 @@ private:
 
 public:
     String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
     void update() override;
 

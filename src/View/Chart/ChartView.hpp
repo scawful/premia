@@ -9,7 +9,7 @@ class ChartView
     using ChartMap  = std::unordered_map<String, std::shared_ptr<Chart>>;
 public:
     String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
     void update() override;
 
@@ -26,7 +26,7 @@ private:
     ChartMap charts;
     std::shared_ptr<ChartModel> model = std::make_shared<ChartModel>();
 
-    ConsoleLogger logger;
+    Logger logger;
 
     void initChart();
     void drawChart();

@@ -11,7 +11,7 @@ private:
     bool isInit = false;
     bool isLoggedIn = false;
     EventMap events;
-    ConsoleLogger logger;
+    Logger logger;
     // -----------------------------
     ArrayList<String> account_ids_std;
     ArrayList<const char*> account_ids;
@@ -34,7 +34,7 @@ private:
 
 public:
     String getName() override;
-    void addLogger(const ConsoleLogger & logger) override;
+    void addLogger(const Logger& logger) override;
     void addEvent(CRString key, const EventHandler & event) override;
     void update() override;
 

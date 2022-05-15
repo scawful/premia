@@ -283,7 +283,7 @@ String AccountView::getName() {
     return "Account";
 }
 
-void AccountView::addLogger(const ConsoleLogger & newLogger)
+void AccountView::addLogger(const Logger& newLogger)
 {
     this->logger = newLogger;
 }

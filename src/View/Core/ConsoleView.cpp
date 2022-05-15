@@ -318,7 +318,7 @@ ConsoleView::getName() {
     return "Console";
 }
 
-void ConsoleView::addLogger(const ConsoleLogger & newLogger)
+void ConsoleView::addLogger(const Logger& newLogger)
 {
     this->logger = newLogger;
 }

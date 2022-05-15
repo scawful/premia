@@ -258,7 +258,7 @@ MenuView::getName() {
     return "Menu";
 }
 
-void MenuView::addLogger(const ConsoleLogger & newLogger)
+void MenuView::addLogger(const Logger& newLogger)
 {
     this->logger = newLogger;
 }
