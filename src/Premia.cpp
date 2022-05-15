@@ -14,6 +14,6 @@ int main(int argc, char *argv[]) {
         std::cout << e.what() << std::endl;
     } finally {
         controller.onExit();
-    } proceed;
+    } Proceed;
     return EXIT_SUCCESS;
 }

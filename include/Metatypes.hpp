@@ -112,7 +112,7 @@ class never_thrown_exception {};
 
 #define Try          try_catch_finally([&](){ try
 #define finally      catch(never_thrown_exception){throw;} },[&]()
-#define proceed      ) 
+#define Proceed      ) 
 
 class Destruction 
     : public std::exception {};
@@ -136,6 +136,7 @@ inline auto cons_ins_des(const C &c, const I &i, const D &d)
 #define Construct   cons_ins_des([&]()
 #define Instruct    ,[&]()
 #define Destruct    ,[&]()
+#define RecursiveDestruct   ,[&]() { throw Destruction(); })
 
 #define canDestroy  catch (const Premia::FatalException & e) { \
                         std::cout << e.what() << std::endl; \

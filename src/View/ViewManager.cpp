@@ -120,6 +120,7 @@ ViewManager::update() const
             ImGui::TableSetupColumn(leftColView->getName().c_str());
             ImGui::TableSetupColumn(currentView->getName().c_str());
             ImGui::TableSetupColumn(rightColView->getName().c_str());
+
             ImGui::TableHeadersRow();
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0); 

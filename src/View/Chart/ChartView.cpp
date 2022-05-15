@@ -68,5 +68,5 @@ ChartView::update() {
         drawChart();
     } Destruct {
         logger("[ChartView] Destruct");
-    } proceed;
+    } Proceed;
 }

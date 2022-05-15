@@ -144,7 +144,7 @@ Controller::initEvents()
         viewManager.setCurrentView(std::make_shared<PrimaryView>());
         viewManager.setLoggedIn(); 
     });
-    viewManager.addEventHandler("quit", [this] () -> void { this->quit(); });
+    viewManager.addEventHandler("quit", [this]()->void{this->quit();});
 }
 
 /**

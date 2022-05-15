@@ -1,16 +1,50 @@
 #include "WatchlistView.hpp"
 
 void 
+WatchlistView::drawWatchlistMenu()
+{
+    const char* names[] = { "Local", "TDAmeritrade", "Coinbase", };
+    static bool toggles[] = { true, false, false };
+
+    if (ImGui::Button("Service"))
+        ImGui::OpenPopup("service_popup");
+
+    ImGui::SameLine();
+    ImGui::TextUnformatted(names[currentService]);
+    if (ImGui::BeginPopup("service_popup"))
+    {
+        if (ImGui::Selectable(names[0]))
+            currentService = 0;
+        if (ImGui::Selectable(names[1])) {
+            currentService = 1;
+        }
+        if (ImGui::Selectable(names[2]))
+            currentService = 2;
+        ImGui::EndPopup();
+    }
+}
+
+void 
 WatchlistView::drawWatchlistTable() {
     static int n = 0;
 
-    ImGui::Combo(" ", &n,  model.getWatchlistNamesCharVec().data(), (int) model.getWatchlistNamesCharVec().size()); 
+    ImGui::Combo("##watchlists", &n,  model.getWatchlistNamesCharVec().data(), (int) model.getWatchlistNamesCharVec().size()); 
 
     if (model.getOpenList(n) == 0) {
         for (int j = 0; j < model.getWatchlist(n).getNumInstruments(); j++) {
             model.setQuote(model.getWatchlist(n).getInstrumentSymbol(j), tda::TDA::getInstance().getQuote(model.getWatchlist(n).getInstrumentSymbol(j)));
         }
         model.setOpenList(n);
+    }
+    
+    ImGui::SameLine();
+    if (ImGui::Button(ICON_MD_EDIT_NOTE))
+        ImGui::OpenPopup("edit_popup");
+    if (ImGui::BeginPopup("edit_popup"))
+    {
+        ImGui::Button(ICON_MD_ADD);
+        ImGui::Button(ICON_MD_DELETE);
+        ImGui::EndPopup();
     }
 
     if (ImGui::BeginTable("Watchlist_Table", 5, watchlistFlags, ImVec2(0,0))) {
@@ -75,21 +109,27 @@ WatchlistView::addEvent(CRString key, const EventHandler & event) {
 void WatchlistView::update() {
     Construct { // runs once 
         model.addLogger(this->logger);
-        Try {
-            model.initWatchlist();
-            isLoggedIn = true;
-        } catch (Premia::NotLoggedInException) {       // non-fatal exceptions can log and continue 
-            logger("[Watchlist] User not logged in!");
-        } canDestroy finally {
-            isInit = true;
-        } proceed;
     } Instruct { // runs each frame 
-        if (isLoggedIn) {
-            drawWatchlistTable();
-        } else {
-            ImGui::Text("empty watchlist pane goes here");
+        drawWatchlistMenu();
+        switch (currentService) {
+            case 0: ImGui::Text("Local Watchlist"); break;
+            case 1: 
+                Construct { 
+                    try {
+                        model.initTDAWatchlists(); 
+                    } catch (Premia::NotLoggedInException) {
+                        logger("[Watchlist] User not logged in!");
+                        throw Destruction();
+                    }
+                } Instruct {
+                    drawWatchlistTable();
+                } RecursiveDestruct;
+                break;
+            case 2: ImGui::Text("Coinbase Watchlist"); break;
+            default: break;
         }
     } Destruct { // runs on throw Destruction, can be used for errors and memory managment 
-        // cleanup 
-    } proceed;
+        // user is not logged into a service 
+        // perhaps make a popup window that directs them to log into that service? (not necessarily an error)
+    } Proceed;
 }

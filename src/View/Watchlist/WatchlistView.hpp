@@ -9,13 +9,14 @@
 class WatchlistView: public View 
 {
 private:
+    int currentService = 0;
     bool isLoggedIn = false;
-    bool isInit = false;
     EventMap events;
     Logger logger;
     WatchlistModel model;
 
     void initWatchlist();
+    void drawWatchlistMenu();
     void drawWatchlistTable();
 
 public:

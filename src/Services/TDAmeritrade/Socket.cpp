@@ -131,7 +131,7 @@ namespace tda
         _logger("WebSocket::on_handshake: success!");
         
         // Send the message
-        write(_login_request);
+        write(_requests);
     }
 
     /**
@@ -212,9 +212,5 @@ namespace tda
 
         _logger("WebSocket::on_close: ");
         _logger(beast::buffers_to_string(_buffer.data()));
-
-        // If we get here then the connection is closed gracefully
-        // The make_printable() function helps print a ConstBufferSequence
-        std::cout << beast::make_printable(_buffer.data()) << std::endl;
     }
 }

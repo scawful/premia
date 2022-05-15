@@ -300,7 +300,7 @@ Client::start_session(Logger logger, CRString ticker) {
         ssl::context context{ssl::context::tlsv12_client};
         websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context, logger, all_requests);
         websocket_session->open(host.c_str(), port.c_str());
-    } proceed;
+    } Proceed;
 }
 
 /**
@@ -311,7 +311,7 @@ void
 Client::send_logout_request() {
     json::ptree logout_request = create_logout_request();
     std::stringstream logout_text_stream;
-    pt::write_json(logout_text_stream, logout_request);
+    json::write_json(logout_text_stream, logout_request);
     String logout_text = logout_text_stream.str();
     websocket_session->write(logout_text);
     websocket_session->close();

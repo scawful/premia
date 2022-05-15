@@ -17,9 +17,10 @@ private:
 
 public:
     bool isActive() const;
-    
     void addLogger(const Logger& logger);
+
     void initWatchlist();
+    void initTDAWatchlists();
     bool getOpenList(int n);
     void setOpenList(int n);
     String getWatchlistName(int index);
