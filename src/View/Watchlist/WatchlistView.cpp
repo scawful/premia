@@ -15,9 +15,8 @@ WatchlistView::drawWatchlistMenu()
     {
         if (ImGui::Selectable(names[0]))
             currentService = 0;
-        if (ImGui::Selectable(names[1])) {
+        if (ImGui::Selectable(names[1]))
             currentService = 1;
-        }
         if (ImGui::Selectable(names[2]))
             currentService = 2;
         ImGui::EndPopup();
