@@ -70,6 +70,7 @@ namespace tda
         boost::asio::thread_pool ioc_pool;
         std::shared_ptr<tda::Socket> websocket_session;
         std::shared_ptr<ArrayList<String>> websocket_buffer;
+        ssl::context context{ssl::context::tlsv12_client};
         ArrayList<std::shared_ptr<String const>> request_queue;
         ArrayList<std::thread> ws_threads;
 
@@ -85,6 +86,7 @@ namespace tda
         void post_authorized_request(CRString endpoint, CRString data) const;
         String post_access_token() const;
         void get_user_principals();
+        void check_user_principals();
 
         // WebSocket functions
         json::ptree create_login_request();

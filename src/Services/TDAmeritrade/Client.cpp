@@ -166,6 +166,12 @@ Client::get_user_principals() {
     has_user_principals = true;
 }
 
+void 
+Client::check_user_principals() {
+    if (!has_user_principals)
+        get_user_principals();
+}
+
 
 json::ptree 
 Client::create_login_request() {
@@ -173,6 +179,7 @@ Client::create_login_request() {
     json::ptree requests;
     json::ptree parameters;
 
+    check_user_principals();
     BOOST_FOREACH (json::ptree::value_type &v, _user_principals.get_child("accounts.")) {
         for (auto const & acct_it : v.second) {
             account_data[acct_it.first] = acct_it.second.get_value<std::string>();
@@ -245,7 +252,7 @@ Client::create_logout_request() {
     json::ptree requests;
     json::ptree parameters;
     requests.put("service", "ADMIN");
-    requests.put("requestid", 1);
+    requests.put("requestid", 3);
     requests.put("command", "LOGOUT");
     requests.put("account", account_data["accountId"]);
     requests.put("source", _user_principals.get<String>(json::ptree::path_type("streamerInfo.appId")));
@@ -284,23 +291,26 @@ void
 Client::start_session(Logger logger, CRString ticker) {
     String host;
     String port = "443";
+    String all_requests;
+    json::ptree requests;
+    std::stringstream requests_text_stream;
+    ArrayList<json::ptree> requests_array;
+
     Try {
         host = _user_principals.get<String>("streamerInfo.streamerSocketUrl");
     } catch (const json::ptree_error &) {
         logger("Client::start_session::ptree_bad_path@[streamerInfo.streamerSocketUrl]");
     } finally {
-        ArrayList<json::ptree> requests_array;
-        requests_array.push_back(create_login_request());
-        requests_array.push_back(create_service_request(QUOTE, ticker, "0,1,2,3,4,5,6,7,8"));
-        json::ptree requests = bind_requests(requests_array);
-        std::stringstream requests_text_stream;
-        write_json(requests_text_stream, requests);
-        String all_requests = requests_text_stream.str();
 
-        ssl::context context{ssl::context::tlsv12_client};
-        websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context, logger, all_requests);
-        websocket_session->open(host.c_str(), port.c_str());
-    } Proceed;
+    } Proceed;        
+
+    requests_array.push_back(create_login_request());
+    requests_array.push_back(create_service_request(QUOTE, ticker, "0,1,2,3,4,5,6,7,8"));
+    requests = bind_requests(requests_array);
+    write_json(requests_text_stream, requests);
+    all_requests = requests_text_stream.str();
+    websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(), context, logger, all_requests);
+    websocket_session->open(host.c_str(), port.c_str());
 }
 
 /**
@@ -336,7 +346,7 @@ Client::fetch_access_token() {
  */
 String 
 Client::get_account(CRString account_id) {
-    get_user_principals();
+    check_user_principals();
     String account_url = "https://api.tdameritrade.com/v1/accounts/{accountNum}?fields=positions,orders";
     Utils::string_replace(account_url, "{accountNum}", account_id);
     return send_authorized_request(account_url);
@@ -349,7 +359,7 @@ Client::get_account(CRString account_id) {
  */
 String 
 Client::get_all_accounts() {
-    get_user_principals();
+    check_user_principals();
     String account_url = "https://api.tdameritrade.com/v1/accounts/?fields=positions,orders";
     return send_authorized_request(account_url);
 }
@@ -477,21 +487,36 @@ Client::get_option_chain(CRString ticker, CRString contractType, CRString strike
     return send_request(url);
 }
 
-
+/**
+ * @brief Retrieve order by the account and the order id
+ * 
+ * @param account_id 
+ * @param order_id 
+ * @return String 
+ */
 String 
-Client::get_order(CRString account_id, CRString order_id) const
-{
+Client::get_order(CRString account_id, 
+                  CRString order_id) const {
     String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders/{orderId}";
     Utils::string_replace(endpoint, "{accountId}", account_id);
     Utils::string_replace(endpoint, "{orderId}", order_id);
     return send_authorized_request(endpoint);
 }
 
+/**
+ * @brief Retrieve Order using query parameters 
+ * 
+ * @param account_id 
+ * @param maxResults 
+ * @param fromEnteredTime 
+ * @param toEnteredTime 
+ * @param status 
+ * @return String 
+ */
 String 
 Client::get_orders_by_query(CRString account_id, int maxResults, 
                             double fromEnteredTime, double toEnteredTime, 
-                            OrderStatus status) const 
-{
+                            OrderStatus status) const {
     String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders?maxResults={maxResults}&fromEnteredTime={from}&toEnteredTime={to}&status={status}";
     Utils::string_replace(endpoint, "{accountId}", account_id);
     Utils::string_replace(endpoint, "{maxResults}", std::to_string(maxResults));
@@ -501,6 +526,12 @@ Client::get_orders_by_query(CRString account_id, int maxResults,
     return send_authorized_request(endpoint);
 }
 
+/**
+ * @brief Place an Order for the account by id 
+ * 
+ * @param account_id 
+ * @param order 
+ */
 void 
 Client::place_order(CRString account_id, const Order & order) const {
     String endpoint = "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
@@ -508,6 +539,12 @@ Client::place_order(CRString account_id, const Order & order) const {
     post_authorized_request(endpoint, order.getString());
 }
 
+/**
+ * @brief temp function for passing key to client 
+ * 
+ * @param key 
+ * @param token 
+ */
 void 
 Client::addAuth(CRString key, CRString token) {
     api_key = key;
