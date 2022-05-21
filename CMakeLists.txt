@@ -71,6 +71,7 @@ add_executable(
     src/Model/Model.cpp
     src/Model/Chart/ChartModel.cpp
     src/Model/Options/OptionsModel.cpp
+    src/Model/Account/AccountModel.cpp
     src/Model/Core/WatchlistModel.cpp
     # View + View Manager 
     src/View/Workspace.cpp

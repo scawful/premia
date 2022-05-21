@@ -3,17 +3,17 @@
 
 #include "Premia.hpp"
 #include "Interface/TDA.hpp"
+#include "Interface/TWS.hpp"
 
 class Model 
 {
 private:
-    std::unordered_map<String, EventHandler> callbacks;
+    EventMap callbacks;
     Logger consoleLogger;
     
 public:
     Model()=default;
     ~Model()=default;
-    
 
     void addLogger(const Logger& logger);
     void addEventHandler(CRString key, const EventHandler & handler);
