@@ -194,7 +194,8 @@ namespace tda
     Socket::close() {
         _io_in_progress = true;
         _logger("WebSocket::close");
-        _ws.async_close(websocket::close_code::normal, beast::bind_front_handler(&Socket::on_close, shared_from_this()));
+        _ws.async_close(websocket::close_code::normal, 
+                        beast::bind_front_handler(&Socket::on_close, shared_from_this()));
     }
 
     /**

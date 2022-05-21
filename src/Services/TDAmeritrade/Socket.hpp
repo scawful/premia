@@ -23,7 +23,7 @@ namespace tda {
         Logger _logger;
         net::io_context _ioc;
         tcp::resolver _resolver;
-        beast::multi_buffer _buffer;
+        beast::flat_buffer _buffer;
         std::atomic<bool> _io_in_progress{false};
         websocket::stream<beast::ssl_stream<beast::tcp_stream>> _ws;
 
