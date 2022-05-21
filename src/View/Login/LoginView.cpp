@@ -13,24 +13,46 @@ void LoginView::drawScreen() const
     io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
     io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
-    static String consumer_key;
-    static String refresh_token;
+    static String username;
+    static String password;
     
-    ImGui::Text("%s %s", ICON_MD_SHOW_CHART, ICON_MD_BAR_CHART);
-    ImGui::Separator();
 
-    if ( ImGui::Button("Guest Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
-        tda::TDA::getInstance().authUser("", "");
+    if (ImGui::BeginTable("split", 2, ImGuiTableFlags_SizingStretchProp)) {
+        ImGui::TableNextColumn();
+        ImGui::Text(ICON_MD_PERSON); 
+        ImGui::TableNextColumn();
+        ImGui::InputText("##username", &username);
+
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::Text(ICON_MD_PASSWORD);
+        ImGui::TableNextColumn();
+        ImGui::InputText("##password", &password);
+
+        ImGui::EndTable();
+    }
+
+    // ImGui::Text(ICON_MD_PERSON); 
+    // ImGui::SameLine(); 
+    // ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+    // ImGui::InputText("##username", &username);
+
+    // ImGui::Text(ICON_MD_PASSWORD);
+    // ImGui::SameLine(); 
+    // ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+    // ImGui::InputText("##password", &password);
+    if ( ImGui::Button("Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
         events.at("login")();
     }
 
     ImGui::Separator();
-
-    ImGui::Text("Consumer Key: "); ImGui::SameLine(); ImGui::InputText("##username", &consumer_key);
-    ImGui::Text("Refresh Token: "); ImGui::SameLine(); ImGui::InputText("##password", &refresh_token);
+    ImGui::Text(ICON_MD_SETTINGS_ETHERNET);
+    ImGui::SameLine();
     
-    if ( ImGui::Button("TDA Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
+    if ( ImGui::Button("TDA Auth", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
         std::ifstream keyfile("assets/apikey.txt");
+        String consumer_key;
+        String refresh_token;
         if (keyfile.good()) {
             std::stringstream buffer;
             buffer << keyfile.rdbuf();
@@ -39,7 +61,6 @@ void LoginView::drawScreen() const
             buffer >> refresh_token;
         }
         tda::TDA::getInstance().authUser(consumer_key, refresh_token);
-        events.at("login")();
     }
 
 }

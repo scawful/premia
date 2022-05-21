@@ -2,6 +2,7 @@
 #define ViewManager_hpp
 
 #include "Virtual/View.hpp"
+#include "Style.hpp"
 #include "Core/PrimaryView.hpp"
 #include "Login/LoginView.hpp"
 #include "Menu/MenuView.hpp"

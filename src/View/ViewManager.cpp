@@ -7,7 +7,7 @@ ViewManager::startGuiFrame() const {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
     if (!isLoggedIn)
-        dimensions = ImVec2(400,250);
+        dimensions = ImVec2(Style::LOGIN_WIDTH, Style::LOGIN_HEIGHT);
 
     ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
     ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize |
