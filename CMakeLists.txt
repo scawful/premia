@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # C++ Standard Specifications ------------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3")
@@ -14,9 +14,7 @@ include_directories(include)
 
 # Boost library --------------------------------------------------------------------------------------------------
 set(Boost_USE_STATIC_LIBS ON)
-set(BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM "iostreams thread system filesystem") #required by gnuplot-iostream
-separate_arguments(BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM)
-find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPONENTS_FOR_GNUPLOT_IOSTREAM})
+find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # SDL libraries --------------------------------------------------------------------------------------------------
@@ -59,6 +57,12 @@ file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp)
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
+# TWS library -------------------------------------------------------------------------------------------------
+set(TWS_PATH "libs/tws")
+file(GLOB TWS_SOURCES ${TWS_PATH}/*.cpp)
+add_library("TWS" STATIC ${TWS_SOURCES})
+target_include_directories("TWS" PUBLIC ${TWS_PATH})
+
 # Premia Executable Linkage --------------------------------------------------------------------------------------
 add_executable(
     Premia 
@@ -85,12 +89,15 @@ add_executable(
     src/Controller/Controller.cpp    
     # Services 
     src/Services/Halext/Client.cpp 
-    src/Services/Halext/User.cpp    
+    src/Services/Halext/User.cpp  
+    ## IEXCloud Service  
     src/Services/IEXCloud/Client.cpp 
     src/Services/IEXCloud/Parser.cpp
+    ## Coinbase Service 
     src/Services/CoinbasePro/Account.cpp 
     src/Services/CoinbasePro/Client.cpp 
     src/Services/CoinbasePro/Product.cpp
+    ## TDAmeritrade Service 
     src/Services/TDAmeritrade/Parser.cpp
     src/Services/TDAmeritrade/Socket.cpp
     src/Services/TDAmeritrade/Client.cpp
@@ -101,6 +108,14 @@ add_executable(
     src/Services/TDAmeritrade/Data/Order.cpp
     src/Services/TDAmeritrade/Data/UserPrincipals.cpp
     src/Services/TDAmeritrade/Data/PriceHistory.cpp 
+    ## InteractiveBrokers Service
+    src/Services/InteractiveBrokers/Client.cpp
+    src/Services/InteractiveBrokers/ContractSamples.cpp
+    src/Services/InteractiveBrokers/OrderSamples.cpp
+    src/Services/InteractiveBrokers/ScannerSubscriptionSamples.cpp
+    src/Services/InteractiveBrokers/AvailableAlgoParams.cpp
+    src/Services/InteractiveBrokers/AccountSummaryTags.cpp
+    src/Services/InteractiveBrokers/Utils.cpp
     # GUI libraries 
     ${IMGUI_PATH}/imgui.cpp 
     ${IMGUI_PATH}/imgui_demo.cpp
@@ -121,6 +136,7 @@ target_link_libraries(
     ${BOOST_LIBRARIES} 
     ${SDL2_LIBRARIES} 
     ${OPENGL_LIBRARIES} 
+    TWS
     ImGui 
     ImPlot
     curl
