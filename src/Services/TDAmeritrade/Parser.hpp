@@ -17,7 +17,7 @@ namespace tda
     {
     private:
         void parseStrikeMap(const json::ptree & data, OptionChain & chain, int idx) const;
-        const StringList months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec" };
+        const StringList months = { "N/A", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec" };
 
     public:
         json::ptree read_response(CRString response) const;
