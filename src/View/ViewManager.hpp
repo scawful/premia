@@ -33,9 +33,9 @@ private:
     Logger consoleLogger;
 
     // Views 
-    std::shared_ptr<View> leftColView;
+    std::shared_ptr<View> leftColView = std::make_shared<WatchlistView>();
     std::shared_ptr<View> currentView;
-    std::shared_ptr<View> rightColView;
+    std::shared_ptr<View> rightColView = std::make_shared<AccountView>();
 
     std::shared_ptr<LoginView> loginView = std::make_shared<LoginView>();
     std::shared_ptr<MenuView> menuView = std::make_shared<MenuView>();

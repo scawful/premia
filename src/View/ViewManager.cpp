@@ -53,8 +53,6 @@ ViewManager::setRightColumnView(std::shared_ptr<View> view)
 
 ViewManager::ViewManager() {
     consoleLogger = std::bind(&ConsoleView::addLogStd, consoleView, std::placeholders::_1);
-    leftColView = std::make_shared<WatchlistView>();
-    rightColView = std::make_shared<AccountView>();
     leftColView->addLogger(consoleLogger);
     rightColView->addLogger(consoleLogger);
     consoleView->addLogger(consoleLogger); // you're be surprised, but this is necessary 
