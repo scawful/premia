@@ -13,55 +13,58 @@ void LoginView::drawScreen() const
     io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
     io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
     io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
+    static bool tdaAuth;
+    static bool coinbaseAuth;
     static String username;
     static String password;
     
-
-    if (ImGui::BeginTable("split", 2, ImGuiTableFlags_SizingStretchProp)) {
+    if (ImGui::BeginTable("split", 2, ImGuiTableFlags_None)) {
         ImGui::TableNextColumn();
         ImGui::Text(ICON_MD_PERSON); 
         ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(175.f);
         ImGui::InputText("##username", &username);
 
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::Text(ICON_MD_PASSWORD);
         ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(175.f);
         ImGui::InputText("##password", &password);
 
         ImGui::EndTable();
     }
 
-    // ImGui::Text(ICON_MD_PERSON); 
-    // ImGui::SameLine(); 
-    // ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-    // ImGui::InputText("##username", &username);
-
-    // ImGui::Text(ICON_MD_PASSWORD);
-    // ImGui::SameLine(); 
-    // ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-    // ImGui::InputText("##password", &password);
-    if ( ImGui::Button("Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
+    if (ImGui::Button("Login", 
+        ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
+        if (tdaAuth) {
+            std::ifstream keyfile("assets/apikey.txt");
+            String consumer_key;
+            String refresh_token;
+            if (keyfile.good()) {
+                std::stringstream buffer;
+                buffer << keyfile.rdbuf();
+                keyfile.close();
+                buffer >> consumer_key;
+                buffer >> refresh_token;
+            }
+            tda::TDA::getInstance().authUser(consumer_key, refresh_token);
+        }
         events.at("login")();
     }
 
     ImGui::Separator();
-    ImGui::Text(ICON_MD_SETTINGS_ETHERNET);
-    ImGui::SameLine();
-    
-    if ( ImGui::Button("TDA Auth", ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
-        std::ifstream keyfile("assets/apikey.txt");
-        String consumer_key;
-        String refresh_token;
-        if (keyfile.good()) {
-            std::stringstream buffer;
-            buffer << keyfile.rdbuf();
-            keyfile.close();
-            buffer >> consumer_key;
-            buffer >> refresh_token;
-        }
-        tda::TDA::getInstance().authUser(consumer_key, refresh_token);
+    if (ImGui::BeginTable("APIICON", 3, ImGuiTableFlags_SizingStretchSame)) {
+        ImGui::TableNextColumn();
+        ImGui::Text(ICON_MD_API);
+        ImGui::TableNextColumn();
+        ImGui::Checkbox("TDA", &tdaAuth);
+        ImGui::TableNextColumn();
+        ImGui::Checkbox("CB", &coinbaseAuth);
+        ImGui::EndTable();
     }
+    
+    
 
 }
 

@@ -4,7 +4,7 @@
 #include "Library/ImGui.hpp"
 
 namespace Style {
-    constexpr size_t LOGIN_WIDTH = 200;
+    constexpr size_t LOGIN_WIDTH = 220;
     constexpr size_t LOGIN_HEIGHT = 200;
     constexpr size_t SCREEN_WIDTH = 1200;
     constexpr size_t SCREEN_HEIGHT = 800;
