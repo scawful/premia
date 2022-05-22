@@ -4,97 +4,14 @@
 // Portable helpers
 static int   Stricmp(const char* s1, const char* s2)         { int d; while ((d = toupper(*s2) - toupper(*s1)) == 0 && *s1) { s1++; s2++; } return d; }
 static int   Strnicmp(const char* s1, const char* s2, int n) { int d = 0; while (n > 0 && (d = toupper(*s2) - toupper(*s1)) == 0 && *s1) { s1++; s2++; n--; } return d; }
-static char* Strdup(const char* s)                           { IM_ASSERT(s); size_t len = strlen(s) + 1; void* buf = malloc(len); IM_ASSERT(buf); return (char*)memcpy(buf, (const void*)s, len); }
+static char* Strdup(const char* s)                           { IM_ASSERT(s); size_t len = strlen(s) + 1; void* buf = malloc(len); IM_ASSERT(buf); return (char*) memcpy(buf, (const void*)s, len); }
 static void  Strtrim(char* s)                                { char* str_end = s + strlen(s); while (str_end > s && str_end[-1] == ' ') str_end--; *str_end = 0; }
-
-void 
-ConsoleView::clearLog() {
-    for (int i = 0; i < Items.Size; i++)
-        free(Items[i]);
-    Items.clear();
-}
-
-void 
-ConsoleView::addLog(const char* fmt, ...) {
-    char buf[1024];
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
-    buf[IM_ARRAYSIZE(buf)-1] = 0;
-    va_end(args);
-    Items.push_back(Strdup(buf));
-}
-
-void 
-ConsoleView::addLogStd(CRString data) {
-    const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    auto hours = now.time_of_day().hours(); 
-    auto minutes = now.time_of_day().minutes();
-
-    String log = "[";
-    log += std::to_string(hours);
-    log += ":" + std::to_string(minutes) + "] " + data;
-
-    Items.push_back(Strdup(log.c_str()));
-}
-
-
-void 
-ConsoleView::executeCommand(const char* command_line) {
-    addLog("# %s\n", command_line);
-
-    // Insert into history. First find match and delete it so it can be pushed to the back.
-    // This isn't trying to be smart or optimal.
-    HistoryPos = -1;
-    for (int i = History.Size - 1; i >= 0; i--)
-        if (Stricmp(History[i], command_line) == 0) {
-            free(History[i]);
-            History.erase(History.begin() + i);
-            break;
-        }
-    History.push_back(Strdup(command_line));
-    String commandString = command_line;
-
-    // Process command
-    if (Stricmp(command_line, "CLEAR") == 0) {
-        clearLog();
-    } else if (Stricmp(command_line, "HELP") == 0) {
-        addLog("Commands:");
-        for (int i = 0; i < Commands.Size; i++)
-            addLog("- %s", Commands[i]);
-    } else if (Stricmp(command_line, "HISTORY") == 0) {
-        int first = History.Size - 10;
-        for (int i = first > 0 ? first : 0; i < History.Size; i++)
-            addLog("%3d: %s\n", i, History[i]);
-    } else if (Stricmp(command_line, "GUIDEMO") == 0) {
-        guiDemo = true;
-    } else if (Stricmp(command_line, "PLOTDEMO") == 0) {
-        plotDemo = true;
-    } else if (Stricmp(command_line, "CLOSE_SOCKET") == 0) {
-        addLogStd("Ending WebSocket session...");
-        tda::TDA::getInstance().sendSocketLogout();
-    } else if (commandString.substr(0,10) == "LOAD_QUOTE") {
-        String ticker = commandString.substr(11, commandString.size());
-        addLogStd("Opening WebSocket session and requesting QUOTE for " + ticker);
-        tda::TDA::getInstance().sendChartRequestToSocket(logger, ticker);
-    } else {
-        addLog("Unknown command: '%s'\n", command_line);
-    }
-
-    // On command input, we scroll to bottom even if AutoScroll==false
-    ScrollToBottom = true;
-}
-
-// In C++11 you'd be better off using lambdas for this sort of forwarding callbacks
-static int 
-TextEditCallbackStub(ImGuiInputTextCallbackData* data) {
-    auto console = (ConsoleView*) data->UserData;
-    return console->TextEditCallback(data);
-}
 
 int 
 ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data) {
-    //addLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
+    if (DebugCallback)
+        addLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
+        
     switch (data->EventFlag) {
         case ImGuiInputTextFlags_CallbackCompletion: {
             // TEXT COMPLETION
@@ -177,22 +94,61 @@ ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data) {
     return 0;
 }
 
+// Removes all contents from scrolling region 
+void ConsoleView::clearLog() {
+    for (int i = 0; i < Items.Size; i++)
+        free(Items[i]);
+    Items.clear();
+}
+
+// Insert into history. First find match and delete it so it can be pushed to the back.
+void ConsoleView::addToHistory(const char * line) {
+    HistoryPos = -1;
+    for (int i = History.Size - 1; i >= 0; i--)
+        if (Stricmp(History[i], line) == 0) {
+            free(History[i]);
+            History.erase(History.begin() + i);
+            break;
+        }
+    History.push_back(Strdup(line));
+}
 
 void 
-ConsoleView::drawScreen() {
-   const ImGuiIO & io = ImGui::GetIO();
+ConsoleView::executeCommand(const char* command_line) {
+    addLog("# %s\n", command_line);
+    addToHistory(command_line);
+    String commandString = command_line;
 
-    ImGui::BeginChild("ScrollingRegion", 
-                      ImVec2(0, ImGui::GetContentRegionAvail().y * 0.8f), 
-                      false, ImGuiWindowFlags_None);
-    
-    if (ImGui::BeginPopupContextWindow()) {
-        if (ImGui::Selectable("Clear")) clearLog();
-        copy_to_clipboard = ImGui::SmallButton("Copy");
-        ImGui::Checkbox("Auto-scroll", &AutoScroll);
-        ImGui::EndPopup();
+    // Process command
+    if (Stricmp(command_line, "CLEAR") == 0) {
+        clearLog();
+    } else if (Stricmp(command_line, "HELP") == 0) {
+        addLog("Commands:");
+        for (int i = 0; i < Commands.Size; i++)
+            addLog("- %s", Commands[i]);
+    } else if (Stricmp(command_line, "HISTORY") == 0) {
+        int first = History.Size - 10;
+        for (int i = first > 0 ? first : 0; i < History.Size; i++)
+            addLog("%3d: %s\n", i, History[i]);
+    } else if (Stricmp(command_line, "GUIDEMO") == 0) {
+        guiDemo = true;
+    } else if (Stricmp(command_line, "PLOTDEMO") == 0) {
+        plotDemo = true;
+    } else if (Stricmp(command_line, "CLOSE_SOCKET") == 0) {
+        addLogStd("Ending WebSocket session...");
+        tda::TDA::getInstance().sendSocketLogout();
+    } else if (commandString.substr(0,10) == "LOAD_QUOTE") {
+        String ticker = commandString.substr(11, commandString.size());
+        addLogStd("Opening WebSocket session and requesting QUOTE for " + ticker);
+        tda::TDA::getInstance().sendChartRequestToSocket(logger, ticker);
+    } else {
+        addLog("Unknown command: '%s'\n", command_line);
     }
 
+    ScrollToBottom = true; // On command input, we scroll to bottom even if AutoScroll==false
+}
+
+void ConsoleView::displayCommands() {
     // Display every line as a separate entry so we can change their color or add custom widgets.
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
     if (copy_to_clipboard)
@@ -225,13 +181,31 @@ ConsoleView::drawScreen() {
     ScrollToBottom = false;
 
     ImGui::PopStyleVar();
+}
+
+void 
+ConsoleView::drawContextMenu() {
+    if (ImGui::BeginPopupContextWindow()) {
+        if (ImGui::Selectable("Clear")) clearLog();
+        copy_to_clipboard = ImGui::SmallButton("Copy");
+        ImGui::Checkbox("Auto-scroll", &AutoScroll);
+        ImGui::Checkbox("Debug Callback", &DebugCallback);
+        ImGui::EndPopup();
+    }
+}
+
+void 
+ConsoleView::drawConsole() {
+    // Console Display 
+    ImGui::BeginChild("ScrollingRegion", 
+                      ImVec2(0, ImGui::GetContentRegionAvail().y * 0.8f), 
+                      false, ImGuiWindowFlags_None);
+    drawContextMenu();
+    displayCommands();
     ImGui::EndChild();
     ImGui::Separator();
 
-    // Command-line
-    bool reclaim_focus = false;
-    ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-
+    // Input Widget 
     if (ImGui::BeginTable("##consoleWidget", 3, 
                           ImGuiTableFlags_SizingStretchProp, 
                           ImVec2(0, ImGui::GetContentRegionAvail().y * 0.2f))) {
@@ -239,12 +213,13 @@ ConsoleView::drawScreen() {
         ImGui::TableSetupColumn("##second");
         ImGui::TableSetupColumn("##third");
         ImGui::TableNextColumn();
-        if (ImGui::InputText("Input", 
-                             InputBuf, 
-                             IM_ARRAYSIZE(InputBuf), 
-                             input_text_flags, 
-                             &TextEditCallbackStub, 
-                             (void*)this)) {
+        ImGui::Text(ICON_MD_TERMINAL);
+        ImGui::SameLine();
+        if (ImGui::InputText("##consoleInput", InputBuf, IM_ARRAYSIZE(InputBuf), input_text_flags, 
+                             [] (ImGuiInputTextCallbackData* data) {
+                                auto console = (ConsoleView*) data->UserData;
+                                return console->TextEditCallback(data);
+                             }, (void*) this)) {
             char* s = InputBuf;
             Strtrim(s);
             if (s[0])
@@ -290,6 +265,30 @@ ConsoleView::getName() {
 }
 
 void 
+ConsoleView::addLog(const char* fmt, ...) {
+    char buf[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
+    buf[IM_ARRAYSIZE(buf)-1] = 0;
+    va_end(args);
+    Items.push_back(Strdup(buf));
+}
+
+void 
+ConsoleView::addLogStd(CRString data) {
+    const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    auto hours = now.time_of_day().hours(); 
+    auto minutes = now.time_of_day().minutes();
+
+    String log = "[";
+    log += std::to_string(hours);
+    log += ":" + std::to_string(minutes) + "] " + data;
+
+    Items.push_back(Strdup(log.c_str()));
+}
+
+void 
 ConsoleView::addLogger(const Logger& newLogger) {
     this->logger = newLogger;
 }
@@ -307,10 +306,5 @@ ConsoleView::update() {
     if (plotDemo)
         ImPlot::ShowDemoWindow();
 
-    ImGuiStyle& style = ImGui::GetStyle();
-    ImGui::Separator();
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
-    drawScreen();
-    ImGui::PopStyleVar(2);
+    drawConsole();
 }

@@ -188,6 +188,7 @@ Controller::onInput()
                     case SDLK_DOWN:
                     case SDLK_RETURN:
                     case SDLK_BACKSPACE:
+                    case SDLK_TAB:
                         io.KeysDown[event.key.keysym.scancode] = (event.type == SDL_KEYDOWN);
                         break;
                     default:
