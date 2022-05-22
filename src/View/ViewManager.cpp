@@ -105,8 +105,7 @@ ViewManager::setCurrentView(std::shared_ptr<View> newView) {
 }
 
 void 
-ViewManager::update() const
-{
+ViewManager::update() const {
     startGuiFrame();
     if (menuActive)
         menuView->update();

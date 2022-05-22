@@ -7,15 +7,15 @@ static int   Strnicmp(const char* s1, const char* s2, int n) { int d = 0; while 
 static char* Strdup(const char* s)                           { IM_ASSERT(s); size_t len = strlen(s) + 1; void* buf = malloc(len); IM_ASSERT(buf); return (char*)memcpy(buf, (const void*)s, len); }
 static void  Strtrim(char* s)                                { char* str_end = s + strlen(s); while (str_end > s && str_end[-1] == ' ') str_end--; *str_end = 0; }
 
-void ConsoleView::clearLog()
-{
+void 
+ConsoleView::clearLog() {
     for (int i = 0; i < Items.Size; i++)
         free(Items[i]);
     Items.clear();
 }
 
-void ConsoleView::addLog(const char* fmt, ...)
-{
+void 
+ConsoleView::addLog(const char* fmt, ...) {
     char buf[1024];
     va_list args;
     va_start(args, fmt);
@@ -25,8 +25,8 @@ void ConsoleView::addLog(const char* fmt, ...)
     Items.push_back(Strdup(buf));
 }
 
-void ConsoleView::addLogStd(CRString data)
-{
+void 
+ConsoleView::addLogStd(CRString data) {
     const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
     auto hours = now.time_of_day().hours(); 
     auto minutes = now.time_of_day().minutes();
@@ -39,16 +39,15 @@ void ConsoleView::addLogStd(CRString data)
 }
 
 
-void ConsoleView::executeCommand(const char* command_line)
-{
+void 
+ConsoleView::executeCommand(const char* command_line) {
     addLog("# %s\n", command_line);
 
     // Insert into history. First find match and delete it so it can be pushed to the back.
     // This isn't trying to be smart or optimal.
     HistoryPos = -1;
     for (int i = History.Size - 1; i >= 0; i--)
-        if (Stricmp(History[i], command_line) == 0)
-        {
+        if (Stricmp(History[i], command_line) == 0) {
             free(History[i]);
             History.erase(History.begin() + i);
             break;
@@ -59,18 +58,15 @@ void ConsoleView::executeCommand(const char* command_line)
     // Process command
     if (Stricmp(command_line, "CLEAR") == 0) {
         clearLog();
-    }
-    else if (Stricmp(command_line, "HELP") == 0) {
+    } else if (Stricmp(command_line, "HELP") == 0) {
         addLog("Commands:");
         for (int i = 0; i < Commands.Size; i++)
             addLog("- %s", Commands[i]);
-    }
-    else if (Stricmp(command_line, "HISTORY") == 0) {
+    } else if (Stricmp(command_line, "HISTORY") == 0) {
         int first = History.Size - 10;
         for (int i = first > 0 ? first : 0; i < History.Size; i++)
             addLog("%3d: %s\n", i, History[i]);
-    }
-    else if (Stricmp(command_line, "GUIDEMO") == 0) {
+    } else if (Stricmp(command_line, "GUIDEMO") == 0) {
         guiDemo = true;
     } else if (Stricmp(command_line, "PLOTDEMO") == 0) {
         plotDemo = true;
@@ -90,26 +86,23 @@ void ConsoleView::executeCommand(const char* command_line)
 }
 
 // In C++11 you'd be better off using lambdas for this sort of forwarding callbacks
-static int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
-{
-    ConsoleView* console = (ConsoleView*)data->UserData;
+static int 
+TextEditCallbackStub(ImGuiInputTextCallbackData* data) {
+    auto console = (ConsoleView*) data->UserData;
     return console->TextEditCallback(data);
 }
 
-int ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data)
-{
+int 
+ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data) {
     //addLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
-    switch (data->EventFlag)
-    {
-    case ImGuiInputTextFlags_CallbackCompletion:
-        {
-            // Example of TEXT COMPLETION
-
+    switch (data->EventFlag) {
+        case ImGuiInputTextFlags_CallbackCompletion: {
+            // TEXT COMPLETION
             // Locate beginning of current word
             const char* word_end = data->Buf + data->CursorPos;
             const char* word_start = word_end;
-            while (word_start > data->Buf)
-            {
+
+            while (word_start > data->Buf) {
                 const char c = word_start[-1];
                 if (c == ' ' || c == '\t' || c == ',' || c == ';')
                     break;
@@ -122,25 +115,19 @@ int ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data)
                 if (Strnicmp(Commands[i], word_start, (int)(word_end - word_start)) == 0)
                     candidates.push_back(Commands[i]);
 
-            if (candidates.Size == 0)
-            {
+            if (candidates.Size == 0) {
                 // No match
                 addLog("No match for \"%.*s\"!\n", (int)(word_end - word_start), word_start);
-            }
-            else if (candidates.Size == 1)
-            {
+            } else if (candidates.Size == 1) {
                 // Single match. Delete the beginning of the word and replace it entirely so we've got nice casing.
                 data->DeleteChars((int)(word_start - data->Buf), (int)(word_end - word_start));
                 data->InsertChars(data->CursorPos, candidates[0]);
                 data->InsertChars(data->CursorPos, " ");
-            }
-            else
-            {
+            } else {
                 // Multiple matches. Complete as much as we can..
                 // So inputing "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as matches.
                 int match_len = (int)(word_end - word_start);
-                for (;;)
-                {
+                for (;;) {
                     int c = 0;
                     bool all_candidates_matches = true;
                     for (int i = 0; i < candidates.Size && all_candidates_matches; i++)
@@ -153,8 +140,7 @@ int ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data)
                     match_len++;
                 }
 
-                if (match_len > 0)
-                {
+                if (match_len > 0) {
                     data->DeleteChars((int)(word_start - data->Buf), (int)(word_end - word_start));
                     data->InsertChars(data->CursorPos, candidates[0], candidates[0] + match_len);
                 }
@@ -167,27 +153,21 @@ int ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data)
 
             break;
         }
-    case ImGuiInputTextFlags_CallbackHistory:
-        {
-            // Example of HISTORY
+        case ImGuiInputTextFlags_CallbackHistory: {
             const int prev_history_pos = HistoryPos;
-            if (data->EventKey == ImGuiKey_UpArrow)
-            {
+            if (data->EventKey == ImGuiKey_UpArrow) {
                 if (HistoryPos == -1)
                     HistoryPos = History.Size - 1;
                 else if (HistoryPos > 0)
                     HistoryPos--;
-            }
-            else if (data->EventKey == ImGuiKey_DownArrow)
-            {
+            } else if (data->EventKey == ImGuiKey_DownArrow) {
                 if (HistoryPos != -1)
                     if (++HistoryPos >= History.Size)
                         HistoryPos = -1;
             }
 
             // A better implementation would preserve the data on the current input line along with cursor position.
-            if (prev_history_pos != HistoryPos)
-            {
+            if (prev_history_pos != HistoryPos) {
                 const char* history_str = (HistoryPos >= 0) ? History[HistoryPos] : "";
                 data->DeleteChars(0, data->BufTextLen);
                 data->InsertChars(0, history_str);
@@ -198,13 +178,18 @@ int ConsoleView::TextEditCallback(ImGuiInputTextCallbackData* data)
 }
 
 
-void ConsoleView::drawScreen()
-{
+void 
+ConsoleView::drawScreen() {
    const ImGuiIO & io = ImGui::GetIO();
 
-    ImGui::BeginChild("ScrollingRegion", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.8f), false, ImGuiWindowFlags_None);
+    ImGui::BeginChild("ScrollingRegion", 
+                      ImVec2(0, ImGui::GetContentRegionAvail().y * 0.8f), 
+                      false, ImGuiWindowFlags_None);
+    
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::Selectable("Clear")) clearLog();
+        copy_to_clipboard = ImGui::SmallButton("Copy");
+        ImGui::Checkbox("Auto-scroll", &AutoScroll);
         ImGui::EndPopup();
     }
 
@@ -212,8 +197,8 @@ void ConsoleView::drawScreen()
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
     if (copy_to_clipboard)
         ImGui::LogToClipboard();
-    for (int i = 0; i < Items.Size; i++)
-    {
+    
+    for (int i = 0; i < Items.Size; i++) {
         const char* item = Items[i];
         if (!Filter.PassFilter(item))
             continue;
@@ -230,11 +215,13 @@ void ConsoleView::drawScreen()
         if (has_color)
             ImGui::PopStyleColor();
     }
+
     if (copy_to_clipboard)
         ImGui::LogFinish();
 
     if (ScrollToBottom || (AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
         ImGui::SetScrollHereY(1.0f);
+
     ScrollToBottom = false;
 
     ImGui::PopStyleVar();
@@ -245,37 +232,29 @@ void ConsoleView::drawScreen()
     bool reclaim_focus = false;
     ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
 
-    if (ImGui::BeginTable("##consoleWidget", 5, ImGuiTableFlags_SizingStretchProp, ImVec2(0, ImGui::GetContentRegionAvail().y * 0.2f))) {
+    if (ImGui::BeginTable("##consoleWidget", 3, 
+                          ImGuiTableFlags_SizingStretchProp, 
+                          ImVec2(0, ImGui::GetContentRegionAvail().y * 0.2f))) {
         ImGui::TableSetupColumn("##first");
         ImGui::TableSetupColumn("##second");
         ImGui::TableSetupColumn("##third");
-        ImGui::TableSetupColumn("##fourth");
-        ImGui::TableSetupColumn("##fifth");
-
         ImGui::TableNextColumn();
-        ImGui::SetNextItemWidth(100.f);
-        if (ImGui::InputText("Input", InputBuf, IM_ARRAYSIZE(InputBuf), input_text_flags, &TextEditCallbackStub, (void*)this))
-        {
+        if (ImGui::InputText("Input", 
+                             InputBuf, 
+                             IM_ARRAYSIZE(InputBuf), 
+                             input_text_flags, 
+                             &TextEditCallbackStub, 
+                             (void*)this)) {
             char* s = InputBuf;
             Strtrim(s);
             if (s[0])
                 executeCommand(s);
             strcpy(s, "");
             reclaim_focus = true;
-        }
-
-        ImGui::TableNextColumn();
-        if (ImGui::SmallButton("Clear")) { 
-            clearLog(); 
-        }
-
-        ImGui::TableNextColumn();
-        copy_to_clipboard = ImGui::SmallButton("Copy");
-        ImGui::SameLine(); ImGui::Checkbox("Auto-scroll", &AutoScroll);
+        }        
 
         ImGui::TableNextColumn();
         Filter.Draw("Filter", 75);
-
         ImGui::TableNextColumn();
         ImGui::SetItemDefaultFocus(); // Auto-focus on window apparition
         if (reclaim_focus)
@@ -285,29 +264,21 @@ void ConsoleView::drawScreen()
     }
 }
 
-ConsoleView::ConsoleView() : View()
-{
+ConsoleView::ConsoleView() 
+    : View() {
     clearLog();
     memset(InputBuf, 0, sizeof(InputBuf));
-    HistoryPos = -1;
-
-    // "CLASSIFY" is here to provide the test case where "C"+[tab] completes to "CL" and display multiple matches.
     Commands.push_back("HELP");
     Commands.push_back("HISTORY");
     Commands.push_back("CLEAR");
-    Commands.push_back("CLASSIFY");
+    Commands.push_back("CLASSIFY"); // "CLASSIFY" is here to provide the test case where "C"+[tab] completes to "CL" and display multiple matches.
     Commands.push_back("LOAD_QUOTE");
     Commands.push_back("CLOSE_SOCKET");
-    AutoScroll = true;
-    ScrollToBottom = false;
     addLogStd("Welcome to Premia!"); 
     addLogStd("Enter 'HELP' for help. TAB key for autocomplete, UP/DOWN key for history");
-
-    this->title = "Console";
 }
 
-ConsoleView::~ConsoleView()
-{
+ConsoleView::~ConsoleView() {
     clearLog();
     for (int i = 0; i < History.Size; i++)
         free(History[i]);
@@ -318,18 +289,18 @@ ConsoleView::getName() {
     return "Console";
 }
 
-void ConsoleView::addLogger(const Logger& newLogger)
-{
+void 
+ConsoleView::addLogger(const Logger& newLogger) {
     this->logger = newLogger;
 }
 
-void ConsoleView::addEvent(CRString key, const EventHandler & event) 
-{
+void 
+ConsoleView::addEvent(CRString key, const EventHandler & event) {
     this->events[key] = event;
 }
 
-void ConsoleView::update() 
-{
+void 
+ConsoleView::update() {
     if (guiDemo)
         ImGui::ShowDemoWindow();
 

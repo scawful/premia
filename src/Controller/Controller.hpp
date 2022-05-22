@@ -7,7 +7,7 @@
 #include "Model/Model.hpp"
 #include "View/ViewManager.hpp"
 #include "View/Login/LoginView.hpp"
-#include "View/Core/ConsoleView.hpp"
+#include "View/Console/ConsoleView.hpp"
 #include "View/Chart/ChartView.hpp"
 #include "View/Options/OptionChain.hpp"
 

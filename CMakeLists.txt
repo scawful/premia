@@ -72,12 +72,13 @@ add_executable(
     src/Model/Chart/ChartModel.cpp
     src/Model/Options/OptionsModel.cpp
     src/Model/Account/AccountModel.cpp
+    src/Model/Console/ConsoleModel.cpp
     src/Model/Core/WatchlistModel.cpp
     # View + View Manager 
     src/View/Workspace.cpp
     src/View/ViewManager.cpp
     src/View/Core/PrimaryView.cpp
-    src/View/Core/ConsoleView.cpp
+    src/View/Console/ConsoleView.cpp
     src/View/Menu/MenuView.cpp
     src/View/Login/LoginView.cpp
     src/View/Options/OptionChain.cpp
