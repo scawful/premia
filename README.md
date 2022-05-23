@@ -4,10 +4,11 @@
 - Dependencies: Boost, SDL2, ImGui, ImPlot, libCURL, OpenSSL
 
 ## Description
-Premia is a general purpose financial market analysis and trading program. Currently, the program supports linking a TDAmeritrade API key to gain access to features like account information, watchlists, positions, and (soon) trading actions. 
+Premia is a general purpose financial market analysis and trading program. Currently, the program supports linking a TDAmeritrade API key to gain access to features like account information, watchlists, positions, and (soon) trading actions. The program also allows InteractiveBrokers users to connect to their TWS or IB Gateway application natively to support the same features as TDAmeritrade users. 
 
 #### Supported Services: 
 - TDAmeritrade
+- InteractiveBrokers
 - CoinbasePro
 - IEXCloud 
 
