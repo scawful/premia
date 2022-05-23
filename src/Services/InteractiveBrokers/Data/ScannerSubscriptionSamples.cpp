@@ -3,7 +3,7 @@
 #include "StdAfx.h"
 
 #include "Library/IBKR.hpp"
-#include "ScannerSubscriptionSamples.h"
+#include "ScannerSubscriptionSamples.hpp"
 
 ScannerSubscription ScannerSubscriptionSamples::HotUSStkByVolume()
 {

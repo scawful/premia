@@ -2,12 +2,12 @@
  * and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable. */
 #include "StdAfx.h"
 
-#include "Utils.h"
+#include "Utils.hpp"
+#include "Library/IBKR.hpp"
 #include <iostream>
 #include <sstream>
 #include <climits>
 #include <cfloat>
-#include "Library/IBKR.hpp"
 
 static const std::string base64_chars = 
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

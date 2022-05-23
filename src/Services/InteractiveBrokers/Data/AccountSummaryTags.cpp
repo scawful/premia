@@ -3,7 +3,7 @@
 
 #include "StdAfx.h"
 
-#include "AccountSummaryTags.h"
+#include "AccountSummaryTags.hpp"
 
 std::string AccountSummaryTags::AccountType = "AccountType";
 std::string AccountSummaryTags::NetLiquidation = "NetLiquidation";

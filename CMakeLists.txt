@@ -112,11 +112,11 @@ add_executable(
     src/Services/TDAmeritrade/Data/PriceHistory.cpp 
     ## InteractiveBrokers Service
     src/Services/InteractiveBrokers/Client.cpp
-    src/Services/InteractiveBrokers/ContractSamples.cpp
-    src/Services/InteractiveBrokers/OrderSamples.cpp
-    src/Services/InteractiveBrokers/ScannerSubscriptionSamples.cpp
-    src/Services/InteractiveBrokers/AvailableAlgoParams.cpp
-    src/Services/InteractiveBrokers/AccountSummaryTags.cpp
+    src/Services/InteractiveBrokers/Data/ContractSamples.cpp
+    src/Services/InteractiveBrokers/Data/OrderSamples.cpp
+    src/Services/InteractiveBrokers/Data/ScannerSubscriptionSamples.cpp
+    src/Services/InteractiveBrokers/Data/AvailableAlgoParams.cpp
+    src/Services/InteractiveBrokers/Data/AccountSummaryTags.cpp
     src/Services/InteractiveBrokers/Utils.cpp
     # GUI libraries 
     ${IMGUI_PATH}/imgui.cpp 

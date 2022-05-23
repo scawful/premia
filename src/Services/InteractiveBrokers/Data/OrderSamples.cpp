@@ -3,7 +3,7 @@
 #include "StdAfx.h"
 
 #include "Library/IBKR.hpp"
-#include "OrderSamples.h"
+#include "OrderSamples.hpp"
 
 	/// <summary>
     /// Make sure to test using only your paper trading account when applicable. A good way of finding out if an order type/exchange combination
