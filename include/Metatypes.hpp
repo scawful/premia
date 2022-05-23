@@ -2,6 +2,7 @@
 #define Metatype_hpp
 #define _USE_MATH_DEFINES
 
+#include <stdio.h>
 #include <iostream>
 #include <cmath>
 #include <memory>
