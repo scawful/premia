@@ -19,9 +19,9 @@ namespace tws {
         }
 
         // functions 
-        auto runClient(String host, int port, String options) 
+        auto runClient(String host, int port, int clientId) 
             -> void {          
-            int clientId = 0;
+            String options = "";
             constexpr auto MAX_ATTEMPTS = 10;
             constexpr auto SLEEP_TIME = 5;
             unsigned attempt = 0;

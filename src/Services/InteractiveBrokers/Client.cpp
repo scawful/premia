@@ -3,13 +3,13 @@
 
 #include "Client.hpp"
 
-#include "ContractSamples.h"
-#include "OrderSamples.h"
-#include "ScannerSubscriptionSamples.h"
-#include "AvailableAlgoParams.h"
-#include "FAMethodSamples.h"
-#include "AccountSummaryTags.h"
-#include "Utils.h"
+#include "Data/ContractSamples.hpp"
+#include "Data/OrderSamples.hpp"
+#include "Data/ScannerSubscriptionSamples.hpp"
+#include "Data/AvailableAlgoParams.hpp"
+#include "Data/FAMethodSamples.hpp"
+#include "Data/AccountSummaryTags.hpp"
+#include "Utils.hpp"
 
 #include <stdio.h>
 #include <chrono>
