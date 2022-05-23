@@ -134,6 +134,8 @@ ConsoleView::executeCommand(const char* command_line) {
         guiDemo = true;
     } else if (Stricmp(command_line, "PLOTDEMO") == 0) {
         plotDemo = true;
+    } else if (Stricmp(command_line, "RUN_TWS") == 0) {
+        tws::TWS::getInstance().runClient("127.0.0.1", 7496, 0);
     } else if (Stricmp(command_line, "CLOSE_SOCKET") == 0) {
         addLogStd("Ending WebSocket session...");
         tda::TDA::getInstance().sendSocketLogout();

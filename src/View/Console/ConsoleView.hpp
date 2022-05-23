@@ -3,6 +3,7 @@
 
 #include "Virtual/View.hpp"
 #include "Interface/TDA.hpp"
+#include "Interface/TWS.hpp"
 
 class ConsoleView : public View
 {
