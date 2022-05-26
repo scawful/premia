@@ -55,7 +55,7 @@ ViewManager::ViewManager() {
     consoleLogger = std::bind(&ConsoleView::addLogStd, consoleView, std::placeholders::_1);
     leftColView->addLogger(consoleLogger);
     rightColView->addLogger(consoleLogger);
-    consoleView->addLogger(consoleLogger); // you're be surprised, but this is necessary 
+    consoleView->addLogger(consoleLogger); // you'd be surprised, but this is necessary
     menuView->addEvent("consoleView", [this]() -> void { consoleView->update(); });
     menuView->addEvent("optionChainLeftCol", [this] () -> void { setLeftColumnView(std::make_shared<OptionChainView>()); });
     menuView->addEvent("optionChainRightCol", [this] () -> void { setRightColumnView(std::make_shared<OptionChainView>()); });
