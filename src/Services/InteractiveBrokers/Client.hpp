@@ -106,22 +106,18 @@ enum State {
 };
 
 //! [ewrapperimpl]
-class Client : public EWrapper
-{
-//! [ewrapperimpl]
+class Client 
+    : public EWrapper {
 public:
-
 	Client();
 	~Client();
-
-	void setConnectOptions(const std::string&);
-	void processMessages();
-
-public:
 
 	bool connect(const char * host, int port, int clientId = 0);
 	void disconnect() const;
 	bool isConnected() const;
+
+	void setConnectOptions(const std::string&);
+	void processMessages();
 
 private:
     void pnlOperation();
@@ -184,13 +180,14 @@ private:
 	EReaderOSSignal m_osSignal;
 	EClientSocket * const m_pClient;
 	//! [socket_declare]
+    Logger logger;
 	State m_state;
 	time_t m_sleepDeadline;
 
 	OrderId m_orderId;
-	std::unique_ptr<EReader> m_pReader;
-    bool m_extraAuth;
-	std::string m_bboExchange;
+    bool m_extraAuth;	
+	String m_bboExchange;    
+    std::unique_ptr<EReader> m_pReader;
 };
 
 #endif

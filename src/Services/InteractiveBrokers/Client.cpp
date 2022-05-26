@@ -31,14 +31,13 @@ Client::Client() :
 	, m_state(ST_CONNECT)
 	, m_sleepDeadline(0)
 	, m_orderId(0)
-    , m_extraAuth(false)
-{
-}
+    , m_extraAuth(false) {}
+
 //! [socket_init]
 Client::~Client()
 {
 	// destroy the reader before the client
-	if( m_pReader )
+	if(m_pReader)
 		m_pReader.reset();
 
 	delete m_pClient;
@@ -48,6 +47,7 @@ bool Client::connect(const char *host, int port, int clientId)
 {
 	// trying to connect
 	printf( "Connecting to %s:%d clientId:%d\n", !( host && *host) ? "127.0.0.1" : host, port, clientId);
+    logger("Connecting to TWS/IB Gateway");
 	
 	//! [connect]
 	bool bRes = m_pClient->eConnect( host, port, clientId, m_extraAuth);
@@ -55,6 +55,7 @@ bool Client::connect(const char *host, int port, int clientId)
 	
 	if (bRes) {
 		printf( "Connected to %s:%d clientId:%d\n", m_pClient->host().c_str(), m_pClient->port(), clientId);
+        logger("Connected to TWS/IB Gateway");
 		//! [ereader]
 		m_pReader = std::unique_ptr<EReader>( new EReader(m_pClient, &m_osSignal) );
 		m_pReader->start();
