@@ -183,14 +183,27 @@ UserPrincipals Parser::parse_user_principals(json::ptree & data) const
 {
     UserPrincipals user_principals;
 
-    BOOST_FOREACH (json::ptree::value_type &v, data.get_child("accounts.")) {
-        StringMap account_data;
-        for (const auto & [acctKey, acctValue] : v.second) {
-            account_data[acctKey] = acctValue.get_value<String>();
+    try {
+        BOOST_FOREACH (json::ptree::value_type &v, data.get_child("accounts.")) {
+            StringMap account_data;
+            for (const auto & [acctKey, acctValue] : v.second) {
+                account_data[acctKey] = acctValue.get_value<String>();
+            }
+            user_principals.add_account_data(account_data);
         }
-        user_principals.add_account_data(account_data);
+        user_principals.set_account_data(user_principals.get_account_data_array(0));
+    } catch ( json::ptree_bad_path ) {
+        // lazy fix to the account issue 
+        for (const auto & [key, value] : data ) {
+            StringMap account_data;
+            if ( key == "primaryAccountId" ) {
+                account_data[key] = value.get_value<String>();
+            }
+            user_principals.add_account_data(account_data);
+        }
+        user_principals.set_account_data(user_principals.get_account_data_array(0));
     }
-    user_principals.set_account_data(user_principals.get_account_data_array(0));
+
 
     return user_principals;
 }
