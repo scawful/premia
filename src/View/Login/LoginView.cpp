@@ -39,14 +39,20 @@ void LoginView::drawScreen() const
         ImVec2(ImGui::GetContentRegionAvail().x, 20.f)) ) {
         if (tdaAuth) {
             std::ifstream keyfile("assets/apikey.txt");
-            String consumer_key;
-            String refresh_token;
+            String consumer_key = username;
+            String refresh_token = password;
             if (keyfile.good()) {
-                std::stringstream buffer;
-                buffer << keyfile.rdbuf();
-                keyfile.close();
-                buffer >> consumer_key;
-                buffer >> refresh_token;
+                try {
+                    std::stringstream buffer;
+                    buffer << keyfile.rdbuf();
+                    buffer >> consumer_key;
+                    buffer >> refresh_token;
+                    keyfile.close();
+                } catch (int e) {
+                    // If issue reading key file, use the keys in the fields
+                    consumer_key = username;
+                    refresh_token = password;
+                }
             }
             tda::TDA::getInstance().authUser(consumer_key, refresh_token);
         }

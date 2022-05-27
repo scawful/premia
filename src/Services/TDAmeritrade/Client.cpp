@@ -385,9 +385,8 @@ Client::get_all_account_ids() {
             }
         }
 
-        if (key == "primaryAccountId" && 
-            std::find(accounts.begin(), accounts.end(), value.get_value<String>()) != std::end(accounts) ) {
-            std::cout << "Here" << value.get_value<String>() << std::endl;
+        if (key == "primaryAccountId") {
+            std::cout << "Here" << value.get_value<String>() << std::endl << std::flush;
             accounts.push_back(value.get_value<String>());
         }
     }

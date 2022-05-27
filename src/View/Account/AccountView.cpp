@@ -84,7 +84,6 @@ void AccountView::initPositions()
     } finally {
         logger("[finally] : AccountView init");
     } Proceed;
-    account_ids_std = tda::TDA::getInstance().getAllAcountNumbers();
     int i = 0;
     for (String const& each_id : account_ids_std) {
         account_ids.push_back(each_id.c_str());
@@ -237,7 +236,7 @@ void AccountView::drawAccountPane()
         load_all_accounts();
     }
     ImGui::SameLine(); ImGui::SetNextItemWidth(100.f);
-    ImGui::Combo("##accounts", &n,  accounts, 6); 
+    ImGui::Combo("##accounts", &n,  accounts, account_ids.size());
 
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
     if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags)) {
