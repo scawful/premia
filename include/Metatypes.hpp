@@ -28,6 +28,7 @@ using MetaFunc = std::function<void(Args &&...)>;
 
 using EventHandler = MetaFunc<>;
 using Logger = MetaFunc<String>;
+using CRLogger = const Logger &;
 using SocketListener = MetaFunc<const char *>;
 
 using TypeIndex = std::type_index;

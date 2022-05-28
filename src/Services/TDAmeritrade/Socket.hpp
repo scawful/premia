@@ -6,8 +6,7 @@
 #include "Library/SDL.hpp"
 #include "Metatypes.hpp"
 
-namespace Premia {
-namespace tda {
+namespace Premia::tda {
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
@@ -31,7 +30,7 @@ class Socket : public std::enable_shared_from_this<Socket> {
 
  public:
   template <typename Executor>
-  explicit Socket(Executor executor, ssl::context& ctx, Logger logger,
+  explicit Socket(Executor executor, ssl::context& ctx, CRLogger logger,
                   CRString requests)
       : _resolver(executor),
         _ws(executor, ctx),
@@ -57,7 +56,6 @@ class Socket : public std::enable_shared_from_this<Socket> {
   void close();
   void on_close(beast::error_code ec);
 };
-}  // namespace tda
-}  // namespace Premia
+} // namespace Premia::tda
 
 #endif
