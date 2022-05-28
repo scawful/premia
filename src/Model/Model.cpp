@@ -1,16 +1,12 @@
 #include "Model.hpp"
 
-void Model::addLogger(const Logger& newLogger)
-{
-    this->consoleLogger = newLogger;
-}
+namespace Premia {
 
-Logger& Model::getLogger()
-{
-    return consoleLogger;
-}
+void Model::addLogger(const Logger& newLogger) { consoleLogger = newLogger; }
 
-void Model::addEventHandler(CRString key, const EventHandler & handler) 
-{
-    this->callbacks[key] = handler;
+Logger& Model::getLogger() { return consoleLogger; }
+
+void Model::addEventHandler(CRString key, const EventHandler& handler) {
+  callbacks[key] = handler;
 }
+}  // namespace Premia

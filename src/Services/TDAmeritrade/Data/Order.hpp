@@ -1,78 +1,77 @@
 #ifndef Order_hpp
 #define Order_hpp
 
-#include "PricingStructures.hpp"
 #include "Library/Boost.hpp"
+#include "PricingStructures.hpp"
+namespace Premia {
+namespace tda {
+class Order {
+ private:
+  struct OrderLegCollection {
+    int quantity;
+    String symbol;
+    String assetType;
+    String instruction;
+  };
 
-namespace tda
-{
-    class Order
-    {
-    private:
-        struct OrderLegCollection {
-            int quantity;
-            String symbol;
-            String assetType;
-            String instruction;
-        };
+  String orderType;
+  String price;
+  String session;
+  String duration;
+  String orderStrategyType;
+  String complexOrderStrategyType;
+  ArrayList<OrderLegCollection> orderLegCollection;
 
-        String orderType;
-        String price;
-        String session;
-        String duration;
-        String orderStrategyType;
-        String complexOrderStrategyType;
-        ArrayList<OrderLegCollection> orderLegCollection;
+  String orderJSON;
 
-        String orderJSON;
+  void prepareOrderString() const;
 
-        void prepareOrderString() const;
+ public:
+  Order();
+  ~Order();
 
-    public:
-        Order();
-        ~Order();
+  String getString() const;
+  String getOrderType() const;
+  String getSession() const;
+  String getDuration() const;
+  String getOrderStrategyType() const;
+  String getPrice() const;
+};
 
-        String getString() const;
-        String getOrderType() const;
-        String getSession() const;
-        String getDuration() const;
-        String getOrderStrategyType() const;
-        String getPrice() const;
-    };
+// Buy Market: Stock
+// "orderType": "MARKET",
+// "session": "NORMAL",
+// "duration": "DAY",
+// "orderStrategyType": "SINGLE",
+// "orderLegCollection": [
+//     {
+//     "instruction": "Buy",
+//     "quantity": 15,
+//     "instrument": {
+//         "symbol": "XYZ",
+//         "assetType": "EQUITY"
+//     }
+//     }
+// ]
 
-    // Buy Market: Stock
-    // "orderType": "MARKET",
-    // "session": "NORMAL",
-    // "duration": "DAY",
-    // "orderStrategyType": "SINGLE",
-    // "orderLegCollection": [
-    //     {
-    //     "instruction": "Buy",
-    //     "quantity": 15,
-    //     "instrument": {
-    //         "symbol": "XYZ",
-    //         "assetType": "EQUITY"
-    //     }
-    //     }
-    // ]
-
-    // Buy Limit: Single Option
-    // "complexOrderStrategyType": "NONE",
-    // "orderType": "LIMIT",
-    // "session": "NORMAL",
-    // "price": "6.45",
-    // "duration": "DAY",
-    // "orderStrategyType": "SINGLE",
-    // "orderLegCollection": [
-    //     {
-    //     "instruction": "BUY_TO_OPEN",
-    //     "quantity": 10,
-    //     "instrument": {
-    //         "symbol": "XYZ_032015C49",
-    //         "assetType": "OPTION"
-    //         }
-    //     }
-    // ]
-}
+// Buy Limit: Single Option
+// "complexOrderStrategyType": "NONE",
+// "orderType": "LIMIT",
+// "session": "NORMAL",
+// "price": "6.45",
+// "duration": "DAY",
+// "orderStrategyType": "SINGLE",
+// "orderLegCollection": [
+//     {
+//     "instruction": "BUY_TO_OPEN",
+//     "quantity": 10,
+//     "instrument": {
+//         "symbol": "XYZ_032015C49",
+//         "assetType": "OPTION"
+//         }
+//     }
+// ]
+}  // namespace tda
+}  // namespace Premia
 
 #endif

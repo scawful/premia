@@ -1,37 +1,35 @@
-#include <gtest/gtest.h>
 #include "Library/Fred.hpp"
 
-namespace ServiceTestSuite
-{
-    namespace FredCppTests
-    {
-        using namespace fredcpp;
+#include <gtest/gtest.h>
 
-        Api api;
-        ApiResponse response;
+namespace ServiceTestSuite {
+namespace FredCppTests {
+using namespace fredcpp;
 
-        TEST(STLFred, basic_test)
-        {
-            api.withLogger( fredcpp::external::SimpleLogger::getInstance() )
-                .withExecutor( fredcpp::external::CurlHttpClient::getInstance() )
-                .withParser( fredcpp::external::PugiXmlParser::getInstance() );
+Api api;
+ApiResponse response;
 
-            // set your FRED API key
-            std::string yourApiKey = "<api-key>";
+TEST(STLFred, basic_test) {
+  api.withLogger(fredcpp::external::SimpleLogger::getInstance())
+      .withExecutor(fredcpp::external::CurlHttpClient::getInstance())
+      .withParser(fredcpp::external::PugiXmlParser::getInstance());
 
-            api.withKey( yourApiKey );
+  // set your FRED API key
+  std::string yourApiKey = "<api-key>";
 
-            // 20yr constant matury yield 10 responses with desc 
-            api.get(ApiRequestBuilder::SeriesObservations("DGS20")
-                                        .withSort("desc")
-                                        .withLimit("10"), response );
+  api.withKey(yourApiKey);
 
+  // 20yr constant matury yield 10 responses with desc
+  api.get(
+      ApiRequestBuilder::SeriesObservations("DGS20").withSort("desc").withLimit(
+          "10"),
+      response);
 
-            if (!response.good()) {
-                FREDCPP_LOG_ERROR(response.error);
-            } else {
-                FREDCPP_LOG_INFO(response);
-            }
-        }
-    }
+  if (!response.good()) {
+    FREDCPP_LOG_ERROR(response.error);
+  } else {
+    FREDCPP_LOG_INFO(response);
+  }
 }
+}  // namespace FredCppTests
+}  // namespace ServiceTestSuite

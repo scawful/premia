@@ -4,12 +4,11 @@
 #include "../Model.hpp"
 #include "Interface/TDA.hpp"
 
-class ConsoleModel
-    : public Model {
-private:
-
-public:
-
+namespace Premia {
+class ConsoleModel : public Model {
+ private:
+ public:
 };
+}  // namespace Premia
 
 #endif

@@ -2,17 +2,13 @@
 #define INSTITUTIONALOWNERSHIP_HPP
 
 #include "Premia.hpp"
-
-namespace iex
-{
-    class InstitutionalOwnership
-    {
-    private:
-
-    public:
-        InstitutionalOwnership()=default;
-    
-    };
+namespace Premia {
+namespace iex {
+class InstitutionalOwnership {
+ private:
+ public:
+  InstitutionalOwnership() = default;
+};
+}  // namespace iex
 }
-
-#endif // INSTITUTIONALOWNERSHIP_HPP
+#endif  // INSTITUTIONALOWNERSHIP_HPP

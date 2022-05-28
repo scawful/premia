@@ -2,62 +2,55 @@
 #define Watchlist_hpp
 
 #include "Premia.hpp"
+namespace Premia {
+namespace tda {
+class Watchlist {
+ public:
+  struct WatchlistInstrument {
+    String symbol;
+    String description;
+    String asset_type;
 
-namespace tda 
-{
-    class Watchlist 
-    {
-    public:
-        struct WatchlistInstrument {
-            String symbol;
-            String description;
-            String asset_type;
+    WatchlistInstrument(CRString sym, CRString desc, CRString type)
+        : symbol(sym), description(desc), asset_type(type) {}
 
-            WatchlistInstrument(CRString sym, CRString desc, CRString type) : symbol(sym), description(desc), asset_type(type) { }
+    String getSymbol() const { return this->symbol; }
 
-            String getSymbol() const {
-                return this->symbol;
-            }
+    String getDescription() const { return this->description; }
 
-            String getDescription() const {
-                return this->description;
-            }
+    String getType() const { return this->asset_type; }
+  };
 
-            String getType() const {
-                return this->asset_type;
-            }
-        };
+ private:
+  ArrayList<WatchlistInstrument> instruments;
+  StringMap variables;
 
-    private:
-        ArrayList<WatchlistInstrument> instruments;
-        StringMap variables;
+  // "name": "string",
+  // "watchlistId": "string",
+  // "accountId": "string",
+  // "status": "'UNCHANGED' or 'CREATED' or 'UPDATED' or 'DELETED'",
+  String name;
+  unsigned int watchlist_id;
+  String account_id;
 
-        // "name": "string",
-        // "watchlistId": "string",
-        // "accountId": "string",
-        // "status": "'UNCHANGED' or 'CREATED' or 'UPDATED' or 'DELETED'",
-        String name;
-        unsigned int watchlist_id;
-        String account_id;
+ public:
+  Watchlist();
 
-    public:
-        Watchlist();
+  int getNumInstruments() const;
 
-        int getNumInstruments() const;
+  String getName() const;
+  String getInstrumentSymbol(int item_id);
+  String getInstrumentDescription(int item_id);
+  String getInstrumentType(int item_id);
 
-        String getName() const;
-        String getInstrumentSymbol(int item_id);
-        String getInstrumentDescription(int item_id);
-        String getInstrumentType(int item_id);
+  void setId(int id);
+  void setName(CRString name);
+  void setAccountId(CRString accountId);
+  void setWatchlistVariable(CRString variable);
 
-        void setId( int id );
-        void setName(CRString name);
-        void setAccountId(CRString accountId);
-        void setWatchlistVariable(CRString variable);
-
-        void addVariable(CRString key, CRString value);
-        void addInstrument(CRString symbol, CRString desc, CRString type);
-    };
-}
-
+  void addVariable(CRString key, CRString value);
+  void addInstrument(CRString symbol, CRString desc, CRString type);
+};
+}  // namespace tda
+}  // namespace Premia
 #endif
