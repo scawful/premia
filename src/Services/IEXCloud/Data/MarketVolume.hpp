@@ -2,14 +2,12 @@
 #define MARKETVOLUME_HPP
 
 #include "Premia.hpp"
-
-namespace iex
-{
-    class MarketVolume
-    {
-    public:
-        MarketVolume()=default;
-    }
+namespace Premia {
+namespace iex {
+class MarketVolume {
+ public:
+  MarketVolume() = default;
 }
-
-#endif // MARKETVOLUME_HPP
+}  // namespace iex
+}
+#endif  // MARKETVOLUME_HPP

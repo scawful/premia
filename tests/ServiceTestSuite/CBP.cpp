@@ -1,14 +1,9 @@
-#include <gtest/gtest.h>
 #include "Interface/CBP.hpp"
 
-namespace ServiceTestSuite
-{
-    namespace CBP
-    {
-        TEST(CBPTest, basic_test)
-        {
-            cbp::Client client;
+#include <gtest/gtest.h>
 
-        }
-    }
-}
+namespace ServiceTestSuite {
+namespace CBP {
+TEST(CBPTest, basic_test) { Premia::cbp::Client client; }
+}  // namespace CBP
+}  // namespace ServiceTestSuite

@@ -3,24 +3,22 @@
 
 #include "Premia.hpp"
 
-namespace cbp
-{
-    class Product 
-    {
-    private:
-        ArrayList<StringMap> accounts_vector;
+namespace Premia {
+namespace cbp {
+class Product {
+ private:
+  ArrayList<StringMap> accounts_vector;
 
-        float current_price;
+  float current_price;
 
-        void initVariables();
+  void initVariables();
 
-    public:
-        Product()=default;
+ public:
+  Product() = default;
 
-        float get_current_price() const;
-
-
-    };
-}
+  float get_current_price() const;
+};
+}  // namespace cbp
+}  // namespace Premia
 
 #endif

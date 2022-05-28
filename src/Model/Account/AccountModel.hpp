@@ -2,14 +2,12 @@
 #define AccountModel_hpp
 
 #include "../Model.hpp"
+namespace Premia {
+class AccountModel : public Model {
+ private:
+  Logger logger;
 
-class AccountModel: public Model
-{
-private:
-    Logger logger;
-
-public:
-
+ public:
 };
-
-#endif 
+}  // namespace Premia
+#endif

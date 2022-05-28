@@ -2,17 +2,13 @@
 #define INSIDERROSTER_HPP
 
 #include "Premia.hpp"
-
-namespace iex
-{
-    class InsiderRoster
-    {
-    private:
-
-    public:
-        InsiderRoster()=default;
-        
-    };
+namespace Premia {
+namespace iex {
+class InsiderRoster {
+ private:
+ public:
+  InsiderRoster() = default;
+};
+}  // namespace iex
 }
-
-#endif // INSIDERROSTER_HPP
+#endif  // INSIDERROSTER_HPP

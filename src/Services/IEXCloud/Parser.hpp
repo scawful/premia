@@ -1,26 +1,24 @@
 #ifndef IEX_Parser_hpp
 #define IEX_Parser_hpp
 
-#include "Library/Boost.hpp"
 #include "Data/FundOwnership.hpp"
 #include "Data/InsiderTransactions.hpp"
+#include "Library/Boost.hpp"
 
-namespace pt = boost::property_tree;
+namespace Premia {
+namespace iex {
+class Parser {
+ private:
+  void log_response(String title, json::ptree data);
+  json::ptree read_response(String response);
 
-namespace iex
-{
-    class Parser
-    {
-    private:
-        void log_response(String title, pt::ptree data);
-        pt::ptree read_response(String response);
+ public:
+  Parser();
 
-    public:
-        Parser();
-
-        ArrayList<FundOwnership> parse_fund_ownership(String response);
-        ArrayList<InsiderTransactions> parse_insider_transactions(String response);
-    };
-}
+  ArrayList<FundOwnership> parse_fund_ownership(String response);
+  ArrayList<InsiderTransactions> parse_insider_transactions(String response);
+};
+}  // namespace iex
+}  // namespace Premia
 
 #endif
