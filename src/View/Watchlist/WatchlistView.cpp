@@ -41,8 +41,23 @@ WatchlistView::drawWatchlistTable() {
         ImGui::OpenPopup("edit_popup");
     if (ImGui::BeginPopup("edit_popup"))
     {
-        ImGui::Button(ICON_MD_ADD);
+        if(ImGui::Button(ICON_MD_ADD)) {
+            ImGui::OpenPopup("add_popup");
+        }
         ImGui::Button(ICON_MD_DELETE);
+        ImGui::EndPopup();
+    }
+    static String addText;
+    if (ImGui::BeginPopup("add_popup")) {
+
+        if (ImGui::BeginTable("split", 2, ImGuiTableFlags_None)) {
+            ImGui::Button(ICON_MD_ADD);
+            ImGui::Text(ICON_MD_SEARCH);
+            ImGui::TableNextColumn();
+            ImGui::SetNextItemWidth(175.f);
+            ImGui::InputText("##addText", &addText);
+            ImGui::EndTable();
+        }
         ImGui::EndPopup();
     }
 
@@ -111,11 +126,23 @@ void WatchlistView::update() {
     } Instruct { // runs each frame 
         drawWatchlistMenu();
         switch (currentService) {
-            case 0: ImGui::Text("Local Watchlist"); break;
-            case 1: 
-                Construct { 
+            case 0:
+                // ImGui::Text("Local Watchlist");
+                Construct {
+                        try {
+                            model.initWatchlist();
+                        } catch (Premia::NotLoggedInException) {
+                            logger("[Watchlist] No local watchlist data found!");
+                            throw Destruction();
+                        }
+                } Instruct {
+                        drawWatchlistTable();
+                } RecursiveDestruct;
+                break;
+            case 1:
+                Construct {
                     try {
-                        model.initTDAWatchlists(); 
+                        model.initTDAWatchlists();
                     } catch (Premia::NotLoggedInException) {
                         logger("[Watchlist] User not logged in!");
                         throw Destruction();
