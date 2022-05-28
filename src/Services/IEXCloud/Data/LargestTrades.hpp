@@ -2,16 +2,13 @@
 #define LARGESTTRADES_HPP
 
 #include "Premia.hpp"
-
-namespace iex
-{
-    class LargestTrades
-    {
-    private:
-
-    public:
-        LargestTrades()=default;
-    };
+namespace Premia {
+namespace iex {
+class LargestTrades {
+ private:
+ public:
+  LargestTrades() = default;
+};
+}  // namespace iex
 }
-
-#endif // LARGESTTRADES_HPP
+#endif  // LARGESTTRADES_HPP

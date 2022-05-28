@@ -1,46 +1,44 @@
 #ifndef Account_hpp
 #define Account_hpp
 
-#include "PricingStructures.hpp"
 #include "Library/Boost.hpp"
+#include "PricingStructures.hpp"
+namespace Premia {
+namespace tda {
+struct PositionBalances {
+  String symbol;
+  StringMap balances;
+  int longQuantity;
+  int averagePrice;
+  double dayProfitLoss;
+};
 
-namespace tda
-{
-    struct PositionBalances
-    {
-        String symbol;
-        StringMap balances;
-        int longQuantity;
-        int averagePrice;
-        double dayProfitLoss;
-    };
+class Account {
+ private:
+  int num_positions;
+  String account_id;
+  StringMap account_info;
+  StringMap current_balances;
+  ArrayList<StringMap> positions_vector;
 
-    class Account
-    {
-    private:
-        int num_positions;
+  ArrayList<PositionBalances> position_balances;
 
-        StringMap account_info;
-        StringMap current_balances;  
-        ArrayList<StringMap> positions_vector;
+ public:
+  Account() = default;
 
-        ArrayList<PositionBalances> position_balances;
-        
-    public:
-        Account()=default;
+  void add_position(StringMap position);
+  void add_balance(PositionBalances balance);
+  void set_account_variable(String key, String value);
+  void set_balance_variable(String key, String value);
+  void set_primary_account_id(CRString key);
 
-        void add_position(StringMap position);
-        void add_balance(PositionBalances balance);
-        void set_account_variable(String key, String value);
-        void set_balance_variable(String key, String value);
+  size_t get_position_vector_size();
+  String get_account_variable(String variable);
+  String get_balance_variable(String variable);
+  StringMap get_position(int index);
+  String get_position_balances(String symbol, String variable);
+};
 
-        size_t get_position_vector_size();
-        String get_account_variable( String variable );
-        String get_balance_variable( String variable );
-        StringMap get_position( int index );
-        String get_position_balances( String symbol, String variable );
-    };
-
-}
-
+}  // namespace tda
+}  // namespace Premia
 #endif

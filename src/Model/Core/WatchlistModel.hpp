@@ -3,31 +3,32 @@
 
 #include "../Model.hpp"
 
-class WatchlistModel: public Model
-{
-private:
-    bool active = false;
-    ArrayList<int> openList;
-    String titleString;
-    ArrayList<tda::Watchlist> watchlists;
-    ArrayList<String> watchlistNames;
-    ArrayList<const char*> watchlistNamesChar;
-    Logger logger;
-    std::unordered_map<String, tda::Quote> quotes;
+namespace Premia {
+class WatchlistModel : public Model {
+ private:  
+  Logger logger;
+  bool active = false;  
+  ArrayList<int> openList;
+  String titleString;
+  ArrayList<tda::Watchlist> watchlists;
+  ArrayList<String> watchlistNames;
+  ArrayList<const char*> watchlistNamesChar;
+  std::unordered_map<String, tda::Quote> quotes;
 
-public:
-    bool isActive() const;
-    void addLogger(const Logger& logger);
+ public:
+  bool isActive() const;
+  void addLogger(const Logger& logger);
 
-    void initWatchlist();
-    void initTDAWatchlists();
-    bool getOpenList(int n);
-    void setOpenList(int n);
-    String getWatchlistName(int index);
-    tda::Quote & getQuote(CRString key);
-    tda::Watchlist & getWatchlist(int index);
-    void setQuote(CRString key, const tda::Quote & quote);
-    ArrayList<const char *> getWatchlistNamesCharVec() const;
+  void initWatchlist();
+  void initTDAWatchlists();
+  bool getOpenList(int n);
+  void setOpenList(int n);
+  String getWatchlistName(int index);
+  tda::Quote& getQuote(CRString key);
+  tda::Watchlist& getWatchlist(int index);
+  void setQuote(CRString key, const tda::Quote& quote);
+  ArrayList<const char*> getWatchlistNamesCharVec() const;
 };
+}  // namespace Premia
 
-#endif 
+#endif

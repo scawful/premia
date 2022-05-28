@@ -1,25 +1,23 @@
 #ifndef Quote_hpp
 #define Quote_hpp
 
-#include "Premia.hpp"
 #include "Library/Boost.hpp"
+#include "Premia.hpp"
+namespace Premia {
+namespace tda {
+class Quote {
+ private:
+  boost::property_tree::ptree quoteData;
+  StringMap quoteVariables;
 
-namespace tda 
-{
-    class Quote 
-    {
-    private:
-        boost::property_tree::ptree quoteData;
-        StringMap quoteVariables;
+ public:
+  Quote();
 
-    public:
-        Quote();
+  void setQuoteVariable(CRString key, CRString value);
+  String getQuoteVariable(CRString variable);
 
-        void setQuoteVariable(CRString key, CRString value);
-        String getQuoteVariable(CRString variable);
-
-        void clear();
-    };
-}
-
+  void clear();
+};
+}  // namespace tda
+}  // namespace Premia
 #endif

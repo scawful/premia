@@ -2,16 +2,13 @@
 #define INSIDERSUMMARY_HPP
 
 #include "Premia.hpp"
-
-namespace iex
-{
-    class InsiderSummary
-    {
-    private:
-
-    public:
-        InsiderSummary()=default;
-    };
+namespace Premia {
+namespace iex {
+class InsiderSummary {
+ private:
+ public:
+  InsiderSummary() = default;
+};
+}  // namespace iex
 }
-
-#endif // INSIDERSUMMARY_HPP
+#endif  // INSIDERSUMMARY_HPP

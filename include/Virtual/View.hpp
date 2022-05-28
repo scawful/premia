@@ -8,16 +8,17 @@
 #include "Library/ImPlot.hpp"
 #include "Library/Boost.hpp"
 
-class View 
-{
-public:
-    View()=default;
-    virtual ~View()=default;
+namespace Premia { 
+class View {
+ public:
+  View()=default;
+  virtual ~View()=default;
 
-    virtual String getName() = 0;
-    virtual void addEvent(CRString, const EventHandler &) = 0;
-    virtual void addLogger(const Logger &) = 0;
-    virtual void update() = 0;
+  virtual String getName() = 0;
+  virtual void addEvent(CRString, const EventHandler &) = 0;
+  virtual void addLogger(const Logger &) = 0;
+  virtual void update() = 0;
 };
+}  // namespace Premia
 
 #endif

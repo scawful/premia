@@ -1,14 +1,9 @@
-#include <gtest/gtest.h>
 #include "Interface/IEX.hpp"
 
-namespace ServiceTestSuite
-{
-    namespace IEX
-    {
-        TEST(IEXTest, basic_test)
-        {
-            iex::Client client;
+#include <gtest/gtest.h>
 
-        }
-    }
-}
+namespace ServiceTestSuite {
+namespace IEX {
+TEST(IEXTest, basic_test) { Premia::iex::Client client; }
+}  // namespace IEX
+}  // namespace ServiceTestSuite

@@ -4,9 +4,9 @@
 ### Overview
 - Stock trading client with support for multiple brokerages API 
     - TDAmeritrade
+    - InteractiveBrokers
     - CoinbasePro
     - IEXCloud
-- Primary function is analyzing risk of portfolio 
 - Places an emphasis on risk premia hedging and the impact of the options market
 - Support for making buy and sell orders
 - Real time quotes and historical charts
@@ -14,61 +14,47 @@
 ## MVC Framework
 Premia's main event loop is managed by the common Model-View-Controller framework, with a few custom touches to accomodate the ImGui library.
 
-### Model
-- Concrete Parent
-    - API Interface Objects
-    - Map of EventHandlers
-- Chart
+### Model/View
+- ViewManager
+    - Handles the lifetime of a View object
+
+- Account
+    - AccountModel : Model
+    - AccountView : View
+- Chart    
     - ChartModel : Model
         - Historical Data Timeframes:
         - Period: Day, Month, Year, YTD
         - Period Type: 1 2 3 4 5 6 10 15 20
         - Frequency: Minute Daily Weekly Monthly
         - Amount: 1 5 10 15 30
-
-### View
-- Abstract Parent
-    - Public update function for ViewManager
-- ViewManager
-    - Handles the lifetime of a View object
-- PrimaryView : View
-
-- Account
-    - TODO : SettingsView
-- Analyze 
-    - TODO : FundOwnershipView
-- Chart
-    - Chart Abstract Parent
-    - CandleChart : Chart
     - ChartView : View  
-    - TODO : LinePlotChart
-    - TODO : BarPlotChart
+        - CandleChart : Chart
+        - LinePlotChart : Chart
+- Console
+    - ConsoleModel : Model
+    - ConsoleView : View
 - Core 
+    - Primary : View
+- Login
     - LoginView : View
+- Menu
     - MenuView : View
-- Tools
-    - TODO : ConsoleView
-- Trade
-    - TODO : OptionChainView
-    - TODO : OrderView
-    - TODO : PortfolioView
-    - TODO : WatchlistView
-- Dev 
-    - DebugView : View
+- Options
+    - OptionChainModel : Model
+    - OptionChainView : View
+- Watchlist
+    - WatchlistModel : Model
+    - WatchlistView : View
 
 ### Controller
-- Abstract Parent
-    - onEntry()
-    - onInput()
-    - onLoad()
-    - doRender()
-    - onExit()
-- DebugController : Controller
-- PrimaryController : Controller
-
+- onEntry()
+- onInput()
+- onLoad()
+- doRender()
+- onExit()
 
 ## Todo List
-- Create login method
 - Display balances, movers, brief portfolio analysis 
 - Set up parsing and GUI callbacks for WebSocket session data
 - Options
@@ -86,6 +72,9 @@ Premia's main event loop is managed by the common Model-View-Controller framewor
 	- Orders (Active, Cancelled, Executed)
 	
 ## Market Data 
+
+TODO: find a way to generate this market data code from the API responses? 
+
 **TDAmeritrade**
 - Account
 - Option Chain 
@@ -120,6 +109,12 @@ Object that handles communication with TDAmeritrade's Developer API. Present in 
 
 ## IEXCloud Interface
 Object that handles communication with the IEXCloud API. 
+
+## InteractiveBrokers
+
+### TraderWorkstation
+
+### IBGateway
 
 ## Dependencies
 	- SDL2.0

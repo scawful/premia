@@ -2,16 +2,13 @@
 #define INSTITUTIONALMONEYFUNDS_HPP
 
 #include "Premia.hpp"
-
-namespace iex
-{
-    class InsititutionalMoneyFunds
-    {
-    private:
-    
-    public:
-        InstitutionalMoneyFunds()=default;
-    };
+namespace Premia {
+namespace iex {
+class InsititutionalMoneyFunds {
+ private:
+ public:
+  InstitutionalMoneyFunds() = default;
+};
+}  // namespace iex
 }
-
-#endif // INSTITUTIONALMONEYFUNDS_HPP
+#endif  // INSTITUTIONALMONEYFUNDS_HPP
