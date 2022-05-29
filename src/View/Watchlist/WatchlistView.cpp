@@ -56,6 +56,8 @@ WatchlistView::drawWatchlistTable() {
         if (ImGui::InputText("##addText", &addText, ImGuiInputTextFlags_EnterReturnsTrue)) {
           printf("enter pressed?\n");
           fflush(stdout);
+          // TODO: Insert implementation
+          // TODO: Save to file
         }
         ImGui::TableNextColumn();
         ImGui::Text(ICON_MD_SEARCH);
@@ -68,6 +70,7 @@ WatchlistView::drawWatchlistTable() {
     ImGui::EndPopup();
   }
 
+  static int selectedRow = -1;
   if (ImGui::BeginTable("Watchlist_Table", 5, watchlistFlags, ImVec2(0, 0))) {
     ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
     ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthFixed);
@@ -80,13 +83,30 @@ WatchlistView::drawWatchlistTable() {
     ImGuiListClipper clipper;
     clipper.Begin(model.getWatchlist(watchlistIndex).getNumInstruments());
     while (clipper.Step()) {
+      bool selected = false;
       for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
+        String symbol = model.getWatchlist(watchlistIndex).getInstrumentSymbol(row);
+        auto symChar = symbol.c_str();
         ImGui::TableNextRow();
         for (int column = 0; column < 5; column++) {
-          String symbol = model.getWatchlist(watchlistIndex).getInstrumentSymbol(row);
           ImGui::TableSetColumnIndex(column);
           switch (column) {
-            case 0:ImGui::Text("%s", symbol.c_str());
+            case 0:
+              // Left click
+              if (ImGui::Selectable(symChar,
+                                    &selected,
+                                    ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_DontClosePopups)) {
+                printf("Selected %s\n", symChar);
+                fflush(stdout);
+              }
+              // Right click
+              if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+                printf("Right click-Selected %s\n", symChar);
+                fflush(stdout);
+                ImGui::OpenPopup("rowSelectPopup");
+                selectedRow = row;
+              }
+
               break;
             case 1:ImGui::Text("%s", model.getQuote(symbol).getQuoteVariable("bidPrice").c_str());
               break;
@@ -96,14 +116,27 @@ WatchlistView::drawWatchlistTable() {
               break;
             case 4:ImGui::Text("%s", model.getQuote(symbol).getQuoteVariable("closePrice").c_str());
               break;
-            default:
-              break;
+            default:break;
           }
         }
+
       }
     }
 
     ImGui::EndTable();
+  }
+  // Right click entry menu
+  if (ImGui::BeginPopupContextItem("rowSelectPopup")) {
+    if (ImGui::MenuItem("Delete") && selectedRow != -1) {
+      String symbol = model.getWatchlist(watchlistIndex).getInstrumentSymbol(selectedRow);
+      auto symChar = symbol.c_str();
+      printf("delete-Selected %s\n", symChar);
+      fflush(stdout);
+      // TODO: Delete implementation given watchlistIndex, selectedRow
+      // TODO: Save to file
+      selectedRow = -1;
+    }
+    ImGui::EndPopup();
   }
 }
 
@@ -123,53 +156,50 @@ WatchlistView::addEvent(CRString key, const EventHandler &event) {
 }
 
 void WatchlistView::update() {
-  Construct{ // runs once
-      model.addLogger(this->logger);
-  }
-  Instruct{ // runs each frame
-      drawWatchlistMenu();
-      switch (currentService) {
-        case 0:
-          // ImGui::Text("Local Watchlist");
-          if (serviceChanged) {
-            // Reset variables
-            watchlistIndex = 0;
-            serviceChanged = false;
-            try {
-              model.initWatchlist();
-            } catch (Premia::NotLoggedInException) {
-              logger("[Watchlist] No local watchlist data found!");
-              throw Destruction();
-            }
-          } else {
-            drawWatchlistTable();
-          }
-        break;
-        case 1:
-          if (serviceChanged) {
-              // Reset variables
-              watchlistIndex = 0;
-              serviceChanged = false;
-              try {
-                model.initTDAWatchlists();
-              } catch (Premia::NotLoggedInException) {
-                logger("[Watchlist] User not logged in!");
-                throw Destruction();
+  Construct { // runs once
+              model.addLogger(this->logger);
+            }Instruct { // runs each frame
+              drawWatchlistMenu();
+              switch (currentService) {
+                case 0:
+                  // ImGui::Text("Local Watchlist");
+                  if (serviceChanged) {
+                    // Reset variables
+                    watchlistIndex = 0;
+                    serviceChanged = false;
+                    try {
+                      model.initWatchlist();
+                    } catch (Premia::NotLoggedInException) {
+                      logger("[Watchlist] No local watchlist data found!");
+                      throw Destruction();
+                    }
+                  } else {
+                    drawWatchlistTable();
+                  }
+                  break;
+                case 1:
+                  if (serviceChanged) {
+                    // Reset variables
+                    watchlistIndex = 0;
+                    serviceChanged = false;
+                    try {
+                      model.initTDAWatchlists();
+                    } catch (Premia::NotLoggedInException) {
+                      logger("[Watchlist] User not logged in!");
+                      throw Destruction();
+                    }
+                  } else {
+                    drawWatchlistTable();
+                  }
+                  break;
+                case 2: ImGui::Text("Coinbase Watchlist");
+                  break;
+                default: break;
               }
-          }
-        else {
-            drawWatchlistTable();
-        }
-        break;
-        case 2: ImGui::Text("Coinbase Watchlist");
-        break;
-        default: break;
-      }
-  }
-  Destruct{ // runs on throw Destruction, can be used for errors and memory managment
-      // user is not logged into a service
-      // perhaps make a popup window that directs them to log into that service? (not necessarily an error)
-  }
+            }Destruct { // runs on throw Destruction, can be used for errors and memory managment
+              // user is not logged into a service
+              // perhaps make a popup window that directs them to log into that service? (not necessarily an error)
+            }
   Proceed;
 }
 }
