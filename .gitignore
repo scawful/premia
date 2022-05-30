@@ -5,6 +5,5 @@ apikey.hpp
 CMakeFiles/**
 cmake_install.cmake
 CMakeCache.txt
-Makefile
 chart.csv
 apikey.txt
