@@ -21,10 +21,12 @@ class WatchlistModel : public Model {
   void addLogger(const Logger& logger);
 
   void resetWatchlist();
-  void initWatchlist();
+  void initLocalWatchlist();
   void initTDAWatchlists();
+  void saveWatchlists(); //TODO: Some method that'll save to disk current watchlist state
   bool getOpenList(int n);
   void setOpenList(int n);
+  void setOpenList(int n, int m);
   String getWatchlistName(int index);
   tda::Quote& getQuote(CRString key);
   tda::Watchlist& getWatchlist(int index);

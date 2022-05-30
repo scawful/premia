@@ -16,7 +16,6 @@ class WatchlistView : public View {
   Logger logger;
   WatchlistModel model;
 
-  void initWatchlist();
   void drawWatchlistMenu();
   void drawWatchlistTable();
 

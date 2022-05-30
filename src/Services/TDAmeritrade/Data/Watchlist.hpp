@@ -50,6 +50,7 @@ class Watchlist {
 
   void addVariable(CRString key, CRString value);
   void addInstrument(CRString symbol, CRString desc, CRString type);
+  void removeInstrument(int idx);
 };
 }  // namespace tda
 }  // namespace Premia

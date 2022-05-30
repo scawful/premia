@@ -9,7 +9,7 @@ void WatchlistModel::resetWatchlist() {
   watchlistNamesChar = ArrayList<const char*>();
 }
 
-void WatchlistModel::initWatchlist() {
+void WatchlistModel::initLocalWatchlist() {
   // TODO: load file in (preferably some xml or json)
   // Parse into openList<int> (binary list of which entries are unloaded (0) or loaded (1)),
   //   watchlists<TDA:Watchlist> (Watchlist data)
@@ -71,6 +71,7 @@ void WatchlistModel::initTDAWatchlists() {
 bool WatchlistModel::getOpenList(int n) { return openList.at(n); }
 
 void WatchlistModel::setOpenList(int n) { this->openList[n] = 1; }
+void WatchlistModel::setOpenList(int n, int m) { this->openList[n] = m; }
 
 bool WatchlistModel::isActive() const { return active; }
 
