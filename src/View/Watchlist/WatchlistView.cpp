@@ -123,20 +123,20 @@ WatchlistView::drawWatchlistTable() {
       }
     }
 
-    ImGui::EndTable();
-  }
-  // Right click entry menu
-  if (ImGui::BeginPopupContextItem("rowSelectPopup")) {
-    if (ImGui::MenuItem("Delete") && selectedRow != -1) {
-      String symbol = model.getWatchlist(watchlistIndex).getInstrumentSymbol(selectedRow);
-      auto symChar = symbol.c_str();
-      printf("delete-Selected %s\n", symChar);
-      fflush(stdout);
-      // TODO: Delete implementation given watchlistIndex, selectedRow
-      // TODO: Save to file
-      selectedRow = -1;
+    // Right click entry menu
+    if (ImGui::BeginPopupContextItem("rowSelectPopup")) {
+      if (ImGui::MenuItem("Delete") && selectedRow != -1) {
+        String symbol = model.getWatchlist(watchlistIndex).getInstrumentSymbol(selectedRow);
+        auto symChar = symbol.c_str();
+        printf("delete-Selected %s\n", symChar);
+        fflush(stdout);
+        // TODO: Delete implementation given watchlistIndex, selectedRow
+        // TODO: Save to file
+        selectedRow = -1;
+      }
+      ImGui::EndPopup();
     }
-    ImGui::EndPopup();
+    ImGui::EndTable();
   }
 }
 
