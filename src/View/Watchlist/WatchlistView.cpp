@@ -70,6 +70,11 @@ WatchlistView::drawWatchlistTable() {
         printf("enter watchlist pressed?\n");
         fflush(stdout);
         // TODO: Insert implementation
+        boost::to_upper(addText);
+
+        // Reset
+        addText = "";
+        ImGui::CloseCurrentPopup();
         // TODO: Save to file
       }
       ImGui::EndPopup();
@@ -95,12 +100,17 @@ WatchlistView::drawWatchlistTable() {
       printf("enter ticker pressed?\n");
       fflush(stdout);
       // TODO: Insert implementation
-      model.getWatchlist(watchlistIndex).addInstrument(addText, "", "Stock");
-
-      int rIdx = model.getWatchlist(watchlistIndex).getNumInstruments()-1;
-      model.setQuote(model.getWatchlist(watchlistIndex).getInstrumentSymbol(rIdx),
-                     tda::TDA::getInstance().getQuote(model.getWatchlist(watchlistIndex).getInstrumentSymbol(rIdx)));
+      boost::to_upper(addText);
+      // Ensure we don't already have said ticker
+      if (!model.getWatchlist(watchlistIndex).containsTicker(addText)) {
+        model.getWatchlist(watchlistIndex).addInstrument(addText, "", "Stock");
+        int rIdx = model.getWatchlist(watchlistIndex).getNumInstruments() - 1;
+        model.setQuote(model.getWatchlist(watchlistIndex).getInstrumentSymbol(rIdx),
+                       tda::TDA::getInstance().getQuote(model.getWatchlist(watchlistIndex).getInstrumentSymbol(rIdx)));
+      }
       // TODO: Save to file
+      addText = "";
+      ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
   }
@@ -163,7 +173,7 @@ WatchlistView::drawWatchlistTable() {
 
     // Right click entry menu
     if (ImGui::BeginPopupContextItem("rowSelectPopup")) {
-      if (ImGui::MenuItem("Delete Entry") && selectedRow != -1) {
+      if (ImGui::MenuItem("Delete") && selectedRow != -1) {
         String symbol = model.getWatchlist(watchlistIndex).getInstrumentSymbol(selectedRow);
         auto symChar = symbol.c_str();
         printf("delete-Selected %s\n", symChar);
@@ -171,8 +181,8 @@ WatchlistView::drawWatchlistTable() {
         // TODO: Delete implementation given watchlistIndex, selectedRow
         model.setOpenList(watchlistIndex, 0);
         model.getWatchlist(watchlistIndex).removeInstrument(selectedRow);
-        // TODO: Save to file
         selectedRow = -1;
+        // TODO: Save to file
       }
       ImGui::EndPopup();
     }
@@ -196,52 +206,50 @@ WatchlistView::addEvent(CRString key, const EventHandler &event) {
 }
 
 void WatchlistView::update() {
-  Construct{ // runs once
-      model.addLogger(this->logger);
-  }
-  Instruct{ // runs each frame
-      drawWatchlistMenu();
-      switch (currentService) {
-        case 0:
-          // ImGui::Text("Local Watchlist");
-          if (serviceChanged) {
-            // Reset variables
-            watchlistIndex = 0;
-            serviceChanged = false;
-            try {
-              model.initLocalWatchlist();
-            } catch (Premia::NotLoggedInException) {
-              logger("[Watchlist] No local watchlist data found!");
-              throw Destruction();
+  Construct { // runs once
+              model.addLogger(this->logger);
+            }Instruct { // runs each frame
+              drawWatchlistMenu();
+              switch (currentService) {
+                case 0:
+                  // ImGui::Text("Local Watchlist");
+                  if (serviceChanged) {
+                    // Reset variables
+                    watchlistIndex = 0;
+                    serviceChanged = false;
+                    try {
+                      model.initLocalWatchlist();
+                    } catch (Premia::NotLoggedInException) {
+                      logger("[Watchlist] No local watchlist data found!");
+                      throw Destruction();
+                    }
+                  } else {
+                    drawWatchlistTable();
+                  }
+                  break;
+                case 1:
+                  if (serviceChanged) {
+                    // Reset variables
+                    watchlistIndex = 0;
+                    serviceChanged = false;
+                    try {
+                      model.initTDAWatchlists();
+                    } catch (Premia::NotLoggedInException) {
+                      logger("[Watchlist] User not logged in!");
+                      throw Destruction();
+                    }
+                  } else {
+                    drawWatchlistTable();
+                  }
+                  break;
+                case 2: ImGui::Text("Coinbase Watchlist");
+                  break;
+                default: break;
+              }
+            }Destruct { // runs on throw Destruction, can be used for errors and memory managment
+              // user is not logged into a service
+              // perhaps make a popup window that directs them to log into that service? (not necessarily an error)
             }
-          } else {
-            drawWatchlistTable();
-          }
-        break;
-        case 1:
-          if (serviceChanged) {
-            // Reset variables
-            watchlistIndex = 0;
-            serviceChanged = false;
-            try {
-              model.initTDAWatchlists();
-            } catch (Premia::NotLoggedInException) {
-              logger("[Watchlist] User not logged in!");
-              throw Destruction();
-            }
-          } else {
-            drawWatchlistTable();
-          }
-        break;
-        case 2: ImGui::Text("Coinbase Watchlist");
-        break;
-        default: break;
-      }
-  }
-  Destruct{ // runs on throw Destruction, can be used for errors and memory managment
-      // user is not logged into a service
-      // perhaps make a popup window that directs them to log into that service? (not necessarily an error)
-  }
   Proceed;
 }
 }

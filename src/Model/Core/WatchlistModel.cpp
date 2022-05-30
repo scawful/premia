@@ -20,7 +20,7 @@ void WatchlistModel::initLocalWatchlist() {
   watchlist.setName("Local watchlist");
   watchlist.setId(0);
   watchlist.setAccountId("local_acc");
-  watchlist.addInstrument("APPL", "", "Stock"); // Add  test entry
+  watchlist.addInstrument("AAPL", "", "Stock"); // Add  test entry
   watchlists.push_back(watchlist); // Add test watchlist to watchlists
 
 
