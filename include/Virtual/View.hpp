@@ -1,18 +1,18 @@
 #ifndef View_hpp
 #define View_hpp
 
-#include "Premia.hpp"
 #include "Interface/HLXT.hpp"
-#include "Library/SDL.hpp"
+#include "Library/Boost.hpp"
 #include "Library/ImGui.hpp"
 #include "Library/ImPlot.hpp"
-#include "Library/Boost.hpp"
+#include "Library/SDL.hpp"
+#include "Premia.hpp"
 
-namespace Premia { 
+namespace Premia {
 class View {
  public:
-  View()=default;
-  virtual ~View()=default;
+  View() = default;
+  virtual ~View() = default;
 
   virtual String getName() = 0;
   virtual void addEvent(CRString, const EventHandler &) = 0;

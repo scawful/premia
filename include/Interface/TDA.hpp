@@ -12,8 +12,7 @@
 #include "../src/Services/TDAmeritrade/Parser.hpp"
 #include "../src/Services/TDAmeritrade/Socket.hpp"
 
-namespace Premia {
-namespace tda {
+namespace Premia::tda {
 using Watchlists = std::vector<Watchlist>;
 
 class TDA {
@@ -32,7 +31,7 @@ class TDA {
     return instance;
   }
 
-  auto authUser(String key, String token) -> void {
+  auto authUser(CRString key, CRString token) -> void {
     if (!key.empty() && !token.empty()) {
       client.addAuth(key, token);
       auth = true;
@@ -41,12 +40,12 @@ class TDA {
 
   auto isAuth() const -> bool { return auth; }
 
-  auto getQuote(String symbol) -> Quote {
+  auto getQuote(CRString symbol) const -> Quote {
     String response = client.get_quote(symbol);
     return parser.parse_quote(parser.read_response(response));
   }
 
-  auto getAccount(String accountNumber) -> Account {
+  auto getAccount(CRString accountNumber) -> Account {
     String response = client.get_account(accountNumber);
     return parser.parse_account(parser.read_response(response));
   }
@@ -56,10 +55,10 @@ class TDA {
     return parser.parse_all_accounts(parser.read_response(response));
   }
 
-  auto getPriceHistory(String ticker, PeriodType periodType,
+  auto getPriceHistory(CRString ticker, PeriodType periodType,
                        FrequencyType frequencyType, int periodAmount,
-                       int frequencyAmount, bool extendedHoursTrading)
-      -> PriceHistory const {
+                       int frequencyAmount, bool extendedHoursTrading) const
+      -> PriceHistory {
     String response = client.get_price_history(ticker, periodType, periodAmount,
                                                frequencyType, frequencyAmount,
                                                extendedHoursTrading);
@@ -67,16 +66,16 @@ class TDA {
                                       frequencyType);
   }
 
-  auto getOptionChain(String ticker, String strikeCount, String strategy,
-                      String range, String expMonth, String optionType)
-      -> OptionChain {
+  auto getOptionChain(CRString ticker, CRString strikeCount, CRString strategy,
+                      CRString range, CRString expMonth,
+                      CRString optionType) const -> OptionChain {
     String response =
         client.get_option_chain(ticker, "ALL", strikeCount, true, strategy,
                                 range, expMonth, optionType);
     return parser.parse_option_chain(parser.read_response(response));
   }
 
-  auto getWatchlistsByAccount(String account_num) -> Watchlists {
+  auto getWatchlistsByAccount(CRString account_num) const -> Watchlists {
     String response = client.get_watchlist_by_account(account_num);
     return parser.parse_watchlist_data(parser.read_response(response));
   }
@@ -92,18 +91,17 @@ class TDA {
     return num;
   }
 
-  auto parseOptionSymbol(CRString symbol) -> String {
+  auto parseOptionSymbol(CRString symbol) const -> String {
     return parser.parse_option_symbol(symbol);
   }
 
-  void sendChartRequestToSocket(Logger logger, String ticker) {
+  void sendChartRequestToSocket(const Logger& logger, CRString ticker) {
     client.start_session(logger, ticker);
   }
 
   void sendSocketLogout() { client.send_logout_request(); }
 };
 
-}  // namespace tda
-}  // namespace Premia
+}  // namespace Premia::tda
 
-#endif /* TDAmeritrade_hpp */
+#endif
