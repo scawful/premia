@@ -44,7 +44,7 @@ if(OPENSSL_FOUND)
 endif()
 
 # ImGui library --------------------------------------------------------------------------------------------------
-set(IMGUI_PATH  "libs/imgui")                            # Set where the ImGui files are stored
+set(IMGUI_PATH  "../libs/imgui")                            # Set where the ImGui files are stored
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)             # Compile as static library 
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
@@ -52,72 +52,76 @@ target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
 target_compile_definitions(ImGui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  GL_GLEXT_PROTOTYPES=1)
 
 # ImPlot library -------------------------------------------------------------------------------------------------
-set(IMPLOT_PATH "libs/implot")
+set(IMPLOT_PATH "../libs/implot")
 file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
 # TWS library -------------------------------------------------------------------------------------------------
-set(TWS_PATH "libs/tws")
+set(TWS_PATH "../libs/tws")
 file(GLOB TWS_SOURCES ${TWS_PATH}/*.cpp)
 add_library("TWS" STATIC ${TWS_SOURCES})
 target_include_directories("TWS" PUBLIC ${TWS_PATH})
 
+add_subdirectory(Model)
+add_subdirectory(Controller)
+add_subdirectory(Services)
+add_subdirectory(View)
+
 # Premia Executable Linkage --------------------------------------------------------------------------------------
-add_executable(
-    Premia 
-    src/Premia.cpp 
+add_executable( Premia 
+    Premia.cpp 
     # Model
-    src/Model/Model.cpp
-    src/Model/Chart/ChartModel.cpp
-    src/Model/Options/OptionsModel.cpp
-    src/Model/Account/AccountModel.cpp
-    src/Model/Console/ConsoleModel.cpp
-    src/Model/Core/WatchlistModel.cpp
+    Model/Model.cpp
+    Model/Chart/ChartModel.cpp
+    Model/Options/OptionsModel.cpp
+    Model/Account/AccountModel.cpp
+    Model/Console/ConsoleModel.cpp
+    Model/Core/WatchlistModel.cpp
     # View + View Manager 
-    src/View/Workspace.cpp
-    src/View/ViewManager.cpp
-    src/View/Core/PrimaryView.cpp
-    src/View/Console/ConsoleView.cpp
-    src/View/Menu/MenuView.cpp
-    src/View/Login/LoginView.cpp
-    src/View/Options/OptionChain.cpp
-    src/View/Account/AccountView.cpp
-    src/View/Watchlist/WatchlistView.cpp
-    src/View/Chart/ChartView.cpp
-    src/View/Chart/Subview/CandleChart.cpp
-    src/View/Chart/Subview/LinePlotChart.cpp
+    View/Workspace.cpp
+    View/ViewManager.cpp
+    View/Core/PrimaryView.cpp
+    View/Console/ConsoleView.cpp
+    View/Menu/MenuView.cpp
+    View/Login/LoginView.cpp
+    View/Options/OptionChain.cpp
+    View/Account/AccountView.cpp
+    View/Watchlist/WatchlistView.cpp
+    View/Chart/ChartView.cpp
+    View/Chart/Subview/CandleChart.cpp
+    View/Chart/Subview/LinePlotChart.cpp
     # Controller 
-    src/Controller/Controller.cpp    
+    Controller/Controller.cpp    
     # Services 
-    src/Services/Halext/Client.cpp 
-    src/Services/Halext/User.cpp  
+    Services/Halext/Client.cpp 
+    Services/Halext/User.cpp  
     ## IEXCloud Service  
-    src/Services/IEXCloud/Client.cpp 
-    src/Services/IEXCloud/Parser.cpp
+    Services/IEXCloud/Client.cpp 
+    Services/IEXCloud/Parser.cpp
     ## Coinbase Service 
-    src/Services/CoinbasePro/Account.cpp 
-    src/Services/CoinbasePro/Client.cpp 
-    src/Services/CoinbasePro/Product.cpp
+    Services/CoinbasePro/Account.cpp 
+    Services/CoinbasePro/Client.cpp 
+    Services/CoinbasePro/Product.cpp
     ## TDAmeritrade Service 
-    src/Services/TDAmeritrade/Parser.cpp
-    src/Services/TDAmeritrade/Socket.cpp
-    src/Services/TDAmeritrade/Client.cpp
-    src/Services/TDAmeritrade/Data/Quote.cpp 
-    src/Services/TDAmeritrade/Data/OptionChain.cpp 
-    src/Services/TDAmeritrade/Data/Account.cpp
-    src/Services/TDAmeritrade/Data/Watchlist.cpp
-    src/Services/TDAmeritrade/Data/Order.cpp
-    src/Services/TDAmeritrade/Data/UserPrincipals.cpp
-    src/Services/TDAmeritrade/Data/PriceHistory.cpp 
+    Services/TDAmeritrade/Parser.cpp
+    Services/TDAmeritrade/Socket.cpp
+    Services/TDAmeritrade/Client.cpp
+    Services/TDAmeritrade/Data/Quote.cpp 
+    Services/TDAmeritrade/Data/OptionChain.cpp 
+    Services/TDAmeritrade/Data/Account.cpp
+    Services/TDAmeritrade/Data/Watchlist.cpp
+    Services/TDAmeritrade/Data/Order.cpp
+    Services/TDAmeritrade/Data/UserPrincipals.cpp
+    Services/TDAmeritrade/Data/PriceHistory.cpp 
     ## InteractiveBrokers Service
-    src/Services/InteractiveBrokers/Client.cpp
-    src/Services/InteractiveBrokers/Data/ContractSamples.cpp
-    src/Services/InteractiveBrokers/Data/OrderSamples.cpp
-    src/Services/InteractiveBrokers/Data/ScannerSubscriptionSamples.cpp
-    src/Services/InteractiveBrokers/Data/AvailableAlgoParams.cpp
-    src/Services/InteractiveBrokers/Data/AccountSummaryTags.cpp
-    src/Services/InteractiveBrokers/Utils.cpp
+    Services/InteractiveBrokers/Client.cpp
+    Services/InteractiveBrokers/Data/ContractSamples.cpp
+    Services/InteractiveBrokers/Data/OrderSamples.cpp
+    Services/InteractiveBrokers/Data/ScannerSubscriptionSamples.cpp
+    Services/InteractiveBrokers/Data/AvailableAlgoParams.cpp
+    Services/InteractiveBrokers/Data/AccountSummaryTags.cpp
+    Services/InteractiveBrokers/Utils.cpp
     # GUI libraries 
     ${IMGUI_PATH}/imgui.cpp 
     ${IMGUI_PATH}/imgui_demo.cpp
@@ -133,6 +137,8 @@ add_executable(
 include_directories(Premia "assets")
 include_directories(Premia "src/Services/")
 include_directories(Premia "src/")
+
+
 target_link_libraries(
     Premia 
     ${BOOST_LIBRARIES} 
@@ -143,71 +149,76 @@ target_link_libraries(
     ImPlot
     curl
     OpenSSL::SSL 
+    controller-lib
+    model-lib
 )
+
+
+
 
 if (WIN32) 
     target_link_libraries(Premia ws2_32)
 endif()
 
-# PremiaTest using GoogleTest ------------------------------------------------------------------------------------
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-enable_testing()
+# # PremiaTest using GoogleTest ------------------------------------------------------------------------------------
+# include(FetchContent)
+# FetchContent_Declare(
+#   googletest
+#   URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+# )
+# # For Windows: Prevent overriding the parent project's compiler/linker settings
+# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# FetchContent_MakeAvailable(googletest)
+# enable_testing()
 
-add_executable(
-  PremiaTest
-  tests/PremiaTest.cpp
-  tests/ServiceTestSuite/TDA.cpp
-  tests/ServiceTestSuite/CBP.cpp
-  tests/ServiceTestSuite/IEX.cpp
-# tests/ServiceTestSuite/FRED.cpp
-  src/Services/Halext/Client.cpp 
-  src/Services/Halext/User.cpp    
-  src/Services/IEXCloud/Client.cpp 
-  src/Services/IEXCloud/Parser.cpp
-  src/Services/CoinbasePro/Account.cpp 
-  src/Services/CoinbasePro/Client.cpp 
-  src/Services/CoinbasePro/Product.cpp
-  src/Services/TDAmeritrade/Parser.cpp
-  src/Services/TDAmeritrade/Socket.cpp
-  src/Services/TDAmeritrade/Client.cpp
-  src/Services/TDAmeritrade/Data/Quote.cpp 
-  src/Services/TDAmeritrade/Data/OptionChain.cpp 
-  src/Services/TDAmeritrade/Data/Account.cpp
-  src/Services/TDAmeritrade/Data/Watchlist.cpp
-  src/Services/TDAmeritrade/Data/Order.cpp
-  src/Services/TDAmeritrade/Data/UserPrincipals.cpp
-  src/Services/TDAmeritrade/Data/PriceHistory.cpp 
-)
+# add_executable(
+#   PremiaTest
+#   tests/PremiaTest.cpp
+#   tests/ServiceTestSuite/TDA.cpp
+#   tests/ServiceTestSuite/CBP.cpp
+#   tests/ServiceTestSuite/IEX.cpp
+# # tests/ServiceTestSuite/FRED.cpp
+#   Services/Halext/Client.cpp 
+#   Services/Halext/User.cpp    
+#   Services/IEXCloud/Client.cpp 
+#   Services/IEXCloud/Parser.cpp
+#   Services/CoinbasePro/Account.cpp 
+#   Services/CoinbasePro/Client.cpp 
+#   Services/CoinbasePro/Product.cpp
+#   Services/TDAmeritrade/Parser.cpp
+#   Services/TDAmeritrade/Socket.cpp
+#   Services/TDAmeritrade/Client.cpp
+#   Services/TDAmeritrade/Data/Quote.cpp 
+#   Services/TDAmeritrade/Data/OptionChain.cpp 
+#   Services/TDAmeritrade/Data/Account.cpp
+#   Services/TDAmeritrade/Data/Watchlist.cpp
+#   Services/TDAmeritrade/Data/Order.cpp
+#   Services/TDAmeritrade/Data/UserPrincipals.cpp
+#   Services/TDAmeritrade/Data/PriceHistory.cpp 
+# )
 
-include_directories(PremiaTest PUBLIC libs/fred/include)
-find_library(FREDCPP_LIBRARY fredcpp HINTS libs/fred)
+# include_directories(PremiaTest PUBLIC libs/fred/include)
+# find_library(FREDCPP_LIBRARY fredcpp HINTS libs/fred)
 
-target_link_libraries(
-  PremiaTest
-  ${BOOST_LIBRARIES} 
-  ${SDL2_LIBRARIES} 
-  ${OPENGL_LIBRARIES}
-# ${FREDCPP_LIBRARY}
-  curl 
-  OpenSSL::SSL 
-  gtest_main
-  gtest
-)
+# target_link_libraries(
+#   PremiaTest
+#   ${BOOST_LIBRARIES} 
+#   ${SDL2_LIBRARIES} 
+#   ${OPENGL_LIBRARIES}
+# # ${FREDCPP_LIBRARY}
+#   curl 
+#   OpenSSL::SSL 
+#   gtest_main
+#   gtest
+# )
 
-if (WIN32) 
-    target_link_libraries(PremiaTest ws2_32)
-endif()
+# if (WIN32) 
+#     target_link_libraries(PremiaTest ws2_32)
+# endif()
 
 
-include(GoogleTest)
-gtest_discover_tests(PremiaTest)
+# include(GoogleTest)
+# gtest_discover_tests(PremiaTest)
 
 # Assets Folder Link ---------------------------------------------------------------------------------------------
 set (source "${CMAKE_SOURCE_DIR}/assets")

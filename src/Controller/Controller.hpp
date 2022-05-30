@@ -1,7 +1,7 @@
 #ifndef Controller_hpp
 #define Controller_hpp
 
-#include "Library/ImPlot.hpp"
+#include "implot/implot.hpp"
 #include "Library/SDL.hpp"
 #include "Model/Model.hpp"
 #include "Style.hpp"
