@@ -3,7 +3,7 @@ namespace Premia {
 tda::Watchlist::Watchlist() = default;
 
 int tda::Watchlist::getNumInstruments() const {
-  return ((int)instruments.size());
+  return ((int) instruments.size());
 }
 
 String tda::Watchlist::getName() const { return name; }
@@ -33,7 +33,22 @@ void tda::Watchlist::addInstrument(CRString symbol, CRString desc,
   instruments.emplace_back(symbol, desc, type);
 }
 
+void tda::Watchlist::removeInstrument(int idx) {
+  ArrayList<WatchlistInstrument>::iterator iidx = instruments.begin();
+  advance(iidx, idx);
+  instruments.erase(iidx);
+}
+
 void tda::Watchlist::addVariable(CRString key, CRString value) {
   variables[key] = value;
 }
+
+bool tda::Watchlist::containsTicker(String ticker) {
+  // Sheesh C++ is wierd with its lambdas...
+  return std::find_if(instruments.begin(),
+                      instruments.end(),
+                      [&s = ticker](const WatchlistInstrument &wli) -> bool { return s == wli.getSymbol(); })
+      != instruments.end();
+}
+
 }  // namespace Premia

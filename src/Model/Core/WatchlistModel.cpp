@@ -1,12 +1,44 @@
 #include "WatchlistModel.hpp"
 
 namespace Premia {
-void WatchlistModel::initWatchlist() {
-  watchlistNamesChar.push_back("Quotes");
+
+void WatchlistModel::resetWatchlist() {
+  watchlists = ArrayList<tda::Watchlist>();
+  openList = ArrayList<int>();
+  watchlistNames = ArrayList<String>();
+  watchlistNamesChar = ArrayList<const char*>();
+}
+
+void WatchlistModel::initLocalWatchlist() {
+  // TODO: load file in (preferably some xml or json)
+  // Parse into openList<int> (binary list of which entries are unloaded (0) or loaded (1)),
+  //   watchlists<TDA:Watchlist> (Watchlist data)
+
+  // For now, just populate with blank entries
+  resetWatchlist();
+  tda::Watchlist watchlist; // Initialze test watchlist
+  watchlist.setName("Local watchlist");
+  watchlist.setId(0);
+  watchlist.setAccountId("local_acc");
+  watchlist.addInstrument("AAPL", "", "Stock"); // Add  test entry
+  watchlists.push_back(watchlist); // Add test watchlist to watchlists
+
+
+  for (int i = 0; i < watchlists.size(); i++) {
+    watchlistNames.push_back(watchlists[i].getName());
+    openList.push_back(0);
+  }
+
+  watchlistNamesChar.clear();
+  for (String const& str : watchlistNames) {
+    watchlistNamesChar.push_back(str.data());
+  }
+
   active = true;
 }
 
 void WatchlistModel::initTDAWatchlists() {
+  resetWatchlist();
   String account_num;
   Try { account_num = tda::TDA::getInstance().getDefaultAccount(); }
   catch (const std::out_of_range& e) {
@@ -39,6 +71,7 @@ void WatchlistModel::initTDAWatchlists() {
 bool WatchlistModel::getOpenList(int n) { return openList.at(n); }
 
 void WatchlistModel::setOpenList(int n) { this->openList[n] = 1; }
+void WatchlistModel::setOpenList(int n, int m) { this->openList[n] = m; }
 
 bool WatchlistModel::isActive() const { return active; }
 

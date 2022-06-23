@@ -2,14 +2,15 @@
 #define WatchlistModel_hpp
 
 #include "../Model.hpp"
+#include "TDAmeritrade/Data/Watchlist.hpp"
 
 namespace Premia {
 class WatchlistModel : public Model {
  private:  
   Logger logger;
   bool active = false;  
-  ArrayList<int> openList;
   String titleString;
+  ArrayList<int> openList;
   ArrayList<tda::Watchlist> watchlists;
   ArrayList<String> watchlistNames;
   ArrayList<const char*> watchlistNamesChar;
@@ -19,10 +20,13 @@ class WatchlistModel : public Model {
   bool isActive() const;
   void addLogger(const Logger& logger);
 
-  void initWatchlist();
+  void resetWatchlist();
+  void initLocalWatchlist();
   void initTDAWatchlists();
+  void saveWatchlists(); //TODO: Some method that'll save to disk current watchlist state
   bool getOpenList(int n);
   void setOpenList(int n);
+  void setOpenList(int n, int m);
   String getWatchlistName(int index);
   tda::Quote& getQuote(CRString key);
   tda::Watchlist& getWatchlist(int index);

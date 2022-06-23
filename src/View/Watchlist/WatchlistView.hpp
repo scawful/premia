@@ -9,12 +9,13 @@ namespace Premia {
 class WatchlistView : public View {
  private:
   int currentService = 0;
+  int watchlistIndex = 0;
+  bool serviceChanged = true;
   bool isLoggedIn = false;
   EventMap events;
   Logger logger;
   WatchlistModel model;
 
-  void initWatchlist();
   void drawWatchlistMenu();
   void drawWatchlistTable();
 
