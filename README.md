@@ -30,7 +30,7 @@ Building and installation
 
         cmake -G "<MinGW Makefiles/Unix Makefiles>" ../
 
-5. Build and run.
+4. Build and run.
 
         make Premia
         cmake --build <premia_root/build> --config Debug --target Premia
