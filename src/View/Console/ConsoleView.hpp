@@ -10,7 +10,7 @@
 #include "Interface/TWS.hpp"
 #include "Library/IconsMaterialDesign.h"
 #include "Metatypes.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 class ConsoleView : public View {

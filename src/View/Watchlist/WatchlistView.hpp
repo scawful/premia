@@ -3,7 +3,7 @@
 
 #include "Interface/TDA.hpp"
 #include "Model/Core/WatchlistModel.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 class WatchlistView : public View {

@@ -9,7 +9,7 @@
 #include "Library/IconsMaterialDesign.h"
 #include "Metatypes.hpp"
 #include "Model/Model.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 class MenuView : public View {

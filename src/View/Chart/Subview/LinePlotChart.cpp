@@ -3,7 +3,7 @@
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 

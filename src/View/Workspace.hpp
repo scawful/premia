@@ -7,7 +7,7 @@
 #include "Core/PrimaryView.hpp"
 #include "Login/LoginView.hpp"
 #include "Menu/MenuView.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 #include "Watchlist/WatchlistView.hpp"
 
 /**

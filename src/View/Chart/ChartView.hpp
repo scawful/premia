@@ -6,7 +6,7 @@
 
 #include "Metatypes.hpp"
 #include "Subview/CandleChart.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 class ChartView : public View {

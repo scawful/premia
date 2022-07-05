@@ -3,7 +3,7 @@
 
 #include "Interface/HLXT.hpp"
 #include "Model/Options/OptionsModel.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 class AccountView : public View {

@@ -2,7 +2,7 @@
 #define PrimaryView_hpp
 
 #include "View/Menu/MenuView.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 class PrimaryView : public View {

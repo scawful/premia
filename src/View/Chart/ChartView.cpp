@@ -9,7 +9,7 @@
 
 #include "Metatypes.hpp"
 #include "Subview/CandleChart.hpp"
-#include "Virtual/View.hpp"
+#include "View/View.hpp"
 
 namespace premia {
 
