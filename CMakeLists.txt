@@ -63,6 +63,9 @@ file(GLOB TWS_SOURCES ${TWS_PATH}/*.cpp)
 add_library("TWS" STATIC ${TWS_SOURCES})
 target_include_directories("TWS" PUBLIC ${TWS_PATH})
 
+add_subdirectory(src/Services/TDAmeritrade/Data)
+add_subdirectory(test)
+
 # Premia Executable Linkage --------------------------------------------------------------------------------------
 add_executable(
     Premia 
@@ -141,6 +144,7 @@ include_directories(
 
 target_link_libraries(
     Premia 
+    premia_proto
     ${BOOST_LIBRARIES} 
     ${SDL2_LIBRARIES} 
     ${OPENGL_LIBRARIES} 
@@ -154,66 +158,6 @@ target_link_libraries(
 if (WIN32) 
     target_link_libraries(Premia ws2_32)
 endif()
-
-# PremiaTest using GoogleTest ------------------------------------------------------------------------------------
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-enable_testing()
-
-add_executable(
-  PremiaTest
-  tests/PremiaTest.cpp
-  tests/ServiceTestSuite/TDA.cpp
-  tests/ServiceTestSuite/CBP.cpp
-  tests/ServiceTestSuite/IEX.cpp
-# tests/ServiceTestSuite/FRED.cpp
-  src/Services/Halext/Client.cpp 
-  src/Services/Halext/User.cpp    
-  src/Services/IEXCloud/Client.cpp 
-  src/Services/IEXCloud/Parser.cpp
-  src/Services/CoinbasePro/Account.cpp 
-  src/Services/CoinbasePro/Client.cpp 
-  src/Services/CoinbasePro/Product.cpp
-  src/Services/TDAmeritrade/Parser.cpp
-  src/Services/TDAmeritrade/Socket.cpp
-  src/Services/TDAmeritrade/Client.cpp
-  src/Services/TDAmeritrade/Data/Quote.cpp 
-  src/Services/TDAmeritrade/Data/OptionChain.cpp 
-  src/Services/TDAmeritrade/Data/Account.cpp
-  src/Services/TDAmeritrade/Data/Watchlist.cpp
-  src/Services/TDAmeritrade/Data/Order.cpp
-  src/Services/TDAmeritrade/Data/UserPrincipals.cpp
-  src/Services/TDAmeritrade/Data/PriceHistory.cpp 
-)
-
-include_directories(PremiaTest PUBLIC libs/fred/include)
-find_library(FREDCPP_LIBRARY fredcpp HINTS libs/fred)
-
-target_link_libraries(
-  PremiaTest
-  ${BOOST_LIBRARIES} 
-  ${SDL2_LIBRARIES} 
-  ${OPENGL_LIBRARIES}
-# ${FREDCPP_LIBRARY}
-  curl 
-  OpenSSL::SSL 
-  gtest_main
-  gtest
-)
-
-if (WIN32) 
-    target_link_libraries(PremiaTest ws2_32)
-endif()
-
-
-include(GoogleTest)
-gtest_discover_tests(PremiaTest)
 
 # Assets Folder Link ---------------------------------------------------------------------------------------------
 set (source "${CMAKE_SOURCE_DIR}/assets")
