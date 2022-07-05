@@ -1,6 +1,22 @@
 #include "ViewManager.hpp"
 
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
+
+#include <memory>
+#include <string>
+#include <unordered_map>
+
+#include "Account/AccountView.hpp"
+#include "Chart/ChartView.hpp"
+#include "Console/ConsoleView.hpp"
+#include "Core/PrimaryView.hpp"
+#include "Login/LoginView.hpp"
+#include "Menu/MenuView.hpp"
+#include "Metatypes.hpp"
+#include "Options/OptionChain.hpp"
+#include "View/Chart/Subview/LinePlotChart.hpp"
+#include "Virtual/View.hpp"
+#include "Watchlist/WatchlistView.hpp"
 
 namespace premia {
 
