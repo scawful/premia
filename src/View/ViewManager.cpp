@@ -3,12 +3,16 @@
 #include "imgui/imgui.h"
 
 namespace premia {
+
+constexpr size_t LOGIN_WIDTH = 220;
+constexpr size_t LOGIN_HEIGHT = 200;
+
 void ViewManager::startGuiFrame() const {
   const ImGuiIO& io = ImGui::GetIO();
   ImGui::NewFrame();
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   ImVec2 dimensions(io.DisplaySize.x, io.DisplaySize.y);
-  if (!isLoggedIn) dimensions = ImVec2(Style::LOGIN_WIDTH, Style::LOGIN_HEIGHT);
+  if (!isLoggedIn) dimensions = ImVec2(LOGIN_WIDTH, LOGIN_HEIGHT);
 
   ImGui::SetNextWindowSize(dimensions, ImGuiCond_Always);
   ImGuiWindowFlags flags =

@@ -10,7 +10,6 @@
 #include "Login/LoginView.hpp"
 #include "Menu/MenuView.hpp"
 #include "Options/OptionChain.hpp"
-#include "Style.hpp"
 #include "View/Chart/Subview/LinePlotChart.hpp"
 #include "Virtual/View.hpp"
 #include "Watchlist/WatchlistView.hpp"

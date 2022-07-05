@@ -6,7 +6,6 @@
 #include <implot/implot_internal.h>
 
 #include "Model/Model.hpp"
-#include "Style.hpp"
 #include "View/Chart/ChartView.hpp"
 #include "View/Console/ConsoleView.hpp"
 #include "View/Login/LoginView.hpp"
