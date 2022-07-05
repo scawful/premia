@@ -1,11 +1,18 @@
 #ifndef ConsoleView_hpp
 #define ConsoleView_hpp
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+
+#include <string>
+
 #include "Interface/TDA.hpp"
 #include "Interface/TWS.hpp"
+#include "Library/IconsMaterialDesign.h"
+#include "Metatypes.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class ConsoleView : public View {
  private:
   bool initialized = false;
@@ -50,6 +57,6 @@ class ConsoleView : public View {
   void addEvent(CRString key, const EventHandler& event) override;
   void update() override;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

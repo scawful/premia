@@ -5,7 +5,7 @@
 #include "../src/Services/CoinbasePro/Client.hpp"
 #include "../src/Services/CoinbasePro/Product.hpp"
 
-namespace Premia {
+namespace premia {
 namespace cbp {
 class CBP {
  private:
@@ -78,6 +78,6 @@ class CBP {
   }
 };
 }  // namespace cbp
-}  // namespace Premia
+}  // namespace premia
 
 #endif

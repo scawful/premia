@@ -1,10 +1,14 @@
 #ifndef ChartView_hpp
 #define ChartView_hpp
 
+#include <memory>
+#include <string>
+
+#include "Metatypes.hpp"
 #include "Subview/CandleChart.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class ChartView : public View {
   using ChartMap = std::unordered_map<String, std::shared_ptr<Chart>>;
 
@@ -33,6 +37,6 @@ class ChartView : public View {
   void drawChart();
   void drawChartSettings();
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

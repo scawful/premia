@@ -1,9 +1,13 @@
 #ifndef Account_hpp
 #define Account_hpp
 
-#include "Library/Boost.hpp"
+#include <boost/lexical_cast.hpp>
+
+#include "Metatypes.hpp"
 #include "PricingStructures.hpp"
-namespace Premia {
+
+
+namespace premia {
 namespace tda {
 struct PositionBalances {
   String symbol;
@@ -40,5 +44,5 @@ class Account {
 };
 
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

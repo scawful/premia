@@ -1,6 +1,8 @@
 #ifndef ViewManager_hpp
 #define ViewManager_hpp
 
+#include "imgui/imgui.h"
+
 #include "Account/AccountView.hpp"
 #include "Chart/ChartView.hpp"
 #include "Console/ConsoleView.hpp"
@@ -13,7 +15,7 @@
 #include "Virtual/View.hpp"
 #include "Watchlist/WatchlistView.hpp"
 
-namespace Premia {
+namespace premia {
 class ViewManager {
  private:
   using ViewMap = std::unordered_map<String, std::shared_ptr<View>>;
@@ -55,6 +57,6 @@ class ViewManager {
   void setCurrentView(std::shared_ptr<View> newView);
   void update() const;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

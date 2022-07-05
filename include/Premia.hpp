@@ -3,7 +3,7 @@
 
 #include "Metatypes.hpp"
 
-namespace Premia {
+namespace premia {
 
 /**
  * @exception exception-object exception description
@@ -37,6 +37,6 @@ class TDAClientException : public ClientException {
   const char* info() const { return info_ex; };
 };
 
-}  // namespace Premia
+}  // namespace premia
 
 #endif

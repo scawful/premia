@@ -12,7 +12,7 @@
 #include "../src/Services/TDAmeritrade/Parser.hpp"
 #include "../src/Services/TDAmeritrade/Socket.hpp"
 
-namespace Premia::tda {
+namespace premia::tda {
 using Watchlists = std::vector<Watchlist>;
 
 class TDA {
@@ -102,6 +102,6 @@ class TDA {
   void sendSocketLogout() { client.send_logout_request(); }
 };
 
-}  // namespace Premia::tda
+}  // namespace premia::tda
 
 #endif

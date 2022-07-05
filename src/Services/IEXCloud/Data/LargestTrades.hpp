@@ -2,7 +2,7 @@
 #define LARGESTTRADES_HPP
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace iex {
 class LargestTrades {
  private:

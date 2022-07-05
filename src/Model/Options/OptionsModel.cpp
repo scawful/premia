@@ -1,6 +1,6 @@
 #include "OptionsModel.hpp"
 
-namespace Premia {
+namespace premia {
 bool OptionsModel::isActive() const { return active; }
 
 tda::OptionChain& OptionsModel::getOptionChainData() {
@@ -164,4 +164,4 @@ ArrayList<double>& OptionsModel::getVegaExposureArray() {
 ArrayList<double>& OptionsModel::getVolgaExposureArray() {
   return volgaExposureArray;
 }
-}  // namespace Premia
+}  // namespace premia

@@ -1,10 +1,19 @@
 #ifndef LoginView_hpp
 #define LoginView_hpp
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+
+#include <string>
+
+#include "Interface/TDA.hpp"
+#include "Library/IconsMaterialDesign.h"
+#include "Metatypes.hpp"
 #include "Model/Model.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class LoginView : public View {
  private:
   bool initialized = false;
@@ -20,6 +29,6 @@ class LoginView : public View {
   void addEvent(CRString, const EventHandler&) override;
   void update() override;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

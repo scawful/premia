@@ -1,5 +1,5 @@
 #include "Quote.hpp"
-namespace Premia {
+namespace premia {
 using namespace tda;
 
 Quote::Quote() = default;
@@ -13,4 +13,4 @@ String Quote::getQuoteVariable(CRString variable) {
 }
 
 void Quote::clear() { quoteVariables.clear(); }
-}  // namespace Premia
+}  // namespace premia

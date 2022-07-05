@@ -1,6 +1,12 @@
 #ifndef Parser_hpp
 #define Parser_hpp
 
+#include <boost/lexical_cast.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
+#include <string>
+
 #include "Data/Account.hpp"
 #include "Data/OptionChain.hpp"
 #include "Data/PriceHistory.hpp"
@@ -9,8 +15,12 @@
 #include "Data/UserPrincipals.hpp"
 #include "Data/Watchlist.hpp"
 #include "Metatypes.hpp"
-namespace Premia {
+
+namespace premia {
 namespace tda {
+
+namespace json = boost::property_tree;
+
 class Parser {
  private:
   void parseStrikeMap(const json::ptree& data, OptionChain& chain,
@@ -33,5 +43,5 @@ class Parser {
 };
 
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

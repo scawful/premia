@@ -3,7 +3,7 @@
 
 #include "Premia.hpp"
 
-namespace Premia {
+namespace premia {
 namespace iex {
 class Stats {
  private:
@@ -181,6 +181,6 @@ class Stats {
   }
 };
 }  // namespace iex
-}  // namespace Premia
+}  // namespace premia
 
 #endif  // INSIDERSUMMARY_HPP

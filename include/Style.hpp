@@ -1,9 +1,9 @@
 #ifndef Style_hpp
 #define Style_hpp
 
-#include "Library/ImGui.hpp"
+// #include "Library/ImGui.hpp"
 
-namespace Premia {
+namespace premia {
 namespace Style {
 constexpr size_t LOGIN_WIDTH = 220;
 constexpr size_t LOGIN_HEIGHT = 200;
@@ -112,6 +112,6 @@ static void ColorsPremia(ImGuiStyle* dst = nullptr) {
   colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 }
 }  // namespace Style
-}  // namespace Premia
+}  // namespace premia
 
 #endif

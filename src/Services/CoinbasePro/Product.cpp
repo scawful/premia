@@ -1,7 +1,7 @@
 #include "Product.hpp"
 
-namespace Premia {
+namespace premia {
 namespace cbp {
 float Product::get_current_price() const { return current_price; }
 }  // namespace cbp
-}  // namespace Premia
+}  // namespace premia

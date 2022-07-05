@@ -1,5 +1,5 @@
 #include "Watchlist.hpp"
-namespace Premia {
+namespace premia {
 tda::Watchlist::Watchlist() = default;
 
 int tda::Watchlist::getNumInstruments() const {
@@ -51,4 +51,4 @@ bool tda::Watchlist::containsTicker(String ticker) {
       != instruments.end();
 }
 
-}  // namespace Premia
+}  // namespace premia

@@ -3,7 +3,7 @@
 
 #include "Metatypes.hpp"
 
-namespace PremiaTests {
+namespace premiaTests {
 namespace MetatypeTests {
 TEST(TemplateTests, run_once_template) {
   // Arrangement
@@ -44,7 +44,7 @@ TEST(TemplateTests, run_once_with_args_template) {
   ASSERT_EQ("f,f_once,f,", s);
 }
 }  // namespace MetatypeTests
-}  // namespace PremiaTests
+}  // namespace premiaTests
 
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);

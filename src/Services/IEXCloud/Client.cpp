@@ -1,7 +1,26 @@
 #include "Client.hpp"
 
-namespace Premia {
-using namespace iex;
+#include <curl/curl.h>
+
+#include <string>
+
+#include "Metatypes.hpp"
+#include "Premia.hpp"
+
+namespace premia {
+namespace iex {
+
+static size_t json_write(const char *contents, size_t size, size_t nmemb,
+                         std::string *s) {
+  size_t new_length = size * nmemb;
+  try {
+    s->append(contents, new_length);
+  } catch (const std::bad_alloc &e) {
+    // @todo attach a logger
+    return EXIT_FAILURE;
+  }
+  return new_length;
+}
 
 String Client::current_endpoint() {
   if (sandbox_mode)
@@ -31,10 +50,10 @@ String Client::send_request(String endpoint) {
   curl = curl_easy_init();
   if (curl) {
     curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     res = curl_easy_perform(curl);
-    if (res != CURLE_OK) throw Premia::ClientException();
+    if (res != CURLE_OK) throw premia::ClientException();
 
     /* always cleanup */
     curl_easy_cleanup(curl);
@@ -62,11 +81,11 @@ String Client::send_authorized_request(String endpoint) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
     res = curl_easy_perform(curl);
-    if (res != CURLE_OK) throw Premia::ClientException();
+    if (res != CURLE_OK) throw premia::ClientException();
 
     curl_easy_cleanup(curl);
   }
@@ -85,4 +104,5 @@ String Client::get_insider_transactions(String symbol) {
                     "/insider-transactions/" + token_parameter;
   return send_request(endpoint);
 }
-}  // namespace Premia
+}  // namespace iex
+}  // namespace premia

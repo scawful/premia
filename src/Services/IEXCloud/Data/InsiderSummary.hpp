@@ -2,7 +2,7 @@
 #define INSIDERSUMMARY_HPP
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace iex {
 class InsiderSummary {
  private:

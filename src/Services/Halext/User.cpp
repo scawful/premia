@@ -1,6 +1,6 @@
 #include "User.hpp"
-namespace Premia {
+namespace premia {
 using namespace halext;
 
 User::User() {}
-}  // namespace Premia
+}  // namespace premia

@@ -1,5 +1,40 @@
 #include "Client.hpp"
-namespace Premia {
+
+#include "Data/Order.hpp"
+#include "Data/UserPrincipals.hpp"
+#include "Metatypes.hpp"
+#include "Parser.hpp"
+#include "Socket.hpp"
+#include "Utils.hpp"
+
+#include <boost/beast.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/ssl.hpp>
+#include <boost/beast/websocket.hpp>
+#include <boost/beast/websocket/ssl.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
+
+namespace premia {
+
+static size_t json_write(const char *contents, size_t size, size_t nmemb,
+                         std::string *s) {
+  size_t new_length = size * nmemb;
+  try {
+    s->append(contents, new_length);
+  } catch (const std::bad_alloc &e) {
+    // @todo attach a logger
+    return EXIT_FAILURE;
+  }
+  return new_length;
+}
+
 using namespace tda;
 
 String Client::get_api_interval_value(int value) const {
@@ -28,14 +63,14 @@ String Client::send_request(CRString endpoint) const {
 
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)
-    throw Premia::TDAClientException("send_request() failed",
+    throw premia::TDAClientException("send_request() failed",
                                      curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
@@ -62,14 +97,14 @@ String Client::send_authorized_request(CRString endpoint) const {
 
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
   res = curl_easy_perform(curl);
   if (res != CURLE_OK)
-    throw Premia::TDAClientException("send_authorized_request() failed",
+    throw premia::TDAClientException("send_authorized_request() failed",
                                      curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
@@ -105,13 +140,13 @@ void Client::post_authorized_request(CRString endpoint, CRString data) const {
                      "&client_id=" + api_key;
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)
-    throw Premia::TDAClientException("post_authorized_request() failed",
+    throw premia::TDAClientException("post_authorized_request() failed",
                                      curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
@@ -151,7 +186,7 @@ String Client::post_access_token() const {
 
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlbacks::json_write);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
@@ -160,7 +195,7 @@ String Client::post_access_token() const {
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)
-    throw Premia::TDAClientException("post_access_token() failed",
+    throw premia::TDAClientException("post_access_token() failed",
                                      curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
@@ -593,4 +628,4 @@ void Client::addAuth(CRString key, CRString token) {
   api_key = key;
   refresh_token = token;
 }
-}  // namespace Premia
+}  // namespace premia

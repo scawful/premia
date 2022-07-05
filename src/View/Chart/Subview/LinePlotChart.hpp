@@ -1,12 +1,12 @@
 #ifndef LinePlotChart_hpp
 #define LinePlotChart_hpp
 
+#include <boost/lexical_cast.hpp>
 #include <fstream>
 
-#include "Library/Boost.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class LinePlotChart : public View {
  private:
   bool show_lines;
@@ -35,6 +35,6 @@ class LinePlotChart : public View {
   void addLogger(const Logger &logger) override;
   void addEvent(CRString key, const EventHandler &event) override;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

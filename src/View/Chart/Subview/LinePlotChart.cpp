@@ -1,6 +1,12 @@
 #include "LinePlotChart.hpp"
 
-namespace Premia {
+#include <boost/lexical_cast.hpp>
+#include <fstream>
+
+#include "Virtual/View.hpp"
+
+namespace premia {
+
 void LinePlotChart::initData() {
   std::ifstream fileInput("assets/chart.csv");
 
@@ -97,4 +103,5 @@ void LinePlotChart::update() {
     ImPlot::EndPlot();
   }
 }
-}  // namespace Premia
+
+}  // namespace premia

@@ -5,7 +5,7 @@
 #include "Interface/TWS.hpp"
 #include "Premia.hpp"
 
-namespace Premia {
+namespace premia {
 class Model {
  private:
   EventMap callbacks;
@@ -20,6 +20,6 @@ class Model {
 
   Logger& getLogger();
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

@@ -11,7 +11,7 @@ using tcp = boost::asio::ip::tcp;
 // https://github.com/boostorg/beast/blob/develop/example/websocket/client/async-ssl/websocket_client_async_ssl.cpp
 // Will improve/change it as I see fit in response to the needs of the
 // TDAmeritrade WebSocket client.
-namespace Premia {
+namespace premia {
 namespace tda {
 void Socket::fail(beast::error_code ec, char const* what) const {
   if (ec == net::error::operation_aborted || ec == websocket::error::closed)
@@ -172,4 +172,4 @@ void Socket::on_close(beast::error_code ec) {
   _logger(beast::buffers_to_string(_buffer.data()));
 }
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia

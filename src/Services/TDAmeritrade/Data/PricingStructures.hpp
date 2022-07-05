@@ -5,9 +5,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Premia.hpp"
-namespace Premia {
+#include "Metatypes.hpp"
+
+namespace premia {
 namespace tda {
+
 struct Candle {
   double volume;
   double high;
@@ -101,5 +103,5 @@ enum ServiceType {
 };
 
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

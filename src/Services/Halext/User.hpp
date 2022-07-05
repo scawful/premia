@@ -2,7 +2,7 @@
 #define HalextUser_hpp
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace halext {
 class User {
  private:
@@ -10,5 +10,5 @@ class User {
   User();
 };
 }  // namespace halext
-}  // namespace Premia
+}  // namespace premia
 #endif

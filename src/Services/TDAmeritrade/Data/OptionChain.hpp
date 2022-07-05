@@ -2,7 +2,7 @@
 #define OptionChain_hpp
 
 #include "PricingStructures.hpp"
-namespace Premia {
+namespace premia {
 namespace tda {
 class OptionChain {
  private:
@@ -33,5 +33,5 @@ class OptionChain {
   void setUnderlyingVariable(CRString key, CRString value);
 };
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

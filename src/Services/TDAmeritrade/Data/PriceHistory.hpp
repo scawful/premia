@@ -2,7 +2,7 @@
 #define PriceHistory_hpp
 
 #include "PricingStructures.hpp"
-namespace Premia {
+namespace premia {
 namespace tda {
 // //CandleList:
 // {
@@ -49,5 +49,5 @@ class PriceHistory {
   void clear();
 };
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

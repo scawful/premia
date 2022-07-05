@@ -2,7 +2,8 @@
 #define ChartModel_hpp
 
 #include "../Model.hpp"
-namespace Premia {
+
+namespace premia {
 class ChartModel : public Model {
  private:
   bool active = false;
@@ -30,5 +31,5 @@ class ChartModel : public Model {
   void fetchPriceHistory(CRString ticker, tda::PeriodType ptype, int period_amt,
                          tda::FrequencyType ftype, int freq_amt, bool ext);
 };
-}  // namespace Premia
+}  // namespace premia
 #endif

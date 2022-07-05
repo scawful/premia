@@ -1,6 +1,6 @@
 #include "OptionChain.hpp"
 
-namespace Premia {
+namespace premia {
 namespace tda {
 
 OptionChain::OptionChain() = default;
@@ -62,4 +62,4 @@ void OptionChain::setUnderlyingVariable(CRString key, CRString value) {
   underlyingMap[key] = value;
 }
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia

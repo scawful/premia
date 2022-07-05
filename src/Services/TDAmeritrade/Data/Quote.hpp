@@ -1,10 +1,12 @@
 #ifndef Quote_hpp
 #define Quote_hpp
 
-#include "Library/Boost.hpp"
+#include <boost/property_tree/ptree.hpp>
 #include "Premia.hpp"
-namespace Premia {
+
+namespace premia {
 namespace tda {
+  
 class Quote {
  private:
   boost::property_tree::ptree quoteData;
@@ -18,6 +20,7 @@ class Quote {
 
   void clear();
 };
+
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

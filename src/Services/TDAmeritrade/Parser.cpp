@@ -1,6 +1,22 @@
 #include "Parser.hpp"
-namespace Premia {
-using namespace tda;
+
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <string>
+
+#include "Data/Account.hpp"
+#include "Data/OptionChain.hpp"
+#include "Data/PriceHistory.hpp"
+#include "Data/PricingStructures.hpp"
+#include "Data/Quote.hpp"
+#include "Data/UserPrincipals.hpp"
+#include "Data/Watchlist.hpp"
+#include "Metatypes.hpp"
+
+namespace premia {
+namespace tda {
 
 /**
  * @brief
@@ -342,7 +358,7 @@ Account Parser::parse_all_accounts(const json::ptree &data) const {
  * @param data
  * @return ArrayList<tda::Watchlist>
  */
-ArrayList<tda::Watchlist> tda::Parser::parse_watchlist_data(
+ArrayList<tda::Watchlist> Parser::parse_watchlist_data(
     const json::ptree &data) const {
   ArrayList<tda::Watchlist> watchlists;
   for (const auto &[dataKey, dataValue] : data) {
@@ -378,4 +394,6 @@ ArrayList<tda::Watchlist> tda::Parser::parse_watchlist_data(
 
   return watchlists;
 }
-}  // namespace Premia
+
+}  // namespace tda
+}  // namespace premia

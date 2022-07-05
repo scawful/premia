@@ -1,5 +1,9 @@
 #include "Client.hpp"
-namespace Premia {
+
+#include <curl/curl.h>
+
+#include <string>
+namespace premia {
 using namespace halext;
 
 static size_t json_write_callback(const char *contents, size_t size,
@@ -35,4 +39,4 @@ String Client::send_request(CRString endpoint) const {
 
   return response;
 }
-}  // namespace Premia
+}  // namespace premia

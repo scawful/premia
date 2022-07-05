@@ -2,7 +2,7 @@
 #define IEX_FundOwnership_hpp
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace iex {
 class FundOwnership {
  private:
@@ -49,5 +49,5 @@ class FundOwnership {
   }
 };
 }  // namespace iex
-}  // namespace Premia
+}  // namespace premia
 #endif

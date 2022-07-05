@@ -4,6 +4,6 @@
 
 namespace ServiceTestSuite {
 namespace HLXT {
-TEST(CBPTest, basic_test) { Premia::halext::Client client; }
+TEST(CBPTest, basic_test) { premia::halext::Client client; }
 }  // namespace HLXT
 }  // namespace ServiceTestSuite

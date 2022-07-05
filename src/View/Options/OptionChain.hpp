@@ -1,10 +1,18 @@
 #ifndef OptionChainView_hpp
 #define OptionChainView_hpp
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+
+#include <string>
+
+#include "Library/IconsMaterialDesign.h"
+#include "Metatypes.hpp"
 #include "Model/Options/OptionsModel.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class OptionChainView : public View {
  private:
   struct GEXEpochPair {
@@ -34,6 +42,6 @@ class OptionChainView : public View {
                                ImPlotAxisFlags_AutoFit |
                                ImPlotAxisFlags_RangeFit;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

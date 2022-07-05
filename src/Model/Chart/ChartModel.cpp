@@ -1,5 +1,6 @@
 #include "ChartModel.hpp"
-namespace Premia {
+
+namespace premia {
 void ChartModel::initCandles() {
   candles = priceHistory.getCandleVector();
   int numCandles = getNumCandles();
@@ -66,4 +67,4 @@ void ChartModel::fetchPriceHistory(CRString ticker, tda::PeriodType ptype,
   initCandles();
   active = true;
 }
-}  // namespace Premia
+}  // namespace premia

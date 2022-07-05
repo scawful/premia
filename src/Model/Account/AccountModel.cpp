@@ -1,3 +1,3 @@
 #include "AccountModel.hpp"
 
-namespace Premia {}
+namespace premia {}

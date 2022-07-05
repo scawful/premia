@@ -1,11 +1,15 @@
 #ifndef IEXClient_hpp
 #define IEXClient_hpp
 
-#include "Library/Boost.hpp"
-#include "Library/Curl.hpp"
+#include <curl/curl.h>
+
+#include <string>
+
+#include "Metatypes.hpp"
 #include "Premia.hpp"
 
-namespace Premia {
+
+namespace premia {
 namespace iex {
 class Client {
  private:
@@ -26,5 +30,5 @@ class Client {
   String get_insider_transactions(String symbol);
 };
 }  // namespace iex
-}  // namespace Premia
+}  // namespace premia
 #endif

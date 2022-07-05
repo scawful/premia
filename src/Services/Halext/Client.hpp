@@ -1,11 +1,14 @@
 #ifndef HalextClient_hpp
 #define HalextClient_hpp
 
-#include "Library/Curl.hpp"
+#include <curl/curl.h>
+
+#include <string>
+
 #include "Metatypes.hpp"
 #include "Premia.hpp"
 
-namespace Premia {
+namespace premia {
 namespace halext {
 class Client {
  private:
@@ -17,5 +20,5 @@ class Client {
   String send_request(CRString endpoint) const;
 };
 }  // namespace halext
-}  // namespace Premia
+}  // namespace premia
 #endif

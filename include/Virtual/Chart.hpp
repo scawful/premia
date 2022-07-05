@@ -1,12 +1,13 @@
 #ifndef Chart_hpp
 #define Chart_hpp
 
-#include "Library/ImGui.hpp"
-#include "Library/ImPlot.hpp"
+// #include "Library/ImGui.hpp"
+#include "../libs/implot/implot.h"
+#include "../libs/implot/implot_internal.h"
 #include "Model/Chart/ChartModel.hpp"
 #include "Premia.hpp"
 
-namespace Premia {
+namespace premia {
 class Chart {
  public:
   Chart() = default;
@@ -17,6 +18,6 @@ class Chart {
                          tda::FrequencyType ftype, int freq_amt, bool ext) = 0;
   virtual void update() = 0;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

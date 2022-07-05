@@ -7,8 +7,43 @@
 #include "Parser.hpp"
 #include "Socket.hpp"
 #include "Utils.hpp"
-namespace Premia {
+
+#include <boost/beast.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/ssl.hpp>
+#include <boost/beast/websocket.hpp>
+#include <boost/beast/websocket/ssl.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
+
+namespace premia {
 namespace tda {
+
+namespace json = boost::property_tree;
+namespace beast = boost::beast;
+namespace http = beast::http;
+namespace websocket = beast::websocket;
+namespace net = boost::asio;
+namespace ssl = boost::asio::ssl;
+using tcp = boost::asio::ip::tcp;
+inline json::ptree 
+bind_requests(std::vector<json::ptree> requests_array)
+{
+    json::ptree requests;
+    json::ptree children;
+    for (const auto & each_request : requests_array) {
+        children.push_back(std::make_pair("", each_request));
+    }
+    requests.add_child("requests", children);
+    return requests;
+}
+
 static const String EnumAPIValues[]{"day", "month", "year", "ytd"};
 static const String EnumAPIFreq[]{"minute", "daily", "weekly", "monthly"};
 static const String EnumAPIPeriod[]{"1", "2",  "3",  "4", "5",
@@ -192,5 +227,5 @@ class Client {
   void addAuth(CRString, CRString);
 };
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

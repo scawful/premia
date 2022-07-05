@@ -1,13 +1,19 @@
 #ifndef CBP_Client_hpp
 #define CBP_Client_hpp
 
-#include <iostream>
+#include <curl/curl.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
+#include <openssl/sha.h>
+#include <openssl/ssl.h>
 
-#include "Library/Boost.hpp"
-#include "Library/Curl.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <iostream>
+#include <string>
+
 #include "Metatypes.hpp"
 
-namespace Premia {
+namespace premia {
 namespace cbp {
 class Client {
  private:
@@ -32,5 +38,5 @@ class Client {
   void send_request(String request, String method, String body);
 };
 }  // namespace cbp
-}  // namespace Premia
+}  // namespace premia
 #endif

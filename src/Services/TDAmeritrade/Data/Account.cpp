@@ -1,6 +1,6 @@
 /* =============== Account Class =============== */
 #include "Account.hpp"
-namespace Premia {
+namespace premia {
 namespace tda {
 
 size_t tda::Account::get_position_vector_size() {
@@ -62,4 +62,4 @@ String tda::Account::get_position_balances(String symbol, String variable) {
   return found_item;
 }
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia

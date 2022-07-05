@@ -1,5 +1,5 @@
 #include "PriceHistory.hpp"
-namespace Premia {
+namespace premia {
 using namespace tda;
 
 PriceHistory::PriceHistory() {
@@ -53,4 +53,4 @@ void PriceHistory::clear() {
   priceHistoryVariables.clear();
   candleVector.clear();
 }
-}  // namespace Premia
+}  // namespace premia

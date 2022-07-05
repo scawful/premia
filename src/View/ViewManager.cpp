@@ -1,6 +1,8 @@
 #include "ViewManager.hpp"
 
-namespace Premia {
+#include "imgui/imgui.h"
+
+namespace premia {
 void ViewManager::startGuiFrame() const {
   const ImGuiIO& io = ImGui::GetIO();
   ImGui::NewFrame();
@@ -142,4 +144,4 @@ void ViewManager::update() const {
   ImGui::End();
 }
 
-}  // namespace Premia
+}  // namespace premia

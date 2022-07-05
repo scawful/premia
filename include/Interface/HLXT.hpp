@@ -4,7 +4,7 @@
 #include "../src/Services/Halext/Client.hpp"
 #include "../src/Services/Halext/User.hpp"
 
-namespace Premia {
+namespace premia {
 namespace halext {
 enum class ChartType { LINEPLOT, CANDLESTICK, MULTIPLOT };
 
@@ -38,6 +38,6 @@ class HLXT {
   auto getSelectedChart() const -> ChartType { return chartType; }
 };
 }  // namespace halext
-}  // namespace Premia
+}  // namespace premia
 
 #endif

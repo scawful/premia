@@ -1,10 +1,17 @@
 #ifndef MenuView_hpp
 #define MenuView_hpp
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+
+#include <string>
+
+#include "Library/IconsMaterialDesign.h"
+#include "Metatypes.hpp"
 #include "Model/Model.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class MenuView : public View {
  private:
   // Local Variables
@@ -31,6 +38,6 @@ class MenuView : public View {
   void addEvent(CRString, const EventHandler&) override;
   void update() override;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

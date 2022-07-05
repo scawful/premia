@@ -6,7 +6,7 @@
 #include "../Model.hpp"
 #include "Interface/TDA.hpp"
 
-namespace Premia {
+namespace premia {
 class OptionsModel : public Model {
  private:
   bool active = false;
@@ -58,6 +58,6 @@ class OptionsModel : public Model {
 
   ArrayList<double>& getVolgaExposureArray();
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

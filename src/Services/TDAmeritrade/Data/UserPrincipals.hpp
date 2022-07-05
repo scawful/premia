@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace tda {
 class UserPrincipals {
  private:
@@ -25,5 +25,5 @@ class UserPrincipals {
   String get_account_data(CRString key);
 };
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

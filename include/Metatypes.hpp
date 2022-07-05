@@ -141,7 +141,7 @@ inline auto cons_ins_des(const C &c, const I &i, const D &d)
 #define Destruct    ,[&]()
 #define RecursiveDestruct   ,[&]() { throw Destruction(); })
 
-#define canDestroy  catch (const Premia::FatalException & e) { \
+#define canDestroy  catch (const premia::FatalException & e) { \
                         std::cout << e.what() << std::endl; \
                         throw Destruction(); \
                     } \

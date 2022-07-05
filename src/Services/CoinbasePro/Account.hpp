@@ -2,7 +2,7 @@
 #define CBP_Account_hpp
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace cbp {
 class Account {
  private:
@@ -13,5 +13,5 @@ class Account {
   StringMap get_position(CRString ticker);
 };
 }  // namespace cbp
-}  // namespace Premia
+}  // namespace premia
 #endif

@@ -4,6 +4,6 @@
 
 namespace ServiceTestSuite {
 namespace CBP {
-TEST(CBPTest, basic_test) { Premia::cbp::Client client; }
+TEST(CBPTest, basic_test) { premia::cbp::Client client; }
 }  // namespace CBP
 }  // namespace ServiceTestSuite

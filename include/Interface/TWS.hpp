@@ -1,10 +1,10 @@
 #ifndef TraderWorkstationApiInterface_hpp
 #define TraderWorkstationApiInterface_hpp
 
-#include "Library/IBKR.hpp"
+// #include "Library/IBKR.hpp"
 #include "Services/InteractiveBrokers/Client.hpp"
 
-namespace Premia {
+namespace premia {
 namespace tws {
 
 class TWS {
@@ -52,6 +52,6 @@ class TWS {
   }
 };
 }  // namespace tws
-}  // namespace Premia
+}  // namespace premia
 
 #endif

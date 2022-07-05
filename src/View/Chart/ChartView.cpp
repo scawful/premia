@@ -1,5 +1,18 @@
 #include "ChartView.hpp"
-namespace Premia {
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+
+#include <memory>
+#include <string>
+
+#include "Metatypes.hpp"
+#include "Subview/CandleChart.hpp"
+#include "Virtual/View.hpp"
+
+namespace premia {
+
 void ChartView::initChart() {
   halext::ChartType chartType = halext::HLXT::getInstance().getSelectedChart();
   if (chartType == halext::ChartType::CANDLESTICK) {
@@ -74,4 +87,5 @@ void ChartView::update() {
   Destruct { logger("[ChartView] Destruct"); }
   Proceed;
 }
-}  // namespace Premia
+
+}  // namespace premia

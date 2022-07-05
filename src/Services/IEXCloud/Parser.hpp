@@ -1,12 +1,20 @@
 #ifndef IEX_Parser_hpp
 #define IEX_Parser_hpp
 
+#include <boost/lexical_cast.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <string>
+
 #include "Data/FundOwnership.hpp"
 #include "Data/InsiderTransactions.hpp"
-#include "Library/Boost.hpp"
+#include "Metatypes.hpp"
 
-namespace Premia {
+namespace premia {
 namespace iex {
+
+namespace json = boost::property_tree;
+
 class Parser {
  private:
   void log_response(String title, json::ptree data);
@@ -19,6 +27,6 @@ class Parser {
   ArrayList<InsiderTransactions> parse_insider_transactions(String response);
 };
 }  // namespace iex
-}  // namespace Premia
+}  // namespace premia
 
 #endif

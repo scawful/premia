@@ -1,7 +1,19 @@
 #include "LoginView.hpp"
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+
+#include <string>
+
 #include "Interface/TDA.hpp"
-namespace Premia {
+#include "Library/IconsMaterialDesign.h"
+#include "Metatypes.hpp"
+#include "Model/Model.hpp"
+#include "Virtual/View.hpp"
+
+namespace premia {
+
 static const char *_IMGUIGetClipboardText(void *) {
   return SDL_GetClipboardText();
 }
@@ -83,4 +95,4 @@ void LoginView::addEvent(CRString key, const EventHandler &event) {
 }
 
 void LoginView::update() { drawScreen(); }
-}  // namespace Premia
+}  // namespace premia

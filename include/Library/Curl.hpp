@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace Premia {
+namespace premia {
 namespace curlbacks {
 /**
  * @brief Get JSON data from server and store into const ref String
@@ -33,6 +33,6 @@ static size_t json_write(const char *contents, size_t size, size_t nmemb,
   return new_length;
 }
 }  // namespace curlbacks
-}  // namespace Premia
+}  // namespace premia
 
 #endif

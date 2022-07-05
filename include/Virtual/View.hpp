@@ -1,14 +1,16 @@
 #ifndef View_hpp
 #define View_hpp
 
+#include <SDL2/SDL.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
+
 #include "Interface/HLXT.hpp"
-#include "Library/Boost.hpp"
-#include "Library/ImGui.hpp"
-#include "Library/ImPlot.hpp"
-#include "Library/SDL.hpp"
 #include "Premia.hpp"
 
-namespace Premia {
+namespace premia {
 class View {
  public:
   View() = default;
@@ -19,6 +21,6 @@ class View {
   virtual void addLogger(const Logger &) = 0;
   virtual void update() = 0;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

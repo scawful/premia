@@ -1,6 +1,17 @@
 #include "OptionChain.hpp"
 
-namespace Premia {
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+
+#include <string>
+
+#include "Library/IconsMaterialDesign.h"
+#include "Metatypes.hpp"
+#include "Model/Options/OptionsModel.hpp"
+#include "Virtual/View.hpp"
+
+namespace premia {
 void OptionChainView::drawSearch() {
   static String ticker;
   static String count;
@@ -377,4 +388,4 @@ void OptionChainView::update() {
     drawSearch();
   }
 }
-}  // namespace Premia
+}  // namespace premia

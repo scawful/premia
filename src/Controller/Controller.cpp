@@ -1,6 +1,10 @@
 #include "Controller.hpp"
 
 #include <SDL2/SDL.h>
+#include <imgui/backends/imgui_impl_sdl.h>
+#include <imgui/backends/imgui_impl_sdlrenderer.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
@@ -12,11 +16,12 @@
 #include "View/Options/OptionChain.hpp"
 #include "View/ViewManager.hpp"
 
-namespace Premia {
+namespace premia {
+
 constexpr size_t TITLE_BORDER = 20;
 constexpr size_t RESIZE_BORDER = 3;
 
-static SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint point,
+static SDL_HitTestResult WindowCallback(SDL_Window* win, const SDL_Point* point,
                                         void* data);
 
 /**
@@ -28,7 +33,7 @@ static SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint point,
  * @param data
  * @return SDL_HitTestResult
  */
-static SDL_HitTestResult WindowCallback(SDLWindow win, SDLPoint pt,
+static SDL_HitTestResult WindowCallback(SDL_Window* win, const SDL_Point* pt,
                                         void* data) {
   int w;
   int h;
@@ -94,14 +99,14 @@ void Controller::initWindow() {
   if (window == nullptr) {
     SDL_Log("SDL_CreateWindow: %s\n", SDL_GetError());
     SDL_Quit();
-    throw Premia::FatalException();
+    throw premia::FatalException();
   } else {
     renderer = SDL_CreateRenderer(
         window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == nullptr) {
       SDL_Log("SDL_CreateRenderer: %s\n", SDL_GetError());
       SDL_Quit();
-      throw Premia::FatalException();
+      throw premia::FatalException();
     } else {
       SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
       SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
@@ -283,4 +288,4 @@ void Controller::onExit() {
   renderer = nullptr;
   window = nullptr;
 }
-}  // namespace Premia
+}  // namespace premia

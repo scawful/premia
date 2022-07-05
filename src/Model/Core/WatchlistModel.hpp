@@ -4,7 +4,7 @@
 #include "../Model.hpp"
 #include "TDAmeritrade/Data/Watchlist.hpp"
 
-namespace Premia {
+namespace premia {
 class WatchlistModel : public Model {
  private:  
   Logger logger;
@@ -33,6 +33,6 @@ class WatchlistModel : public Model {
   void setQuote(CRString key, const tda::Quote& quote);
   ArrayList<const char*> getWatchlistNamesCharVec() const;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

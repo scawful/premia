@@ -1,7 +1,16 @@
 #include "Parser.hpp"
 
-namespace Premia {
-using namespace iex;
+#include <boost/lexical_cast.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <string>
+
+#include "Data/FundOwnership.hpp"
+#include "Data/InsiderTransactions.hpp"
+#include "Metatypes.hpp"
+
+namespace premia {
+namespace iex {
 
 void Parser::log_response(String title, json::ptree data) {
   std::time_t now = std::time(0);
@@ -18,7 +27,7 @@ void Parser::log_response(String title, json::ptree data) {
   // }
 
   try {
-    json::write_json(file, data);
+    write_json(file, data);
   } catch (std::exception &json_parser_error) {
     std::cout << "iex::Parser - " << json_parser_error.what() << std::endl;
   }
@@ -30,7 +39,7 @@ json::ptree Parser::read_response(String response) {
   json::ptree property_tree;
 
   try {
-    json::read_json(json_response, property_tree);
+    read_json(json_response, property_tree);
   } catch (std::exception &json_parser_error) {
     std::cout << json_parser_error.what() << std::endl;
   }
@@ -87,4 +96,5 @@ ArrayList<InsiderTransactions> Parser::parse_insider_transactions(
   ArrayList<InsiderTransactions> transactions_array;
   return transactions_array;
 }
-}  // namespace Premia
+}  // namespace iex
+}  // namespace premia

@@ -1,6 +1,6 @@
 #include "CandleChart.hpp"
 
-namespace Premia {
+namespace premia {
 /**
  * @brief double array binary search
  * @author @scawful
@@ -175,4 +175,4 @@ void CandleChart::importModel(std::shared_ptr<ChartModel> newModel) {
 }
 
 void CandleChart::update() { drawCandleChart(); }
-}  // namespace Premia
+}  // namespace premia

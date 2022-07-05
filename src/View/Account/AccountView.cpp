@@ -1,6 +1,6 @@
 #include "AccountView.hpp"
 
-namespace Premia {
+namespace premia {
 void AccountView::draw_balance_string(CRString variable) {
   String str =
       (halext::HLXT::getInstance().getPrivateBalance()) ? "***" : variable;
@@ -64,12 +64,12 @@ void AccountView::initPositions() {
   catch (const std::bad_function_call &e) {
     String error(e.what());
     logger("[error] " + error);
-    throw Premia::NotLoggedInException();
+    throw premia::NotLoggedInException();
   }
   catch (const boost::property_tree::ptree_error &e) {
     String error(e.what());
     logger("[error] " + error);
-    throw Premia::NotLoggedInException();
+    throw premia::NotLoggedInException();
   }
   finally { logger("[finally] : AccountView init"); }
   Proceed;
@@ -322,7 +322,7 @@ void AccountView::update() {
       initPositions();
       isLoggedIn = true;
     }
-    catch (const Premia::NotLoggedInException &e) {
+    catch (const premia::NotLoggedInException &e) {
       logger("User not logged in, loading empty account pane");
     }
     finally { isInit = true; }
@@ -335,4 +335,4 @@ void AccountView::update() {
     }
   }
 }
-}  // namespace Premia
+}  // namespace premia

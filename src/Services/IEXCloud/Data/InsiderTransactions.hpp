@@ -2,7 +2,7 @@
 #define InsiderTransactions_hpp
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace iex {
 // conversionOrExercisePrice 	number 	The conversion or exercise price of the
 // transaction, if available

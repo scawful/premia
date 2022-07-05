@@ -3,7 +3,7 @@
 
 #include "Premia.hpp"
 
-namespace Premia {
+namespace premia {
 namespace iex {
 class RetailMoneyFunds {
  private:
@@ -11,5 +11,5 @@ class RetailMoneyFunds {
   RetailMoneyFunds() = default;
 };
 }  // namespace iex
-}  // namespace Premia
+}  // namespace premia
 #endif  // RETAILMONEYFUNDS_HPP

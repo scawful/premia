@@ -8,3 +8,4 @@ CMakeCache.txt
 Makefile
 chart.csv
 apikey.txt
+.cache/

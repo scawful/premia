@@ -1,6 +1,6 @@
 #include "ConsoleView.hpp"
 
-namespace Premia {
+namespace premia {
 // Portable helpers
 static int Stricmp(const char* s1, const char* s2) {
   int d;
@@ -334,4 +334,4 @@ void ConsoleView::update() {
 
   drawConsole();
 }
-}  // namespace Premia
+}  // namespace premia

@@ -34,7 +34,7 @@
  * console command, or a key combination...
  *
  */
-namespace Premia {
+namespace premia {
 class Workspace {
  private:
   EventMap events;
@@ -49,6 +49,6 @@ class Workspace {
 
   void update();
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

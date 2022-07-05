@@ -5,7 +5,7 @@
 #include "Model/Options/OptionsModel.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class AccountView : public View {
  private:
   bool isInit = false;
@@ -45,6 +45,6 @@ class AccountView : public View {
       ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable |
       ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

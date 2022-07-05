@@ -1,6 +1,6 @@
 #include "PrimaryView.hpp"
 
-namespace Premia {
+namespace premia {
 void PrimaryView::drawInfoPane() {
   ImGui::Text("General");
   if (ImGui::TreeNode("Getting Started")) {
@@ -117,4 +117,4 @@ void PrimaryView::addEvent(CRString key, const EventHandler& event) {
 }
 
 void PrimaryView::update() { drawScreen(); }
-}  // namespace Premia
+}  // namespace premia

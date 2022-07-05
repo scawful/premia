@@ -3,7 +3,7 @@
 
 #include "Metatypes.hpp"
 
-namespace Premia {
+namespace premia {
 namespace Utils {
 
 /**
@@ -24,6 +24,6 @@ static auto string_replace(RString str, CRString from, CRString to) -> bool {
   return true;
 }
 }  // namespace Utils
-}  // namespace Premia
+}  // namespace premia
 
 #endif

@@ -2,7 +2,7 @@
 #include "Controller/Controller.hpp"
 
 int main(int argc, char *argv[]) {
-  Premia::Controller controller;
+  premia::Controller controller;
   controller.onEntry();
   while (controller.isActive()) {
     controller.onInput();

@@ -2,15 +2,15 @@
 
 #include <gtest/gtest.h>
 
-namespace PremiaTests::ServiceTestSuite::TDATests {
+namespace premiatests::ServiceTestSuite::TDATests {
 
 class TDAFixture : public ::testing::Test {
  private:
-  Premia::tda::Client client_;
-  Premia::tda::Parser parser_;
+  premia::tda::Client client_;
+  premia::tda::Parser parser_;
  public:
-  inline Premia::tda::Client & client() { return client_; }
-  inline Premia::tda::Parser & parser() { return parser_; }
+  inline premia::tda::Client & client() { return client_; }
+  inline premia::tda::Parser & parser() { return parser_; }
 
   void SetUp() override {  
     String consumer_key;
@@ -49,4 +49,4 @@ TEST_F(TDAFixture, get_and_parse_option_chain_test) {
 }
 
 
-}  // namespace PremiaTests::ServiceTestSuite::TDATests
+}  // namespace premiaTests::ServiceTestSuite::TDATests

@@ -2,7 +2,7 @@
 #define INSTITUTIONALMONEYFUNDS_HPP
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace iex {
 class InsititutionalMoneyFunds {
  private:

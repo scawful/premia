@@ -3,9 +3,9 @@
 
 #include <SDL2/SDL.h>
 
-namespace Premia {
+namespace premia {
 using SDLWindow = SDL_Window*;
 using SDLPoint = const SDL_Point*;
-}  // namespace Premia
+}  // namespace premia
 
 #endif

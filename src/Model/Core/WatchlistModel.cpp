@@ -1,6 +1,6 @@
 #include "WatchlistModel.hpp"
 
-namespace Premia {
+namespace premia {
 
 void WatchlistModel::resetWatchlist() {
   watchlists = ArrayList<tda::Watchlist>();
@@ -44,12 +44,12 @@ void WatchlistModel::initTDAWatchlists() {
   catch (const std::out_of_range& e) {
     String error(e.what());
     logger("[error] " + error);
-    throw Premia::NotLoggedInException();
+    throw premia::NotLoggedInException();
   }
   catch (const boost::property_tree::ptree_error& e) {
     String error(e.what());
     logger("[error] " + error);
-    throw Premia::NotLoggedInException();
+    throw premia::NotLoggedInException();
   }
   finally {
     watchlists = tda::TDA::getInstance().getWatchlistsByAccount(account_num);
@@ -94,4 +94,4 @@ void WatchlistModel::setQuote(CRString key, const tda::Quote& quote) {
 ArrayList<const char*> WatchlistModel::getWatchlistNamesCharVec() const {
   return watchlistNamesChar;
 }
-}  // namespace Premia
+}  // namespace premia

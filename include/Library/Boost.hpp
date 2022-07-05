@@ -21,7 +21,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace Premia {
+namespace premia {
 namespace json = boost::property_tree;
 namespace beast = boost::beast;
 namespace http = beast::http;

@@ -2,7 +2,7 @@
 #define Watchlist_hpp
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace tda {
 class Watchlist {
  public:
@@ -55,5 +55,5 @@ class Watchlist {
   bool containsTicker(String s);
 };
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 #endif

@@ -1,5 +1,5 @@
 #include "UserPrincipals.hpp"
-namespace Premia {
+namespace premia {
 using namespace tda;
 
 UserPrincipals::UserPrincipals() = default;
@@ -19,4 +19,4 @@ StringMap UserPrincipals::get_account_data_array(int i) {
 String UserPrincipals::get_account_data(CRString key) {
   return account_data[key];
 }
-}  // namespace Premia
+}  // namespace premia

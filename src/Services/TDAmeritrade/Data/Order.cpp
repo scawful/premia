@@ -1,5 +1,12 @@
 #include "Order.hpp"
-namespace Premia {
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <string>
+
+#include "PricingStructures.hpp"
+
+namespace premia {
 namespace tda {
 
 void Order::prepareOrderString() const {
@@ -33,4 +40,4 @@ String Order::getOrderStrategyType() const { return orderStrategyType; }
 
 String Order::getPrice() const { return price; }
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia

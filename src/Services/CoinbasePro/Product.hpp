@@ -3,7 +3,7 @@
 
 #include "Premia.hpp"
 
-namespace Premia {
+namespace premia {
 namespace cbp {
 class Product {
  private:
@@ -19,6 +19,6 @@ class Product {
   float get_current_price() const;
 };
 }  // namespace cbp
-}  // namespace Premia
+}  // namespace premia
 
 #endif

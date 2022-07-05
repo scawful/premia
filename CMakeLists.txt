@@ -130,9 +130,15 @@ add_executable(
     ${IMPLOT_PATH}/implot_items.cpp 
     ${IMPLOT_PATH}/implot_demo.cpp
 )
-include_directories(Premia "assets")
-include_directories(Premia "src/Services/")
-include_directories(Premia "src/")
+
+include_directories(
+  Premia 
+  "assets"
+  "src/Services/"
+  "src/"
+  "libs/"
+  )
+
 target_link_libraries(
     Premia 
     ${BOOST_LIBRARIES} 

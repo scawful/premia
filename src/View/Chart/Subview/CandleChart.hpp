@@ -4,7 +4,7 @@
 #include "Model/Chart/ChartModel.hpp"
 #include "Virtual/Chart.hpp"
 
-namespace Premia {
+namespace premia {
 class CandleChart : public Chart {
  private:
   String tickerSymbol;
@@ -22,6 +22,6 @@ class CandleChart : public Chart {
                  tda::FrequencyType ftype, int freq_amt, bool ext) override;
   void update() override;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

@@ -4,7 +4,7 @@
 #include "View/Menu/MenuView.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class PrimaryView : public View {
  private:
   Logger logger;
@@ -20,6 +20,6 @@ class PrimaryView : public View {
   void addEvent(CRString key, const EventHandler& event) override;
   void update() override;
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

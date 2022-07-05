@@ -1,5 +1,5 @@
 #include "Account.hpp"
-namespace Premia {
+namespace premia {
 namespace cbp {
 /**
  * @brief Get an account positions
@@ -19,4 +19,4 @@ StringMap Account::get_position(CRString ticker) {
 }
 
 }  // namespace cbp
-}  // namespace Premia
+}  // namespace premia

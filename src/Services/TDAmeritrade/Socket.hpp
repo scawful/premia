@@ -1,12 +1,37 @@
 #ifndef Socket_hpp
 #define Socket_hpp
 
-#include "Library/Boost.hpp"
-#include "Library/Curl.hpp"
-#include "Library/SDL.hpp"
+#include <SDL2/SDL.h>
+#include <curl/curl.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
+#include <openssl/sha.h>
+#include <openssl/ssl.h>
+
+#include <boost/asio.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/beast.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/ssl.hpp>
+#include <boost/beast/websocket.hpp>
+#include <boost/beast/websocket/ssl.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/tokenizer.hpp>
+
 #include "Metatypes.hpp"
 
-namespace Premia::tda {
+
+namespace premia::tda {
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
@@ -56,6 +81,6 @@ class Socket : public std::enable_shared_from_this<Socket> {
   void close();
   void on_close(beast::error_code ec);
 };
-} // namespace Premia::tda
+}  // namespace premia::tda
 
 #endif

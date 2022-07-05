@@ -1,5 +1,18 @@
 #include "Client.hpp"
-namespace Premia {
+
+#include <curl/curl.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
+#include <openssl/sha.h>
+#include <openssl/ssl.h>
+
+#include <boost/property_tree/json_parser.hpp>
+#include <iostream>
+#include <string>
+
+#include "Metatypes.hpp"
+
+namespace premia {
 namespace cbp {
 
 /**
@@ -261,4 +274,4 @@ String Client::send_request(CRString request) {
 
 // }
 }  // namespace cbp
-}  // namespace Premia
+}  // namespace premia

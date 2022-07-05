@@ -1,9 +1,13 @@
 #ifndef Order_hpp
 #define Order_hpp
 
-#include "Library/Boost.hpp"
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <string>
+
 #include "PricingStructures.hpp"
-namespace Premia {
+
+namespace premia {
 namespace tda {
 class Order {
  private:
@@ -72,6 +76,6 @@ class Order {
 //     }
 // ]
 }  // namespace tda
-}  // namespace Premia
+}  // namespace premia
 
 #endif

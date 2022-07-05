@@ -13,7 +13,7 @@
 #include "View/Options/OptionChain.hpp"
 #include "View/ViewManager.hpp"
 
-namespace Premia {
+namespace premia {
 class Controller {
  private:
   bool active = false;
@@ -38,6 +38,6 @@ class Controller {
   void doRender();
   void onExit();
 };
-}  // namespace Premia
+}  // namespace premia
 
 #endif

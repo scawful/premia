@@ -1,5 +1,17 @@
 #include "MenuView.hpp"
-namespace Premia {
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+
+#include <string>
+
+#include "Library/IconsMaterialDesign.h"
+#include "Metatypes.hpp"
+#include "Model/Model.hpp"
+#include "Virtual/View.hpp"
+
+namespace premia {
+
 void MenuView::drawFileMenu() const {
   static bool show_console = false;
 
@@ -242,4 +254,4 @@ void MenuView::addEvent(CRString key, const EventHandler& event) {
 }
 
 void MenuView::update() { drawScreen(); }
-}  // namespace Premia
+}  // namespace premia

@@ -2,7 +2,7 @@
 #define MARKETVOLUME_HPP
 
 #include "Premia.hpp"
-namespace Premia {
+namespace premia {
 namespace iex {
 class MarketVolume {
  public:

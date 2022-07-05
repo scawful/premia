@@ -5,7 +5,7 @@
 #include "Model/Core/WatchlistModel.hpp"
 #include "Virtual/View.hpp"
 
-namespace Premia {
+namespace premia {
 class WatchlistView : public View {
  private:
   int currentService = 0;
@@ -32,5 +32,5 @@ class WatchlistView : public View {
       ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable |
       ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 };
-}  // namespace Premia
+}  // namespace premia
 #endif

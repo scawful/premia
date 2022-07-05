@@ -5,7 +5,7 @@
 #include "../src/Services/IEXCloud/Data/FundOwnership.hpp"
 #include "../src/Services/IEXCloud/Parser.hpp"
 
-namespace Premia {
+namespace premia {
 namespace iex {
 class IEX {
  private:
@@ -28,6 +28,6 @@ class IEX {
 };
 
 }  // namespace iex
-}  // namespace Premia
+}  // namespace premia
 
 #endif

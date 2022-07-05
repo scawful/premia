@@ -1,6 +1,6 @@
 #include "Workspace.hpp"
-namespace Premia {
+namespace premia {
 Workspace::Workspace() {}
 
 void Workspace::update() {}
-}  // namespace Premia
+}  // namespace premia
