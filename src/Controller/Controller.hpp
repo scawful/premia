@@ -1,8 +1,10 @@
 #ifndef Controller_hpp
 #define Controller_hpp
 
-#include "Library/ImPlot.hpp"
-#include "Library/SDL.hpp"
+#include <SDL2/SDL.h>
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
+
 #include "Model/Model.hpp"
 #include "Style.hpp"
 #include "View/Chart/ChartView.hpp"

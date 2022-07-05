@@ -1,5 +1,17 @@
 #include "Controller.hpp"
 
+#include <SDL2/SDL.h>
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
+
+#include "Model/Model.hpp"
+#include "Style.hpp"
+#include "View/Chart/ChartView.hpp"
+#include "View/Console/ConsoleView.hpp"
+#include "View/Login/LoginView.hpp"
+#include "View/Options/OptionChain.hpp"
+#include "View/ViewManager.hpp"
+
 namespace Premia {
 constexpr size_t TITLE_BORDER = 20;
 constexpr size_t RESIZE_BORDER = 3;
