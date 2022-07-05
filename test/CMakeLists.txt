@@ -37,6 +37,7 @@ add_executable(
 include_directories(
   premia_test PUBLIC 
   libs/fred/include
+  "../src/"
   ${PROTOBUF_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/../src/Protocols
 )

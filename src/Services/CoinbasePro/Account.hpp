@@ -1,7 +1,8 @@
 #ifndef CBP_Account_hpp
 #define CBP_Account_hpp
 
-#include "Premia.hpp"
+#include "Metatypes.hpp"
+
 namespace premia {
 namespace cbp {
 class Account {

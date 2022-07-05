@@ -275,7 +275,7 @@ json::ptree Client::create_login_request() {
   std::istringstream ss(reformatted_token_timestamp);
   ss >> std::get_time(&token_timestamp, "%Y-%m-%d %H:%M:%S");
   if (ss.fail()) {
-    SDL_Log("Token timestamp parse failed!");
+    std::cout << "Token timestamp parse failed!" << std::endl;
   } else {
     // this is disgusting i'm sorry
     std::time_t token_timestamp_as_sec = std::mktime(&token_timestamp);

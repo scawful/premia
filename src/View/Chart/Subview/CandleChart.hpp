@@ -1,8 +1,8 @@
 #ifndef CandleChart_hpp
 #define CandleChart_hpp
 
+#include "View/Chart/Chart.hpp"
 #include "Model/Chart/ChartModel.hpp"
-#include "Virtual/Chart.hpp"
 
 namespace premia {
 class CandleChart : public Chart {

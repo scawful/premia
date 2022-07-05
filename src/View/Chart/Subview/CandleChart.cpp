@@ -1,5 +1,8 @@
 #include "CandleChart.hpp"
 
+#include "Model/Chart/ChartModel.hpp"
+#include "View/Chart/Chart.hpp"
+
 namespace premia {
 /**
  * @brief double array binary search
