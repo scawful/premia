@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package = tda.account;
+
 // TDAmeritrade Account
 service AccountService {
   rpc GetAccount(AccountRequest) returns (AccountResponse) {}
