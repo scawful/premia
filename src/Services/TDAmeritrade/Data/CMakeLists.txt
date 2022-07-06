@@ -22,3 +22,4 @@ set_source_files_properties(
 
 add_library(premia_proto ${PROTO_HDRS} ${PROTO_SRCS})
 target_link_libraries(premia_proto INTERFACE ${PROTO_LIBRARIES})
+SET_SOURCE_FILES_PROPERTIES(${PROTO_SRC} ${PROTO_INCL} PROPERTIES GENERATED TRUE)
