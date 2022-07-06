@@ -11,7 +11,7 @@ include_directories(
 PROTOBUF_GENERATE_CPP(
   PROTO_SRCS 
   PROTO_HDRS 
-  account_service.proto
+  protos/account_service.proto
 )
 
 set_source_files_properties(
