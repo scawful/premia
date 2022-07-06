@@ -14,8 +14,8 @@
 #include "Menu/MenuView.hpp"
 #include "Metatypes.hpp"
 #include "Options/OptionChain.hpp"
-#include "View/View.hpp"
 #include "View/Chart/Subview/LinePlotChart.hpp"
+#include "View/View.hpp"
 #include "Watchlist/WatchlistView.hpp"
 
 namespace premia {

@@ -1,6 +1,7 @@
 #include "ConsoleView.hpp"
 
 namespace premia {
+
 // Portable helpers
 static int Stricmp(const char* s1, const char* s2) {
   int d;
@@ -10,6 +11,7 @@ static int Stricmp(const char* s1, const char* s2) {
   }
   return d;
 }
+
 static int Strnicmp(const char* s1, const char* s2, int n) {
   int d = 0;
   while (n > 0 && (d = toupper(*s2) - toupper(*s1)) == 0 && *s1) {
@@ -19,6 +21,7 @@ static int Strnicmp(const char* s1, const char* s2, int n) {
   }
   return d;
 }
+
 static char* Strdup(const char* s) {
   IM_ASSERT(s);
   size_t len = strlen(s) + 1;
@@ -26,6 +29,7 @@ static char* Strdup(const char* s) {
   IM_ASSERT(buf);
   return (char*)memcpy(buf, (const void*)s, len);
 }
+
 static void Strtrim(char* s) {
   char* str_end = s + strlen(s);
   while (str_end > s && str_end[-1] == ' ') str_end--;
@@ -334,4 +338,5 @@ void ConsoleView::update() {
 
   drawConsole();
 }
+
 }  // namespace premia
