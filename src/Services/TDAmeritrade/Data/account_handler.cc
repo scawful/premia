@@ -2,6 +2,9 @@
 
 #include "account_service.pb.h"
 
+namespace premia {
+namespace tda {
+
 class AccountServiceImpl final : public Account::Service {
   Status GetAccount(ServerContext* context, const AccountRequest* request,
                     AccountResponse* reply) override {
@@ -12,3 +15,6 @@ class AccountServiceImpl final : public Account::Service {
   Status GetAccount(ServerContext* context, const AccountRequest* request,
                     AccountsResponse* response) override {}
 };
+
+}  // namespace tda
+}  // namespace premia
