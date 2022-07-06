@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package tda.option_chain;
-
 service OptionChainService {}
 
 message OptionChainRequest {}

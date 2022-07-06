@@ -1,6 +1,6 @@
 #include <google/protobuf/message.h>
 
-#include "account_service.pb.h"
+#include "account.pb.h"
 
 namespace premia {
 namespace tda {
