@@ -1,32 +1,36 @@
-# SDL libraries --------------------------------------------------------------------------------------------------
+# SDL libraries ---------------------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
 
-# cURL library ---------------------------------------------------------------------------------------------------
+# cURL library ----------------------------------------------------------------------------------------------
 find_package(CURL REQUIRED)
 
-# ImGui library --------------------------------------------------------------------------------------------------
-set(IMGUI_PATH  "../libs/imgui")                            # Set where the ImGui files are stored
+# ImGui library ---------------------------------------------------------------------------------------------
+set(IMGUI_PATH  "../libs/imgui")                         # Set where the ImGui files are stored
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)             # Compile as static library 
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
-target_compile_definitions(ImGui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  GL_GLEXT_PROTOTYPES=1)
+target_compile_definitions(ImGui PUBLIC 
+  IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  
+  GL_GLEXT_PROTOTYPES=1
+)
 
-# ImPlot library -------------------------------------------------------------------------------------------------
+# ImPlot library --------------------------------------------------------------------------------------------
 set(IMPLOT_PATH "../libs/implot")
 file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
-# TWS library -------------------------------------------------------------------------------------------------
+# TWS library -----------------------------------------------------------------------------------------------
 set(TWS_PATH "../libs/tws")
 file(GLOB TWS_SOURCES ${TWS_PATH}/*.cpp)
 add_library("TWS" STATIC ${TWS_SOURCES})
 target_include_directories("TWS" PUBLIC ${TWS_PATH})
 
-add_subdirectory(Services/TDAmeritrade/Data)
+# Service definitions ---------------------------------------------------------------------------------------
+add_subdirectory(Services/TDAmeritrade)
 
-# Premia Executable Linkage --------------------------------------------------------------------------------------
+# Premia Executable Linkage ---------------------------------------------------------------------------------
 add_executable(
     Premia 
     Premia.cpp 
@@ -96,10 +100,11 @@ add_executable(
 
 include_directories(
   Premia 
-  "../assets"
-  "../libs/"
-  "Services/"
   "."
+  "../assets"
+  "../libs"
+  "Services"
+  "../build/src/Services/TDAmeritrade"
 )
 
 target_link_libraries(
@@ -119,7 +124,7 @@ if (WIN32)
     target_link_libraries(Premia ws2_32)
 endif()
 
-# Assets Folder Link ---------------------------------------------------------------------------------------------
+# Assets Folder Link ----------------------------------------------------------------------------------------
 set (source "${CMAKE_SOURCE_DIR}/assets")
 set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
