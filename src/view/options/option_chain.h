@@ -40,7 +40,7 @@ class OptionChainView : public View {
   void update() override;
 
  private:
-  ImPlotAxisFlags dateFlags = ImPlotAxisFlags_Time | ImPlotAxisFlags_NoLabel;
+  ImPlotAxisFlags dateFlags = ImPlotAxisFlags_NoLabel;
   ImPlotAxisFlags priceFlags = ImPlotAxisFlags_NoLabel |
                                ImPlotAxisFlags_AutoFit |
                                ImPlotAxisFlags_RangeFit;

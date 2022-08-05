@@ -36,10 +36,9 @@ add_executable(
 
 include_directories(
   premia_test PUBLIC 
-  libs/fred/include
-  "../src/"
+  ../src
+  ../src/lib  
   ${PROTOBUF_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}/../src/Protocols
 )
 
 target_link_libraries(
@@ -47,7 +46,6 @@ target_link_libraries(
   ${BOOST_LIBRARIES} 
   ${SDL2_LIBRARIES} 
   ${OPENGL_LIBRARIES}
-  premia_proto
   curl 
   OpenSSL::SSL 
   gtest_main

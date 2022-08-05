@@ -1,7 +1,6 @@
 #ifndef Socket_hpp
 #define Socket_hpp
 
-#include <SDL.h>
 #include <curl/curl.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>

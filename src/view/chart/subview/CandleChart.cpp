@@ -138,7 +138,7 @@ void CandleChart::drawCandleChart() {
                             ImPlotSubplotFlags_LinkAllX)) {
     if (ImPlot::BeginPlot(quoteDetails.c_str(), ImVec2(-1, -1), 0)) {
       ImPlot::SetupAxisFormat(ImAxis_Y1, "$%.2f");
-      ImPlot::SetupAxes("Date", "Price", ImPlotAxisFlags_Time,
+      ImPlot::SetupAxes("Date", "Price", ImPlotAxisFlags_AutoFit,
                         ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit);
 
       if (model->isActive()) {
@@ -155,7 +155,7 @@ void CandleChart::drawCandleChart() {
 
     if (ImPlot::BeginPlot("##volume", ImVec2(-1, 200.f))) {
       ImPlot::SetupAxes("Date", "Volume",
-                        ImPlotAxisFlags_Time | ImPlotAxisFlags_NoLabel,
+                        ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel,
                         ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_AutoFit |
                             ImPlotAxisFlags_RangeFit);
       ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_None);
