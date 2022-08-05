@@ -6,7 +6,7 @@
 #ifndef TWS_API_SAMPLES_TESTCPPCLIENT_TESTCPPCLIENT_H
 #define TWS_API_SAMPLES_TESTCPPCLIENT_TESTCPPCLIENT_H
 
-#include "Metatypes.hpp"
+#include "metatypes.h"
 #include "tws/CommissionReport.h"
 #include "tws/CommonDefs.h"
 #include "tws/Contract.h"

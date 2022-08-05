@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "Library/IconsMaterialDesign.h"
+#include "gfx/IconsMaterialDesign.h"
 
 namespace premia {
 

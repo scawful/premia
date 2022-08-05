@@ -5,10 +5,10 @@
 
 #include <string>
 
-#include "Library/IconsMaterialDesign.h"
-#include "Metatypes.hpp"
+#include "gfx/IconsMaterialDesign.h"
+#include "metatypes.h"
 #include "model/model.h"
-#include "View/view.h"
+#include "view/view.h"
 
 namespace premia {
 

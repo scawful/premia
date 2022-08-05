@@ -6,11 +6,11 @@
 #include <implot/implot_internal.h>
 
 #include "model/model.h"
-#include "view/Chart/chart_view.h"
-#include "view/Console/console_view.h"
-#include "view/Login/login_view.h"
-#include "view/Options/OptionChain.hpp"
-#include "view/ViewManager.hpp"
+#include "view/chart/chart_view.h"
+#include "view/console/console_view.h"
+#include "view/login/login_view.h"
+#include "view/options/option_chain.h"
+#include "view/view_manager.h"
 
 namespace premia {
 class Controller {

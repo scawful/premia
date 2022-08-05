@@ -1,5 +1,8 @@
 #include "CandleChart.hpp"
 
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
+
 #include "model/chart/chart_model.h"
 #include "view/chart/chart.h"
 

@@ -1,7 +1,7 @@
 #ifndef STATS_HPP
 #define STATS_HPP
 
-#include "Premia.hpp"
+#include "premia.h"
 
 namespace premia {
 namespace iex {

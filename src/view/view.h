@@ -1,14 +1,14 @@
 #ifndef View_hpp
 #define View_hpp
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
-#include "Interface/HLXT.hpp"
-#include "Premia.hpp"
+#include "singletons/HLXT.hpp"
+#include "premia.h"
 
 namespace premia {
 class View {

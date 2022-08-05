@@ -3,7 +3,7 @@
 
 #include "singletons/TDA.hpp"
 #include "singletons/TWS.hpp"
-#include "Premia.hpp"
+#include "premia.h"
 
 namespace premia {
 class Model {

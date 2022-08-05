@@ -1,5 +1,8 @@
-#ifndef CandleChart_hpp
-#define CandleChart_hpp
+#ifndef PREMIA_VIEW_CANDLECHART_H
+#define PREMIA_VIEW_CANDLECHART_H
+
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
 
 #include "model/chart/chart_model.h"
 #include "view/chart/chart.h"

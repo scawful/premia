@@ -19,7 +19,7 @@
 #include "service/TDAmeritrade/Data/UserPrincipals.hpp"
 #include "service/TDAmeritrade/Parser.hpp"
 #include "service/TDAmeritrade/Socket.hpp"
-#include "service/TDAmeritrade/Utils.hpp"
+#include "util.h"
 #include "metatypes.h"
 
 namespace premia {

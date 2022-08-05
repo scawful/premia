@@ -7,9 +7,9 @@
 #include <memory>
 #include <string>
 
-#include "Metatypes.hpp"
-#include "Subview/CandleChart.hpp"
-#include "View/view.h"
+#include "metatypes.h"
+#include "view/chart/subview/CandleChart.hpp"
+#include "view/view.h"
 
 namespace premia {
 

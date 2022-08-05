@@ -5,7 +5,7 @@
 #include <string>
 
 #include "metatypes.h"
-#include "view/subview/CandleChart.hpp"
+#include "view/chart/subview/CandleChart.hpp"
 #include "view/view.h"
 
 namespace premia {

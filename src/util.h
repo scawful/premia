@@ -1,7 +1,7 @@
 #ifndef Utils_hpp
 #define Utils_hpp
 
-#include "Metatypes.hpp"
+#include "metatypes.h"
 
 namespace premia {
 namespace Utils {

@@ -13,7 +13,7 @@
 #include "Data/Quote.hpp"
 #include "Data/UserPrincipals.hpp"
 #include "Data/Watchlist.hpp"
-#include "Metatypes.hpp"
+#include "metatypes.h"
 
 namespace premia {
 namespace tda {

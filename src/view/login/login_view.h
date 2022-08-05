@@ -7,11 +7,11 @@
 
 #include <string>
 
-#include "Interface/TDA.hpp"
-#include "Library/IconsMaterialDesign.h"
-#include "Metatypes.hpp"
+#include "singletons/TDA.hpp"
+#include "gfx/IconsMaterialDesign.h"
+#include "metatypes.h"
 #include "model/model.h"
-#include "View/view.h"
+#include "view/view.h"
 
 namespace premia {
 class LoginView : public View {

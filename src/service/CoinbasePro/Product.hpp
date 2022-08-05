@@ -1,7 +1,7 @@
 #ifndef Product_hpp
 #define Product_hpp
 
-#include "Premia.hpp"
+#include "premia.h"
 
 namespace premia {
 namespace cbp {

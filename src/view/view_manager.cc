@@ -1,4 +1,4 @@
-#include "ViewManager.hpp"
+#include "view_manager.h"
 
 #include <imgui/imgui.h>
 
@@ -6,17 +6,17 @@
 #include <string>
 #include <unordered_map>
 
-#include "Account/account_view.h"
-#include "Chart/chart_view.h"
-#include "Console/console_view.h"
-#include "Core/primary_view.h"
-#include "Login/login_view.h"
-#include "Menu/menu_view.h"
-#include "Metatypes.hpp"
-#include "Options/OptionChain.hpp"
-#include "View/Chart/Subview/LinePlotChart.hpp"
-#include "View/view.h"
-#include "Watchlist/watchlist_view.h"
+#include "view/account/account_view.h"
+#include "view/chart/chart_view.h"
+#include "view/console/console_view.h"
+#include "view/core/primary_view.h"
+#include "view/login/login_view.h"
+#include "view/menu/menu_view.h"
+#include "metatypes.h"
+#include "view/options/option_chain.h"
+#include "view/chart/subview/LinePlotChart.hpp"
+#include "view/view.h"
+#include "watchlist/watchlist_view.h"
 
 namespace premia {
 

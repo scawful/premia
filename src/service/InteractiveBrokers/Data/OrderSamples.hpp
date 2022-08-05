@@ -6,6 +6,7 @@
 #define TWS_API_SAMPLES_TESTCPPCLIENT_ORDERSAMPLES_H
 
 #include <vector>
+#include <string>
 
 struct Order;
 class OrderCondition;

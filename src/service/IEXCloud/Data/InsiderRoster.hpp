@@ -1,7 +1,7 @@
 #ifndef INSIDERROSTER_HPP
 #define INSIDERROSTER_HPP
 
-#include "Premia.hpp"
+#include "premia.h"
 namespace premia {
 namespace iex {
 class InsiderRoster {

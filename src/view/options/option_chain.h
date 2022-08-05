@@ -4,13 +4,16 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
 
 #include <string>
 
-#include "Library/IconsMaterialDesign.h"
-#include "Metatypes.hpp"
-#include "Model/Options/OptionsModel.hpp"
-#include "View/view.h"
+#include "gfx/IconsMaterialDesign.h"
+#include "metatypes.h"
+#include "model/options/options_model.h"
+#include "view/view.h"
+
 
 namespace premia {
 class OptionChainView : public View {

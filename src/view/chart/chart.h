@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "model/chart/ChartModel.hpp"
+#include "model/chart/chart_model.h"
 
 namespace premia {
 class Chart {

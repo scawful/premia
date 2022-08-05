@@ -3,7 +3,7 @@ find_package(CURL REQUIRED)
 
 # ImGui library ---------------------------------------------------------------
 set(IMGUI_PATH  "libs/imgui")                         # Set where the ImGui files are stored
-file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)             # Compile as static library 
+file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)          # Compile as static library 
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
@@ -24,21 +24,18 @@ file(GLOB TWS_SOURCES ${TWS_PATH}/*.cpp)
 add_library("TWS" STATIC ${TWS_SOURCES})
 target_include_directories("TWS" PUBLIC ${TWS_PATH})
 
-# Service definitions -----------------------------------------------------------
-# add_subdirectory(service/TDAmeritrade)
-
-# Premia Executable Linkage ------------------------------------------------------
-add_executable(
-  Premia 
-  premia.cc
-  # Model
+set(
+  PREMIA_APP_MODEL_SRC 
   model/model.cc
   model/chart/chart_model.cc
   model/options/options_model.cc
   model/account/account_model.cc
   model/console/console_model.cc
   model/core/watchlist_model.cc
-  # View + View Manager 
+)
+
+set(
+  PREMIA_APP_VIEW_SRC
   view/workspace.cc
   view/view_manager.cc
   view/core/primary_view.cc
@@ -51,19 +48,10 @@ add_executable(
   view/chart/chart_view.cc
   view/chart/subview/CandleChart.cpp
   view/chart/subview/LinePlotChart.cpp
-  # Controller 
-  core/controller.cc    
-  # Services 
-  service/Halext/Client.cpp 
-  service/Halext/User.cpp  
-  ## IEXCloud Service  
-  service/IEXCloud/Client.cpp 
-  service/IEXCloud/Parser.cpp
-  ## Coinbase Service 
-  service/CoinbasePro/Account.cpp 
-  service/CoinbasePro/Client.cpp 
-  service/CoinbasePro/Product.cpp
-  ## TDAmeritrade Service 
+)
+
+set(
+  PREMIA_SERVICE_TDA_SRC
   service/TDAmeritrade/Parser.cpp
   service/TDAmeritrade/Socket.cpp
   service/TDAmeritrade/Client.cpp
@@ -74,6 +62,31 @@ add_executable(
   service/TDAmeritrade/Data/Order.cpp
   service/TDAmeritrade/Data/UserPrincipals.cpp
   service/TDAmeritrade/Data/PriceHistory.cpp 
+)
+
+set(
+  PREMIA_SERVICE_CB_SRC
+  service/CoinbasePro/Account.cpp 
+  service/CoinbasePro/Client.cpp 
+  service/CoinbasePro/Product.cpp
+)
+
+# Premia Executable Linkage ------------------------------------------------------
+add_executable(
+  Premia 
+  premia.cc
+  ${PREMIA_APP_MODEL_SRC}
+  ${PREMIA_APP_VIEW_SRC}
+  # Controller 
+  core/controller.cc    
+  # Services 
+  service/Halext/Client.cpp 
+  service/Halext/User.cpp  
+  ## IEXCloud Service  
+  service/IEXCloud/Client.cpp 
+  service/IEXCloud/Parser.cpp
+  ${PREMIA_SERVICE_CB_SRC}
+  ${PREMIA_SERVICE_TDA_SRC}
   ## InteractiveBrokers Service
   service/InteractiveBrokers/Client.cpp
   service/InteractiveBrokers/Data/ContractSamples.cpp
@@ -95,26 +108,31 @@ add_executable(
   ${IMPLOT_PATH}/implot_demo.cpp
 )
 
-include_directories(
-  Premia 
+target_include_directories(
+  Premia PUBLIC
   .
-  src
-  src/libs
-  src/libs/imgui
-  src/libs/SDL/include
+  libs
+  libs/imgui
+  libs/SDL/include
 )
+
+set(SDL_TARGETS SDL2::SDL2)
+
+if(WIN32 OR MINGW)
+    list(PREPEND SDL_TARGETS SDL2::SDL2main)
+    add_definitions(-DSDL_MAIN_HANDLED)
+endif()
 
 target_link_libraries(
   Premia
   ${BOOST_LIBRARIES} 
-  ${SDL2_LIBRARIES} 
+  ${SDL_TARGETS}
   ${OPENGL_LIBRARIES} 
   TWS
   ImGui 
   ImPlot
   curl
-  OpenSSL::SSL 
-  premia_proto
+  OpenSSL::SSL
 )
 
 if (WIN32) 

@@ -3,6 +3,9 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
+
 
 #include <string>
 
@@ -10,6 +13,7 @@
 #include "metatypes.h"
 #include "model/options/options_model.h"
 #include "view/view.h"
+
 
 namespace premia {
 void OptionChainView::drawSearch() {

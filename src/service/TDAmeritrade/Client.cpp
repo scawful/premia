@@ -2,10 +2,10 @@
 
 #include "Data/Order.hpp"
 #include "Data/UserPrincipals.hpp"
-#include "Metatypes.hpp"
+#include "metatypes.h"
 #include "Parser.hpp"
 #include "Socket.hpp"
-#include "Utils.hpp"
+#include "util.h"
 
 #include <boost/beast.hpp>
 #include <boost/beast/core.hpp>

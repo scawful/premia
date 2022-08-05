@@ -1,9 +1,9 @@
 #ifndef IEX_hpp
 #define IEX_hpp
 
-#include "../src/Services/IEXCloud/Client.hpp"
-#include "../src/Services/IEXCloud/Data/FundOwnership.hpp"
-#include "../src/Services/IEXCloud/Parser.hpp"
+#include "service/IEXCloud/Client.hpp"
+#include "service/IEXCloud/Data/FundOwnership.hpp"
+#include "service/IEXCloud/Parser.hpp"
 
 namespace premia {
 namespace iex {

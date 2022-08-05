@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-#include "Metatypes.hpp"
+#include "metatypes.h"
 
 namespace premia {
 namespace cbp {

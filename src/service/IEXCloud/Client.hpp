@@ -5,8 +5,8 @@
 
 #include <string>
 
-#include "Metatypes.hpp"
-#include "Premia.hpp"
+#include "metatypes.h"
+#include "premia.h"
 
 
 namespace premia {

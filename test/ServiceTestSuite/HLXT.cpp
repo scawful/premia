@@ -1,4 +1,4 @@
-#include "Interface/HLXT.hpp"
+#include "singletons/HLXT.hpp"
 
 #include <gtest/gtest.h>
 

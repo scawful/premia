@@ -1,9 +1,9 @@
 #ifndef CBP_hpp
 #define CBP_hpp
 
-#include "../src/Services/CoinbasePro/Account.hpp"
-#include "../src/Services/CoinbasePro/Client.hpp"
-#include "../src/Services/CoinbasePro/Product.hpp"
+#include "service/CoinbasePro/Account.hpp"
+#include "service/CoinbasePro/Client.hpp"
+#include "service/CoinbasePro/Product.hpp"
 
 namespace premia {
 namespace cbp {

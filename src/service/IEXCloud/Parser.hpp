@@ -8,7 +8,7 @@
 
 #include "Data/FundOwnership.hpp"
 #include "Data/InsiderTransactions.hpp"
-#include "Metatypes.hpp"
+#include "metatypes.h"
 
 namespace premia {
 namespace iex {

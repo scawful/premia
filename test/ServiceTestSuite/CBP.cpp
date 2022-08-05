@@ -1,4 +1,4 @@
-#include "Interface/CBP.hpp"
+#include "singletons/CBP.hpp"
 
 #include <gtest/gtest.h>
 

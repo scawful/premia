@@ -1,6 +1,6 @@
-#include "Controller.hpp"
+#include "controller.h"
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <imgui/backends/imgui_impl_sdlrenderer.h>
 #include <imgui/imgui.h>
@@ -9,11 +9,11 @@
 #include <implot/implot_internal.h>
 
 #include "model/model.h"
-#include "View/Chart/chart_view.h"
-#include "View/Console/console_view.h"
-#include "View/Login/login_view.h"
-#include "View/Options/OptionChain.hpp"
-#include "View/ViewManager.hpp"
+#include "view/chart/chart_view.h"
+#include "view/console/console_view.h"
+#include "view/login/login_view.h"
+#include "view/options/option_chain.h"
+#include "view/view_manager.h"
 
 namespace premia {
 
