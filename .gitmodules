@@ -7,3 +7,6 @@
 [submodule "libs/fredcpp"]
 	path = libs/fredcpp
 	url = https://github.com/nomadbyte/fredcpp.git
+[submodule "libs/SDL"]
+	path = libs/SDL
+	url = https://github.com/libsdl-org/SDL

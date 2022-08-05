@@ -15,23 +15,23 @@ add_executable(
   ServiceTestSuite/TDA.cpp
   ServiceTestSuite/CBP.cpp
   ServiceTestSuite/IEX.cpp
-  ../src/Services/Halext/Client.cpp 
-  ../src/Services/Halext/User.cpp    
-  ../src/Services/IEXCloud/Client.cpp 
-  ../src/Services/IEXCloud/Parser.cpp
-  ../src/Services/CoinbasePro/Account.cpp 
-  ../src/Services/CoinbasePro/Client.cpp 
-  ../src/Services/CoinbasePro/Product.cpp
-  ../src/Services/TDAmeritrade/Parser.cpp
-  ../src/Services/TDAmeritrade/Socket.cpp
-  ../src/Services/TDAmeritrade/Client.cpp
-  ../src/Services/TDAmeritrade/Data/Quote.cpp 
-  ../src/Services/TDAmeritrade/Data/OptionChain.cpp 
-  ../src/Services/TDAmeritrade/Data/Account.cpp
-  ../src/Services/TDAmeritrade/Data/Watchlist.cpp
-  ../src/Services/TDAmeritrade/Data/Order.cpp
-  ../src/Services/TDAmeritrade/Data/UserPrincipals.cpp
-  ../src/Services/TDAmeritrade/Data/PriceHistory.cpp 
+  ../src/service/Halext/Client.cpp 
+  ../src/service/Halext/User.cpp    
+  ../src/service/IEXCloud/Client.cpp 
+  ../src/service/IEXCloud/Parser.cpp
+  ../src/service/CoinbasePro/Account.cpp 
+  ../src/service/CoinbasePro/Client.cpp 
+  ../src/service/CoinbasePro/Product.cpp
+  ../src/service/TDAmeritrade/Parser.cpp
+  ../src/service/TDAmeritrade/Socket.cpp
+  ../src/service/TDAmeritrade/Client.cpp
+  ../src/service/TDAmeritrade/Data/Quote.cpp 
+  ../src/service/TDAmeritrade/Data/OptionChain.cpp 
+  ../src/service/TDAmeritrade/Data/Account.cpp
+  ../src/service/TDAmeritrade/Data/Watchlist.cpp
+  ../src/service/TDAmeritrade/Data/Order.cpp
+  ../src/service/TDAmeritrade/Data/UserPrincipals.cpp
+  ../src/service/TDAmeritrade/Data/PriceHistory.cpp 
 )
 
 include_directories(

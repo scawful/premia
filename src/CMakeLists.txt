@@ -1,11 +1,8 @@
-# SDL libraries ---------------------------------------------------------------------------------------------
-find_package(SDL2 REQUIRED)
-
-# cURL library ----------------------------------------------------------------------------------------------
+# cURL library ----------------------------------------------------------------
 find_package(CURL REQUIRED)
 
-# ImGui library ---------------------------------------------------------------------------------------------
-set(IMGUI_PATH  "../libs/imgui")                         # Set where the ImGui files are stored
+# ImGui library ---------------------------------------------------------------
+set(IMGUI_PATH  "libs/imgui")                         # Set where the ImGui files are stored
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)             # Compile as static library 
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
@@ -15,76 +12,76 @@ target_compile_definitions(ImGui PUBLIC
   GL_GLEXT_PROTOTYPES=1
 )
 
-# ImPlot library --------------------------------------------------------------------------------------------
-set(IMPLOT_PATH "../libs/implot")
+# ImPlot library ----------------------------------------------------------------
+set(IMPLOT_PATH "libs/implot")
 file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
-# TWS library -----------------------------------------------------------------------------------------------
-set(TWS_PATH "../libs/tws")
+# TWS library --------------------------------------------------------------------
+set(TWS_PATH "libs/tws")
 file(GLOB TWS_SOURCES ${TWS_PATH}/*.cpp)
 add_library("TWS" STATIC ${TWS_SOURCES})
 target_include_directories("TWS" PUBLIC ${TWS_PATH})
 
-# Service definitions ---------------------------------------------------------------------------------------
-add_subdirectory(Services/TDAmeritrade)
+# Service definitions -----------------------------------------------------------
+# add_subdirectory(service/TDAmeritrade)
 
-# Premia Executable Linkage ---------------------------------------------------------------------------------
+# Premia Executable Linkage ------------------------------------------------------
 add_executable(
   Premia 
-  Premia.cpp 
+  premia.cc
   # Model
-  Model/Model.cpp
-  Model/Chart/ChartModel.cpp
-  Model/Options/OptionsModel.cpp
-  Model/Account/AccountModel.cpp
-  Model/Console/ConsoleModel.cpp
-  Model/Core/WatchlistModel.cpp
+  model/model.cc
+  model/chart/chart_model.cc
+  model/options/options_model.cc
+  model/account/account_model.cc
+  model/console/console_model.cc
+  model/core/watchlist_model.cc
   # View + View Manager 
-  View/Workspace.cpp
-  View/ViewManager.cpp
-  View/Core/PrimaryView.cpp
-  View/Console/ConsoleView.cpp
-  View/Menu/MenuView.cpp
-  View/Login/LoginView.cpp
-  View/Options/OptionChain.cpp
-  View/Account/AccountView.cpp
-  View/Watchlist/WatchlistView.cpp
-  View/Chart/ChartView.cpp
-  View/Chart/Subview/CandleChart.cpp
-  View/Chart/Subview/LinePlotChart.cpp
+  view/workspace.cc
+  view/view_manager.cc
+  view/core/primary_view.cc
+  view/console/console_view.cc
+  view/menu/menu_view.cc
+  view/login/login_view.cc
+  view/options/option_chain.cc
+  view/account/account_view.cc
+  view/watchlist/watchlist_view.cc
+  view/chart/chart_view.cc
+  view/chart/subview/CandleChart.cpp
+  view/chart/subview/LinePlotChart.cpp
   # Controller 
-  Controller/Controller.cpp    
+  core/controller.cc    
   # Services 
-  Services/Halext/Client.cpp 
-  Services/Halext/User.cpp  
+  service/Halext/Client.cpp 
+  service/Halext/User.cpp  
   ## IEXCloud Service  
-  Services/IEXCloud/Client.cpp 
-  Services/IEXCloud/Parser.cpp
+  service/IEXCloud/Client.cpp 
+  service/IEXCloud/Parser.cpp
   ## Coinbase Service 
-  Services/CoinbasePro/Account.cpp 
-  Services/CoinbasePro/Client.cpp 
-  Services/CoinbasePro/Product.cpp
+  service/CoinbasePro/Account.cpp 
+  service/CoinbasePro/Client.cpp 
+  service/CoinbasePro/Product.cpp
   ## TDAmeritrade Service 
-  Services/TDAmeritrade/Parser.cpp
-  Services/TDAmeritrade/Socket.cpp
-  Services/TDAmeritrade/Client.cpp
-  Services/TDAmeritrade/Data/Quote.cpp 
-  Services/TDAmeritrade/Data/OptionChain.cpp 
-  Services/TDAmeritrade/Data/Account.cpp
-  Services/TDAmeritrade/Data/Watchlist.cpp
-  Services/TDAmeritrade/Data/Order.cpp
-  Services/TDAmeritrade/Data/UserPrincipals.cpp
-  Services/TDAmeritrade/Data/PriceHistory.cpp 
+  service/TDAmeritrade/Parser.cpp
+  service/TDAmeritrade/Socket.cpp
+  service/TDAmeritrade/Client.cpp
+  service/TDAmeritrade/Data/Quote.cpp 
+  service/TDAmeritrade/Data/OptionChain.cpp 
+  service/TDAmeritrade/Data/Account.cpp
+  service/TDAmeritrade/Data/Watchlist.cpp
+  service/TDAmeritrade/Data/Order.cpp
+  service/TDAmeritrade/Data/UserPrincipals.cpp
+  service/TDAmeritrade/Data/PriceHistory.cpp 
   ## InteractiveBrokers Service
-  Services/InteractiveBrokers/Client.cpp
-  Services/InteractiveBrokers/Data/ContractSamples.cpp
-  Services/InteractiveBrokers/Data/OrderSamples.cpp
-  Services/InteractiveBrokers/Data/ScannerSubscriptionSamples.cpp
-  Services/InteractiveBrokers/Data/AvailableAlgoParams.cpp
-  Services/InteractiveBrokers/Data/AccountSummaryTags.cpp
-  Services/InteractiveBrokers/Utils.cpp
+  service/InteractiveBrokers/Client.cpp
+  service/InteractiveBrokers/Data/ContractSamples.cpp
+  service/InteractiveBrokers/Data/OrderSamples.cpp
+  service/InteractiveBrokers/Data/ScannerSubscriptionSamples.cpp
+  service/InteractiveBrokers/Data/AvailableAlgoParams.cpp
+  service/InteractiveBrokers/Data/AccountSummaryTags.cpp
+  service/InteractiveBrokers/Utils.cpp
   # GUI libraries 
   ${IMGUI_PATH}/imgui.cpp 
   ${IMGUI_PATH}/imgui_demo.cpp
@@ -100,11 +97,11 @@ add_executable(
 
 include_directories(
   Premia 
-  "."
-  "../assets"
-  "../libs"
-  "Services"
-  "../build/src/Services/TDAmeritrade"
+  .
+  src
+  src/libs
+  src/libs/imgui
+  src/libs/SDL/include
 )
 
 target_link_libraries(

@@ -17,8 +17,6 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-# gRPC library ----------------------------------------------------------------------------------------------
-find_package(gRPC REQUIRED)
 
 # OpenSSL library -------------------------------------------------------------------------------------------
 if(APPLE)
@@ -39,6 +37,8 @@ if(OPENSSL_FOUND)
         message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
     endif()
 endif()
+
+add_subdirectory(src/libs/SDL)
 
 # Premia program --------------------------------------------------------------------------------------------
 add_subdirectory(src)
