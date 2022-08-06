@@ -21,13 +21,13 @@ class LoginView : public View {
   Logger logger;
   std::unordered_map<std::string, EventHandler> events;
 
-  void drawScreen() const;
+  void DrawScreen() const;
 
  public:
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string& , const EventHandler&) override;
-  void update() override;
+  void Update() override;
 };
 }  // namespace premia
 

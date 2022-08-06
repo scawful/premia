@@ -37,13 +37,13 @@ private:
     void init_pie_chart();
     void get_spx_gamma_exposure();
 
-    void draw_heatmap();
+    void Draw_heatmap();
 
 public:
     RiskPremiaFrame();
     ~RiskPremiaFrame();
     
-    void update();
+    void Update();
 };
 
 #endif 

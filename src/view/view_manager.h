@@ -59,7 +59,7 @@ class ViewManager {
 
   void addEventHandler(const std::string& key, const EventHandler& event);
   void setCurrentView(std::shared_ptr<View> newView);
-  void update() const;
+  void Update() const;
 };
 }  // namespace premia
 

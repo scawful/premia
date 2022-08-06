@@ -25,9 +25,9 @@ void ChartView::initChart() {
   isInit = true;
 }
 
-void ChartView::drawChart() { charts.at(currentChart)->update(); }
+void ChartView::DrawChart() { charts.at(currentChart)->Update(); }
 
-void ChartView::drawChartSettings() {
+void ChartView::DrawChartSettings() {
   if (ImGui::BeginTable("Chart Settings", 13, ImGuiTableFlags_SizingFixedFit)) {
     ImGui::TableNextColumn();
     ImGui::Text("Symbol");
@@ -75,14 +75,14 @@ void ChartView::addEvent(const std::string &key, const EventHandler& event) {
   this->events[key] = event;
 }
 
-void ChartView::update() {
+void ChartView::Update() {
   Construct {
     logger("[ChartView] Instruct");
     initChart();
   }
   Instruct {
-    drawChartSettings();
-    drawChart();
+    DrawChartSettings();
+    DrawChart();
   }
   Destruct { logger("[ChartView] Destruct"); }
   Proceed;

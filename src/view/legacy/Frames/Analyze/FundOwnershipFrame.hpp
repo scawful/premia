@@ -13,7 +13,7 @@ public:
 
     FundOwnershipFrame();
 
-    void update();
+    void Update();
 };
 
 #endif

@@ -43,8 +43,8 @@ class ConsoleView : public View {
   void addToHistory(const char* line);
   void executeCommand(const char* line);
   void displayCommands();
-  void drawContextMenu();
-  void drawConsole();
+  void DrawContextMenu();
+  void DrawConsole();
 
  public:
   ConsoleView();
@@ -55,7 +55,7 @@ class ConsoleView : public View {
   void addLogStd(const std::string &data);
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string &key, const EventHandler& event) override;
-  void update() override;
+  void Update() override;
 };
 }  // namespace premia
 

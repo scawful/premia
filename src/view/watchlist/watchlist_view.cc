@@ -10,7 +10,7 @@
 
 namespace premia {
 
-void WatchlistView::drawWatchlistMenu() {
+void WatchlistView::DrawWatchlistMenu() {
   const int sz = 3;
   const char *names[] = {
       "Local",
@@ -36,7 +36,7 @@ void WatchlistView::drawWatchlistMenu() {
   }
 }
 
-void WatchlistView::drawWatchlistTable() {
+void WatchlistView::DrawWatchlistTable() {
   ImGui::Combo("##watchlists", &watchlistIndex,
                model.getWatchlistNamesCharVec().data(),
                (int)model.getWatchlistNamesCharVec().size());
@@ -229,12 +229,12 @@ void WatchlistView::addEvent(const std::string &key, const EventHandler &event) 
   this->events[key] = event;
 }
 
-void WatchlistView::update() {
+void WatchlistView::Update() {
   Construct {  // runs once
     model.addLogger(this->logger);
   }
   Instruct {  // runs each frame
-    drawWatchlistMenu();
+    DrawWatchlistMenu();
     switch (currentService) {
       case 0:
         // ImGui::Text("Local Watchlist");
@@ -249,7 +249,7 @@ void WatchlistView::update() {
             throw Destruction();
           }
         } else {
-          drawWatchlistTable();
+          DrawWatchlistTable();
         }
         break;
       case 1:
@@ -264,7 +264,7 @@ void WatchlistView::update() {
             throw Destruction();
           }
         } else {
-          drawWatchlistTable();
+          DrawWatchlistTable();
         }
         break;
       case 2:

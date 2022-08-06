@@ -67,7 +67,7 @@ void LinePlotChart::addEvent(const std::string &key, const EventHandler& event) 
   this->events[key] = event;
 }
 
-void LinePlotChart::update() {
+void LinePlotChart::Update() {
   ImGui::Checkbox("Lines", &show_lines);
   ImGui::SameLine();
   ImGui::Checkbox("Fills", &show_fills);

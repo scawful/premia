@@ -1,13 +1,13 @@
 #include "account_view.h"
 
 namespace premia {
-void AccountView::draw_balance_string(const std::string &variable) {
+void AccountView::Draw_balance_string(const std::string &variable) {
   std::string str =
       (halext::HLXT::getInstance().getPrivateBalance()) ? "***" : variable;
   ImGui::Text("%s", str.c_str());
 }
 
-void AccountView::draw_symbol_string(const std::string &symbol) {
+void AccountView::Draw_symbol_string(const std::string &symbol) {
   std::string outputSymbol = symbol;
   if (symbol.find('_') != std::string::npos) {
     outputSymbol = tda::TDA::getInstance().parseOptionSymbol(symbol);
@@ -153,7 +153,7 @@ void AccountView::initPositions() {
  * @author @scawful
  *
  */
-void AccountView::draw_positions() {
+void AccountView::Draw_positions() {
   if (ImGui::BeginTable("PositionsTable", 6, positionFlags)) {
     ImGui::TableSetupScrollFreeze(0, 1);  // Make top row always visible
     ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthStretch);
@@ -178,26 +178,26 @@ void AccountView::draw_positions() {
           ImGui::TableSetColumnIndex(column);
           switch (column) {
             case 0:
-              draw_symbol_string(symbol);
+              Draw_symbol_string(symbol);
               break;
             case 1:
-              draw_balance_string(account_data.get_position_balances(
+              Draw_balance_string(account_data.get_position_balances(
                   symbol, "currentDayProfitLoss"));
               break;
             case 2:
-              draw_balance_string(account_data.get_position_balances(
+              Draw_balance_string(account_data.get_position_balances(
                   symbol, "currentDayProfitLossPercentage"));
               break;
             case 3:
-              draw_balance_string(
+              Draw_balance_string(
                   account_data.get_position_balances(symbol, "averagePrice"));
               break;
             case 4:
-              draw_balance_string(
+              Draw_balance_string(
                   account_data.get_position_balances(symbol, "marketValue"));
               break;
             case 5:
-              draw_balance_string(
+              Draw_balance_string(
                   account_data.get_position_balances(symbol, "longQuantity"));
               break;
             default:
@@ -211,7 +211,7 @@ void AccountView::draw_positions() {
   }
 }
 
-void AccountView::drawAccountPane() {
+void AccountView::DrawAccountPane() {
   ImGui::Text("Account ID: %s",
               account_data.get_account_variable("accountId").c_str());
   ImGui::Text("Cash: %s",
@@ -267,7 +267,7 @@ void AccountView::drawAccountPane() {
   ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
   if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags)) {
     if (ImGui::BeginTabItem("Positions")) {
-      draw_positions();
+      Draw_positions();
       ImGui::EndTabItem();
     }
     if (ImGui::BeginTabItem("Performance")) {
@@ -316,7 +316,7 @@ void AccountView::addEvent(const std::string &key, const EventHandler &event) {
   this->events[key] = event;
 }
 
-void AccountView::update() {
+void AccountView::Update() {
   if (!isInit) {
     Try {
       initPositions();
@@ -329,7 +329,7 @@ void AccountView::update() {
     Proceed;
   } else {
     if (isLoggedIn) {
-      drawAccountPane();
+      DrawAccountPane();
     } else {
       ImGui::Text("empty account pane goes here");
     }

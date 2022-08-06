@@ -221,7 +221,7 @@ void ConsoleView::displayCommands() {
   ImGui::PopStyleVar();
 }
 
-void ConsoleView::drawContextMenu() {
+void ConsoleView::DrawContextMenu() {
   if (ImGui::BeginPopupContextWindow()) {
     if (ImGui::Selectable("Clear")) clearLog();
     copy_to_clipboard = ImGui::SmallButton("Copy");
@@ -231,12 +231,12 @@ void ConsoleView::drawContextMenu() {
   }
 }
 
-void ConsoleView::drawConsole() {
+void ConsoleView::DrawConsole() {
   // Console Display
   ImGui::BeginChild("ScrollingRegion",
                     ImVec2(0, ImGui::GetContentRegionAvail().y * 0.8f), false,
                     ImGuiWindowFlags_None);
-  drawContextMenu();
+  DrawContextMenu();
   displayCommands();
   ImGui::EndChild();
   ImGui::Separator();
@@ -331,12 +331,12 @@ void ConsoleView::addEvent(const std::string& key, const EventHandler& event) {
   this->events[key] = event;
 }
 
-void ConsoleView::update() {
+void ConsoleView::Update() {
   if (guiDemo) ImGui::ShowDemoWindow();
 
   if (plotDemo) ImPlot::ShowDemoWindow();
 
-  drawConsole();
+  DrawConsole();
 }
 
 }  // namespace premia

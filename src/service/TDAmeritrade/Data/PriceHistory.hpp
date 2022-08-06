@@ -45,7 +45,7 @@ class PriceHistory {
   void setPriceHistoryVariable(std::string key, std::string value);
   void setTickerSymbol(std::string ticker);
   void setInitialized();
-  void updatePriceHistory();
+  void UpdatePriceHistory();
   void clear();
 };
 }  // namespace tda

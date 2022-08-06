@@ -15,15 +15,15 @@ class CandleChart : public Chart {
   std::shared_ptr<ChartModel> model;
 
   int binary_search(const std::vector<double>& arr, int l, int r, double x);
-  void drawCandles(float width_percent, int count, ImVec4 bullCol,
+  void DrawCandles(float width_percent, int count, ImVec4 bullCol,
                    ImVec4 bearCol, bool tooltip);
-  void drawCandleChart();
+  void DrawCandleChart();
 
  public:
   void importModel(std::shared_ptr<ChartModel> newModel) override;
   void fetchData(const std::string &ticker, tda::PeriodType ptype, int period_amt,
                  tda::FrequencyType ftype, int freq_amt, bool ext) override;
-  void update() override;
+  void Update() override;
 };
 }  // namespace premia
 

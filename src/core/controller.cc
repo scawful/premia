@@ -8,7 +8,6 @@
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
-#include "model/model.h"
 #include "view/chart/chart_view.h"
 #include "view/console/console_view.h"
 #include "view/login/login_view.h"
@@ -17,8 +16,6 @@
 
 namespace premia {
 
-constexpr size_t LOGIN_WIDTH = 220;
-constexpr size_t LOGIN_HEIGHT = 200;
 constexpr size_t SCREEN_WIDTH = 1200;
 constexpr size_t SCREEN_HEIGHT = 800;
 
@@ -134,11 +131,6 @@ static SDL_HitTestResult WindowCallback(SDL_Window* win, const SDL_Point* point,
 /**
  * @brief Handles dragging the window by the title bar
  *        and resizing the window at its edges and corners
- *
- * @param win
- * @param pt
- * @param data
- * @return SDL_HitTestResult
  */
 static SDL_HitTestResult WindowCallback(SDL_Window* win, const SDL_Point* pt,
                                         void* data) {
@@ -197,8 +189,8 @@ void Controller::initWindow() {
     window = SDL_CreateWindow("Premia",                 // window title
                               SDL_WINDOWPOS_UNDEFINED,  // initial x position
                               SDL_WINDOWPOS_UNDEFINED,  // initial y position
-                              LOGIN_WIDTH,              // width, in pixels
-                              LOGIN_HEIGHT,             // height, in pixels
+                              SCREEN_WIDTH,             // width, in pixels
+                              SCREEN_HEIGHT,            // height, in pixels
                               SDL_WINDOW_RESIZABLE |    // flags
                                   SDL_WINDOW_BORDERLESS);
   }
@@ -253,50 +245,13 @@ void Controller::initWindow() {
   ColorsPremia();
 }
 
-/**
- * @brief Initializes any events the ViewManager may need for modifying the
- * Controller
- *
- */
-void Controller::initEvents() {
-  viewManager.addEventHandler("login", [this]() -> void {
-    SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
-    SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED,
-                          SDL_WINDOWPOS_CENTERED);
-    ImGuiIO& io = ImGui::GetIO();
-    io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
-    io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
-    io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
-    io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
-    io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
-    viewManager.setCurrentView(std::make_shared<PrimaryView>());
-    viewManager.setLoggedIn();
-  });
-  viewManager.addEventHandler("quit", [this]() -> void { this->quit(); });
-}
-
-/**
- * @brief Returns program runtime
- *
- * @return true
- * @return false
- */
 bool Controller::isActive() const { return active; }
 
-/**
- * @brief Entry point of application
- *
- */
 void Controller::onEntry() noexcept(false) {
   initWindow();
-  initEvents();
   active = true;
 }
 
-/**
- * @brief Handles keyboard and mouse input via SDL_Events
- *
- */
 void Controller::onInput() {
   int wheel = 0;
   SDL_Event event;
@@ -363,16 +318,8 @@ void Controller::onInput() {
   io.MouseWheel = static_cast<float>(wheel);
 }
 
-/**
- * @brief Refer to View group and ViewManager class
- *
- */
-void Controller::onLoad() const { this->viewManager.update(); }
+void Controller::onLoad() { workspace_.Update(); }
 
-/**
- * @brief Render current contents to the screen
- *
- */
 void Controller::doRender() {
   SDL_RenderClear(renderer);
   ImGui::Render();
@@ -380,10 +327,6 @@ void Controller::doRender() {
   SDL_RenderPresent(renderer);
 }
 
-/**
- * @brief Cleanup all resources
- *
- */
 void Controller::onExit() {
   ImGui_ImplSDLRenderer_Shutdown();
   ImGui_ImplSDL2_Shutdown();
@@ -395,4 +338,5 @@ void Controller::onExit() {
   renderer = nullptr;
   window = nullptr;
 }
+
 }  // namespace premia

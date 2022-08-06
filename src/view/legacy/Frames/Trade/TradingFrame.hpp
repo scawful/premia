@@ -11,7 +11,7 @@ private:
 public:
     TradingFrame();
 
-    void update();
+    void Update();
 };
 
 #endif

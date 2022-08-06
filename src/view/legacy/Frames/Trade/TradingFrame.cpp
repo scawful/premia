@@ -5,7 +5,7 @@ TradingFrame::TradingFrame() : Frame()
     
 }
 
-void TradingFrame::update() 
+void TradingFrame::Update() 
 {
     // Place Order Button ---------------------------------------------------------------------------------
     if (ImGui::Button("Quick Order", ImVec2(120, 30)))

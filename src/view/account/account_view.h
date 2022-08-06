@@ -25,18 +25,18 @@ class AccountView : public View {
   void initPositions();
   void load_account(const std::string &account);
   void load_all_accounts();
-  void draw_symbol_string(const std::string &symbol);
-  void draw_balance_string(const std::string &variable);
-  void draw_positions();
+  void Draw_symbol_string(const std::string &symbol);
+  void Draw_balance_string(const std::string &variable);
+  void Draw_positions();
 
   // ------------------------------
-  void drawAccountPane();
+  void DrawAccountPane();
 
  public:
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string &key, const EventHandler& event) override;
-  void update() override;
+  void Update() override;
 
  private:
   ImGuiTableFlags positionFlags =

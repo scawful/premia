@@ -13,30 +13,29 @@
 
 namespace premia {
 class MenuView : public View {
+ public:
+  MenuView() = default;
+  std::string getName() override;
+  void addLogger(const Logger& logger) override;
+  void addEvent(const std::string&, const EventHandler&) override;
+  void Update() override;
+
  private:
-  // Local Variables
+  void DrawFileMenu();
+  void DrawTradeMenu();
+  void DrawChartsMenu();
+  void DrawAnalyzeMenu();
+  void DrawColumnOptions(int x);
+  void DrawViewMenu();
+  void DrawHelpMenu();
+  void DrawScreen();
+
   ImGuiStyle* ref = nullptr;
   bool initialized = false;
   bool about = false;
 
-  // Premia Context Utilities
   EventMap events;
   Logger logger;
-
-  void drawFileMenu() const;
-  void drawTradeMenu() const;
-  void drawChartsMenu() const;
-  void drawAnalyzeMenu() const;
-  void drawColumnOptions(int x) const;
-  void drawViewMenu() const;
-  void drawHelpMenu();
-  void drawScreen();
-
- public:
-  std::string getName() override;
-  void addLogger(const Logger& logger) override;
-  void addEvent(const std::string &, const EventHandler&) override;
-  void update() override;
 };
 }  // namespace premia
 

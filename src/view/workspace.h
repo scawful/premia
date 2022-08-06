@@ -1,13 +1,16 @@
 #ifndef Workspace_hpp
 #define Workspace_hpp
 
-#include "account/account_view.h"
-#include "chart/chart_view.h"
-#include "console/console_view.h"
-#include "core/primary_view.h"
-#include "login/login_view.h"
-#include "menu/menu_view.h"
+#include "view/account/account_view.h"
+#include "view/chart/chart_view.h"
+#include "view/chart/subview/LinePlotChart.hpp"
+#include "view/console/console_view.h"
+#include "view/core/primary_view.h"
+#include "view/login/login_view.h"
+#include "view/menu/menu_view.h"
+#include "view/options/option_chain.h"
 #include "view/view.h"
+#include "view/watchlist/watchlist_view.h"
 #include "watchlist/watchlist_view.h"
 
 /**
@@ -35,20 +38,18 @@
  *
  */
 namespace premia {
+
 class Workspace {
- private:
-  EventMap events;
-  Logger logger;
-  std::shared_ptr<View> rootView;
-
-  // load workspace configurations from files ?
-  // map of views? sharing events? idk idk
-
  public:
-  Workspace();
+  Workspace() = default;
 
-  void update();
+  void Update();
+
+ private:
+  MenuView menu_view_;
+  PrimaryView primary_view_;
 };
+
 }  // namespace premia
 
 #endif

@@ -16,7 +16,7 @@
 
 
 namespace premia {
-void OptionChainView::drawSearch() {
+void OptionChainView::DrawSearch() {
   static std::string ticker;
   static std::string count;
   static std::string strike;
@@ -54,7 +54,7 @@ void OptionChainView::drawSearch() {
   ImGui::Separator();
 }
 
-void OptionChainView::drawChain() {
+void OptionChainView::DrawChain() {
   static bool select_options[] = {false};
   static ImGuiTableFlags flags =
       ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg |
@@ -239,7 +239,7 @@ void OptionChainView::drawChain() {
   }
 }
 
-void OptionChainView::drawUnderlying() {
+void OptionChainView::DrawUnderlying() {
   if (ImGui::TreeNode("Underlying")) {
     ImGui::Text(
         "%s | %s (%s)",
@@ -376,20 +376,20 @@ void OptionChainView::addEvent(const std::string &key, const EventHandler& event
   this->events[key] = event;
 }
 
-void OptionChainView::update() {
+void OptionChainView::Update() {
   if (model.isActive()) {
     if (ImGui::BeginTable("OptionChainTable", 1,
                           ImGuiTableFlags_NoBordersInBody)) {
       ImGui::TableSetupColumn("Option Chain",
                               ImGuiTableColumnFlags_WidthStretch);
       ImGui::TableNextColumn();
-      drawSearch();
-      drawUnderlying();
-      drawChain();
+      DrawSearch();
+      DrawUnderlying();
+      DrawChain();
       ImGui::EndTable();
     }
   } else {
-    drawSearch();
+    DrawSearch();
   }
 }
 }  // namespace premia

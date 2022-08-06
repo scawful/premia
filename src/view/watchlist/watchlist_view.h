@@ -16,14 +16,14 @@ class WatchlistView : public View {
   Logger logger;
   WatchlistModel model;
 
-  void drawWatchlistMenu();
-  void drawWatchlistTable();
+  void DrawWatchlistMenu();
+  void DrawWatchlistTable();
 
  public:
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string &, const EventHandler&) override;
-  void update() override;
+  void Update() override;
 
  private:
   ImGuiTableFlags watchlistFlags =

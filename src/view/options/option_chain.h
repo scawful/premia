@@ -29,15 +29,15 @@ class OptionChainView : public View {
   Logger logger;
   OptionsModel model;
 
-  void drawSearch();
-  void drawChain();
-  void drawUnderlying();
+  void DrawSearch();
+  void DrawChain();
+  void DrawUnderlying();
 
  public:
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string &key, const EventHandler& event) override;
-  void update() override;
+  void Update() override;
 
  private:
   ImPlotAxisFlags dateFlags = ImPlotAxisFlags_NoLabel;

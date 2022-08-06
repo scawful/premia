@@ -42,9 +42,9 @@ int CandleChart::binary_search(const std::vector<double>& arr, int l, int r,
  * @param bearCol
  * @param tooltip
  */
-void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol,
+void CandleChart::DrawCandles(float width_percent, int count, ImVec4 bullCol,
                               ImVec4 bearCol, bool tooltip) {
-  ImDrawList* draw_list = ImPlot::GetPlotDrawList();
+  ImDrawList* Draw_list = ImPlot::GetPlotDrawList();
   // calc real value width
   double half_width =
       count > 1 ? (model->getDate(1) - model->getDate(0)) * width_percent
@@ -60,7 +60,7 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol,
     float tool_t = ImPlot::GetPlotPos().y;
     float tool_b = tool_t + ImPlot::GetPlotSize().y;
     ImPlot::PushPlotClipRect();
-    draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b),
+    Draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b),
                              IM_COL32(128, 128, 128, 64));
     ImPlot::PopPlotClipRect();
     // find mouse location index
@@ -106,8 +106,8 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol,
       ImU32 color = ImGui::GetColorU32(
           model->getCandle(i).open > model->getCandle(i).close ? bearCol
                                                                : bullCol);
-      draw_list->AddLine(low_pos, high_pos, color);
-      draw_list->AddRectFilled(open_pos, close_pos, color);
+      Draw_list->AddLine(low_pos, high_pos, color);
+      Draw_list->AddRectFilled(open_pos, close_pos, color);
     }
 
     // end plot item
@@ -115,7 +115,7 @@ void CandleChart::drawCandles(float width_percent, int count, ImVec4 bullCol,
   }
 }
 
-void CandleChart::drawCandleChart() {
+void CandleChart::DrawCandleChart() {
   static bool tooltip = false;
   static auto bullCol = ImVec4(0.000f, 1.000f, 0.441f, 1.000f);
   static auto bearCol = ImVec4(0.853f, 0.050f, 0.310f, 1.000f);
@@ -148,7 +148,7 @@ void CandleChart::drawCandleChart() {
                 model->getQuote().getQuoteVariable("52WkLow")),
             boost::lexical_cast<double>(
                 model->getQuote().getQuoteVariable("52WkHigh")));
-        drawCandles(0.25, model->getNumCandles(), bullCol, bearCol, tooltip);
+        DrawCandles(0.25, model->getNumCandles(), bullCol, bearCol, tooltip);
       }
       ImPlot::EndPlot();
     }
@@ -180,5 +180,5 @@ void CandleChart::importModel(std::shared_ptr<ChartModel> newModel) {
   this->model = newModel;
 }
 
-void CandleChart::update() { drawCandleChart(); }
+void CandleChart::Update() { DrawCandleChart(); }
 }  // namespace premia

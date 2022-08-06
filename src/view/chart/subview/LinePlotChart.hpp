@@ -30,7 +30,7 @@ class LinePlotChart : public View {
   LinePlotChart();
   ~LinePlotChart() override;
 
-  void update() override;
+  void Update() override;
   std::string getName() override;
   void addLogger(const Logger &logger) override;
   void addEvent(const std::string &key, const EventHandler &event) override;

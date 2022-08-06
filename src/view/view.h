@@ -19,7 +19,7 @@ class View {
   virtual std::string getName() = 0;
   virtual void addEvent(const std::string &, const EventHandler &) = 0;
   virtual void addLogger(const Logger &) = 0;
-  virtual void update() = 0;
+  virtual void Update() = 0;
 };
 }  // namespace premia
 

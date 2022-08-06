@@ -16,7 +16,7 @@ class ChartView : public View {
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string &key, const EventHandler& event) override;
-  void update() override;
+  void Update() override;
 
  private:
   int period_type = 2;
@@ -34,8 +34,8 @@ class ChartView : public View {
   Logger logger;
 
   void initChart();
-  void drawChart();
-  void drawChartSettings();
+  void DrawChart();
+  void DrawChartSettings();
 };
 }  // namespace premia
 

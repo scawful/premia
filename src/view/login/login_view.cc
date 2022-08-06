@@ -21,7 +21,7 @@ static void _IMGUISetClipboardText(void *, const char *text) {
   SDL_SetClipboardText(text);
 }
 
-void LoginView::drawScreen() const {
+void LoginView::DrawScreen() const {
   ImGuiIO &io = ImGui::GetIO();
   io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
   io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
@@ -94,5 +94,5 @@ void LoginView::addEvent(const std::string &key, const EventHandler &event) {
   this->events[key] = event;
 }
 
-void LoginView::update() { drawScreen(); }
+void LoginView::Update() { DrawScreen(); }
 }  // namespace premia

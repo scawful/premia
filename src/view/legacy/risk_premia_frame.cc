@@ -160,7 +160,7 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
     setInitialized(true);
 }
 
-void RiskPremiaFrame::draw_heatmap()
+void RiskPremiaFrame::Draw_heatmap()
 {
     static float values1[7][7] = { {0.8f, 2.4f, 2.5f, 3.9f, 0.0f, 4.0f, 0.0f},
                                         {2.4f, 0.0f, 4.0f, 1.0f, 2.7f, 0.0f, 0.0f},
@@ -219,7 +219,7 @@ RiskPremiaFrame::~RiskPremiaFrame()
     delete positions_pie;
 }
 
-void RiskPremiaFrame::update()
+void RiskPremiaFrame::Update()
 {
     if (!getInitialized()) {
         get_spx_gamma_exposure();

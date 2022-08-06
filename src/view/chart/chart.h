@@ -18,7 +18,7 @@ class Chart {
   virtual void fetchData(const std::string& ticker, tda::PeriodType ptype,
                          int period_amt, tda::FrequencyType ftype, int freq_amt,
                          bool ext) = 0;
-  virtual void update() = 0;
+  virtual void Update() = 0;
 };
 }  // namespace premia
 

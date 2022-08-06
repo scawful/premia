@@ -12,7 +12,7 @@
 
 namespace premia {
 
-void MenuView::drawFileMenu() const {
+void MenuView::DrawFileMenu() {
   static bool show_console = false;
 
   if (show_console) {
@@ -51,7 +51,7 @@ void MenuView::drawFileMenu() const {
   }
 }
 
-void MenuView::drawTradeMenu() const {
+void MenuView::DrawTradeMenu() {
   if (ImGui::BeginMenu(ICON_MD_SYNC_ALT)) {
     ImGui::MenuItem("Place Order", "N/A");
     ImGui::MenuItem("Replace Order", "N/A");
@@ -66,7 +66,7 @@ void MenuView::drawTradeMenu() const {
   }
 }
 
-void MenuView::drawChartsMenu() const {
+void MenuView::DrawChartsMenu() {
   if (ImGui::BeginMenu(ICON_MD_ADD_CHART)) {
     if (ImGui::MenuItem("Line Plot", ICON_MD_SHOW_CHART)) {
       halext::HLXT::getInstance().setSelectedChart(0);
@@ -108,7 +108,7 @@ void MenuView::drawChartsMenu() const {
   }
 }
 
-void MenuView::drawAnalyzeMenu() const {
+void MenuView::DrawAnalyzeMenu() {
   if (ImGui::BeginMenu(ICON_MD_TOPIC)) {
     if (ImGui::MenuItem("Risk Premia Hub")) events.at("goHome")();
     ImGui::Separator();
@@ -138,7 +138,7 @@ void MenuView::drawAnalyzeMenu() const {
   }
 }
 
-void MenuView::drawColumnOptions(int x) const {
+void MenuView::DrawColumnOptions(int x) {
   std::string column = "LeftCol";
   if (x) column = "RightCol";
 
@@ -147,7 +147,7 @@ void MenuView::drawColumnOptions(int x) const {
   }
 }
 
-void MenuView::drawViewMenu() const {
+void MenuView::DrawViewMenu() {
   static bool show_imgui_metrics = false;
   static bool show_implot_metrics = false;
   static bool show_imgui_style_editor = false;
@@ -172,12 +172,12 @@ void MenuView::drawViewMenu() const {
 
   if (ImGui::BeginMenu(ICON_MD_TUNE)) {
     if (ImGui::BeginMenu("Left Column")) {
-      drawColumnOptions(0);
+      DrawColumnOptions(0);
       ImGui::EndMenu();
     }
 
     if (ImGui::BeginMenu("Right Column")) {
-      drawColumnOptions(1);
+      DrawColumnOptions(1);
       ImGui::EndMenu();
     }
 
@@ -207,7 +207,7 @@ void MenuView::drawViewMenu() const {
   }
 }
 
-void MenuView::drawHelpMenu() {
+void MenuView::DrawHelpMenu() {
   if (ImGui::BeginMenu(ICON_MD_HELP)) {
     ImGui::MenuItem("Get Started");
     ImGui::MenuItem("Tips and Tricks");
@@ -217,14 +217,14 @@ void MenuView::drawHelpMenu() {
   }
 }
 
-void MenuView::drawScreen() {
+void MenuView::DrawScreen() {
   if (ImGui::BeginMenuBar()) {
-    drawFileMenu();
-    drawTradeMenu();
-    drawChartsMenu();
-    drawAnalyzeMenu();
-    drawViewMenu();
-    drawHelpMenu();
+    DrawFileMenu();
+    DrawTradeMenu();
+    DrawChartsMenu();
+    DrawAnalyzeMenu();
+    DrawViewMenu();
+    DrawHelpMenu();
     ImGui::EndMenuBar();
   }
 
@@ -249,9 +249,9 @@ std::string MenuView::getName() { return "Menu"; }
 
 void MenuView::addLogger(const Logger& newLogger) { this->logger = newLogger; }
 
-void MenuView::addEvent(const std::string &key, const EventHandler& event) {
+void MenuView::addEvent(const std::string& key, const EventHandler& event) {
   this->events[key] = event;
 }
 
-void MenuView::update() { drawScreen(); }
+void MenuView::Update() { DrawScreen(); }
 }  // namespace premia

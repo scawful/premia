@@ -6,15 +6,15 @@
 #include <string>
 #include <unordered_map>
 
+#include "metatypes.h"
 #include "view/account/account_view.h"
 #include "view/chart/chart_view.h"
+#include "view/chart/subview/LinePlotChart.hpp"
 #include "view/console/console_view.h"
 #include "view/core/primary_view.h"
 #include "view/login/login_view.h"
 #include "view/menu/menu_view.h"
-#include "metatypes.h"
 #include "view/options/option_chain.h"
-#include "view/chart/subview/LinePlotChart.hpp"
 #include "view/view.h"
 #include "watchlist/watchlist_view.h"
 
@@ -76,7 +76,7 @@ ViewManager::ViewManager() {
   consoleView->addLogger(
       consoleLogger);  // you'd be surprised, but this is necessary
   menuView->addEvent("consoleView",
-                     [this]() -> void { consoleView->update(); });
+                     [this]() -> void { consoleView->Update(); });
   menuView->addEvent("optionChainLeftCol", [this]() -> void {
     setLeftColumnView(std::make_shared<OptionChainView>());
   });
@@ -107,7 +107,8 @@ void ViewManager::transferEvents() const {
 
 void ViewManager::setLoggedIn() { isLoggedIn = true; }
 
-void ViewManager::addEventHandler(const std::string &key, const EventHandler& event) {
+void ViewManager::addEventHandler(const std::string& key,
+                                  const EventHandler& event) {
   events[key] = event;
   menuView->addEvent(key, event);
   if (!isLoggedIn) {
@@ -129,12 +130,12 @@ void ViewManager::setCurrentView(std::shared_ptr<View> newView) {
   transferEvents();
 }
 
-void ViewManager::update() const {
+void ViewManager::Update() const {
   startGuiFrame();
-  if (menuActive) menuView->update();
+  if (menuActive) menuView->Update();
 
   if (!isLoggedIn) {
-    loginView->update();
+    loginView->Update();
   } else {
     if (ImGui::BeginTable("Main", 3, viewColumnFlags,
                           ImGui::GetContentRegionAvail())) {
@@ -148,14 +149,14 @@ void ViewManager::update() const {
       ImGui::BeginChild("WatchlistRegion",
                         ImVec2(ImGui::GetContentRegionAvail().x, 0.f), false,
                         ImGuiWindowFlags_None);
-      leftColView->update();
+      leftColView->Update();
       ImGui::EndChild();
 
       ImGui::TableSetColumnIndex(1);
-      currentView->update();
+      currentView->Update();
 
       ImGui::TableSetColumnIndex(2);
-      rightColView->update();
+      rightColView->Update();
 
       ImGui::EndTable();
     }

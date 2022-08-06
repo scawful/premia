@@ -1,7 +1,7 @@
 #include "primary_view.h"
 
 namespace premia {
-void PrimaryView::drawInfoPane() {
+void PrimaryView::DrawInfoPane() {
   ImGui::Text("General");
   if (ImGui::TreeNode("Getting Started")) {
     ImGui::Separator();
@@ -104,7 +104,7 @@ void PrimaryView::drawInfoPane() {
   }
 }
 
-void PrimaryView::drawScreen() { drawInfoPane(); }
+void PrimaryView::DrawScreen() { DrawInfoPane(); }
 
 std::string PrimaryView::getName() { return "Overview"; }
 
@@ -116,5 +116,5 @@ void PrimaryView::addEvent(const std::string &key, const EventHandler& event) {
   this->events[key] = event;
 }
 
-void PrimaryView::update() { drawScreen(); }
+void PrimaryView::Update() { DrawScreen(); }
 }  // namespace premia
