@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
   premia::Controller controller;
-  if (controller.onEntry().ok()) {
+  if (!controller.onEntry().ok()) {
     return EXIT_FAILURE;
   }
   while (controller.isActive()) {
