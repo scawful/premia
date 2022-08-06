@@ -122,66 +122,6 @@ static void ColorsPremia(ImGuiStyle* dst = nullptr) {
   colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 }
 
-constexpr size_t TITLE_BORDER = 20;
-constexpr size_t RESIZE_BORDER = 3;
-
-static SDL_HitTestResult WindowCallback(SDL_Window* win, const SDL_Point* point,
-                                        void* data);
-
-/**
- * @brief Handles dragging the window by the title bar
- *        and resizing the window at its edges and corners
- */
-static SDL_HitTestResult WindowCallback(SDL_Window* win, const SDL_Point* pt,
-                                        void* data) {
-  int w;
-  int h;
-  SDL_GetWindowSize(win, &w, &h);
-
-  // dragging this pixel moves the window.
-  if (pt->y < TITLE_BORDER && pt->x < (w - TITLE_BORDER)) {
-    return SDL_HITTEST_DRAGGABLE;
-  }
-
-#define RESIZE_HIT(name) \
-  { return SDL_HITTEST_RESIZE_##name; }
-
-  // SDL_HITTEST_RESIZE_* - dragging this pixel resizes a specific edge (or
-  // edges) of the window. (Here * is one of: TOPLEFT, TOP, TOPRIGHT, RIGHT,
-  // BOTTOMRIGHT, BOTTOM, BOTTOMLEFT, LEFT).
-  if (pt->x < RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-    RESIZE_HIT(TOPLEFT)
-  } else if (pt->x > RESIZE_BORDER && pt->x < w - RESIZE_BORDER &&
-             pt->y < RESIZE_BORDER) {
-    RESIZE_HIT(TOP)
-  } else if (pt->x > w - RESIZE_BORDER && pt->y < RESIZE_BORDER) {
-    RESIZE_HIT(TOPRIGHT)
-  } else if (pt->x > w - RESIZE_BORDER && pt->y > RESIZE_BORDER &&
-             pt->y < h - RESIZE_BORDER) {
-    RESIZE_HIT(RIGHT)
-  } else if (pt->x > w - RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-    RESIZE_HIT(BOTTOMRIGHT)
-  } else if (pt->x < w - RESIZE_BORDER && pt->x > RESIZE_BORDER &&
-             pt->y > h - RESIZE_BORDER) {
-    RESIZE_HIT(BOTTOM)
-  } else if (pt->x < RESIZE_BORDER && pt->y > h - RESIZE_BORDER) {
-    RESIZE_HIT(BOTTOMLEFT)
-  } else if (pt->x < RESIZE_BORDER && pt->y < h - RESIZE_BORDER &&
-             pt->y > RESIZE_BORDER) {
-    RESIZE_HIT(LEFT)
-  }
-
-  // no action.
-  return SDL_HITTEST_NORMAL;
-}
-
-/**
- * @brief Initializes the SDL_Window and SDL_Renderer
- *        Starts the ImGui and ImPlot contexts
- *        Loads default fonts and theme
- *        Builds the GUI Frame
- *
- */
 void Controller::initWindow() {
   if (SDL_Init(SDL_INIT_EVERYTHING)) {
     SDL_Log("SDL_Init: %s\n", SDL_GetError());
@@ -191,8 +131,8 @@ void Controller::initWindow() {
                               SDL_WINDOWPOS_UNDEFINED,  // initial y position
                               SCREEN_WIDTH,             // width, in pixels
                               SCREEN_HEIGHT,            // height, in pixels
-                              SDL_WINDOW_RESIZABLE |    // flags
-                                  SDL_WINDOW_BORDERLESS);
+                              SDL_WINDOW_RESIZABLE      // flags
+    );
   }
 
   if (window == nullptr) {
@@ -240,7 +180,6 @@ void Controller::initWindow() {
   ImGui_ImplSDLRenderer_NewFrame();
   ImGui_ImplSDL2_NewFrame(window);
 
-  SDL_SetWindowHitTest(this->window, &WindowCallback, nullptr);
   SDL_SetWindowResizable(this->window, SDL_TRUE);
   ColorsPremia();
 }

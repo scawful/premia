@@ -12,6 +12,7 @@
 #include "view/workspace.h"
 
 namespace premia {
+
 class Controller {
  public:
   Controller() = default;
@@ -25,8 +26,9 @@ class Controller {
   void onExit();
 
  private:
-  bool active = false;
   void quit() { active = false; }
+
+  bool active = false;
 
   Workspace workspace_;
   SDL_Window* window = nullptr;
@@ -34,6 +36,7 @@ class Controller {
 
   void initWindow();
 };
+
 }  // namespace premia
 
 #endif
