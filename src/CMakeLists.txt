@@ -1,10 +1,8 @@
 # Premia Project --------------------------------------------------------------
-include(FindProtobuf)
-
-find_package(CURL REQUIRED)
 find_package(protobuf CONFIG REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 find_package(Threads)
+find_package(CURL REQUIRED)
 
 # ImGui library ---------------------------------------------------------------
 set(IMGUI_PATH  "lib/imgui")

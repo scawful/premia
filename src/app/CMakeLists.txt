@@ -75,9 +75,6 @@ target_link_libraries(
   coinbase
   interactive_brokers
   halext
-  protobuf::libprotobuf
-  gRPC::grpc
-  gRPC::grpc++
 )
 
 if (WIN32) 

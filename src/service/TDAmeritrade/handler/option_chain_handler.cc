@@ -2,11 +2,17 @@
 #include <grpc/support/log.h>
 #include <grpcpp/grpcpp.h>
 
-#include "service/TDAmeritrade/proto/option_chain.pb.h"
 #include "service/TDAmeritrade/proto/option_chain.grpc.pb.h"
+#include "service/TDAmeritrade/proto/option_chain.pb.h"
 
 namespace premia {
 namespace tda {
+
+using grpc::Channel;
+using grpc::ClientAsyncResponseReader;
+using grpc::ClientContext;
+using grpc::CompletionQueue;
+using grpc::Status;
 
 class OptionChainServiceImpl final : public OptionChain::Service {
   Status GetOptionChain(const OptionChainRequest* request,
