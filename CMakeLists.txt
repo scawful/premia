@@ -38,7 +38,7 @@ if(OPENSSL_FOUND)
     endif()
 endif()
 
-add_subdirectory(src/libs/SDL)
+add_subdirectory(src/lib/SDL)
 
 # Premia program --------------------------------------------------------------------------------------------
 add_subdirectory(src)

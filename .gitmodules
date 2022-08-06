@@ -16,3 +16,12 @@
 [submodule "src/libs/implot"]
 	path = src/libs/implot
 	url = https://github.com/epezent/implot.git
+[submodule "src/lib/imgui"]
+	path = src/lib/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "src/lib/implot"]
+	path = src/lib/implot
+	url = https://github.com/epezent/implot
+[submodule "src/lib/SDL"]
+	path = src/lib/SDL
+	url = https://github.com/libsdl-org/SDL

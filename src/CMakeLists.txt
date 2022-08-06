@@ -2,7 +2,7 @@
 find_package(CURL REQUIRED)
 
 # ImGui library ---------------------------------------------------------------
-set(IMGUI_PATH  "libs/imgui")                         # Set where the ImGui files are stored
+set(IMGUI_PATH  "lib/imgui")                         # Set where the ImGui files are stored
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)          # Compile as static library 
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
@@ -13,13 +13,13 @@ target_compile_definitions(ImGui PUBLIC
 )
 
 # ImPlot library ----------------------------------------------------------------
-set(IMPLOT_PATH "libs/implot")
+set(IMPLOT_PATH "lib/implot")
 file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
 # TWS library --------------------------------------------------------------------
-set(TWS_PATH "libs/tws")
+set(TWS_PATH "lib/tws")
 file(GLOB TWS_SOURCES ${TWS_PATH}/*.cpp)
 add_library("TWS" STATIC ${TWS_SOURCES})
 target_include_directories("TWS" PUBLIC ${TWS_PATH})
@@ -111,9 +111,9 @@ add_executable(
 target_include_directories(
   Premia PUBLIC
   .
-  libs
-  libs/imgui
-  libs/SDL/include
+  lib
+  lib/imgui
+  lib/SDL/include
 )
 
 set(SDL_TARGETS SDL2::SDL2)
