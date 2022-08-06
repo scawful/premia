@@ -12,12 +12,12 @@ namespace premia {
 namespace halext {
 class Client {
  private:
-  String username;
+  std::string username;
 
  public:
   Client() = default;
 
-  String send_request(CRString endpoint) const;
+  std::string send_request(const std::string &endpoint) const;
 };
 }  // namespace halext
 }  // namespace premia

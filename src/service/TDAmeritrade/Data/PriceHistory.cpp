@@ -6,7 +6,7 @@ PriceHistory::PriceHistory() {
   this->tickerSymbol = "";
   this->initialized = false;
   for (int i = 0; i < 4; i++) {
-    ArrayList<tda::Candle> vector;
+    std::vector<tda::Candle> vector;
     candles.push_back(vector);
   }
 }
@@ -19,31 +19,31 @@ void PriceHistory::addCandleByType(Candle candle, int type) {
   candles[type].push_back(candle);
 }
 
-ArrayList<tda::Candle> PriceHistory::getCandles(int index) {
+std::vector<tda::Candle> PriceHistory::getCandles(int index) {
   return candles[index];
 }
 
 int PriceHistory::getNumCandles(int index) { return candles[index].size(); }
 
-ArrayList<tda::Candle> PriceHistory::getCandleVector() { return candleVector; }
+std::vector<tda::Candle> PriceHistory::getCandleVector() { return candleVector; }
 
-String PriceHistory::getCandleDataVariable(String variable) {
+std::string PriceHistory::getCandleDataVariable(std::string variable) {
   return candleData[variable];
 }
 
-String PriceHistory::getPriceHistoryVariable(String variable) {
+std::string PriceHistory::getPriceHistoryVariable(std::string variable) {
   return priceHistoryVariables[variable];
 }
 
-String PriceHistory::getTickerSymbol() { return tickerSymbol; }
+std::string PriceHistory::getTickerSymbol() { return tickerSymbol; }
 
 bool PriceHistory::getInitialized() { return initialized; }
 
-void PriceHistory::setPriceHistoryVariable(String key, String value) {
+void PriceHistory::setPriceHistoryVariable(std::string key, std::string value) {
   priceHistoryVariables[key] = value;
 }
 
-void PriceHistory::setTickerSymbol(String ticker) {
+void PriceHistory::setTickerSymbol(std::string ticker) {
   this->tickerSymbol = ticker;
 }
 

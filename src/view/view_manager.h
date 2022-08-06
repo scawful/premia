@@ -7,10 +7,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "account/account_view.h"
 #include "metatypes.h"
-#include "view/chart/subview/LinePlotChart.hpp"
+#include "view/account/account_view.h"
 #include "view/chart/chart_view.h"
+#include "view/chart/subview/LinePlotChart.hpp"
 #include "view/console/console_view.h"
 #include "view/core/primary_view.h"
 #include "view/login/login_view.h"
@@ -22,7 +22,7 @@
 namespace premia {
 class ViewManager {
  private:
-  using ViewMap = std::unordered_map<String, std::shared_ptr<View>>;
+  using ViewMap = std::unordered_map<std::string, std::shared_ptr<View>>;
   ImGuiTableFlags viewColumnFlags =
       ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersH |
       ImGuiTableFlags_BordersV | ImGuiTableFlags_Hideable |
@@ -57,7 +57,7 @@ class ViewManager {
   void transferEvents() const;
   void setLoggedIn();
 
-  void addEventHandler(CRString key, const EventHandler& event);
+  void addEventHandler(const std::string& key, const EventHandler& event);
   void setCurrentView(std::shared_ptr<View> newView);
   void update() const;
 };

@@ -7,7 +7,7 @@ namespace premia {
 namespace cbp {
 class Product {
  private:
-  ArrayList<StringMap> accounts_vector;
+  std::vector<std::unordered_map<std::string, std::string>> accounts_vector;
 
   float current_price;
 

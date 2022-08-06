@@ -8,52 +8,52 @@ namespace tda {
 class Watchlist {
  public:
   struct WatchlistInstrument {
-    String symbol;
-    String description;
-    String asset_type;
+    std::string symbol;
+    std::string description;
+    std::string asset_type;
 
-    WatchlistInstrument(CRString sym, CRString desc, CRString type)
+    WatchlistInstrument(const std::string &sym, const std::string &desc, const std::string &type)
         : symbol(sym), description(desc), asset_type(type) {}
 
-    String getSymbol() const { return this->symbol; }
+    std::string getSymbol() const { return this->symbol; }
 
-    String getDescription() const { return this->description; }
+    std::string getDescription() const { return this->description; }
 
-    String getType() const { return this->asset_type; }
+    std::string getType() const { return this->asset_type; }
   };
 
  private:
-  ArrayList<WatchlistInstrument> instruments;
-  StringMap variables;
+  std::vector<WatchlistInstrument> instruments;
+  std::unordered_map<std::string, std::string> variables;
 
   // "name": "string",
   // "watchlistId": "string",
   // "accountId": "string",
   // "status": "'UNCHANGED' or 'CREATED' or 'UPDATED' or 'DELETED'",
-  String name;
+  std::string name;
   unsigned int watchlist_id;
-  String account_id;
+  std::string account_id;
 
  public:
   Watchlist();
 
   int getNumInstruments() const;
 
-  String getName() const;
-  String getInstrumentSymbol(int item_id);
-  String getInstrumentDescription(int item_id);
-  String getInstrumentType(int item_id);
+  std::string getName() const;
+  std::string getInstrumentSymbol(int item_id);
+  std::string getInstrumentDescription(int item_id);
+  std::string getInstrumentType(int item_id);
 
   void setId(int id);
-  void setName(CRString name);
-  void setAccountId(CRString accountId);
-  void setWatchlistVariable(CRString variable);
+  void setName(const std::string &name);
+  void setAccountId(const std::string &accountId);
+  void setWatchlistVariable(const std::string &variable);
 
-  void addVariable(CRString key, CRString value);
-  void addInstrument(CRString symbol, CRString desc, CRString type);
+  void addVariable(const std::string &key, const std::string &value);
+  void addInstrument(const std::string &symbol, const std::string &desc, const std::string &type);
   void removeInstrument(int idx);
 
-  bool containsTicker(String s);
+  bool containsTicker(std::string s);
 };
 }  // namespace tda
 }  // namespace premia

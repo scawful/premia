@@ -6,31 +6,31 @@ namespace premia {
 namespace tda {
 class OptionChain {
  private:
-  StringMap callExpDateMap;
-  StringMap putExpDateMap;
-  StringMap optionChainMap;
-  StringMap underlyingMap;
-  ArrayList<OptionsDateTimeObj> callOptionArray;
-  ArrayList<OptionsDateTimeObj> putOptionArray;
-  ArrayList<OptionsDateTimeObj> optionsDateTimeVector;
+  std::unordered_map<std::string, std::string> callExpDateMap;
+  std::unordered_map<std::string, std::string> putExpDateMap;
+  std::unordered_map<std::string, std::string> optionChainMap;
+  std::unordered_map<std::string, std::string> underlyingMap;
+  std::vector<OptionsDateTimeObj> callOptionArray;
+  std::vector<OptionsDateTimeObj> putOptionArray;
+  std::vector<OptionsDateTimeObj> optionsDateTimeVector;
 
  public:
   OptionChain();
 
-  ArrayList<OptionsDateTimeObj> getCallOptionArray() const;
-  ArrayList<OptionsDateTimeObj> getPutOptionArray() const;
-  ArrayList<OptionsDateTimeObj> getOptionsDateTimeObj() const;
-  String getCallVariable(CRString variable);
-  String getPutVariable(CRString variable);
-  String getOptionChainDataVariable(CRString variable);
-  String getUnderlyingDataVariable(CRString variable);
+  std::vector<OptionsDateTimeObj> getCallOptionArray() const;
+  std::vector<OptionsDateTimeObj> getPutOptionArray() const;
+  std::vector<OptionsDateTimeObj> getOptionsDateTimeObj() const;
+  std::string getCallVariable(const std::string &variable);
+  std::string getPutVariable(const std::string &variable);
+  std::string getOptionChainDataVariable(const std::string &variable);
+  std::string getUnderlyingDataVariable(const std::string &variable);
 
   void addOptionsDateTimeObj(const OptionsDateTimeObj& obj);
   void addOptionsDateTimeObj(const OptionsDateTimeObj& obj, int idx);
-  void setCallVariable(CRString key, CRString value);
-  void setPutVariable(CRString key, CRString value);
-  void setOptionChainVariable(CRString key, CRString value);
-  void setUnderlyingVariable(CRString key, CRString value);
+  void setCallVariable(const std::string &key, const std::string &value);
+  void setPutVariable(const std::string &key, const std::string &value);
+  void setOptionChainVariable(const std::string &key, const std::string &value);
+  void setUnderlyingVariable(const std::string &key, const std::string &value);
 };
 }  // namespace tda
 }  // namespace premia

@@ -18,24 +18,24 @@ namespace cbp {
 class Client {
  private:
   bool sandbox = true;
-  String api_key;
-  String secret_key;
-  String passphrase;
-  String endpoint_url;
+  std::string api_key;
+  std::string secret_key;
+  std::string passphrase;
+  std::string endpoint_url;
 
   unsigned int hash_length;
   std::array<unsigned char, EVP_MAX_MD_SIZE> hash;
 
   static size_t json_write_callback(const char* contents, size_t size,
-                                    size_t nmemb, String* s);
-  String get_server_time() const;
+                                    size_t nmemb, std::string* s);
+  std::string get_server_time() const;
 
  public:
   Client();
   ~Client();
 
-  String send_request(CRString request);
-  void send_request(String request, String method, String body);
+  std::string send_request(const std::string &request);
+  void send_request(std::string request, std::string method, std::string body);
 };
 }  // namespace cbp
 }  // namespace premia

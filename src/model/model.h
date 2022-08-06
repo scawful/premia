@@ -16,7 +16,7 @@ class Model {
   ~Model() = default;
 
   void addLogger(const Logger& logger);
-  void addEventHandler(CRString key, const EventHandler& handler);
+  void addEventHandler(const std::string &key, const EventHandler& handler);
 
   Logger& getLogger();
 };

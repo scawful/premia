@@ -21,8 +21,8 @@ class IEX {
     return instance;
   }
 
-  auto getFundOwnership(String symbol) -> ArrayList<FundOwnership> const {
-    String response = client.get_fund_ownership(symbol);
+  auto getFundOwnership(std::string symbol) -> std::vector<FundOwnership> const {
+    std::string response = client.get_fund_ownership(symbol);
     return parser.parse_fund_ownership(response);
   }
 };

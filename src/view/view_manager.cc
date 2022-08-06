@@ -107,7 +107,7 @@ void ViewManager::transferEvents() const {
 
 void ViewManager::setLoggedIn() { isLoggedIn = true; }
 
-void ViewManager::addEventHandler(CRString key, const EventHandler& event) {
+void ViewManager::addEventHandler(const std::string &key, const EventHandler& event) {
   events[key] = event;
   menuView->addEvent(key, event);
   if (!isLoggedIn) {

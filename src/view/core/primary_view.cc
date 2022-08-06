@@ -106,13 +106,13 @@ void PrimaryView::drawInfoPane() {
 
 void PrimaryView::drawScreen() { drawInfoPane(); }
 
-String PrimaryView::getName() { return "Overview"; }
+std::string PrimaryView::getName() { return "Overview"; }
 
 void PrimaryView::addLogger(const Logger& newLogger) {
   this->logger = newLogger;
 }
 
-void PrimaryView::addEvent(CRString key, const EventHandler& event) {
+void PrimaryView::addEvent(const std::string &key, const EventHandler& event) {
   this->events[key] = event;
 }
 

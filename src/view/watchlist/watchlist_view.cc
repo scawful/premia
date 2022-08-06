@@ -55,7 +55,7 @@ void WatchlistView::drawWatchlistTable() {
     model.setOpenList(watchlistIndex);
   }
 
-  static String addText;
+  static std::string addText;
   ImGui::SameLine();
 
   // Edit watchlist button/menu/popup thing
@@ -147,7 +147,7 @@ void WatchlistView::drawWatchlistTable() {
     while (clipper.Step()) {
       bool selected = false;
       for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
-        String symbol =
+        std::string symbol =
             model.getWatchlist(watchlistIndex).getInstrumentSymbol(row);
         auto symChar = symbol.c_str();
         ImGui::TableNextRow();
@@ -202,7 +202,7 @@ void WatchlistView::drawWatchlistTable() {
     // Right click entry menu
     if (ImGui::BeginPopupContextItem("rowSelectPopup")) {
       if (ImGui::MenuItem("Delete") && selectedRow != -1) {
-        String symbol =
+        std::string symbol =
             model.getWatchlist(watchlistIndex).getInstrumentSymbol(selectedRow);
         auto symChar = symbol.c_str();
         printf("delete-Selected %s\n", symChar);
@@ -219,13 +219,13 @@ void WatchlistView::drawWatchlistTable() {
   }
 }
 
-String WatchlistView::getName() { return "Watchlists"; }
+std::string WatchlistView::getName() { return "Watchlists"; }
 
 void WatchlistView::addLogger(const Logger &newLogger) {
   this->logger = newLogger;
 }
 
-void WatchlistView::addEvent(CRString key, const EventHandler &event) {
+void WatchlistView::addEvent(const std::string &key, const EventHandler &event) {
   this->events[key] = event;
 }
 

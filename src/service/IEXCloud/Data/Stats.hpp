@@ -7,7 +7,7 @@ namespace premia {
 namespace iex {
 class Stats {
  private:
-  String companyName;  // Company name of the security
+  std::string companyName;  // Company name of the security
   double marketcap;    // Market cap of the security calculated as shares
                        // outstanding * previous day close.
   double week52high;   // Highest fully adjusted price observed during trading
@@ -34,10 +34,10 @@ class Stats {
                          // is represented as a percentage calculated as
                          // (ttmDividendRate) / (previous day close price)
                          // Investopedia
-  String nextDividendDate;  //	Announced ex date of the next dividend
-  String exDividendDate;    // Ex date of the last dividend
-  String nextEarningsDate;
-  ;                // 	CRString 	Announced next earnings report date
+  std::string nextDividendDate;  //	Announced ex date of the next dividend
+  std::string exDividendDate;    // Ex date of the last dividend
+  std::string nextEarningsDate;
+  ;                // 	const std::string &	Announced next earnings report date
   double peRatio;  // 	number 	Price to earnings ratio calculated as (previous
                    // day close price) / (ttmEPS).
   // Note: This endpoint is calculated on a trailing twelve month basis.

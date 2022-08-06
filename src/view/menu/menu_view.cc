@@ -139,7 +139,7 @@ void MenuView::drawAnalyzeMenu() const {
 }
 
 void MenuView::drawColumnOptions(int x) const {
-  String column = "LeftCol";
+  std::string column = "LeftCol";
   if (x) column = "RightCol";
 
   if (ImGui::MenuItem("Option Chain")) {
@@ -245,11 +245,11 @@ void MenuView::drawScreen() {
   }
 }
 
-String MenuView::getName() { return "Menu"; }
+std::string MenuView::getName() { return "Menu"; }
 
 void MenuView::addLogger(const Logger& newLogger) { this->logger = newLogger; }
 
-void MenuView::addEvent(CRString key, const EventHandler& event) {
+void MenuView::addEvent(const std::string &key, const EventHandler& event) {
   this->events[key] = event;
 }
 

@@ -24,7 +24,7 @@ class HLXT {
     return instance;
   }
 
-  auto getSqueezeMetricsData() const -> String {
+  auto getSqueezeMetricsData() const -> std::string {
     return client.send_request(
         "https://squeezemetrics.com/monitor/download/SPX.csv");
   }

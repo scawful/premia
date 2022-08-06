@@ -22,7 +22,7 @@ static size_t json_write(const char *contents, size_t size, size_t nmemb,
   return new_length;
 }
 
-String Client::current_endpoint() {
+std::string Client::current_endpoint() {
   if (sandbox_mode)
     return this->sandbox_endpoint;
   else
@@ -40,12 +40,12 @@ Client::Client() {
  * @brief
  *
  * @param endpoint
- * @return String
+ * @return std::string
  */
-String Client::send_request(String endpoint) {
+std::string Client::send_request(std::string endpoint) {
   CURL *curl;
   CURLcode res;
-  String response;
+  std::string response;
 
   curl = curl_easy_init();
   if (curl) {
@@ -66,17 +66,17 @@ String Client::send_request(String endpoint) {
  * @brief
  *
  * @param endpoint
- * @return String
+ * @return std::string
  */
-String Client::send_authorized_request(String endpoint) {
+std::string Client::send_authorized_request(std::string endpoint) {
   CURL *curl;
   CURLcode res;
-  String response;
+  std::string response;
 
   curl = curl_easy_init();
   if (curl) {
     struct curl_slist *headers = NULL;
-    String auth_bearer = "Authorization: Bearer " + api_key;
+    std::string auth_bearer = "Authorization: Bearer " + api_key;
     headers = curl_slist_append(headers, auth_bearer.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
@@ -93,14 +93,14 @@ String Client::send_authorized_request(String endpoint) {
   return response;
 }
 
-String Client::get_fund_ownership(String symbol) {
-  String endpoint = current_endpoint() + "stock/" + symbol +
+std::string Client::get_fund_ownership(std::string symbol) {
+  std::string endpoint = current_endpoint() + "stock/" + symbol +
                     "/fund-ownership/" + token_parameter;
   return send_request(endpoint);
 }
 
-String Client::get_insider_transactions(String symbol) {
-  String endpoint = current_endpoint() + "stock/" + symbol +
+std::string Client::get_insider_transactions(std::string symbol) {
+  std::string endpoint = current_endpoint() + "stock/" + symbol +
                     "/insider-transactions/" + token_parameter;
   return send_request(endpoint);
 }

@@ -7,7 +7,7 @@ namespace premia {
 using namespace halext;
 
 static size_t json_write_callback(const char *contents, size_t size,
-                                  size_t nmemb, String *s) {
+                                  size_t nmemb, std::string *s) {
   size_t new_length = size * nmemb;
   try {
     s->append(contents, new_length);
@@ -18,10 +18,10 @@ static size_t json_write_callback(const char *contents, size_t size,
   return new_length;
 }
 
-String Client::send_request(CRString endpoint) const {
+std::string Client::send_request(const std::string &endpoint) const {
   CURL *curl;
   CURLcode res;
-  String response;
+  std::string response;
 
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());

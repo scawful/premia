@@ -13,29 +13,29 @@ class AccountView : public View {
   EventMap events;
   Logger logger;
   // -----------------------------
-  ArrayList<String> account_ids_std;
-  ArrayList<const char*> account_ids;
-  String default_account;
+  std::vector<std::string> account_ids_std;
+  std::vector<const char*> account_ids;
+  std::string default_account;
 
-  std::unordered_map<String, tda::Quote> quotes;
+  std::unordered_map<std::string, tda::Quote> quotes;
 
   tda::Account account_data;
-  ArrayList<String> positions_vector;
+  std::vector<std::string> positions_vector;
 
   void initPositions();
-  void load_account(CRString account);
+  void load_account(const std::string &account);
   void load_all_accounts();
-  void draw_symbol_string(CRString symbol);
-  void draw_balance_string(CRString variable);
+  void draw_symbol_string(const std::string &symbol);
+  void draw_balance_string(const std::string &variable);
   void draw_positions();
 
   // ------------------------------
   void drawAccountPane();
 
  public:
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString key, const EventHandler& event) override;
+  void addEvent(const std::string &key, const EventHandler& event) override;
   void update() override;
 
  private:

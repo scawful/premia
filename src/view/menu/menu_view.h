@@ -33,9 +33,9 @@ class MenuView : public View {
   void drawScreen();
 
  public:
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString, const EventHandler&) override;
+  void addEvent(const std::string &, const EventHandler&) override;
   void update() override;
 };
 }  // namespace premia

@@ -13,20 +13,20 @@ class Order {
  private:
   struct OrderLegCollection {
     int quantity;
-    String symbol;
-    String assetType;
-    String instruction;
+    std::string symbol;
+    std::string assetType;
+    std::string instruction;
   };
 
-  String orderType;
-  String price;
-  String session;
-  String duration;
-  String orderStrategyType;
-  String complexOrderStrategyType;
-  ArrayList<OrderLegCollection> orderLegCollection;
+  std::string orderType;
+  std::string price;
+  std::string session;
+  std::string duration;
+  std::string orderStrategyType;
+  std::string complexOrderStrategyType;
+  std::vector<OrderLegCollection> orderLegCollection;
 
-  String orderJSON;
+  std::string orderJSON;
 
   void prepareOrderString() const;
 
@@ -34,12 +34,12 @@ class Order {
   Order();
   ~Order();
 
-  String getString() const;
-  String getOrderType() const;
-  String getSession() const;
-  String getDuration() const;
-  String getOrderStrategyType() const;
-  String getPrice() const;
+  std::string getString() const;
+  std::string getOrderType() const;
+  std::string getSession() const;
+  std::string getDuration() const;
+  std::string getOrderStrategyType() const;
+  std::string getPrice() const;
 };
 
 // Buy Market: Stock

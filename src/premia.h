@@ -3,6 +3,10 @@
 
 #include "metatypes.h"
 
+#if defined(_WIN32)
+#define main SDL_main
+#endif
+
 namespace premia {
 
 /**

@@ -17,7 +17,7 @@ namespace premia {
  * @param x
  * @return int
  */
-int CandleChart::binary_search(const ArrayList<double>& arr, int l, int r,
+int CandleChart::binary_search(const std::vector<double>& arr, int l, int r,
                                double x) {
   if (r >= l) {
     int mid = l + (r - l) / 2;
@@ -169,7 +169,7 @@ void CandleChart::drawCandleChart() {
   }
 }
 
-void CandleChart::fetchData(CRString ticker, tda::PeriodType ptype,
+void CandleChart::fetchData(const std::string &ticker, tda::PeriodType ptype,
                             int period_amt, tda::FrequencyType ftype,
                             int freq_amt, bool ext) {
   model->fetchPriceHistory(ticker, ptype, period_amt, ftype, freq_amt, ext);

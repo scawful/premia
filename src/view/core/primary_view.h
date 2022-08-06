@@ -9,15 +9,15 @@ class PrimaryView : public View {
  private:
   Logger logger;
   std::shared_ptr<View> menuView = std::make_shared<MenuView>();
-  std::unordered_map<String, EventHandler> events;
+  std::unordered_map<std::string, EventHandler> events;
 
   void drawInfoPane();
   void drawScreen();
 
  public:
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString key, const EventHandler& event) override;
+  void addEvent(const std::string &key, const EventHandler& event) override;
   void update() override;
 };
 }  // namespace premia

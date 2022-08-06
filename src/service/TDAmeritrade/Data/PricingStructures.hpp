@@ -16,12 +16,12 @@ struct Candle {
   double low;
   double open;
   double close;
-  String datetime;
+  std::string datetime;
   time_t raw_datetime;
 };
 
 struct OptionsContract {
-  String putCall;
+  std::string putCall;
   double bid;
   double ask;
   double bidSize;
@@ -38,14 +38,14 @@ struct OptionsContract {
 };
 
 struct StrikePriceMap {
-  String strikePrice;
-  StringMap raw_option;
-  std::unordered_map<String, OptionsContract> options;
+  std::string strikePrice;
+  std::unordered_map<std::string, std::string> raw_option;
+  std::unordered_map<std::string, OptionsContract> options;
 };
 
 struct OptionsDateTimeObj {
-  String datetime;
-  ArrayList<StrikePriceMap> strikePriceObj;
+  std::string datetime;
+  std::vector<StrikePriceMap> strikePriceObj;
 };
 
 enum PeriodType { DAY, MONTH, YEAR, YTD };

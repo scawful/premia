@@ -4,11 +4,11 @@ using namespace tda;
 
 Quote::Quote() = default;
 
-void Quote::setQuoteVariable(CRString key, CRString value) {
+void Quote::setQuoteVariable(const std::string &key, const std::string &value) {
   quoteVariables[key] = value;
 }
 
-String Quote::getQuoteVariable(CRString variable) {
+std::string Quote::getQuoteVariable(const std::string &variable) {
   return quoteVariables[variable];
 }
 

@@ -7,7 +7,7 @@ size_t tda::Account::get_position_vector_size() {
   return positions_vector.size();
 }
 
-void Account::add_position(StringMap position) {
+void Account::add_position(std::unordered_map<std::string, std::string> position) {
   positions_vector.push_back(position);
 }
 
@@ -15,11 +15,11 @@ void Account::add_balance(PositionBalances balance) {
   position_balances.push_back(balance);
 }
 
-void Account::set_account_variable(String key, String value) {
+void Account::set_account_variable(std::string key, std::string value) {
   account_info[key] = value;
 }
 
-void Account::set_balance_variable(String key, String value) {
+void Account::set_balance_variable(std::string key, std::string value) {
   if (!current_balances.count(key)) {
     current_balances[key] = value;
   } else {
@@ -28,7 +28,7 @@ void Account::set_balance_variable(String key, String value) {
       num = boost::lexical_cast<double>(value);
       double balance = boost::lexical_cast<double>(current_balances[key]);
       num += balance;
-      String newEntry = std::to_string(num);
+      std::string newEntry = std::to_string(num);
       current_balances[key] = newEntry.substr(0, newEntry.find('.') + 3);
     } catch (const boost::wrapexcept<boost::bad_lexical_cast>& e) {
       // it's fine
@@ -37,22 +37,22 @@ void Account::set_balance_variable(String key, String value) {
   }
 }
 
-void Account::set_primary_account_id(CRString key) { account_id = key; }
+void Account::set_primary_account_id(const std::string &key) { account_id = key; }
 
-String tda::Account::get_account_variable(String variable) {
+std::string tda::Account::get_account_variable(std::string variable) {
   return account_info[variable];
 }
 
-String tda::Account::get_balance_variable(String variable) {
+std::string tda::Account::get_balance_variable(std::string variable) {
   return current_balances[variable];
 }
 
-StringMap tda::Account::get_position(int index) {
+std::unordered_map<std::string, std::string> tda::Account::get_position(int index) {
   return positions_vector[index];
 }
 
-String tda::Account::get_position_balances(String symbol, String variable) {
-  String found_item;
+std::string tda::Account::get_position_balances(std::string symbol, std::string variable) {
+  std::string found_item;
   for (int i = 0; i < position_balances.size(); i++) {
     if (position_balances[i].symbol == symbol) {
       found_item = position_balances[i].balances[variable];

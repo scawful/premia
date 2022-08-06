@@ -8,19 +8,19 @@ namespace iex {
 // transaction, if available
 // directIndirect 	            letter 	(D)irect or (I)ndirect
 // effectiveDate 	            number 	Effective date of the
-// transaction. filingDate 	                CRString 	Date the
+// transaction. filingDate 	                const std::string &	Date the
 // transaction was filed with the SEC.
-// fullName 	                CRString 	Full name of the individual. This
+// fullName 	                const std::string &	Full name of the individual. This
 // field concatenates the individuals First Name, Middle Name, Last Name and
 // Suffix. is10b51 	                    boolean 	Whether the transaction
 // was executed under Rule 10b5-1. Rule 10b5-1 allows company insiders to make
 // predetermined trades while following insider trading laws and avoiding
 // insider trading accusations. Learn more. postShares number 	The reported
-// number of shares held after the transaction. reportedTitle CRString Insiders
-// job title per the sourced filing if available symbol CRString
+// number of shares held after the transaction. reportedTitle const std::string &Insiders
+// job title per the sourced filing if available symbol CRstd::string
 // Associated ticker or symbol
 // transactionCode 	            letter 	Transaction Codes
-// transactionDate 	            CRString 	Date the transaction was
+// transactionDate 	            const std::string &	Date the transaction was
 // executed transactionPrice 	        number 	As-reported (unadjusted) unit
 // price at which shares were acquired or disposed, represented in USD.
 // transactionShares 	        number 	As-reported (unadjusted) number of
@@ -41,14 +41,14 @@ class InsiderTransactions {
   double conversionOrExercisePrice;
   char directIndirect;
   double effectiveDate;
-  String filingDate;
-  String fullName;
+  std::string filingDate;
+  std::string fullName;
   bool is10b51;
   double postShares;
-  String reportedTitle;
-  String symbol;
+  std::string reportedTitle;
+  std::string symbol;
   char transactionCode;
-  String transactionDate;
+  std::string transactionDate;
   double transactionPrice;
   double transactionShares;
   double transactionValue;
@@ -86,8 +86,8 @@ class InsiderTransactions {
   double getPostShares() const { return postShares; }
   void setPostShares(double postShares_) { postShares = postShares_; }
 
-  String getFullName() const { return fullName; }
-  void setFullName(CRString fullName_) { fullName = fullName_; }
+  std::string getFullName() const { return fullName; }
+  void setFullName(const std::string &fullName_) { fullName = fullName_; }
 
   double getConversionOrExercisePrice() const {
     return conversionOrExercisePrice;

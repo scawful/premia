@@ -1,25 +1,27 @@
 #include "Client.hpp"
 
-#include "Data/Order.hpp"
-#include "Data/UserPrincipals.hpp"
-#include "metatypes.h"
-#include "Parser.hpp"
-#include "Socket.hpp"
-#include "util.h"
-
+#include <boost/asio.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/asio/thread_pool.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/websocket.hpp>
 #include <boost/beast/websocket/ssl.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/asio/thread_pool.hpp>
-#include <boost/asio/post.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <string>
+#include <vector>
+
+#include "Data/Order.hpp"
+#include "Data/UserPrincipals.hpp"
+#include "Parser.hpp"
+#include "Socket.hpp"
+#include "metatypes.h"
+#include "util.h"
 
 namespace premia {
 
@@ -37,16 +39,16 @@ static size_t json_write(const char *contents, size_t size, size_t nmemb,
 
 using namespace tda;
 
-String Client::get_api_interval_value(int value) const {
+std::string Client::get_api_interval_value(int value) const {
   return EnumAPIValues[value];
 }
-String Client::get_api_frequency_type(int value) const {
+std::string Client::get_api_frequency_type(int value) const {
   return EnumAPIFreq[value];
 }
-String Client::get_api_period_amount(int value) const {
+std::string Client::get_api_period_amount(int value) const {
   return EnumAPIPeriod[value];
 }
-String Client::get_api_frequency_amount(int value) const {
+std::string Client::get_api_frequency_amount(int value) const {
   return EnumAPIFreqAmt[value];
 }
 
@@ -54,12 +56,12 @@ String Client::get_api_frequency_amount(int value) const {
  * @brief Send a request for data from the API using the json callback
  *
  * @param endpoint
- * @return String
+ * @return std::string
  */
-String Client::send_request(CRString endpoint) const {
+std::string Client::send_request(const std::string &endpoint) const {
   CURL *curl;
   CURLcode res;
-  String response;
+  std::string response;
 
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
@@ -83,14 +85,14 @@ String Client::send_request(CRString endpoint) const {
  * @author @scawful
  *
  * @param endpoint
- * @return String
+ * @return std::string
  */
-String Client::send_authorized_request(CRString endpoint) const {
+std::string Client::send_authorized_request(const std::string &endpoint) const {
   CURL *curl;
   CURLcode res;
   CURLHeader headers = nullptr;
-  String response;
-  String auth_bearer = "Authorization: Bearer " + access_token;
+  std::string response;
+  std::string auth_bearer = "Authorization: Bearer " + access_token;
 
   curl = curl_easy_init();
   headers = curl_slist_append(headers, auth_bearer.c_str());
@@ -117,27 +119,29 @@ String Client::send_authorized_request(CRString endpoint) const {
  * @param endpoint
  * @param data
  */
-void Client::post_authorized_request(CRString endpoint, CRString data) const {
+void Client::post_authorized_request(const std::string &endpoint,
+                                     const std::string &data) const {
   CURL *curl;
   CURLcode res;
   CURLHeader headers = nullptr;
-  String response;
+  std::string response;
 
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
   curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
 
-  String auth_bearer = "Authorization: Bearer " + access_token;
+  std::string auth_bearer = "Authorization: Bearer " + access_token;
   curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
   curl_slist_append(headers, auth_bearer.c_str());
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
 
-  String easy_escape = curl_easy_escape(
+  std::string easy_escape = curl_easy_escape(
       curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-  String data_post = "grant_type=refresh_token&refresh_token=" + easy_escape +
-                     "&client_id=" + api_key;
+  std::string data_post =
+      "grant_type=refresh_token&refresh_token=" + easy_escape +
+      "&client_id=" + api_key;
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
@@ -157,13 +161,13 @@ void Client::post_authorized_request(CRString endpoint, CRString data) const {
  * the access token
  * @author @scawful
  *
- * @return String
+ * @return std::string
  */
-String Client::post_access_token() const {
+std::string Client::post_access_token() const {
   CURL *curl;
   CURLcode res;
   CURLHeader headers = nullptr;
-  String response;
+  std::string response;
 
   curl = curl_easy_init();
 
@@ -179,10 +183,11 @@ String Client::post_access_token() const {
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
   // specify post data, have to url encode the refresh token
-  String easy_escape = curl_easy_escape(
+  std::string easy_escape = curl_easy_escape(
       curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
-  String data_post = "grant_type=refresh_token&refresh_token=" + easy_escape +
-                     "&client_id=" + api_key;
+  std::string data_post =
+      "grant_type=refresh_token&refresh_token=" + easy_escape +
+      "&client_id=" + api_key;
 
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
@@ -207,10 +212,10 @@ String Client::post_access_token() const {
  *        Parse and store in UserPrincipals object for local use
  */
 void Client::get_user_principals() {
-  String endpoint =
+  std::string endpoint =
       "https://api.tdameritrade.com/v1/"
       "userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
-  String response = send_authorized_request(endpoint);
+  std::string response = send_authorized_request(endpoint);
   _user_principals = parser.read_response(response);
   user_principals = parser.parse_user_principals(_user_principals);
   has_user_principals = true;
@@ -247,19 +252,19 @@ json::ptree Client::create_login_request() {
   credentials.put("cddomain", account_data["accountCdDomainId"]);
   credentials.put("userid", account_data["accountId"]);
   credentials.put("usergroup",
-                  _user_principals.get<String>(
+                  _user_principals.get<std::string>(
                       json::ptree::path_type("streamerInfo.userGroup")));
   credentials.put("accesslevel",
-                  _user_principals.get<String>(
+                  _user_principals.get<std::string>(
                       json::ptree::path_type("streamerInfo.accessLevel")));
   credentials.put("authorized", "Y");
-  credentials.put("acl", _user_principals.get<String>(
+  credentials.put("acl", _user_principals.get<std::string>(
                              json::ptree::path_type("streamerInfo.acl")));
 
   std::tm token_timestamp =
       {};  // token timestamp format :: 2021-08-10T14:57:11+0000
   std::string original_token_timestamp =
-      _user_principals.get<String>("streamerInfo.tokenTimestamp");
+      _user_principals.get<std::string>("streamerInfo.tokenTimestamp");
 
   // remove 'T' character
   std::size_t found = original_token_timestamp.find('T');
@@ -289,17 +294,17 @@ json::ptree Client::create_login_request() {
     credentials.put("timestamp", millis);
   }
 
-  credentials.put("appid", _user_principals.get<String>(
+  credentials.put("appid", _user_principals.get<std::string>(
                                json::ptree::path_type("streamerInfo.appId")));
 
-  String credential_str;  // format parameters
+  std::string credential_str;  // format parameters
   for (const auto &[key, value] : (json::ptree)credentials) {
-    credential_str += key + "%3D" + value.get_value<String>() + "%26";
+    credential_str += key + "%3D" + value.get_value<std::string>() + "%26";
   }
   std::size_t end = credential_str.size();
   credential_str.replace(end - 3, 3, "");
 
-  parameters.put("token", _user_principals.get<String>(
+  parameters.put("token", _user_principals.get<std::string>(
                               json::ptree::path_type("streamerInfo.token")));
   parameters.put("version", "1.0");
   parameters.put("credential", credential_str);
@@ -315,21 +320,22 @@ json::ptree Client::create_logout_request() {
   requests.put("requestid", 3);
   requests.put("command", "LOGOUT");
   requests.put("account", account_data["accountId"]);
-  requests.put("source", _user_principals.get<String>(
+  requests.put("source", _user_principals.get<std::string>(
                              json::ptree::path_type("streamerInfo.appId")));
   requests.add_child("parameters", parameters);
   return requests;
 }
 
-json::ptree Client::create_service_request(ServiceType type, CRString keys,
-                                           CRString fields) {
+json::ptree Client::create_service_request(ServiceType type,
+                                           const std::string &keys,
+                                           const std::string &fields) {
   json::ptree requests;
   json::ptree parameters;
   requests.put("service", EnumAPIServiceName[type]);
   requests.put("requestid", 2);
   requests.put("command", "SUBS");
   requests.put("account", account_data["accountId"]);
-  requests.put("source", _user_principals.get<String>(
+  requests.put("source", _user_principals.get<std::string>(
                              json::ptree::path_type("streamerInfo.appId")));
   parameters.put("keys", keys);
   parameters.put("fields", fields);
@@ -351,15 +357,17 @@ void Client::api_login() {
  * @param ticker
  * @param fields
  */
-void Client::start_session(Logger logger, CRString ticker) {
-  String host;
-  String port = "443";
-  String all_requests;
+void Client::start_session(Logger logger, const std::string &ticker) {
+  std::string host;
+  std::string port = "443";
+  std::string all_requests;
   json::ptree requests;
   std::stringstream requests_text_stream;
-  ArrayList<json::ptree> requests_array;
+  std::vector<json::ptree> requests_array;
 
-  Try { host = _user_principals.get<String>("streamerInfo.streamerSocketUrl"); }
+  Try {
+    host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
+  }
   catch (const json::ptree_error &) {
     logger(
         "Client::start_session::ptree_bad_path@[streamerInfo."
@@ -387,7 +395,7 @@ void Client::send_logout_request() {
   json::ptree logout_request = create_logout_request();
   std::stringstream logout_text_stream;
   json::write_json(logout_text_stream, logout_request);
-  String logout_text = logout_text_stream.str();
+  std::string logout_text = logout_text_stream.str();
   websocket_session->write(logout_text);
   websocket_session->close();
 }
@@ -406,11 +414,11 @@ void Client::fetch_access_token() {
  *        Return the API response after authorization
  *
  * @param account_id
- * @return String
+ * @return std::string
  */
-String Client::get_account(CRString account_id) {
+std::string Client::get_account(const std::string &account_id) {
   check_user_principals();
-  String account_url =
+  std::string account_url =
       "https://api.tdameritrade.com/v1/accounts/"
       "{accountNum}?fields=positions,orders";
   Utils::string_replace(account_url, "{accountNum}", account_id);
@@ -420,11 +428,11 @@ String Client::get_account(CRString account_id) {
 /**
  * @brief Get all account data as a response
  *
- * @return String
+ * @return std::string
  */
-String Client::get_all_accounts() {
+std::string Client::get_all_accounts() {
   check_user_principals();
-  String account_url =
+  std::string account_url =
       "https://api.tdameritrade.com/v1/accounts/?fields=positions,orders";
   return send_authorized_request(account_url);
 }
@@ -432,10 +440,10 @@ String Client::get_all_accounts() {
 /**
  * @brief Create a vector of all the account ids present on the API key
  *
- * @return StringList
+ * @return std::vector<std::string>
  */
-StringList Client::get_all_account_ids() {
-  StringList accounts;
+std::vector<std::string> Client::get_all_account_ids() {
+  std::vector<std::string> accounts;
   api_login();
 
   for (const auto &[key, value] : _user_principals) {
@@ -450,9 +458,9 @@ StringList Client::get_all_account_ids() {
     }
 
     if (key == "primaryAccountId") {
-      std::cout << "Here" << value.get_value<String>() << std::endl
+      std::cout << "Here" << value.get_value<std::string>() << std::endl
                 << std::flush;
-      accounts.push_back(value.get_value<String>());
+      accounts.push_back(value.get_value<std::string>());
     }
   }
 
@@ -464,10 +472,10 @@ StringList Client::get_all_account_ids() {
  *        Return the API response
  *
  * @param symbol
- * @return String
+ * @return std::string
  */
-String Client::get_quote(CRString symbol) const {
-  String url =
+std::string Client::get_quote(const std::string &symbol) const {
+  std::string url =
       "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" +
       api_key;
   Utils::string_replace(url, "{ticker}", symbol);
@@ -479,10 +487,11 @@ String Client::get_quote(CRString symbol) const {
  *        Return the API response
  *
  * @param account_id
- * @return String
+ * @return std::string
  */
-String Client::get_watchlist_by_account(CRString account_id) const {
-  String url =
+std::string Client::get_watchlist_by_account(
+    const std::string &account_id) const {
+  std::string url =
       "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
   Utils::string_replace(url, "{accountNum}", account_id);
   return send_authorized_request(url);
@@ -498,12 +507,13 @@ String Client::get_watchlist_by_account(CRString account_id) const {
  * @param ftype
  * @param freq_amt
  * @param ext
- * @return String
+ * @return std::string
  */
-String Client::get_price_history(CRString symbol, PeriodType ptype,
-                                 int period_amt, FrequencyType ftype,
-                                 int freq_amt, bool ext) const {
-  String url =
+std::string Client::get_price_history(const std::string &symbol,
+                                      PeriodType ptype, int period_amt,
+                                      FrequencyType ftype, int freq_amt,
+                                      bool ext) const {
+  std::string url =
       "https://api.tdameritrade.com/v1/marketdata/{ticker}/"
       "pricehistory?apikey=" +
       api_key +
@@ -536,14 +546,15 @@ String Client::get_price_history(CRString symbol, PeriodType ptype,
  * @param range
  * @param expMonth
  * @param optionType
- * @return String
+ * @return std::string
  */
-String Client::get_option_chain(CRString ticker, CRString contractType,
-                                CRString strikeCount, bool includeQuotes,
-                                CRString strategy, CRString range,
-                                CRString expMonth, CRString optionType) const {
+std::string Client::get_option_chain(
+    const std::string &ticker, const std::string &contractType,
+    const std::string &strikeCount, bool includeQuotes,
+    const std::string &strategy, const std::string &range,
+    const std::string &expMonth, const std::string &optionType) const {
   OptionChain option_chain;
-  String url =
+  std::string url =
       "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + api_key +
       "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&"
       "includeQuotes={includeQuotes}&strategy={strategy}&range={range}&"
@@ -570,10 +581,11 @@ String Client::get_option_chain(CRString ticker, CRString contractType,
  *
  * @param account_id
  * @param order_id
- * @return String
+ * @return std::string
  */
-String Client::get_order(CRString account_id, CRString order_id) const {
-  String endpoint =
+std::string Client::get_order(const std::string &account_id,
+                              const std::string &order_id) const {
+  std::string endpoint =
       "https://api.tdameritrade.com/v1/accounts/{accountId}/orders/{orderId}";
   Utils::string_replace(endpoint, "{accountId}", account_id);
   Utils::string_replace(endpoint, "{orderId}", order_id);
@@ -588,12 +600,13 @@ String Client::get_order(CRString account_id, CRString order_id) const {
  * @param fromEnteredTime
  * @param toEnteredTime
  * @param status
- * @return String
+ * @return std::string
  */
-String Client::get_orders_by_query(CRString account_id, int maxResults,
-                                   double fromEnteredTime, double toEnteredTime,
-                                   OrderStatus status) const {
-  String endpoint =
+std::string Client::get_orders_by_query(const std::string &account_id,
+                                        int maxResults, double fromEnteredTime,
+                                        double toEnteredTime,
+                                        OrderStatus status) const {
+  std::string endpoint =
       "https://api.tdameritrade.com/v1/accounts/{accountId}/"
       "orders?maxResults={maxResults}&fromEnteredTime={from}&toEnteredTime={to}"
       "&status={status}";
@@ -611,8 +624,9 @@ String Client::get_orders_by_query(CRString account_id, int maxResults,
  * @param account_id
  * @param order
  */
-void Client::place_order(CRString account_id, const Order &order) const {
-  String endpoint =
+void Client::place_order(const std::string &account_id,
+                         const Order &order) const {
+  std::string endpoint =
       "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
   Utils::string_replace(endpoint, "{accountId}", account_id);
   post_authorized_request(endpoint, order.getString());
@@ -624,8 +638,9 @@ void Client::place_order(CRString account_id, const Order &order) const {
  * @param key
  * @param token
  */
-void Client::addAuth(CRString key, CRString token) {
+void Client::addAuth(const std::string &key, const std::string &token) {
   api_key = key;
   refresh_token = token;
 }
+
 }  // namespace premia

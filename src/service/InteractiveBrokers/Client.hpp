@@ -214,7 +214,7 @@ class Client : public EWrapper {
 
   OrderId m_orderId;
   bool m_extraAuth;
-  String m_bboExchange;
+  std::string m_bboExchange;
   std::unique_ptr<EReader> m_pReader;
 };
 

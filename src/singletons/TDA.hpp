@@ -31,7 +31,7 @@ class TDA {
     return instance;
   }
 
-  auto authUser(CRString key, CRString token) -> void {
+  auto authUser(const std::string &key, const std::string &token) -> void {
     if (!key.empty() && !token.empty()) {
       client.addAuth(key, token);
       auth = true;
@@ -40,62 +40,62 @@ class TDA {
 
   auto isAuth() const -> bool { return auth; }
 
-  auto getQuote(CRString symbol) const -> Quote {
-    String response = client.get_quote(symbol);
+  auto getQuote(const std::string &symbol) const -> Quote {
+    std::string response = client.get_quote(symbol);
     return parser.parse_quote(parser.read_response(response));
   }
 
-  auto getAccount(CRString accountNumber) -> Account {
-    String response = client.get_account(accountNumber);
+  auto getAccount(const std::string &accountNumber) -> Account {
+    std::string response = client.get_account(accountNumber);
     return parser.parse_account(parser.read_response(response));
   }
 
   auto getAllAccounts() -> Account {
-    String response = client.get_all_accounts();
+    std::string response = client.get_all_accounts();
     return parser.parse_all_accounts(parser.read_response(response));
   }
 
-  auto getPriceHistory(CRString ticker, PeriodType periodType,
+  auto getPriceHistory(const std::string &ticker, PeriodType periodType,
                        FrequencyType frequencyType, int periodAmount,
                        int frequencyAmount, bool extendedHoursTrading) const
       -> PriceHistory {
-    String response = client.get_price_history(ticker, periodType, periodAmount,
+    std::string response = client.get_price_history(ticker, periodType, periodAmount,
                                                frequencyType, frequencyAmount,
                                                extendedHoursTrading);
     return parser.parse_price_history(parser.read_response(response), ticker,
                                       frequencyType);
   }
 
-  auto getOptionChain(CRString ticker, CRString strikeCount, CRString strategy,
-                      CRString range, CRString expMonth,
-                      CRString optionType) const -> OptionChain {
-    String response =
+  auto getOptionChain(const std::string &ticker, const std::string &strikeCount, const std::string &strategy,
+                      const std::string &range, const std::string &expMonth,
+                      const std::string &optionType) const -> OptionChain {
+    std::string response =
         client.get_option_chain(ticker, "ALL", strikeCount, true, strategy,
                                 range, expMonth, optionType);
     return parser.parse_option_chain(parser.read_response(response));
   }
 
-  auto getWatchlistsByAccount(CRString account_num) const -> Watchlists {
-    String response = client.get_watchlist_by_account(account_num);
+  auto getWatchlistsByAccount(const std::string &account_num) const -> Watchlists {
+    std::string response = client.get_watchlist_by_account(account_num);
     return parser.parse_watchlist_data(parser.read_response(response));
   }
 
-  auto getAllAcountNumbers() -> StringList {
+  auto getAllAcountNumbers() -> std::vector<std::string> {
     auto list = client.get_all_account_ids();
     return list;
   }
 
-  auto getDefaultAccount() -> String {
+  auto getDefaultAccount() -> std::string {
     auto list = getAllAcountNumbers();
     auto num = list.at(0);
     return num;
   }
 
-  auto parseOptionSymbol(CRString symbol) const -> String {
+  auto parseOptionSymbol(const std::string &symbol) const -> std::string {
     return parser.parse_option_symbol(symbol);
   }
 
-  void sendChartRequestToSocket(const Logger& logger, CRString ticker) {
+  void sendChartRequestToSocket(const Logger& logger, const std::string &ticker) {
     client.start_session(logger, ticker);
   }
 

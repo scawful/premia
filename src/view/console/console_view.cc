@@ -150,7 +150,7 @@ void ConsoleView::addToHistory(const char* line) {
 void ConsoleView::executeCommand(const char* command_line) {
   addLog("# %s\n", command_line);
   addToHistory(command_line);
-  String commandString = command_line;
+  std::string command_string = command_line;
 
   // Process command
   if (Stricmp(command_line, "CLEAR") == 0) {
@@ -171,8 +171,8 @@ void ConsoleView::executeCommand(const char* command_line) {
   } else if (Stricmp(command_line, "CLOSE_SOCKET") == 0) {
     addLogStd("Ending WebSocket session...");
     tda::TDA::getInstance().sendSocketLogout();
-  } else if (commandString.substr(0, 10) == "LOAD_QUOTE") {
-    String ticker = commandString.substr(11, commandString.size());
+  } else if (command_string.substr(0, 10) == "LOAD_QUOTE") {
+    std::string ticker = command_string.substr(11, command_string.size());
     addLogStd("Opening WebSocket session and requesting QUOTE for " + ticker);
     tda::TDA::getInstance().sendChartRequestToSocket(logger, ticker);
   } else {
@@ -298,7 +298,7 @@ ConsoleView::~ConsoleView() {
   for (int i = 0; i < History.Size; i++) free(History[i]);
 }
 
-String ConsoleView::getName() { return "Console"; }
+std::string ConsoleView::getName() { return "Console"; }
 
 void ConsoleView::addLog(const char* fmt, ...) {
   char buf[1024];
@@ -310,13 +310,13 @@ void ConsoleView::addLog(const char* fmt, ...) {
   Items.push_back(Strdup(buf));
 }
 
-void ConsoleView::addLogStd(CRString data) {
+void ConsoleView::addLogStd(const std::string& data) {
   const boost::posix_time::ptime now =
       boost::posix_time::second_clock::local_time();
   auto hours = now.time_of_day().hours();
   auto minutes = now.time_of_day().minutes();
 
-  String log = "[";
+  std::string log = "[";
   log += std::to_string(hours);
   log += ":" + std::to_string(minutes) + "] " + data;
 
@@ -327,7 +327,7 @@ void ConsoleView::addLogger(const Logger& newLogger) {
   this->logger = newLogger;
 }
 
-void ConsoleView::addEvent(CRString key, const EventHandler& event) {
+void ConsoleView::addEvent(const std::string& key, const EventHandler& event) {
   this->events[key] = event;
 }
 

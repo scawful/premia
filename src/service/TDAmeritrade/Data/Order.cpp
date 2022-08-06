@@ -28,16 +28,16 @@ void Order::prepareOrderString() const {
 Order::Order() = default;
 Order::~Order() = default;
 
-String Order::getString() const { return orderJSON; }
+std::string Order::getString() const { return orderJSON; }
 
-String Order::getOrderType() const { return orderType; }
+std::string Order::getOrderType() const { return orderType; }
 
-String Order::getSession() const { return session; }
+std::string Order::getSession() const { return session; }
 
-String Order::getDuration() const { return duration; }
+std::string Order::getDuration() const { return duration; }
 
-String Order::getOrderStrategyType() const { return orderStrategyType; }
+std::string Order::getOrderStrategyType() const { return orderStrategyType; }
 
-String Order::getPrice() const { return price; }
+std::string Order::getPrice() const { return price; }
 }  // namespace tda
 }  // namespace premia

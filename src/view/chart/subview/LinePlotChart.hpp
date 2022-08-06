@@ -19,10 +19,10 @@ class LinePlotChart : public View {
   double *x;
   double *y;
 
-  ArrayList<double> numDays;
-  ArrayList<double> balances;
-  ArrayList<String> dates;
-  std::unordered_map<String, EventHandler> events;
+  std::vector<double> numDays;
+  std::vector<double> balances;
+  std::vector<std::string> dates;
+  std::unordered_map<std::string, EventHandler> events;
 
   void initData();
 
@@ -31,9 +31,9 @@ class LinePlotChart : public View {
   ~LinePlotChart() override;
 
   void update() override;
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger &logger) override;
-  void addEvent(CRString key, const EventHandler &event) override;
+  void addEvent(const std::string &key, const EventHandler &event) override;
 };
 }  // namespace premia
 

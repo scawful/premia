@@ -19,8 +19,8 @@ class TWS {
   }
 
   // functions
-  auto runClient(String host, int port, int clientId) -> void {
-    String options = "";
+  auto runClient(std::string host, int port, int clientId) -> void {
+    std::string options = "";
     constexpr auto MAX_ATTEMPTS = 10;
     constexpr auto SLEEP_TIME = 5;
     unsigned attempt = 0;
@@ -44,9 +44,6 @@ class TWS {
       if (attempt >= MAX_ATTEMPTS) {
         break;
       }
-
-      printf("Sleeping %u seconds before next attempt\n", SLEEP_TIME);
-      std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME));
     }
   }
 };

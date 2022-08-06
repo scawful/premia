@@ -5,23 +5,23 @@ namespace tda {
 
 OptionChain::OptionChain() = default;
 
-ArrayList<OptionsDateTimeObj> OptionChain::getOptionsDateTimeObj() const {
+std::vector<OptionsDateTimeObj> OptionChain::getOptionsDateTimeObj() const {
   return optionsDateTimeVector;
 }
 
-String OptionChain::getCallVariable(CRString variable) {
+std::string OptionChain::getCallVariable(const std::string &variable) {
   return callExpDateMap[variable];
 }
 
-String OptionChain::getPutVariable(CRString variable) {
+std::string OptionChain::getPutVariable(const std::string &variable) {
   return putExpDateMap[variable];
 }
 
-String OptionChain::getOptionChainDataVariable(CRString variable) {
+std::string OptionChain::getOptionChainDataVariable(const std::string &variable) {
   return optionChainMap[variable];
 }
 
-String OptionChain::getUnderlyingDataVariable(CRString variable) {
+std::string OptionChain::getUnderlyingDataVariable(const std::string &variable) {
   return underlyingMap[variable];
 }
 
@@ -29,11 +29,11 @@ void OptionChain::addOptionsDateTimeObj(const OptionsDateTimeObj& obj) {
   optionsDateTimeVector.push_back(obj);
 }
 
-ArrayList<OptionsDateTimeObj> OptionChain::getCallOptionArray() const {
+std::vector<OptionsDateTimeObj> OptionChain::getCallOptionArray() const {
   return callOptionArray;
 }
 
-ArrayList<OptionsDateTimeObj> OptionChain::getPutOptionArray() const {
+std::vector<OptionsDateTimeObj> OptionChain::getPutOptionArray() const {
   return putOptionArray;
 }
 
@@ -46,19 +46,19 @@ void OptionChain::addOptionsDateTimeObj(const OptionsDateTimeObj& obj,
   }
 }
 
-void OptionChain::setCallVariable(CRString key, CRString value) {
+void OptionChain::setCallVariable(const std::string &key, const std::string &value) {
   callExpDateMap[key] = value;
 }
 
-void OptionChain::setPutVariable(CRString key, CRString value) {
+void OptionChain::setPutVariable(const std::string &key, const std::string &value) {
   putExpDateMap[key] = value;
 }
 
-void OptionChain::setOptionChainVariable(CRString key, CRString value) {
+void OptionChain::setOptionChainVariable(const std::string &key, const std::string &value) {
   optionChainMap[key] = value;
 }
 
-void OptionChain::setUnderlyingVariable(CRString key, CRString value) {
+void OptionChain::setUnderlyingVariable(const std::string &key, const std::string &value) {
   underlyingMap[key] = value;
 }
 }  // namespace tda

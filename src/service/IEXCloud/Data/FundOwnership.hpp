@@ -7,44 +7,44 @@ namespace iex {
 class FundOwnership {
  private:
   time_t report_date;
-  String symbol;
-  String entity_proper_name;
-  String adjusted_holdings;
-  String adjusted_market_value;
-  String reported_holding;
-  String reported_market_value;
+  std::string symbol;
+  std::string entity_proper_name;
+  std::string adjusted_holdings;
+  std::string adjusted_market_value;
+  std::string reported_holding;
+  std::string reported_market_value;
 
  public:
   FundOwnership() = default;
 
-  String reportedMarketValue() const { return reported_market_value; }
-  void setReportedMarketValue(CRString reportedMarketValue) {
+  std::string reportedMarketValue() const { return reported_market_value; }
+  void setReportedMarketValue(const std::string &reportedMarketValue) {
     reported_market_value = reportedMarketValue;
   }
 
-  String reportedHolding() const { return reported_holding; }
-  void setReportedHolding(CRString reportedHolding) {
+  std::string reportedHolding() const { return reported_holding; }
+  void setReportedHolding(const std::string &reportedHolding) {
     reported_holding = reportedHolding;
   }
 
   time_t reportDate() const { return report_date; }
   void setReportDate(const time_t &reportDate) { report_date = reportDate; }
 
-  String entityProperName() const { return entity_proper_name; }
-  void setEntityProperName(CRString entityProperName) {
+  std::string entityProperName() const { return entity_proper_name; }
+  void setEntityProperName(const std::string &entityProperName) {
     entity_proper_name = entityProperName;
   }
 
-  String adjustedMarketValue() const { return adjusted_market_value; }
-  void setAdjustedMarketValue(CRString adjustedMarketValue) {
+  std::string adjustedMarketValue() const { return adjusted_market_value; }
+  void setAdjustedMarketValue(const std::string &adjustedMarketValue) {
     adjusted_market_value = adjustedMarketValue;
   }
 
-  String getSymbol() const { return symbol; }
-  void setSymbol(CRString symbol_) { symbol = symbol_; }
+  std::string getSymbol() const { return symbol; }
+  void setSymbol(const std::string &symbol_) { symbol = symbol_; }
 
-  String adjustedHoldings() const { return adjusted_holdings; }
-  void setAdjustedHoldings(CRString adjustedHoldings) {
+  std::string adjustedHoldings() const { return adjusted_holdings; }
+  void setAdjustedHoldings(const std::string &adjustedHoldings) {
     adjusted_holdings = adjustedHoldings;
   }
 };

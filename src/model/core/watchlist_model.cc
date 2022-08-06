@@ -3,10 +3,10 @@
 namespace premia {
 
 void WatchlistModel::resetWatchlist() {
-  watchlists = ArrayList<tda::Watchlist>();
-  openList = ArrayList<int>();
-  watchlistNames = ArrayList<String>();
-  watchlistNamesChar = ArrayList<const char*>();
+  watchlists = std::vector<tda::Watchlist>();
+  openList = std::vector<int>();
+  watchlistNames = std::vector<std::string>();
+  watchlistNamesChar = std::vector<const char*>();
 }
 
 void WatchlistModel::initLocalWatchlist() {
@@ -30,7 +30,7 @@ void WatchlistModel::initLocalWatchlist() {
   }
 
   watchlistNamesChar.clear();
-  for (String const& str : watchlistNames) {
+  for (std::string const& str : watchlistNames) {
     watchlistNamesChar.push_back(str.data());
   }
 
@@ -39,15 +39,15 @@ void WatchlistModel::initLocalWatchlist() {
 
 void WatchlistModel::initTDAWatchlists() {
   resetWatchlist();
-  String account_num;
+  std::string account_num;
   Try { account_num = tda::TDA::getInstance().getDefaultAccount(); }
   catch (const std::out_of_range& e) {
-    String error(e.what());
+    std::string error(e.what());
     logger("[error] " + error);
     throw premia::NotLoggedInException();
   }
   catch (const boost::property_tree::ptree_error& e) {
-    String error(e.what());
+    std::string error(e.what());
     logger("[error] " + error);
     throw premia::NotLoggedInException();
   }
@@ -60,7 +60,7 @@ void WatchlistModel::initTDAWatchlists() {
     }
 
     watchlistNamesChar.clear();
-    for (String const& str : watchlistNames) {
+    for (std::string const& str : watchlistNames) {
       watchlistNamesChar.push_back(str.data());
     }
     active = true;
@@ -77,21 +77,21 @@ bool WatchlistModel::isActive() const { return active; }
 
 void WatchlistModel::addLogger(const Logger& log) { this->logger = log; }
 
-String WatchlistModel::getWatchlistName(int index) {
+std::string WatchlistModel::getWatchlistName(int index) {
   return watchlistNames.at(index);
 }
 
-tda::Quote& WatchlistModel::getQuote(CRString key) { return quotes.at(key); }
+tda::Quote& WatchlistModel::getQuote(const std::string &key) { return quotes.at(key); }
 
 tda::Watchlist& WatchlistModel::getWatchlist(int index) {
   return watchlists.at(index);
 }
 
-void WatchlistModel::setQuote(CRString key, const tda::Quote& quote) {
+void WatchlistModel::setQuote(const std::string &key, const tda::Quote& quote) {
   this->quotes[key] = quote;
 }
 
-ArrayList<const char*> WatchlistModel::getWatchlistNamesCharVec() const {
+std::vector<const char*> WatchlistModel::getWatchlistNamesCharVec() const {
   return watchlistNamesChar;
 }
 }  // namespace premia

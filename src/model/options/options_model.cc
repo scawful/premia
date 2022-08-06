@@ -19,21 +19,21 @@ tda::OptionsDateTimeObj& OptionsModel::getOptionsDateTimeObj(int index) {
   return this->optionsDateTimeObj.at(index);
 }
 
-ArrayList<const char*>& OptionsModel::getDateTimeArray() {
+std::vector<const char*>& OptionsModel::getDateTimeArray() {
   return this->datetime_array;
 }
 
-ArrayList<String>& OptionsModel::getDateTimeArrayStr() {
+std::vector<std::string>& OptionsModel::getDateTimeArrayStr() {
   return this->datetimeArray;
 }
 
-String OptionsModel::getDateTime(int index) {
+std::string OptionsModel::getDateTime(int index) {
   return this->datetimeArray.at(index);
 }
 
-void OptionsModel::fetchOptionChain(CRString ticker, CRString strikeCount,
-                                    CRString strategy, CRString range,
-                                    CRString expMonth, CRString optionType) {
+void OptionsModel::fetchOptionChain(const std::string &ticker, const std::string &strikeCount,
+                                    const std::string &strategy, const std::string &range,
+                                    const std::string &expMonth, const std::string &optionType) {
   if (!datetimeEpochArray.empty()) {
     datetimeEpochArray.clear();
     datetime_array.clear();
@@ -137,31 +137,31 @@ double& OptionsModel::getGammaAtExpiry(int i) {
   return gammaAtExpiryArray.at(i);
 }
 
-ArrayList<double>& OptionsModel::getGammaAtExpiryList() {
+std::vector<double>& OptionsModel::getGammaAtExpiryList() {
   return gammaAtExpiryArray;
 }
 
-ArrayList<double>& OptionsModel::getCallGammaAtExpiryList() {
+std::vector<double>& OptionsModel::getCallGammaAtExpiryList() {
   return callGammaAtExpiryArray;
 }
 
-ArrayList<double>& OptionsModel::getPutGammaAtExpiryList() {
+std::vector<double>& OptionsModel::getPutGammaAtExpiryList() {
   return putGammaAtExpiryArray;
 }
 
-ArrayList<double>& OptionsModel::getNaiveVannaExposureList() {
+std::vector<double>& OptionsModel::getNaiveVannaExposureList() {
   return naiveVannaExposureArray;
 }
 
-ArrayList<double>& OptionsModel::getDatetimeEpochArray() {
+std::vector<double>& OptionsModel::getDatetimeEpochArray() {
   return datetimeEpochArray;
 }
 
-ArrayList<double>& OptionsModel::getVegaExposureArray() {
+std::vector<double>& OptionsModel::getVegaExposureArray() {
   return vegaExposureArray;
 }
 
-ArrayList<double>& OptionsModel::getVolgaExposureArray() {
+std::vector<double>& OptionsModel::getVolgaExposureArray() {
   return volgaExposureArray;
 }
 }  // namespace premia

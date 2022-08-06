@@ -67,11 +67,11 @@ void ChartView::drawChartSettings() {
   }
 }
 
-String ChartView::getName() { return "Chart"; }
+std::string ChartView::getName() { return "Chart"; }
 
 void ChartView::addLogger(const Logger& newLogger) { this->logger = newLogger; }
 
-void ChartView::addEvent(CRString key, const EventHandler& event) {
+void ChartView::addEvent(const std::string &key, const EventHandler& event) {
   this->events[key] = event;
 }
 

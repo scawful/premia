@@ -20,9 +20,9 @@ class WatchlistView : public View {
   void drawWatchlistTable();
 
  public:
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString, const EventHandler&) override;
+  void addEvent(const std::string &, const EventHandler&) override;
   void update() override;
 
  private:

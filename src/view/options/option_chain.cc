@@ -17,9 +17,9 @@
 
 namespace premia {
 void OptionChainView::drawSearch() {
-  static String ticker;
-  static String count;
-  static String strike;
+  static std::string ticker;
+  static std::string count;
+  static std::string strike;
   static int current_strategy = 0;
 
   if (ImGui::BeginTable("SearchTable", 4, ImGuiTableFlags_SizingStretchProp,
@@ -366,13 +366,13 @@ void OptionChainView::drawUnderlying() {
   ImGui::Separator();
 }
 
-String OptionChainView::getName() { return "Option Chain"; }
+std::string OptionChainView::getName() { return "Option Chain"; }
 
 void OptionChainView::addLogger(const Logger& newLogger) {
   this->logger = newLogger;
 }
 
-void OptionChainView::addEvent(CRString key, const EventHandler& event) {
+void OptionChainView::addEvent(const std::string &key, const EventHandler& event) {
   this->events[key] = event;
 }
 

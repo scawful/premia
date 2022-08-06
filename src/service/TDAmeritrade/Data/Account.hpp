@@ -9,8 +9,8 @@
 namespace premia {
 namespace tda {
 struct PositionBalances {
-  String symbol;
-  StringMap balances;
+  std::string symbol;
+  std::unordered_map<std::string, std::string> balances;
   int longQuantity;
   int averagePrice;
   double dayProfitLoss;
@@ -19,27 +19,27 @@ struct PositionBalances {
 class Account {
  private:
   int num_positions;
-  String account_id;
-  StringMap account_info;
-  StringMap current_balances;
-  ArrayList<StringMap> positions_vector;
+  std::string account_id;
+  std::unordered_map<std::string, std::string> account_info;
+  std::unordered_map<std::string, std::string> current_balances;
+  std::vector<std::unordered_map<std::string, std::string>> positions_vector;
 
-  ArrayList<PositionBalances> position_balances;
+  std::vector<PositionBalances> position_balances;
 
  public:
   Account() = default;
 
-  void add_position(StringMap position);
+  void add_position(std::unordered_map<std::string, std::string> position);
   void add_balance(PositionBalances balance);
-  void set_account_variable(String key, String value);
-  void set_balance_variable(String key, String value);
-  void set_primary_account_id(CRString key);
+  void set_account_variable(std::string key, std::string value);
+  void set_balance_variable(std::string key, std::string value);
+  void set_primary_account_id(const std::string &key);
 
   size_t get_position_vector_size();
-  String get_account_variable(String variable);
-  String get_balance_variable(String variable);
-  StringMap get_position(int index);
-  String get_position_balances(String symbol, String variable);
+  std::string get_account_variable(std::string variable);
+  std::string get_balance_variable(std::string variable);
+  std::unordered_map<std::string, std::string> get_position(int index);
+  std::string get_position_balances(std::string symbol, std::string variable);
 };
 
 }  // namespace tda

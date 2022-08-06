@@ -89,7 +89,7 @@ void Socket::on_ssl_handshake(beast::error_code ec) {
   // Set a decorator to change the User-Agent of the handshake
   _ws.set_option(
       websocket::stream_base::decorator([](websocket::request_type& req) {
-        req.set(http::field::user_agent, String(BOOST_BEAST_VERSION_STRING) +
+        req.set(http::field::user_agent, std::string(BOOST_BEAST_VERSION_STRING) +
                                              " websocket-client-async-ssl");
       }));
 
@@ -113,7 +113,7 @@ void Socket::on_handshake(beast::error_code ec) {
  *
  * @param s
  */
-void Socket::write(String request) {
+void Socket::write(std::string request) {
   _logger("WebSocket::write");
   _io_in_progress = true;
 

@@ -6,7 +6,7 @@
 class TradingFrame : public Frame 
 {
 private:
-    std::map<String, tda::Quote> quotes;
+    std::map<std::string, tda::Quote> quotes;
 
 public:
     TradingFrame();

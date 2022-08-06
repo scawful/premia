@@ -6,7 +6,7 @@
 class RiskPremiaFrame : public Frame
 {
 private:
-    String title_string;
+    std::string title_string;
     int length;
     double gex[3500];
     double vix[3500];
@@ -19,7 +19,7 @@ private:
     double* positions_pie;
     char** positions_labels;
 
-    ArrayList<String> symbols_array;
+    std::vector<std::string> symbols_array;
 
     double oneYearDix[400];
 

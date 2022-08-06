@@ -40,9 +40,9 @@ using tcp = boost::asio::ip::tcp;
 
 class Socket : public std::enable_shared_from_this<Socket> {
  private:
-  String _host;
-  String _port;
-  String _requests;
+  std::string _host;
+  std::string _port;
+  std::string _requests;
   Logger _logger;
   net::io_context _ioc;
   tcp::resolver _resolver;
@@ -55,7 +55,7 @@ class Socket : public std::enable_shared_from_this<Socket> {
  public:
   template <typename Executor>
   explicit Socket(Executor executor, ssl::context& ctx, CRLogger logger,
-                  CRString requests)
+                  const std::string &requests)
       : _resolver(executor),
         _ws(executor, ctx),
         _logger(logger),
@@ -72,7 +72,7 @@ class Socket : public std::enable_shared_from_this<Socket> {
   void on_handshake(beast::error_code ec);
 
   // read/write sequence
-  void write(String request);
+  void write(std::string request);
   void on_write(beast::error_code ec, std::size_t bytes);
   void on_read(beast::error_code ec, std::size_t bytes);
 

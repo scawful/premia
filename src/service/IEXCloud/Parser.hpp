@@ -17,14 +17,14 @@ namespace json = boost::property_tree;
 
 class Parser {
  private:
-  void log_response(String title, json::ptree data);
-  json::ptree read_response(String response);
+  void log_response(std::string title, json::ptree data);
+  json::ptree read_response(std::string response);
 
  public:
   Parser();
 
-  ArrayList<FundOwnership> parse_fund_ownership(String response);
-  ArrayList<InsiderTransactions> parse_insider_transactions(String response);
+  std::vector<FundOwnership> parse_fund_ownership(std::string response);
+  std::vector<InsiderTransactions> parse_insider_transactions(std::string response);
 };
 }  // namespace iex
 }  // namespace premia

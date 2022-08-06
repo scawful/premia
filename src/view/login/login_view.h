@@ -19,14 +19,14 @@ class LoginView : public View {
   bool initialized = false;
 
   Logger logger;
-  std::unordered_map<String, EventHandler> events;
+  std::unordered_map<std::string, EventHandler> events;
 
   void drawScreen() const;
 
  public:
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString, const EventHandler&) override;
+  void addEvent(const std::string& , const EventHandler&) override;
   void update() override;
 };
 }  // namespace premia

@@ -15,7 +15,7 @@ void LinePlotChart::initData() {
   }
 
   int i = 0;
-  String temp, word, line;
+  std::string temp, word, line;
   if (fileInput.good()) {
     while (std::getline(fileInput, line)) {
       // Create a std::istringstream from line
@@ -57,13 +57,13 @@ LinePlotChart::~LinePlotChart() {
   delete[] y;
 }
 
-String LinePlotChart::getName() { return "Line Plot"; }
+std::string LinePlotChart::getName() { return "Line Plot"; }
 
 void LinePlotChart::addLogger(const Logger& newLogger) {
   // this->logger = newLogger;
 }
 
-void LinePlotChart::addEvent(CRString key, const EventHandler& event) {
+void LinePlotChart::addEvent(const std::string &key, const EventHandler& event) {
   this->events[key] = event;
 }
 

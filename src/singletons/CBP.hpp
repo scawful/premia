@@ -23,7 +23,7 @@ class CBP {
 
   auto getAccounts() -> Account {
     return Account();
-    // String response = http_client->send_request("/accounts");
+    // std::string response = http_client->send_request("/accounts");
     // std::istringstream json_response(response);
     // boost::property_tree::ptree property_tree;
     // try {
@@ -37,10 +37,10 @@ class CBP {
     // boost::make_shared<Account>(); return new_account_data;
   }
 
-  auto getProductTicker(CRString symbol) -> Product {
+  auto getProductTicker(const std::string &symbol) -> Product {
     return Product();
-    // String request = "/products/" + symbol + "-USD/ticker";
-    // String response = http_client->send_request(request);
+    // std::string request = "/products/" + symbol + "-USD/ticker";
+    // std::string response = http_client->send_request(request);
     // std::istringstream json_response(response);
     // boost::property_tree::ptree property_tree;
     // try {
@@ -54,7 +54,7 @@ class CBP {
   }
 
   auto getTotalDepositsUSD() -> double {
-    // String response = http_client->send_request("/transfers");
+    // std::string response = http_client->send_request("/transfers");
     // std::istringstream json_response(response);
     // boost::property_tree::ptree property_tree;
     // try {

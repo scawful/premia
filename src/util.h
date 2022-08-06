@@ -1,6 +1,8 @@
 #ifndef Utils_hpp
 #define Utils_hpp
 
+#include <string>
+
 #include "metatypes.h"
 
 namespace premia {
@@ -16,9 +18,10 @@ namespace Utils {
  * @return true
  * @return false
  */
-static auto string_replace(RString str, CRString from, CRString to) -> bool {
+static auto string_replace(std::string& str, const std::string& from,
+                           const std::string& to) -> bool {
   size_t start = str.find(from);
-  if (start == String::npos) return false;
+  if (start == std::string::npos) return false;
 
   str.replace(start, from.length(), to);
   return true;

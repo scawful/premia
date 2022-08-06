@@ -14,20 +14,20 @@ namespace iex {
 class Client {
  private:
   bool sandbox_mode;
-  String api_key;
-  String base_endpoint;
-  String sandbox_endpoint;
-  String token_parameter;
-  String current_endpoint();
+  std::string api_key;
+  std::string base_endpoint;
+  std::string sandbox_endpoint;
+  std::string token_parameter;
+  std::string current_endpoint();
 
  public:
   Client();
 
-  String send_request(String endpoint);
-  String send_authorized_request(String endpoint);
+  std::string send_request(std::string endpoint);
+  std::string send_authorized_request(std::string endpoint);
 
-  String get_fund_ownership(String symbol);
-  String get_insider_transactions(String symbol);
+  std::string get_fund_ownership(std::string symbol);
+  std::string get_insider_transactions(std::string symbol);
 };
 }  // namespace iex
 }  // namespace premia

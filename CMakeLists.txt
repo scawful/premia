@@ -2,10 +2,16 @@
 cmake_minimum_required(VERSION 3.10)
 
 # C++ Standard Specifications -------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_MODULE_LINKER_FLAGS \"-Wl,--no-undefined -Wl,--no-undefined\")
+set(BUILD_SHARED_LIBS ON)
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 # Premia by Justin Scofield ---------------------------------------------------------------------------------

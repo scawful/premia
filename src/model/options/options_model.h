@@ -2,34 +2,37 @@
 #define OptionsModel_hpp
 
 #include <cmath>
+#include <string>
+#include <vector>
 
+#include "metatypes.h"
 #include "model/model.h"
 #include "singletons/TDA.hpp"
-#include "metatypes.h"
+
 
 namespace premia {
 class OptionsModel : public Model {
  private:
   bool active = false;
   double naiveGammaExposure = 0.0;
-  String tickerSymbol;
+  std::string tickerSymbol;
   tda::OptionChain optionChainData;
-  ArrayList<tda::OptionsDateTimeObj> callOptionArray;
-  ArrayList<tda::OptionsDateTimeObj> putOptionArray;
-  ArrayList<tda::OptionsDateTimeObj> optionsDateTimeObj;
-  ArrayList<const char*> datetime_array;
+  std::vector<tda::OptionsDateTimeObj> callOptionArray;
+  std::vector<tda::OptionsDateTimeObj> putOptionArray;
+  std::vector<tda::OptionsDateTimeObj> optionsDateTimeObj;
+  std::vector<const char*> datetime_array;
 
-  ArrayList<double> gammaAtExpiryArray;
-  ArrayList<double> callGammaAtExpiryArray;
-  ArrayList<double> putGammaAtExpiryArray;
+  std::vector<double> gammaAtExpiryArray;
+  std::vector<double> callGammaAtExpiryArray;
+  std::vector<double> putGammaAtExpiryArray;
 
-  ArrayList<String> datetimeArray;
-  ArrayList<double> datetimeEpochArray;
+  std::vector<std::string> datetimeArray;
+  std::vector<double> datetimeEpochArray;
 
-  ArrayList<double> naiveVannaExposureArray;
-  ArrayList<double> volgaExposureArray;
+  std::vector<double> naiveVannaExposureArray;
+  std::vector<double> volgaExposureArray;
 
-  ArrayList<double> vegaExposureArray;
+  std::vector<double> vegaExposureArray;
 
  public:
   bool isActive() const;
@@ -38,26 +41,28 @@ class OptionsModel : public Model {
   tda::OptionsDateTimeObj& getCallOptionObj(int index);
   tda::OptionsDateTimeObj& getPutOptionObj(int index);
   tda::OptionsDateTimeObj& getOptionsDateTimeObj(int index);
-  ArrayList<const char*>& getDateTimeArray();
-  ArrayList<String>& getDateTimeArrayStr();
-  String getDateTime(int index);
-  void fetchOptionChain(CRString ticker, CRString strikeCount,
-                        CRString strategy, CRString range, CRString expMonth,
-                        CRString optionType);
+  std::vector<const char*>& getDateTimeArray();
+  std::vector<std::string>& getDateTimeArrayStr();
+  std::string getDateTime(int index);
+  void fetchOptionChain(const std::string& ticker,
+                        const std::string& strikeCount,
+                        const std::string& strategy, const std::string& range,
+                        const std::string& expMonth,
+                        const std::string& optionType);
   void calculateGammaExposure();
   double& getGammaExposure();
   double& getGammaAtExpiry(int i);
-  ArrayList<double>& getGammaAtExpiryList();
-  ArrayList<double>& getCallGammaAtExpiryList();
-  ArrayList<double>& getPutGammaAtExpiryList();
+  std::vector<double>& getGammaAtExpiryList();
+  std::vector<double>& getCallGammaAtExpiryList();
+  std::vector<double>& getPutGammaAtExpiryList();
 
-  ArrayList<double>& getNaiveVannaExposureList();
+  std::vector<double>& getNaiveVannaExposureList();
 
-  ArrayList<double>& getDatetimeEpochArray();
+  std::vector<double>& getDatetimeEpochArray();
 
-  ArrayList<double>& getVegaExposureArray();
+  std::vector<double>& getVegaExposureArray();
 
-  ArrayList<double>& getVolgaExposureArray();
+  std::vector<double>& getVolgaExposureArray();
 };
 }  // namespace premia
 

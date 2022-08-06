@@ -7,8 +7,8 @@
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
-#include "singletons/HLXT.hpp"
 #include "premia.h"
+#include "singletons/HLXT.hpp"
 
 namespace premia {
 class View {
@@ -16,8 +16,8 @@ class View {
   View() = default;
   virtual ~View() = default;
 
-  virtual String getName() = 0;
-  virtual void addEvent(CRString, const EventHandler &) = 0;
+  virtual std::string getName() = 0;
+  virtual void addEvent(const std::string &, const EventHandler &) = 0;
   virtual void addLogger(const Logger &) = 0;
   virtual void update() = 0;
 };

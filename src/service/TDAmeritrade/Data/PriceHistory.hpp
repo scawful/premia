@@ -22,11 +22,11 @@ namespace tda {
 class PriceHistory {
  private:
   bool initialized;
-  String tickerSymbol;
-  ListList<tda::Candle> candles;
-  ArrayList<tda::Candle> candleVector;
-  StringMap priceHistoryVariables;
-  StringMap candleData;
+  std::string tickerSymbol;
+  std::vector<std::vector<tda::Candle>> candles;
+  std::vector<tda::Candle> candleVector;
+  std::unordered_map<std::string, std::string> priceHistoryVariables;
+  std::unordered_map<std::string, std::string> candleData;
 
  public:
   PriceHistory();
@@ -34,16 +34,16 @@ class PriceHistory {
   void addCandle(tda::Candle candle);
   void addCandleByType(Candle candle, int type);
 
-  ArrayList<tda::Candle> getCandles(int index);
+  std::vector<tda::Candle> getCandles(int index);
   int getNumCandles(int index);
 
-  ArrayList<tda::Candle> getCandleVector();
-  String getCandleDataVariable(String variable);
-  String getPriceHistoryVariable(String variable);
-  String getTickerSymbol();
+  std::vector<tda::Candle> getCandleVector();
+  std::string getCandleDataVariable(std::string variable);
+  std::string getPriceHistoryVariable(std::string variable);
+  std::string getTickerSymbol();
   bool getInitialized();
-  void setPriceHistoryVariable(String key, String value);
-  void setTickerSymbol(String ticker);
+  void setPriceHistoryVariable(std::string key, std::string value);
+  void setTickerSymbol(std::string ticker);
   void setInitialized();
   void updatePriceHistory();
   void clear();

@@ -1,20 +1,23 @@
 #ifndef WatchlistModel_hpp
 #define WatchlistModel_hpp
 
+#include <string>
+#include <vector>
+
 #include "model/model.h"
 #include "service/TDAmeritrade/Data/Watchlist.hpp"
 
 namespace premia {
 class WatchlistModel : public Model {
- private:  
+ private:
   Logger logger;
-  bool active = false;  
-  String titleString;
-  ArrayList<int> openList;
-  ArrayList<tda::Watchlist> watchlists;
-  ArrayList<String> watchlistNames;
-  ArrayList<const char*> watchlistNamesChar;
-  std::unordered_map<String, tda::Quote> quotes;
+  bool active = false;
+  std::string titleString;
+  std::vector<int> openList;
+  std::vector<tda::Watchlist> watchlists;
+  std::vector<std::string> watchlistNames;
+  std::vector<const char*> watchlistNamesChar;
+  std::unordered_map<std::string, tda::Quote> quotes;
 
  public:
   bool isActive() const;
@@ -23,15 +26,16 @@ class WatchlistModel : public Model {
   void resetWatchlist();
   void initLocalWatchlist();
   void initTDAWatchlists();
-  void saveWatchlists(); //TODO: Some method that'll save to disk current watchlist state
+  void saveWatchlists();  // TODO: Some method that'll save to disk current
+                          // watchlist state
   bool getOpenList(int n);
   void setOpenList(int n);
   void setOpenList(int n, int m);
-  String getWatchlistName(int index);
-  tda::Quote& getQuote(CRString key);
+  std::string getWatchlistName(int index);
+  tda::Quote& getQuote(const std::string& key);
   tda::Watchlist& getWatchlist(int index);
-  void setQuote(CRString key, const tda::Quote& quote);
-  ArrayList<const char*> getWatchlistNamesCharVec() const;
+  void setQuote(const std::string& key, const tda::Quote& quote);
+  std::vector<const char*> getWatchlistNamesCharVec() const;
 };
 }  // namespace premia
 

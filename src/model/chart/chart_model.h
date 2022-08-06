@@ -7,28 +7,28 @@ namespace premia {
 class ChartModel : public Model {
  private:
   bool active = false;
-  String tickerSymbol;
+  std::string tickerSymbol;
   SocketListener socketListener;
   tda::Quote quote;
   tda::PriceHistory priceHistory;
-  ArrayList<tda::Candle> candles;
-  ArrayList<double> datesVec;
-  ArrayList<double> volumeVec;
+  std::vector<tda::Candle> candles;
+  std::vector<double> datesVec;
+  std::vector<double> volumeVec;
 
   void initCandles();
   void initListener();
 
  public:
   bool isActive() const;
-  ArrayList<double> getDates() const;
-  ArrayList<double> getVolumeVector() const;
+  std::vector<double> getDates() const;
+  std::vector<double> getVolumeVector() const;
   double getDate(int i);
   tda::Quote& getQuote();
   int getNumCandles() const;
   tda::Candle getCandle(int i);
-  String getTickerSymbol() const;
-  String getQuoteDetails();
-  void fetchPriceHistory(CRString ticker, tda::PeriodType ptype, int period_amt,
+  std::string getTickerSymbol() const;
+  std::string getQuoteDetails();
+  void fetchPriceHistory(const std::string &ticker, tda::PeriodType ptype, int period_amt,
                          tda::FrequencyType ftype, int freq_amt, bool ext);
 };
 }  // namespace premia

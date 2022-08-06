@@ -24,7 +24,7 @@ class OptionChainView : public View {
     GEXEpochPair(double* epoch, double* gamma)
         : epochArray(epoch), gammaArray(gamma) {}
   };
-  String symbol;
+  std::string symbol;
   EventMap events;
   Logger logger;
   OptionsModel model;
@@ -34,9 +34,9 @@ class OptionChainView : public View {
   void drawUnderlying();
 
  public:
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString key, const EventHandler& event) override;
+  void addEvent(const std::string &key, const EventHandler& event) override;
   void update() override;
 
  private:

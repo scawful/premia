@@ -28,9 +28,9 @@ void ChartModel::initListener() {
   };
 }
 
-ArrayList<double> ChartModel::getDates() const { return datesVec; }
+std::vector<double> ChartModel::getDates() const { return datesVec; }
 
-ArrayList<double> ChartModel::getVolumeVector() const { return volumeVec; }
+std::vector<double> ChartModel::getVolumeVector() const { return volumeVec; }
 
 double ChartModel::getDate(int i) { return datesVec.at(i); }
 
@@ -42,17 +42,17 @@ int ChartModel::getNumCandles() const { return (int)candles.size(); }
 
 tda::Candle ChartModel::getCandle(int i) { return candles.at(i); }
 
-String ChartModel::getTickerSymbol() const { return tickerSymbol; }
+std::string ChartModel::getTickerSymbol() const { return tickerSymbol; }
 
-String ChartModel::getQuoteDetails() {
-  String quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") +
+std::string ChartModel::getQuoteDetails() {
+  std::string quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") +
                         " | Ask: $" + quote.getQuoteVariable("askPrice") +
                         " | Open: $" + quote.getQuoteVariable("openPrice") +
                         " | Close: $" + quote.getQuoteVariable("closePrice");
   return quoteDetails;
 }
 
-void ChartModel::fetchPriceHistory(CRString ticker, tda::PeriodType ptype,
+void ChartModel::fetchPriceHistory(const std::string &ticker, tda::PeriodType ptype,
                                    int period_amt, tda::FrequencyType ftype,
                                    int freq_amt, bool ext) {
   if (active) {

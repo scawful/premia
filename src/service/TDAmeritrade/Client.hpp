@@ -1,6 +1,9 @@
 #ifndef Client_hpp
 #define Client_hpp
 
+#include <string>
+#include <vector>
+
 #include <boost/asio.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/ssl.hpp>
@@ -15,12 +18,12 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "metatypes.h"
 #include "service/TDAmeritrade/Data/Order.hpp"
 #include "service/TDAmeritrade/Data/UserPrincipals.hpp"
 #include "service/TDAmeritrade/Parser.hpp"
 #include "service/TDAmeritrade/Socket.hpp"
 #include "util.h"
-#include "metatypes.h"
 
 namespace premia {
 namespace tda {
@@ -44,12 +47,12 @@ inline json::ptree bind_requests(std::vector<json::ptree> requests_array) {
   return requests;
 }
 
-static const String EnumAPIValues[]{"day", "month", "year", "ytd"};
-static const String EnumAPIFreq[]{"minute", "daily", "weekly", "monthly"};
-static const String EnumAPIPeriod[]{"1", "2",  "3",  "4", "5",
-                                    "6", "10", "15", "20"};
-static const String EnumAPIFreqAmt[]{"1", "5", "10", "15", "30"};
-static const String EnumAPIServiceName[]{
+static const std::string EnumAPIValues[]{"day", "month", "year", "ytd"};
+static const std::string EnumAPIFreq[]{"minute", "daily", "weekly", "monthly"};
+static const std::string EnumAPIPeriod[]{"1", "2",  "3",  "4", "5",
+                                         "6", "10", "15", "20"};
+static const std::string EnumAPIFreqAmt[]{"1", "5", "10", "15", "30"};
+static const std::string EnumAPIServiceName[]{
     "NONE",
     "ADMIN",
     "ACTIVES_NASDAQ",
@@ -146,14 +149,14 @@ class Client {
   bool has_access_token = false;
   bool has_user_principals = false;
 
-  // API Strings
-  String api_key = "";
-  String refresh_token = "";
-  String access_token = "";
+  // API std::strings
+  std::string api_key = "";
+  std::string refresh_token = "";
+  std::string access_token = "";
 
   // API Data
   Parser parser;
-  StringMap account_data;
+  std::unordered_map<std::string, std::string> account_data;
   UserPrincipals user_principals;
   json::ptree _user_principals;
 
@@ -161,30 +164,32 @@ class Client {
   net::io_context ioc;
   boost::asio::thread_pool ioc_pool;
   std::shared_ptr<tda::Socket> websocket_session;
-  std::shared_ptr<ArrayList<String>> websocket_buffer;
+  std::shared_ptr<std::vector<std::string>> websocket_buffer;
   ssl::context context{ssl::context::tlsv12_client};
-  ArrayList<std::shared_ptr<String const>> request_queue;
-  ArrayList<std::thread> ws_threads;
+  std::vector<std::shared_ptr<std::string const>> request_queue;
+  std::vector<std::thread> ws_threads;
 
-  // String Manipulation
-  String get_api_interval_value(int value) const;
-  String get_api_frequency_type(int value) const;
-  String get_api_period_amount(int value) const;
-  String get_api_frequency_amount(int value) const;
+  // std::string Manipulation
+  std::string get_api_interval_value(int value) const;
+  std::string get_api_frequency_type(int value) const;
+  std::string get_api_period_amount(int value) const;
+  std::string get_api_frequency_amount(int value) const;
 
   // API Functions
-  String send_request(CRString endpoint) const;
-  String send_authorized_request(CRString endpoint) const;
-  void post_authorized_request(CRString endpoint, CRString data) const;
-  String post_access_token() const;
+  std::string send_request(const std::string &endpoint) const;
+  std::string send_authorized_request(const std::string &endpoint) const;
+  void post_authorized_request(const std::string &endpoint,
+                               const std::string &data) const;
+  std::string post_access_token() const;
   void get_user_principals();
   void check_user_principals();
 
   // WebSocket functions
   json::ptree create_login_request();
   json::ptree create_logout_request();
-  json::ptree create_service_request(ServiceType serv_type, CRString keys,
-                                     CRString fields);
+  json::ptree create_service_request(ServiceType serv_type,
+                                     const std::string &keys,
+                                     const std::string &fields);
 
  public:
   Client();
@@ -192,39 +197,44 @@ class Client {
   void api_login();
 
   // WebSocket Controls
-  void start_session(Logger logger, CRString ticker);
+  void start_session(Logger logger, const std::string &ticker);
   void send_logout_request();
   void fetch_access_token();
 
   // Accounts
-  String get_account(CRString account_id);
-  String get_all_accounts();
-  StringList get_all_account_ids();
+  std::string get_account(const std::string &account_id);
+  std::string get_all_accounts();
+  std::vector<std::string> get_all_account_ids();
 
   // Quotes
-  String get_quote(CRString symbol) const;
+  std::string get_quote(const std::string &symbol) const;
 
   // Watchlists
-  String get_watchlist_by_account(CRString account_id) const;
+  std::string get_watchlist_by_account(const std::string &account_id) const;
 
   // Price History
-  String get_price_history(CRString symbol, PeriodType ptype, int period_amt,
-                           FrequencyType ftype, int freq_amt, bool ext) const;
+  std::string get_price_history(const std::string &symbol, PeriodType ptype,
+                                int period_amt, FrequencyType ftype,
+                                int freq_amt, bool ext) const;
 
   // Option Chain
-  String get_option_chain(CRString ticker, CRString contractType,
-                          CRString strikeCount, bool includeQuotes,
-                          CRString strategy, CRString range, CRString expMonth,
-                          CRString optionType) const;
+  std::string get_option_chain(const std::string &ticker,
+                               const std::string &contractType,
+                               const std::string &strikeCount,
+                               bool includeQuotes, const std::string &strategy,
+                               const std::string &range,
+                               const std::string &expMonth,
+                               const std::string &optionType) const;
 
   // Orders
-  String get_order(CRString account_id, CRString order_id) const;
-  String get_orders_by_query(CRString account_id, int maxResults,
-                             double fromEnteredTime, double toEnteredTime,
-                             OrderStatus status) const;
-  void place_order(CRString account_id, const Order &order) const;
+  std::string get_order(const std::string &account_id,
+                        const std::string &order_id) const;
+  std::string get_orders_by_query(const std::string &account_id, int maxResults,
+                                  double fromEnteredTime, double toEnteredTime,
+                                  OrderStatus status) const;
+  void place_order(const std::string &account_id, const Order &order) const;
 
-  void addAuth(CRString, CRString);
+  void addAuth(const std::string &key, const std::string &token);
 };
 
 }  // namespace tda

@@ -1,15 +1,15 @@
 #include "account_view.h"
 
 namespace premia {
-void AccountView::draw_balance_string(CRString variable) {
-  String str =
+void AccountView::draw_balance_string(const std::string &variable) {
+  std::string str =
       (halext::HLXT::getInstance().getPrivateBalance()) ? "***" : variable;
   ImGui::Text("%s", str.c_str());
 }
 
-void AccountView::draw_symbol_string(CRString symbol) {
-  String outputSymbol = symbol;
-  if (symbol.find('_') != String::npos) {
+void AccountView::draw_symbol_string(const std::string &symbol) {
+  std::string outputSymbol = symbol;
+  if (symbol.find('_') != std::string::npos) {
     outputSymbol = tda::TDA::getInstance().parseOptionSymbol(symbol);
   }
   ImGui::Text("%s", outputSymbol.c_str());
@@ -21,7 +21,7 @@ void AccountView::draw_symbol_string(CRString symbol) {
  *
  * @param account_num
  */
-void AccountView::load_account(CRString account_num) {
+void AccountView::load_account(const std::string &account_num) {
   account_data = tda::TDA::getInstance().getAccount(account_num);
 
   if (!positions_vector.empty()) positions_vector.clear();
@@ -29,7 +29,7 @@ void AccountView::load_account(CRString account_num) {
   for (int i = 0; i < account_data.get_position_vector_size(); i++) {
     for (const auto &[key, value] : account_data.get_position(i)) {
       if (key == "symbol") {
-        String str = value;
+        std::string str = value;
         positions_vector.push_back(str);
       }
     }
@@ -46,7 +46,7 @@ void AccountView::load_all_accounts() {
   for (int i = 0; i < account_data.get_position_vector_size(); i++) {
     for (const auto &[key, value] : account_data.get_position(i)) {
       if (key == "symbol") {
-        String str = value;
+        std::string str = value;
         positions_vector.push_back(str);
       }
     }
@@ -62,19 +62,19 @@ void AccountView::initPositions() {
   // @todo move this into a model class
   Try { account_ids_std = tda::TDA::getInstance().getAllAcountNumbers(); }
   catch (const std::bad_function_call &e) {
-    String error(e.what());
+    std::string error(e.what());
     logger("[error] " + error);
     throw premia::NotLoggedInException();
   }
   catch (const boost::property_tree::ptree_error &e) {
-    String error(e.what());
+    std::string error(e.what());
     logger("[error] " + error);
     throw premia::NotLoggedInException();
   }
   finally { logger("[finally] : AccountView init"); }
   Proceed;
   int i = 0;
-  for (String const &each_id : account_ids_std) {
+  for (std::string const &each_id : account_ids_std) {
     account_ids.push_back(each_id.c_str());
     i++;
   }
@@ -174,7 +174,7 @@ void AccountView::draw_positions() {
       for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
         ImGui::TableNextRow();
         for (int column = 0; column < 6; column++) {
-          String symbol = positions_vector[row];
+          std::string symbol = positions_vector[row];
           ImGui::TableSetColumnIndex(column);
           switch (column) {
             case 0:
@@ -306,13 +306,13 @@ void AccountView::drawAccountPane() {
   }
 }
 
-String AccountView::getName() { return "Account"; }
+std::string AccountView::getName() { return "Account"; }
 
 void AccountView::addLogger(const Logger &newLogger) {
   this->logger = newLogger;
 }
 
-void AccountView::addEvent(CRString key, const EventHandler &event) {
+void AccountView::addEvent(const std::string &key, const EventHandler &event) {
   this->events[key] = event;
 }
 

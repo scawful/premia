@@ -31,8 +31,8 @@ void LoginView::drawScreen() const {
   io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
   static bool tdaAuth;
   static bool coinbaseAuth;
-  static String username;
-  static String password;
+  static std::string username;
+  static std::string password;
 
   if (ImGui::BeginTable("split", 2, ImGuiTableFlags_None)) {
     ImGui::TableNextColumn();
@@ -54,8 +54,8 @@ void LoginView::drawScreen() const {
   if (ImGui::Button("Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f))) {
     if (tdaAuth) {
       std::ifstream keyfile("assets/apikey.txt");
-      String consumer_key = username;
-      String refresh_token = password;
+      std::string consumer_key = username;
+      std::string refresh_token = password;
       if (keyfile.good()) {
         try {
           std::stringstream buffer;
@@ -86,11 +86,11 @@ void LoginView::drawScreen() const {
   }
 }
 
-String LoginView::getName() { return "Login"; }
+std::string LoginView::getName() { return "Login"; }
 
 void LoginView::addLogger(const Logger &newLogger) { this->logger = newLogger; }
 
-void LoginView::addEvent(CRString key, const EventHandler &event) {
+void LoginView::addEvent(const std::string &key, const EventHandler &event) {
   this->events[key] = event;
 }
 

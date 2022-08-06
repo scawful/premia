@@ -25,21 +25,22 @@ class Parser {
  private:
   void parseStrikeMap(const json::ptree& data, OptionChain& chain,
                       int idx) const;
-  const StringList months = {"N/A",  "Jan", "Feb",  "Mar", "Apr", "May", "Jun",
-                             "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
+  const std::vector<std::string> months = {"N/A", "Jan", "Feb",  "Mar", "Apr",
+                                           "May", "Jun", "July", "Aug", "Sept",
+                                           "Oct", "Nov", "Dec"};
 
  public:
-  json::ptree read_response(CRString response) const;
-  String parse_option_symbol(CRString symbol) const;
-  String parse_access_token(CRString response) const;
+  json::ptree read_response(const std::string& response) const;
+  std::string parse_option_symbol(const std::string& symbol) const;
+  std::string parse_access_token(const std::string& response) const;
   Quote parse_quote(const json::ptree& data) const;
-  PriceHistory parse_price_history(const json::ptree& data, CRString ticker,
-                                   int freq) const;
+  PriceHistory parse_price_history(const json::ptree& data,
+                                   const std::string& ticker, int freq) const;
   UserPrincipals parse_user_principals(json::ptree& data) const;
   OptionChain parse_option_chain(const json::ptree& data) const;
   Account parse_account(const json::ptree& data) const;
   Account parse_all_accounts(const json::ptree& data) const;
-  ArrayList<Watchlist> parse_watchlist_data(const json::ptree& data) const;
+  std::vector<Watchlist> parse_watchlist_data(const json::ptree& data) const;
 };
 
 }  // namespace tda

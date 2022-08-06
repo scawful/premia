@@ -12,9 +12,9 @@
 namespace premia {
 namespace iex {
 
-void Parser::log_response(String title, json::ptree data) {
+void Parser::log_response(std::string title, json::ptree data) {
   std::time_t now = std::time(0);
-  String filename = title + boost::lexical_cast<String>(now) + ".json";
+  std::string filename = title + boost::lexical_cast<std::string>(now) + ".json";
   std::ofstream file(filename);
 
   // boost::filesystem::path dir("data");
@@ -33,7 +33,7 @@ void Parser::log_response(String title, json::ptree data) {
   }
 }
 
-json::ptree Parser::read_response(String response) {
+json::ptree Parser::read_response(std::string response) {
   std::cout << response << std::endl;
   std::istringstream json_response(response);
   json::ptree property_tree;
@@ -49,8 +49,8 @@ json::ptree Parser::read_response(String response) {
 
 Parser::Parser() {}
 
-ArrayList<FundOwnership> Parser::parse_fund_ownership(String response) {
-  ArrayList<FundOwnership> funds_array;
+std::vector<FundOwnership> Parser::parse_fund_ownership(std::string response) {
+  std::vector<FundOwnership> funds_array;
   json::ptree fund_ownership_json = read_response(response);
   log_response("fund-ownership", fund_ownership_json);
 
@@ -58,20 +58,20 @@ ArrayList<FundOwnership> Parser::parse_fund_ownership(String response) {
     int i = 0;
     FundOwnership fund_ownership;
     for (auto &each : outer_list.second) {
-      std::cout << each.first << " : " << each.second.get_value<String>()
+      std::cout << each.first << " : " << each.second.get_value<std::string>()
                 << std::endl;
       if (each.first == "adjHolding") {
-        fund_ownership.setAdjustedMarketValue(each.second.get_value<String>());
+        fund_ownership.setAdjustedMarketValue(each.second.get_value<std::string>());
       } else if (each.first == "adjMv") {
-        fund_ownership.setAdjustedHoldings(each.second.get_value<String>());
+        fund_ownership.setAdjustedHoldings(each.second.get_value<std::string>());
       } else if (each.first == "entityProperName") {
-        fund_ownership.setEntityProperName(each.second.get_value<String>());
+        fund_ownership.setEntityProperName(each.second.get_value<std::string>());
       } else if (each.first == "reportedHolding") {
-        fund_ownership.setReportedHolding(each.second.get_value<String>());
+        fund_ownership.setReportedHolding(each.second.get_value<std::string>());
       } else if (each.first == "reportedMv") {
-        fund_ownership.setReportedMarketValue(each.second.get_value<String>());
+        fund_ownership.setReportedMarketValue(each.second.get_value<std::string>());
       } else if (each.first == "symbol") {
-        fund_ownership.setSymbol(each.second.get_value<String>());
+        fund_ownership.setSymbol(each.second.get_value<std::string>());
       } else if (each.first == "date") {
         fund_ownership.setReportDate(each.second.get_value<time_t>());
       } else if (each.first == "id") {
@@ -91,9 +91,9 @@ ArrayList<FundOwnership> Parser::parse_fund_ownership(String response) {
   return funds_array;
 }
 
-ArrayList<InsiderTransactions> Parser::parse_insider_transactions(
-    String response) {
-  ArrayList<InsiderTransactions> transactions_array;
+std::vector<InsiderTransactions> Parser::parse_insider_transactions(
+    std::string response) {
+  std::vector<InsiderTransactions> transactions_array;
   return transactions_array;
 }
 }  // namespace iex

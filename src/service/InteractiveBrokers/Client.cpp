@@ -1449,7 +1449,7 @@ void Client::tickGeneric(TickerId tickerId, TickType tickType, double value) {
 
 //! [tickstring]
 void Client::tickString(TickerId tickerId, TickType tickType, const std::string& value) {
-	printf( "Tick String. Ticker Id: %ld, Type: %d, Value: %s\n", tickerId, (int)tickType, value.c_str());
+	printf( "Tick std::string. Ticker Id: %ld, Type: %d, Value: %s\n", tickerId, (int)tickType, value.c_str());
 }
 //! [tickstring]
 
@@ -1694,7 +1694,7 @@ void Client::scannerParameters(const std::string& xml) {
 void Client::scannerData(int reqId, int rank, const ContractDetails& contractDetails,
                                 const std::string& distance, const std::string& benchmark, const std::string& projection,
                                 const std::string& legsStr) {
-	printf( "ScannerData. %d - Rank: %d, Symbol: %s, SecType: %s, Currency: %s, Distance: %s, Benchmark: %s, Projection: %s, Legs String: %s\n", reqId, rank, contractDetails.contract.symbol.c_str(), contractDetails.contract.secType.c_str(), contractDetails.contract.currency.c_str(), distance.c_str(), benchmark.c_str(), projection.c_str(), legsStr.c_str());
+	printf( "ScannerData. %d - Rank: %d, Symbol: %s, SecType: %s, Currency: %s, Distance: %s, Benchmark: %s, Projection: %s, Legs std::string: %s\n", reqId, rank, contractDetails.contract.symbol.c_str(), contractDetails.contract.secType.c_str(), contractDetails.contract.currency.c_str(), distance.c_str(), benchmark.c_str(), projection.c_str(), legsStr.c_str());
 }
 //! [scannerdata]
 

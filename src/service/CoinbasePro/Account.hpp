@@ -7,11 +7,11 @@ namespace premia {
 namespace cbp {
 class Account {
  private:
-  ArrayList<StringMap> accounts_vector;
+  std::vector<std::unordered_map<std::string, std::string>> accounts_vector;
 
  public:
   Account() = default;
-  StringMap get_position(CRString ticker);
+  std::unordered_map<std::string, std::string> get_position(const std::string &ticker);
 };
 }  // namespace cbp
 }  // namespace premia

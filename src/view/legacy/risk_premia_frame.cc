@@ -22,7 +22,7 @@ void RiskPremiaFrame::init_pie_chart()
     for ( int i = 0; i < account.get_position_vector_size(); i++ ) {
         for ( const auto& [positionsKey, positionsValue] : account.get_position( i ) ) {
             if ( positionsKey == "symbol" ) {
-                String str = positionsValue;
+                std::string str = positionsValue;
                 symbols_array.push_back( str );
             }
         }
@@ -35,7 +35,7 @@ void RiskPremiaFrame::init_pie_chart()
     
     double sum = 0;
     for (int i = 0; i < size; i++) {
-        String symbol = symbols_array[i];
+        std::string symbol = symbols_array[i];
         positions_pie[i] = boost::lexical_cast<double>(account.get_position_balances(symbol, "marketValue"));
         sum += positions_pie[i];
         positions_labels[i] = new char[symbol.size()];
@@ -45,26 +45,26 @@ void RiskPremiaFrame::init_pie_chart()
 
 void RiskPremiaFrame::get_spx_gamma_exposure()
 {
-    String data = premia->getGenericClient().get_spx_gex();
+    std::string data = premia->getGenericClient().get_spx_gex();
     std::istd::istringstream ss(data);
 
     int i = 0;
     char c1, c2, c3, c4, c5;
-    String header;
+    std::string header;
     ss >> header;
 
     while (!ss.eof()) {
-        String row;
+        std::string row;
         ss >> row;
 
         std::istd::istringstream ss(row);
-        String imported_date;
+        std::string imported_date;
         std::getline(ss, imported_date, ',');
 
 
         date[i] = i;
 
-        String gexStr;
+        std::string gexStr;
         std::getline(ss, gexStr, ',');
         try {
             gex[i] = stod(gexStr);
@@ -78,7 +78,7 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
         if (gex[i] < minGex)
             minGex = gex[i];
 
-        String gxvStr;
+        std::string gxvStr;
         std::getline(ss, gxvStr, ',');
         try {
             gxv[i] = stod(gxvStr);
@@ -92,7 +92,7 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
         if (gxv[i] < minGxv)
             minGxv = gxv[i];
 
-        String vixStr;
+        std::string vixStr;
         std::getline(ss, vixStr, ',');
         try {
             vix[i] = stod(vixStr);
@@ -106,7 +106,7 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
         if (vix[i] < minVix)
             minVix = vix[i];
 
-        String dixStr;
+        std::string dixStr;
         std::getline(ss, dixStr, ',');
         try {
             dix[i] = stod(dixStr);
@@ -120,7 +120,7 @@ void RiskPremiaFrame::get_spx_gamma_exposure()
         if (dix[i] < minDix)
             minDix = dix[i];
 
-        String spxStr;
+        std::string spxStr;
         std::getline(ss, spxStr, ',');
         try {
             spx[i] = stod(spxStr);

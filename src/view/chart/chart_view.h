@@ -10,12 +10,12 @@
 
 namespace premia {
 class ChartView : public View {
-  using ChartMap = std::unordered_map<String, std::shared_ptr<Chart>>;
+  using ChartMap = std::unordered_map<std::string, std::shared_ptr<Chart>>;
 
  public:
-  String getName() override;
+  std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString key, const EventHandler& event) override;
+  void addEvent(const std::string &key, const EventHandler& event) override;
   void update() override;
 
  private:
@@ -24,8 +24,8 @@ class ChartView : public View {
   int frequency_type = 1;
   int frequency_amount = 0;
   bool isInit = false;
-  String tickerSymbol;
-  String currentChart;
+  std::string tickerSymbol;
+  std::string currentChart;
 
   EventMap events;
   ChartMap charts;

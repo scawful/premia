@@ -25,7 +25,7 @@ class ConsoleView : public View {
   bool DebugCallback = false;
   int HistoryPos = -1;  // -1: new line, 0..History.Size-1 browsing history.
   char InputBuf[256];
-  String title;
+  std::string title;
   Logger logger;
   EventMap events;
   ImVector<char*> Items;
@@ -50,11 +50,11 @@ class ConsoleView : public View {
   ConsoleView();
   ~ConsoleView();
 
-  String getName() override;
+  std::string getName() override;
   void addLog(const char* fmt, ...);
-  void addLogStd(CRString data);
+  void addLogStd(const std::string &data);
   void addLogger(const Logger& logger) override;
-  void addEvent(CRString key, const EventHandler& event) override;
+  void addEvent(const std::string &key, const EventHandler& event) override;
   void update() override;
 };
 }  // namespace premia
