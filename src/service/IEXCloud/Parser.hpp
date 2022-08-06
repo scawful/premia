@@ -8,7 +8,6 @@
 
 #include "Data/FundOwnership.hpp"
 #include "Data/InsiderTransactions.hpp"
-#include "metatypes.h"
 
 namespace premia {
 namespace iex {
@@ -24,7 +23,8 @@ class Parser {
   Parser();
 
   std::vector<FundOwnership> parse_fund_ownership(std::string response);
-  std::vector<InsiderTransactions> parse_insider_transactions(std::string response);
+  std::vector<InsiderTransactions> parse_insider_transactions(
+      std::string response);
 };
 }  // namespace iex
 }  // namespace premia

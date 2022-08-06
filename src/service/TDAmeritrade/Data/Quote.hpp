@@ -3,8 +3,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "premia.h"
-
 namespace premia {
 namespace tda {
 

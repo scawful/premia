@@ -27,10 +27,8 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/tokenizer.hpp>
 
-#include "metatypes.h"
-
 namespace premia::tda {
-  
+
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
@@ -43,7 +41,6 @@ class Socket : public std::enable_shared_from_this<Socket> {
   std::string _host;
   std::string _port;
   std::string _requests;
-  Logger _logger;
   net::io_context _ioc;
   tcp::resolver _resolver;
   beast::flat_buffer _buffer;
@@ -54,12 +51,9 @@ class Socket : public std::enable_shared_from_this<Socket> {
 
  public:
   template <typename Executor>
-  explicit Socket(Executor executor, ssl::context& ctx, CRLogger logger,
-                  const std::string &requests)
-      : _resolver(executor),
-        _ws(executor, ctx),
-        _logger(logger),
-        _requests(requests) {}
+  explicit Socket(Executor executor, ssl::context& ctx,
+                  const std::string& requests)
+      : _resolver(executor), _ws(executor, ctx), _requests(requests) {}
 
   bool io_in_progress() const;
 

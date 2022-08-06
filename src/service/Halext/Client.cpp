@@ -2,8 +2,11 @@
 
 #include <curl/curl.h>
 
+#include <iostream>
 #include <string>
+
 namespace premia {
+
 using namespace halext;
 
 static size_t json_write_callback(const char *contents, size_t size,
@@ -39,4 +42,5 @@ std::string Client::send_request(const std::string &endpoint) const {
 
   return response;
 }
+
 }  // namespace premia

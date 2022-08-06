@@ -1,7 +1,9 @@
 #ifndef CBP_Account_hpp
 #define CBP_Account_hpp
 
-#include "metatypes.h"
+#include <string>
+#include <vector>
+#include <unordered_map>
 
 namespace premia {
 namespace cbp {

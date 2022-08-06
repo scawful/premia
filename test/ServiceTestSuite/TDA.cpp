@@ -1,4 +1,4 @@
-#include "singletons/TDA.hpp"
+#include "app/core/TDA.hpp"
 
 #include <gtest/gtest.h>
 
@@ -18,7 +18,6 @@ class TDAFixture : public ::testing::Test {
   void SetUp() override {
     std::string consumer_key;
     std::string refresh_token;
-    Logger logger;
     std::ifstream keyfile("../assets/apikey.txt");
     if (keyfile.good()) {
       std::stringstream buffer;

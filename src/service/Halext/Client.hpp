@@ -3,10 +3,8 @@
 
 #include <curl/curl.h>
 
+#include <iostream>
 #include <string>
-
-#include "metatypes.h"
-#include "premia.h"
 
 namespace premia {
 namespace halext {

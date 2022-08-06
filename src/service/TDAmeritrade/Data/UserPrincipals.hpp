@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "premia.h"
-
 namespace premia {
 namespace tda {
 
@@ -19,12 +17,15 @@ class UserPrincipals {
  public:
   UserPrincipals();
 
-  void add_account_data(const std::unordered_map<std::string, std::string>& data);
-  void set_account_data(const std::unordered_map<std::string, std::string>& data);
-  void set_streamer_info(const std::unordered_map<std::string, std::string>& data);
+  void add_account_data(
+      const std::unordered_map<std::string, std::string>& data);
+  void set_account_data(
+      const std::unordered_map<std::string, std::string>& data);
+  void set_streamer_info(
+      const std::unordered_map<std::string, std::string>& data);
   std::unordered_map<std::string, std::string> get_account_data_array(int i);
 
-  std::string get_account_data(const std::string &key);
+  std::string get_account_data(const std::string& key);
 };
 
 }  // namespace tda

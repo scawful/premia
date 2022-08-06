@@ -15,7 +15,7 @@ set(BUILD_SHARED_LIBS ON)
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 # Premia by Justin Scofield ---------------------------------------------------------------------------------
-project(Premia VERSION 0.40)
+project(premia VERSION 0.40)
 include_directories(include)
 
 # Boost library ---------------------------------------------------------------------------------------------
@@ -42,15 +42,18 @@ if(OPENSSL_FOUND)
         include_directories(/usr/local/Cellar/openssl@1.1/1.1.1o/include)
         list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1o/lib/libssl.dylib)
         list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1o/lib/libcrypto.dylib)
-        message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
     else()
         include_directories(${OPENSSL_INCLUDE_DIR})
         list(APPEND LIB_LIST ${OPENSSL_LIBRARIES})
-        message(STATUS "OpenSSL Version: ${OPENSSL_VERSION} ${OPENSSL_INCLUDE_DIR} ${OPENSSL_LIBRARIES}")
     endif()
 endif()
 
 add_subdirectory(src/lib/SDL)
+
+set(PROTOBUF_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}
+    CACHE INTERNAL "Path to generated protobuf files.")
+
+include_directories(${PROTOBUF_INCLUDE_PATH})
 
 # Premia program --------------------------------------------------------------------------------------------
 add_subdirectory(src)

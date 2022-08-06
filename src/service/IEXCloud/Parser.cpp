@@ -1,20 +1,20 @@
 #include "Parser.hpp"
 
 #include <boost/lexical_cast.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <string>
 
 #include "Data/FundOwnership.hpp"
 #include "Data/InsiderTransactions.hpp"
-#include "metatypes.h"
 
 namespace premia {
 namespace iex {
 
 void Parser::log_response(std::string title, json::ptree data) {
   std::time_t now = std::time(0);
-  std::string filename = title + boost::lexical_cast<std::string>(now) + ".json";
+  std::string filename =
+      title + boost::lexical_cast<std::string>(now) + ".json";
   std::ofstream file(filename);
 
   // boost::filesystem::path dir("data");
@@ -61,15 +61,19 @@ std::vector<FundOwnership> Parser::parse_fund_ownership(std::string response) {
       std::cout << each.first << " : " << each.second.get_value<std::string>()
                 << std::endl;
       if (each.first == "adjHolding") {
-        fund_ownership.setAdjustedMarketValue(each.second.get_value<std::string>());
+        fund_ownership.setAdjustedMarketValue(
+            each.second.get_value<std::string>());
       } else if (each.first == "adjMv") {
-        fund_ownership.setAdjustedHoldings(each.second.get_value<std::string>());
+        fund_ownership.setAdjustedHoldings(
+            each.second.get_value<std::string>());
       } else if (each.first == "entityProperName") {
-        fund_ownership.setEntityProperName(each.second.get_value<std::string>());
+        fund_ownership.setEntityProperName(
+            each.second.get_value<std::string>());
       } else if (each.first == "reportedHolding") {
         fund_ownership.setReportedHolding(each.second.get_value<std::string>());
       } else if (each.first == "reportedMv") {
-        fund_ownership.setReportedMarketValue(each.second.get_value<std::string>());
+        fund_ownership.setReportedMarketValue(
+            each.second.get_value<std::string>());
       } else if (each.first == "symbol") {
         fund_ownership.setSymbol(each.second.get_value<std::string>());
       } else if (each.first == "date") {

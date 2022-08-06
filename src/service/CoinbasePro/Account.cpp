@@ -1,4 +1,5 @@
 #include "Account.hpp"
+
 namespace premia {
 namespace cbp {
 /**
@@ -7,7 +8,8 @@ namespace cbp {
  * @param ticker
  * @return std::unordered_map<std::string, std::string>
  */
-std::unordered_map<std::string, std::string> Account::get_position(const std::string &ticker) {
+std::unordered_map<std::string, std::string> Account::get_position(
+    const std::string& ticker) {
   for (const auto& fields : accounts_vector) {
     for (const auto& [key, value] : fields) {
       if (value == ticker) {

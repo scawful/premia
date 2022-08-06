@@ -4,9 +4,6 @@
 
 #include <string>
 
-#include "metatypes.h"
-#include "premia.h"
-
 namespace premia {
 namespace iex {
 
@@ -53,7 +50,7 @@ std::string Client::send_request(std::string endpoint) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     res = curl_easy_perform(curl);
-    if (res != CURLE_OK) throw premia::ClientException();
+    // if (res != CURLE_OK) throw premia::ClientException();
 
     /* always cleanup */
     curl_easy_cleanup(curl);
@@ -85,7 +82,7 @@ std::string Client::send_authorized_request(std::string endpoint) {
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
     res = curl_easy_perform(curl);
-    if (res != CURLE_OK) throw premia::ClientException();
+    // if (res != CURLE_OK) throw premia::ClientException();
 
     curl_easy_cleanup(curl);
   }
@@ -95,13 +92,13 @@ std::string Client::send_authorized_request(std::string endpoint) {
 
 std::string Client::get_fund_ownership(std::string symbol) {
   std::string endpoint = current_endpoint() + "stock/" + symbol +
-                    "/fund-ownership/" + token_parameter;
+                         "/fund-ownership/" + token_parameter;
   return send_request(endpoint);
 }
 
 std::string Client::get_insider_transactions(std::string symbol) {
   std::string endpoint = current_endpoint() + "stock/" + symbol +
-                    "/insider-transactions/" + token_parameter;
+                         "/insider-transactions/" + token_parameter;
   return send_request(endpoint);
 }
 }  // namespace iex

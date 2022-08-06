@@ -1,7 +1,9 @@
 #ifndef Product_hpp
 #define Product_hpp
 
-#include "premia.h"
+#include <vector>
+#include <unordered_map>
+#include <string>
 
 namespace premia {
 namespace cbp {

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service OptionChain {
+  rpc GetOptionChain(OptionChainRequest) returns (OptionChainResponse) {}
+}
+
+message OptionChainRequest {
+  string symbol = 1;
+}
+
+message OptionChainResponse {
+  string symbol = 1;
+  string status = 2;
+}

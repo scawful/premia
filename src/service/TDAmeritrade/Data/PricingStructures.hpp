@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "metatypes.h"
-
 namespace premia {
 namespace tda {
 

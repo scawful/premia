@@ -1,5 +1,7 @@
 #include "Socket.hpp"
 
+#include <iostream>
+
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
@@ -13,11 +15,13 @@ using tcp = boost::asio::ip::tcp;
 // TDAmeritrade WebSocket client.
 namespace premia {
 namespace tda {
+  
 void Socket::fail(beast::error_code ec, char const* what) const {
   if (ec == net::error::operation_aborted || ec == websocket::error::closed)
     return;
 
-  _logger("WebSocket::fail(error: " + ec.message() + ", what: " + what + ")");
+  std::cout << "WebSocket::fail(error: " << ec.message() << ", what: " << what
+            << ")" << std::endl;
 }
 
 bool Socket::io_in_progress() const { return _io_in_progress; }
@@ -26,7 +30,8 @@ void Socket::open(char const* host, char const* port) {
   _host = host;
   _port = port;
 
-  _logger("WebSocket::open(host: " + _host + ", port: " + _port + ")");
+  std::cout << "WebSocket::open(host: " + _host + ", port: " + _port + ")"
+            << std::endl;
 
   _resolver.async_resolve(
       host, port,
@@ -37,7 +42,7 @@ void Socket::on_resolve(beast::error_code ec,
                         tcp::resolver::results_type results) {
   if (ec) return fail(ec, "resolve");
 
-  _logger("WebSocket::on_resolve");
+  std::cout << "WebSocket::on_resolve" << std::endl;
 
   beast::get_lowest_layer(_ws).expires_after(std::chrono::seconds(30));
 
@@ -50,7 +55,7 @@ void Socket::on_connect(beast::error_code ec,
                         tcp::resolver::results_type::endpoint_type ep) {
   if (ec) return fail(ec, "connect");
 
-  _logger("WebSocket::on_connect");
+  std::cout << "WebSocket::on_connect" << std::endl;
 
   // Update the _host string. This will provide the value of the
   // Host HTTP header during the WebSocket handshake.
@@ -76,7 +81,7 @@ void Socket::on_connect(beast::error_code ec,
 void Socket::on_ssl_handshake(beast::error_code ec) {
   if (ec) return fail(ec, "ssl_handshake");
 
-  _logger("WebSocket::on_ssl_handshake");
+  std::cout << "WebSocket::on_ssl_handshake" << std::endl;
 
   // Turn off the timeout on the tcp_stream, because
   // the websocket stream has its own timeout system.
@@ -89,8 +94,9 @@ void Socket::on_ssl_handshake(beast::error_code ec) {
   // Set a decorator to change the User-Agent of the handshake
   _ws.set_option(
       websocket::stream_base::decorator([](websocket::request_type& req) {
-        req.set(http::field::user_agent, std::string(BOOST_BEAST_VERSION_STRING) +
-                                             " websocket-client-async-ssl");
+        req.set(http::field::user_agent,
+                std::string(BOOST_BEAST_VERSION_STRING) +
+                    " websocket-client-async-ssl");
       }));
 
   // Perform the websocket handshake
@@ -102,7 +108,7 @@ void Socket::on_ssl_handshake(beast::error_code ec) {
 void Socket::on_handshake(beast::error_code ec) {
   if (ec) return fail(ec, "handshake");
 
-  _logger("WebSocket::on_handshake: success!");
+  std::cout << "WebSocket::on_handshake: success!" << std::endl;
 
   // Send the message
   write(_requests);
@@ -114,7 +120,7 @@ void Socket::on_handshake(beast::error_code ec) {
  * @param s
  */
 void Socket::write(std::string request) {
-  _logger("WebSocket::write");
+  std::cout << "WebSocket::write" << std::endl;
   _io_in_progress = true;
 
   _ws.async_write(
@@ -127,7 +133,7 @@ void Socket::on_write(beast::error_code ec, std::size_t bytes) {
 
   if (ec) return fail(ec, "write");
 
-  _logger("WebSocket::on_write");
+  std::cout << "WebSocket::on_write" << std::endl;
 
   // read a message into our buffer
   _ws.async_read(
@@ -140,8 +146,8 @@ void Socket::on_read(beast::error_code ec, std::size_t bytes) {
   if (ec) return fail(ec, "read");
 
   // handle the server response here
-  _logger("WebSocket::on_read: ");
-  _logger(beast::buffers_to_string(_buffer.data()));
+  std::cout << "WebSocket::on_read: " << std::endl;
+  std::cout << beast::buffers_to_string(_buffer.data()) << std::endl;
 
   // clear the buffer
   _buffer.consume(_buffer.size());
@@ -152,7 +158,7 @@ void Socket::on_read(beast::error_code ec, std::size_t bytes) {
 
 void Socket::close() {
   _io_in_progress = true;
-  _logger("WebSocket::close");
+  std::cout << "WebSocket::close" << std::endl;
   _ws.async_close(
       websocket::close_code::normal,
       beast::bind_front_handler(&Socket::on_close, shared_from_this()));
@@ -168,8 +174,8 @@ void Socket::on_close(beast::error_code ec) {
 
   if (ec) return fail(ec, "close");
 
-  _logger("WebSocket::on_close: ");
-  _logger(beast::buffers_to_string(_buffer.data()));
+  std::cout << "WebSocket::on_close: " << std::endl;
+  std::cout << beast::buffers_to_string(_buffer.data()) << std::endl;
 }
 }  // namespace tda
 }  // namespace premia

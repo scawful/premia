@@ -1,7 +1,10 @@
 #ifndef Watchlist_hpp
 #define Watchlist_hpp
 
-#include "premia.h"
+#include <algorithm>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace premia {
 namespace tda {
@@ -12,7 +15,8 @@ class Watchlist {
     std::string description;
     std::string asset_type;
 
-    WatchlistInstrument(const std::string &sym, const std::string &desc, const std::string &type)
+    WatchlistInstrument(const std::string &sym, const std::string &desc,
+                        const std::string &type)
         : symbol(sym), description(desc), asset_type(type) {}
 
     std::string getSymbol() const { return this->symbol; }
@@ -50,7 +54,8 @@ class Watchlist {
   void setWatchlistVariable(const std::string &variable);
 
   void addVariable(const std::string &key, const std::string &value);
-  void addInstrument(const std::string &symbol, const std::string &desc, const std::string &type);
+  void addInstrument(const std::string &symbol, const std::string &desc,
+                     const std::string &type);
   void removeInstrument(int idx);
 
   bool containsTicker(std::string s);

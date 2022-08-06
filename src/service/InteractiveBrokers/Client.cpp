@@ -3,12 +3,12 @@
 
 #include "Client.hpp"
 
-#include "Data/ContractSamples.hpp"
-#include "Data/OrderSamples.hpp"
-#include "Data/ScannerSubscriptionSamples.hpp"
-#include "Data/AvailableAlgoParams.hpp"
-#include "Data/FAMethodSamples.hpp"
-#include "Data/AccountSummaryTags.hpp"
+#include "data/ContractSamples.hpp"
+#include "data/OrderSamples.hpp"
+#include "data/ScannerSubscriptionSamples.hpp"
+#include "data/AvailableAlgoParams.hpp"
+#include "data/FAMethodSamples.hpp"
+#include "data/AccountSummaryTags.hpp"
 #include "Utils.hpp"
 
 #include <stdio.h>
@@ -47,7 +47,7 @@ bool Client::connect(const char *host, int port, int clientId)
 {
 	// trying to connect
 	printf( "Connecting to %s:%d clientId:%d\n", !( host && *host) ? "127.0.0.1" : host, port, clientId);
-    logger("Connecting to TWS/IB Gateway");
+    printf("Connecting to TWS/IB Gateway");
 	
 	//! [connect]
 	bool bRes = m_pClient->eConnect( host, port, clientId, m_extraAuth);
@@ -55,7 +55,7 @@ bool Client::connect(const char *host, int port, int clientId)
 	
 	if (bRes) {
 		printf( "Connected to %s:%d clientId:%d\n", m_pClient->host().c_str(), m_pClient->port(), clientId);
-        logger("Connected to TWS/IB Gateway");
+        printf("Connected to TWS/IB Gateway");
 		//! [ereader]
 		m_pReader = std::unique_ptr<EReader>( new EReader(m_pClient, &m_osSignal) );
 		m_pReader->start();

@@ -1,9 +1,6 @@
 #ifndef Client_hpp
 #define Client_hpp
 
-#include <string>
-#include <vector>
-
 #include <boost/asio.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/ssl.hpp>
@@ -17,13 +14,13 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <string>
+#include <vector>
 
-#include "metatypes.h"
-#include "service/TDAmeritrade/Data/Order.hpp"
-#include "service/TDAmeritrade/Data/UserPrincipals.hpp"
-#include "service/TDAmeritrade/Parser.hpp"
-#include "service/TDAmeritrade/Socket.hpp"
-#include "util.h"
+#include "Data/Order.hpp"
+#include "Data/UserPrincipals.hpp"
+#include "Parser.hpp"
+#include "Socket.hpp"
 
 namespace premia {
 namespace tda {
@@ -197,7 +194,7 @@ class Client {
   void api_login();
 
   // WebSocket Controls
-  void start_session(Logger logger, const std::string &ticker);
+  void start_session(const std::string &ticker);
   void send_logout_request();
   void fetch_access_token();
 

@@ -1,7 +1,8 @@
 #ifndef IEX_FundOwnership_hpp
 #define IEX_FundOwnership_hpp
 
-#include "premia.h"
+#include "app/premia.h"
+
 namespace premia {
 namespace iex {
 class FundOwnership {

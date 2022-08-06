@@ -13,8 +13,6 @@ add_executable(
   premia_test
   PremiaTest.cpp
   ServiceTestSuite/TDA.cpp
-  ServiceTestSuite/CBP.cpp
-  ServiceTestSuite/IEX.cpp
   ../src/service/Halext/Client.cpp 
   ../src/service/Halext/User.cpp    
   ../src/service/IEXCloud/Client.cpp 

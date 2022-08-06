@@ -7,14 +7,13 @@
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 
-#include "metatypes.h"
-#include "service/TDAmeritrade/Data/Account.hpp"
-#include "service/TDAmeritrade/Data/OptionChain.hpp"
-#include "service/TDAmeritrade/Data/PriceHistory.hpp"
-#include "service/TDAmeritrade/Data/PricingStructures.hpp"
-#include "service/TDAmeritrade/Data/Quote.hpp"
-#include "service/TDAmeritrade/Data/UserPrincipals.hpp"
-#include "service/TDAmeritrade/Data/Watchlist.hpp"
+#include "data/Account.hpp"
+#include "data/OptionChain.hpp"
+#include "data/PriceHistory.hpp"
+#include "data/PricingStructures.hpp"
+#include "data/Quote.hpp"
+#include "data/UserPrincipals.hpp"
+#include "data/Watchlist.hpp"
 
 namespace premia {
 namespace tda {

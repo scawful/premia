@@ -4,7 +4,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "PricingStructures.hpp"
-#include "metatypes.h"
 
 namespace premia {
 namespace tda {

@@ -4,16 +4,16 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <iostream>
 #include <string>
 
-#include "Data/Account.hpp"
-#include "Data/OptionChain.hpp"
-#include "Data/PriceHistory.hpp"
-#include "Data/PricingStructures.hpp"
-#include "Data/Quote.hpp"
-#include "Data/UserPrincipals.hpp"
-#include "Data/Watchlist.hpp"
-#include "metatypes.h"
+#include "data/Account.hpp"
+#include "data/OptionChain.hpp"
+#include "data/PriceHistory.hpp"
+#include "data/PricingStructures.hpp"
+#include "data/Quote.hpp"
+#include "data/UserPrincipals.hpp"
+#include "data/Watchlist.hpp"
 
 namespace premia {
 namespace tda {
@@ -125,7 +125,8 @@ Quote Parser::parse_quote(const json::ptree &data) const {
 
   for (const auto &[key, value] : data) {
     for (const auto &[propertyKey, propertyValue] : value) {
-      quote.setQuoteVariable(propertyKey, propertyValue.get_value<std::string>());
+      quote.setQuoteVariable(propertyKey,
+                             propertyValue.get_value<std::string>());
     }
   }
 
@@ -143,7 +144,8 @@ Quote Parser::parse_quote(const json::ptree &data) const {
  * @return PriceHistory
  */
 PriceHistory Parser::parse_price_history(const json::ptree &data,
-                                         const std::string &ticker, int freq) const {
+                                         const std::string &ticker,
+                                         int freq) const {
   PriceHistory price_history;
   price_history.setTickerSymbol(ticker);
 
@@ -155,20 +157,20 @@ PriceHistory Parser::parse_price_history(const json::ptree &data,
         for (const auto &[valueKey, finalValue] : candleValue) {
           try {
             if (valueKey == "open") {
-              newCandle.open =
-                  boost::lexical_cast<double>(finalValue.get_value<std::string>());
+              newCandle.open = boost::lexical_cast<double>(
+                  finalValue.get_value<std::string>());
             } else if (valueKey == "close") {
-              newCandle.close =
-                  boost::lexical_cast<double>(finalValue.get_value<std::string>());
+              newCandle.close = boost::lexical_cast<double>(
+                  finalValue.get_value<std::string>());
             } else if (valueKey == "high") {
-              newCandle.high =
-                  boost::lexical_cast<double>(finalValue.get_value<std::string>());
+              newCandle.high = boost::lexical_cast<double>(
+                  finalValue.get_value<std::string>());
             } else if (valueKey == "low") {
-              newCandle.low =
-                  boost::lexical_cast<double>(finalValue.get_value<std::string>());
+              newCandle.low = boost::lexical_cast<double>(
+                  finalValue.get_value<std::string>());
             } else if (valueKey == "volume") {
-              newCandle.volume =
-                  boost::lexical_cast<double>(finalValue.get_value<std::string>());
+              newCandle.volume = boost::lexical_cast<double>(
+                  finalValue.get_value<std::string>());
             } else if (valueKey == "datetime") {
               std::stringstream dt_ss;
               std::time_t secsSinceEpoch = boost::lexical_cast<std::time_t>(
@@ -247,8 +249,8 @@ OptionChain Parser::parse_option_chain(const json::ptree &data) const {
 
     if (optionsKey == "underlying") {
       for (const auto &[underlyingKey, underlyingValue] : optionsValue) {
-        optionChain.setUnderlyingVariable(underlyingKey,
-                                          underlyingValue.get_value<std::string>());
+        optionChain.setUnderlyingVariable(
+            underlyingKey, underlyingValue.get_value<std::string>());
       }
     }
 
@@ -279,7 +281,8 @@ Account Parser::parse_account(const json::ptree &data) const {
             std::unordered_map<std::string, std::string> instrument;
             for (const auto &[fieldKey, fieldValue] : positionsValue) {
               if (fieldKey == "symbol") {
-                new_position_balance.symbol = fieldValue.get_value<std::string>();
+                new_position_balance.symbol =
+                    fieldValue.get_value<std::string>();
               }
               pos_field[fieldKey] = fieldValue.get_value<std::string>();
             }
@@ -321,14 +324,16 @@ Account Parser::parse_all_accounts(const json::ptree &data) const {
             for (const auto &[positionsKey, positionsValue] :
                  positionListValue) {
               std::cout << "Positions List: " << positionListKey << " : "
-                        << positionListValue.get_value<std::string>() << std::endl;
+                        << positionListValue.get_value<std::string>()
+                        << std::endl;
               new_position_balance.balances[positionsKey] =
                   positionsValue.get_value<std::string>();
               std::unordered_map<std::string, std::string> pos_field;
               std::unordered_map<std::string, std::string> instrument;
               for (const auto &[fieldKey, fieldValue] : positionsValue) {
                 if (fieldKey == "symbol") {
-                  new_position_balance.symbol = fieldValue.get_value<std::string>();
+                  new_position_balance.symbol =
+                      fieldValue.get_value<std::string>();
                 }
                 pos_field[fieldKey] = fieldValue.get_value<std::string>();
               }
@@ -377,9 +382,11 @@ std::vector<tda::Watchlist> Parser::parse_watchlist_data(
       for (const auto &[item2Key, item2Value] : itemValue) {
         if (item2Key == "instrument") {
           try {
-            std::string symbol = item2Value.get_child("symbol").get_value<std::string>();
+            std::string symbol =
+                item2Value.get_child("symbol").get_value<std::string>();
             std::string desc = "";
-            std::string type = item2Value.get_child("assetType").get_value<std::string>();
+            std::string type =
+                item2Value.get_child("assetType").get_value<std::string>();
             watchlist.addInstrument(symbol, desc, type);
           } catch (const json::ptree_error &e) {
             std::cout << e.what() << std::endl;

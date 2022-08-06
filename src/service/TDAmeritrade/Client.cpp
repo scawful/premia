@@ -14,14 +14,22 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Data/Order.hpp"
 #include "Data/UserPrincipals.hpp"
 #include "Parser.hpp"
 #include "Socket.hpp"
-#include "metatypes.h"
-#include "util.h"
+
+static auto string_replace(std::string &str, const std::string &from,
+                           const std::string &to) -> bool {
+  size_t start = str.find(from);
+  if (start == std::string::npos) return false;
+
+  str.replace(start, from.length(), to);
+  return true;
+}
 
 namespace premia {
 
@@ -71,9 +79,9 @@ std::string Client::send_request(const std::string &endpoint) const {
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
   res = curl_easy_perform(curl);
 
-  if (res != CURLE_OK)
-    throw premia::TDAClientException("send_request() failed",
-                                     curl_easy_strerror(res));
+  // if (res != CURLE_OK)
+  //   throw premia::TDAClientException("send_request() failed",
+  //                                    curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
   return response;
@@ -105,9 +113,9 @@ std::string Client::send_authorized_request(const std::string &endpoint) const {
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
   res = curl_easy_perform(curl);
-  if (res != CURLE_OK)
-    throw premia::TDAClientException("send_authorized_request() failed",
-                                     curl_easy_strerror(res));
+  // if (res != CURLE_OK)
+  //   throw premia::TDAClientException("send_authorized_request() failed",
+  //                                    curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
   return response;
@@ -149,9 +157,9 @@ void Client::post_authorized_request(const std::string &endpoint,
 
   res = curl_easy_perform(curl);
 
-  if (res != CURLE_OK)
-    throw premia::TDAClientException("post_authorized_request() failed",
-                                     curl_easy_strerror(res));
+  // if (res != CURLE_OK)
+  //   throw premia::TDAClientException("post_authorized_request() failed",
+  //                                    curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
 }
@@ -199,9 +207,9 @@ std::string Client::post_access_token() const {
   // run the operations
   res = curl_easy_perform(curl);
 
-  if (res != CURLE_OK)
-    throw premia::TDAClientException("post_access_token() failed",
-                                     curl_easy_strerror(res));
+  // if (res != CURLE_OK)
+  //   throw premia::TDAClientException("post_access_token() failed",
+  //                                    curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
   return response;
@@ -357,7 +365,7 @@ void Client::api_login() {
  * @param ticker
  * @param fields
  */
-void Client::start_session(Logger logger, const std::string &ticker) {
+void Client::start_session(const std::string &ticker) {
   std::string host;
   std::string port = "443";
   std::string all_requests;
@@ -365,16 +373,7 @@ void Client::start_session(Logger logger, const std::string &ticker) {
   std::stringstream requests_text_stream;
   std::vector<json::ptree> requests_array;
 
-  Try {
-    host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
-  }
-  catch (const json::ptree_error &) {
-    logger(
-        "Client::start_session::ptree_bad_path@[streamerInfo."
-        "streamerSocketUrl]");
-  }
-  finally {}
-  Proceed;
+  host = _user_principals.get<std::string>("streamerInfo.streamerSocketUrl");
 
   requests_array.push_back(create_login_request());
   requests_array.push_back(
@@ -382,8 +381,8 @@ void Client::start_session(Logger logger, const std::string &ticker) {
   requests = bind_requests(requests_array);
   write_json(requests_text_stream, requests);
   all_requests = requests_text_stream.str();
-  websocket_session = std::make_shared<tda::Socket>(
-      ioc_pool.get_executor(), context, logger, all_requests);
+  websocket_session = std::make_shared<tda::Socket>(ioc_pool.get_executor(),
+                                                    context, all_requests);
   websocket_session->open(host.c_str(), port.c_str());
 }
 
@@ -421,7 +420,7 @@ std::string Client::get_account(const std::string &account_id) {
   std::string account_url =
       "https://api.tdameritrade.com/v1/accounts/"
       "{accountNum}?fields=positions,orders";
-  Utils::string_replace(account_url, "{accountNum}", account_id);
+  string_replace(account_url, "{accountNum}", account_id);
   return send_authorized_request(account_url);
 }
 
@@ -478,7 +477,7 @@ std::string Client::get_quote(const std::string &symbol) const {
   std::string url =
       "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" +
       api_key;
-  Utils::string_replace(url, "{ticker}", symbol);
+  string_replace(url, "{ticker}", symbol);
   return send_request(url);
 }
 
@@ -493,7 +492,7 @@ std::string Client::get_watchlist_by_account(
     const std::string &account_id) const {
   std::string url =
       "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
-  Utils::string_replace(url, "{accountNum}", account_id);
+  string_replace(url, "{accountNum}", account_id);
   return send_authorized_request(url);
 }
 
@@ -520,16 +519,16 @@ std::string Client::get_price_history(const std::string &symbol,
       "&periodType={periodType}&period={period}&frequencyType={frequencyType}&"
       "frequency={frequency}&needExtendedHoursData={ext}";
 
-  Utils::string_replace(url, "{ticker}", symbol);
-  Utils::string_replace(url, "{periodType}", get_api_interval_value(ptype));
-  Utils::string_replace(url, "{period}", get_api_period_amount(period_amt));
-  Utils::string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
-  Utils::string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
+  string_replace(url, "{ticker}", symbol);
+  string_replace(url, "{periodType}", get_api_interval_value(ptype));
+  string_replace(url, "{period}", get_api_period_amount(period_amt));
+  string_replace(url, "{frequencyType}", get_api_frequency_type(ftype));
+  string_replace(url, "{frequency}", get_api_frequency_amount(freq_amt));
 
   if (!ext)
-    Utils::string_replace(url, "{ext}", "false");
+    string_replace(url, "{ext}", "false");
   else
-    Utils::string_replace(url, "{ext}", "true");
+    string_replace(url, "{ext}", "true");
 
   return send_request(url);
 }
@@ -560,18 +559,18 @@ std::string Client::get_option_chain(
       "includeQuotes={includeQuotes}&strategy={strategy}&range={range}&"
       "expMonth={expMonth}&optionType={optionType}";
 
-  Utils::string_replace(url, "{ticker}", ticker);
-  Utils::string_replace(url, "{contractType}", contractType);
-  Utils::string_replace(url, "{strikeCount}", strikeCount);
-  Utils::string_replace(url, "{strategy}", strategy);
-  Utils::string_replace(url, "{range}", range);
-  Utils::string_replace(url, "{expMonth}", expMonth);
-  Utils::string_replace(url, "{optionType}", optionType);
+  string_replace(url, "{ticker}", ticker);
+  string_replace(url, "{contractType}", contractType);
+  string_replace(url, "{strikeCount}", strikeCount);
+  string_replace(url, "{strategy}", strategy);
+  string_replace(url, "{range}", range);
+  string_replace(url, "{expMonth}", expMonth);
+  string_replace(url, "{optionType}", optionType);
 
   if (!includeQuotes)
-    Utils::string_replace(url, "{includeQuotes}", "FALSE");
+    string_replace(url, "{includeQuotes}", "FALSE");
   else
-    Utils::string_replace(url, "{includeQuotes}", "TRUE");
+    string_replace(url, "{includeQuotes}", "TRUE");
 
   return send_request(url);
 }
@@ -587,8 +586,8 @@ std::string Client::get_order(const std::string &account_id,
                               const std::string &order_id) const {
   std::string endpoint =
       "https://api.tdameritrade.com/v1/accounts/{accountId}/orders/{orderId}";
-  Utils::string_replace(endpoint, "{accountId}", account_id);
-  Utils::string_replace(endpoint, "{orderId}", order_id);
+  string_replace(endpoint, "{accountId}", account_id);
+  string_replace(endpoint, "{orderId}", order_id);
   return send_authorized_request(endpoint);
 }
 
@@ -610,11 +609,11 @@ std::string Client::get_orders_by_query(const std::string &account_id,
       "https://api.tdameritrade.com/v1/accounts/{accountId}/"
       "orders?maxResults={maxResults}&fromEnteredTime={from}&toEnteredTime={to}"
       "&status={status}";
-  Utils::string_replace(endpoint, "{accountId}", account_id);
-  Utils::string_replace(endpoint, "{maxResults}", std::to_string(maxResults));
-  Utils::string_replace(endpoint, "{from}", std::to_string(fromEnteredTime));
-  Utils::string_replace(endpoint, "{to}", std::to_string(toEnteredTime));
-  Utils::string_replace(endpoint, "{status}", "status");
+  string_replace(endpoint, "{accountId}", account_id);
+  string_replace(endpoint, "{maxResults}", std::to_string(maxResults));
+  string_replace(endpoint, "{from}", std::to_string(fromEnteredTime));
+  string_replace(endpoint, "{to}", std::to_string(toEnteredTime));
+  string_replace(endpoint, "{status}", "status");
   return send_authorized_request(endpoint);
 }
 
@@ -628,7 +627,7 @@ void Client::place_order(const std::string &account_id,
                          const Order &order) const {
   std::string endpoint =
       "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
-  Utils::string_replace(endpoint, "{accountId}", account_id);
+  string_replace(endpoint, "{accountId}", account_id);
   post_authorized_request(endpoint, order.getString());
 }
 

@@ -6,7 +6,6 @@
 #ifndef TWS_API_SAMPLES_TESTCPPCLIENT_TESTCPPCLIENT_H
 #define TWS_API_SAMPLES_TESTCPPCLIENT_TESTCPPCLIENT_H
 
-#include "metatypes.h"
 #include "tws/CommissionReport.h"
 #include "tws/CommonDefs.h"
 #include "tws/Contract.h"
@@ -38,9 +37,9 @@
 #endif
 #endif
 
-#include "EReader.h"
-#include "EReaderOSSignal.h"
-#include "EWrapper.h"
+#include "tws/EReader.h"
+#include "tws/EReaderOSSignal.h"
+#include "tws/EWrapper.h"
 
 class EClientSocket;
 
@@ -208,7 +207,6 @@ class Client : public EWrapper {
   EReaderOSSignal m_osSignal;
   EClientSocket* const m_pClient;
   //! [socket_declare]
-  Logger logger;
   State m_state;
   time_t m_sleepDeadline;
 
