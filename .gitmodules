@@ -28,3 +28,6 @@
 [submodule "src/lib/protobuf"]
 	path = src/lib/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
+[submodule "src/lib/abseil-cpp"]
+	path = src/lib/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp

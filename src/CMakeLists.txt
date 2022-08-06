@@ -46,8 +46,8 @@ set(
   view/account/account_view.cc
   view/watchlist/watchlist_view.cc
   view/chart/chart_view.cc
-  view/chart/subview/CandleChart.cpp
-  view/chart/subview/LinePlotChart.cpp
+  view/chart/subview/candle_chart.cc
+  view/chart/subview/line_plot_chart.cc
 )
 
 set(
@@ -113,6 +113,7 @@ target_include_directories(
   .
   lib
   lib/imgui
+  lib/abseil-cpp
   lib/SDL/include
 )
 
@@ -123,8 +124,25 @@ if(WIN32 OR MINGW)
     add_definitions(-DSDL_MAIN_HANDLED)
 endif()
 
+set(
+  ABSL_TARGETS   
+  absl::strings
+  absl::flags
+  absl::status
+  absl::statusor
+  absl::examine_stack
+  absl::stacktrace
+  absl::base
+  absl::config
+  absl::core_headers
+  absl::raw_logging_internal
+  absl::failure_signal_handler
+  absl::flat_hash_map
+)
+
 target_link_libraries(
   Premia
+  ${ABSL_TARGETS}
   ${BOOST_LIBRARIES} 
   ${SDL_TARGETS}
   ${OPENGL_LIBRARIES} 

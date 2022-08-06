@@ -1,5 +1,17 @@
 #include "workspace.h"
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+
+#include <memory>
+#include <string>
+
+#include "metatypes.h"
+#include "singletons/HLXT.hpp"
+#include "view/chart/subview/candle_chart.h"
+#include "view/view.h"
+
 namespace premia {
 
 namespace {
@@ -20,6 +32,7 @@ void NewMasterFrame() {
     ImGui::End();
     return;
   }
+  halext::HLXT::getInstance().setSelectedChart(0);
 }
 
 }  // namespace
@@ -27,9 +40,7 @@ void NewMasterFrame() {
 void Workspace::Update() {
   NewMasterFrame();
   menu_view_.Update();
-
   primary_view_.Update();
-
   ImGui::End();
 }
 

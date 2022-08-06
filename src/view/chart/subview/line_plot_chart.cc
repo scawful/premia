@@ -1,4 +1,4 @@
-#include "LinePlotChart.hpp"
+#include "line_plot_chart.h"
 
 #include <boost/lexical_cast.hpp>
 #include <fstream>
@@ -63,7 +63,8 @@ void LinePlotChart::addLogger(const Logger& newLogger) {
   // this->logger = newLogger;
 }
 
-void LinePlotChart::addEvent(const std::string &key, const EventHandler& event) {
+void LinePlotChart::addEvent(const std::string& key,
+                             const EventHandler& event) {
   this->events[key] = event;
 }
 

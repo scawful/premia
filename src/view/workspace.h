@@ -3,7 +3,7 @@
 
 #include "view/account/account_view.h"
 #include "view/chart/chart_view.h"
-#include "view/chart/subview/LinePlotChart.hpp"
+#include "view/chart/subview/line_plot_chart.h"
 #include "view/console/console_view.h"
 #include "view/core/primary_view.h"
 #include "view/login/login_view.h"

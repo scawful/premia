@@ -8,7 +8,7 @@
 #include <string>
 
 #include "metatypes.h"
-#include "view/chart/subview/CandleChart.hpp"
+#include "view/chart/subview/candle_chart.h"
 #include "view/view.h"
 
 namespace premia {
@@ -71,7 +71,7 @@ std::string ChartView::getName() { return "Chart"; }
 
 void ChartView::addLogger(const Logger& newLogger) { this->logger = newLogger; }
 
-void ChartView::addEvent(const std::string &key, const EventHandler& event) {
+void ChartView::addEvent(const std::string& key, const EventHandler& event) {
   this->events[key] = event;
 }
 

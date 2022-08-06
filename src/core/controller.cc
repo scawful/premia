@@ -8,11 +8,19 @@
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
+#include <memory>
+#include <string>
+
+#include "absl/status/status.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/string_view.h"
 #include "view/chart/chart_view.h"
 #include "view/console/console_view.h"
 #include "view/login/login_view.h"
 #include "view/options/option_chain.h"
 #include "view/view_manager.h"
+#include "view/workspace.h"
 
 namespace premia {
 
@@ -122,73 +130,14 @@ static void ColorsPremia(ImGuiStyle* dst = nullptr) {
   colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 }
 
-void Controller::initWindow() {
-  if (SDL_Init(SDL_INIT_EVERYTHING)) {
-    SDL_Log("SDL_Init: %s\n", SDL_GetError());
-  } else {
-    window = SDL_CreateWindow("Premia",                 // window title
-                              SDL_WINDOWPOS_UNDEFINED,  // initial x position
-                              SDL_WINDOWPOS_UNDEFINED,  // initial y position
-                              SCREEN_WIDTH,             // width, in pixels
-                              SCREEN_HEIGHT,            // height, in pixels
-                              SDL_WINDOW_RESIZABLE      // flags
-    );
-  }
-
-  if (window == nullptr) {
-    SDL_Log("SDL_CreateWindow: %s\n", SDL_GetError());
-    SDL_Quit();
-    throw premia::FatalException();
-  } else {
-    renderer = SDL_CreateRenderer(
-        window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == nullptr) {
-      SDL_Log("SDL_CreateRenderer: %s\n", SDL_GetError());
-      SDL_Quit();
-      throw premia::FatalException();
-    } else {
-      SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-      SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
-    }
-  }
-
-  // Create the ImGui and ImPlot contexts
-  ImGui::CreateContext();
-  ImPlot::CreateContext();
-
-  // Initialize ImGui for SDL
-  ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-  ImGui_ImplSDLRenderer_Init(renderer);
-
-  // Load available fonts
-  const ImGuiIO& io = ImGui::GetIO();
-  io.Fonts->AddFontFromFileTTF("assets/Cousine-Regular.ttf", 13.0f);
-  // merge in icons from Google Material Design
-  static const ImWchar icons_ranges[] = {ICON_MIN_MD, 0xf900, 0};
-  ImFontConfig icons_config;
-  icons_config.MergeMode = true;
-  icons_config.GlyphOffset.y = 6.0f;
-  icons_config.GlyphMinAdvanceX = 13.0f;
-  icons_config.PixelSnapH = true;
-  io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_MD, 18.0f, &icons_config,
-                               icons_ranges);
-  io.Fonts->AddFontFromFileTTF("assets/DroidSans.ttf", 13.0f);
-  io.Fonts->AddFontFromFileTTF("assets/Karla-Regular.ttf", 12.0f);
-  io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 12.0f);
-
-  // Build a new ImGui frame
-  ImGui_ImplSDLRenderer_NewFrame();
-  ImGui_ImplSDL2_NewFrame(window);
-
-  SDL_SetWindowResizable(this->window, SDL_TRUE);
-  ColorsPremia();
-}
-
 bool Controller::isActive() const { return active; }
 
-void Controller::onEntry() noexcept(false) {
-  initWindow();
+absl::Status Controller::onEntry() noexcept(false) {
+  CHECK_STATUS(CreatePremiaWindow())
+  CHECK_STATUS(CreatePremiaRenderer())
+  CHECK_STATUS(CreatePremiaGuiContext())
   active = true;
+  return absl::OkStatus();
 }
 
 void Controller::onInput() {
@@ -260,10 +209,10 @@ void Controller::onInput() {
 void Controller::onLoad() { workspace_.Update(); }
 
 void Controller::doRender() {
-  SDL_RenderClear(renderer);
+  SDL_RenderClear(renderer_.get());
   ImGui::Render();
   ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-  SDL_RenderPresent(renderer);
+  SDL_RenderPresent(renderer_.get());
 }
 
 void Controller::onExit() {
@@ -271,11 +220,78 @@ void Controller::onExit() {
   ImGui_ImplSDL2_Shutdown();
   ImPlot::DestroyContext();
   ImGui::DestroyContext();
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
   SDL_Quit();
-  renderer = nullptr;
-  window = nullptr;
+}
+
+absl::Status Controller::CreatePremiaWindow() {
+  if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    return absl::InternalError(
+        absl::StrFormat("SDL_Init: %s\n", SDL_GetError()));
+  } else {
+    window_ = std::unique_ptr<SDL_Window, sdl_deleter>(
+        SDL_CreateWindow("Premia",                 // window title
+                         SDL_WINDOWPOS_UNDEFINED,  // initial x position
+                         SDL_WINDOWPOS_UNDEFINED,  // initial y position
+                         SCREEN_WIDTH,             // width, in pixels
+                         SCREEN_HEIGHT,            // height, in pixels
+                         SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL),
+        sdl_deleter());
+    if (window_ == nullptr) {
+      return absl::InternalError(
+          absl::StrFormat("SDL_CreateWindow: %s\n", SDL_GetError()));
+    }
+  }
+  return absl::OkStatus();
+}
+
+absl::Status Controller::CreatePremiaRenderer() {
+  renderer_ = std::unique_ptr<SDL_Renderer, sdl_deleter>(
+      SDL_CreateRenderer(window_.get(), -1,
+                         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC),
+      sdl_deleter());
+  if (renderer_ == nullptr) {
+    return absl::InternalError(
+        absl::StrFormat("SDL_CreateRenderer: %s\n", SDL_GetError()));
+  } else {
+    SDL_SetRenderDrawBlendMode(renderer_.get(), SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer_.get(), 0x00, 0x00, 0x00, 0x00);
+  }
+  return absl::OkStatus();
+}
+
+absl::Status Controller::CreatePremiaGuiContext() {
+  ImGui::CreateContext();
+  ImPlot::CreateContext();
+
+  // Initialize ImGui for SDL
+  ImGui_ImplSDL2_InitForSDLRenderer(window_.get(), renderer_.get());
+  ImGui_ImplSDLRenderer_Init(renderer_.get());
+
+  // Load available fonts
+  const ImGuiIO& io = ImGui::GetIO();
+  io.Fonts->AddFontFromFileTTF("assets/Cousine-Regular.ttf", 13.0f);
+
+  // merge in icons from Google Material Design
+  static const ImWchar icons_ranges[] = {ICON_MIN_MD, 0xf900, 0};
+  ImFontConfig icons_config;
+  icons_config.MergeMode = true;
+  icons_config.GlyphOffset.y = 6.0f;
+  icons_config.GlyphMinAdvanceX = 13.0f;
+  icons_config.PixelSnapH = true;
+  io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_MD, 18.0f, &icons_config,
+                               icons_ranges);
+  io.Fonts->AddFontFromFileTTF("assets/DroidSans.ttf", 13.0f);
+  io.Fonts->AddFontFromFileTTF("assets/Karla-Regular.ttf", 12.0f);
+  io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 12.0f);
+
+  // Build a new ImGui frame
+  ImGui_ImplSDLRenderer_NewFrame();
+  ImGui_ImplSDL2_NewFrame(window_.get());
+
+  SDL_SetWindowResizable(window_.get(), SDL_TRUE);
+  premia::ColorsPremia();
+
+  return absl::OkStatus();
 }
 
 }  // namespace premia

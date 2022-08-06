@@ -1,4 +1,4 @@
-#include "CandleChart.hpp"
+#include "candle_chart.h"
 
 #include <implot/implot.h>
 #include <implot/implot_internal.h>

@@ -5,7 +5,7 @@
 #include <string>
 
 #include "metatypes.h"
-#include "view/chart/subview/CandleChart.hpp"
+#include "view/chart/subview/candle_chart.h"
 #include "view/view.h"
 
 namespace premia {
@@ -15,7 +15,7 @@ class ChartView : public View {
  public:
   std::string getName() override;
   void addLogger(const Logger& logger) override;
-  void addEvent(const std::string &key, const EventHandler& event) override;
+  void addEvent(const std::string& key, const EventHandler& event) override;
   void Update() override;
 
  private:

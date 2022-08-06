@@ -7,6 +7,11 @@
 #define main SDL_main
 #endif
 
+#define CHECK_STATUS(w) \
+  if (!w.ok()) {        \
+    return w;           \
+  }
+
 namespace premia {
 
 /**

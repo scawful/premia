@@ -9,6 +9,14 @@
 
 namespace premia {
 class CandleChart : public Chart {
+ public:
+  void Update() override;
+
+  void importModel(std::shared_ptr<ChartModel> newModel) override;
+  void fetchData(const std::string& ticker, tda::PeriodType ptype,
+                 int period_amt, tda::FrequencyType ftype, int freq_amt,
+                 bool ext) override;
+
  private:
   std::string tickerSymbol;
   std::string quoteDetails;
@@ -18,12 +26,6 @@ class CandleChart : public Chart {
   void DrawCandles(float width_percent, int count, ImVec4 bullCol,
                    ImVec4 bearCol, bool tooltip);
   void DrawCandleChart();
-
- public:
-  void importModel(std::shared_ptr<ChartModel> newModel) override;
-  void fetchData(const std::string &ticker, tda::PeriodType ptype, int period_amt,
-                 tda::FrequencyType ftype, int freq_amt, bool ext) override;
-  void Update() override;
 };
 }  // namespace premia
 

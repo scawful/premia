@@ -8,6 +8,16 @@
 
 namespace premia {
 class LinePlotChart : public View {
+ public:
+  LinePlotChart();
+  ~LinePlotChart() override;
+
+  void Update() override;
+
+  std::string getName() override;
+  void addLogger(const Logger &logger) override;
+  void addEvent(const std::string &key, const EventHandler &event) override;
+
  private:
   bool show_lines;
   bool show_fills;
@@ -25,15 +35,6 @@ class LinePlotChart : public View {
   std::unordered_map<std::string, EventHandler> events;
 
   void initData();
-
- public:
-  LinePlotChart();
-  ~LinePlotChart() override;
-
-  void Update() override;
-  std::string getName() override;
-  void addLogger(const Logger &logger) override;
-  void addEvent(const std::string &key, const EventHandler &event) override;
 };
 }  // namespace premia
 

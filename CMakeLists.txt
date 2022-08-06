@@ -23,6 +23,12 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
+# Abseil Standard Specifications ----------------------------------------------
+set(ABSL_PROPAGATE_CXX_STD ON)
+set(ABSL_CXX_STANDARD 17)
+set(ABSL_USE_GOOGLETEST_HEAD ON)
+set(ABSL_ENABLE_INSTALL ON)
+add_subdirectory(src/lib/abseil-cpp)
 
 # OpenSSL library -------------------------------------------------------------------------------------------
 if(APPLE)
