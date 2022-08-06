@@ -2,15 +2,13 @@
 find_package(CURL REQUIRED)
 
 # ImGui library ---------------------------------------------------------------
-set(IMGUI_PATH  "lib/imgui")                         # Set where the ImGui files are stored
-file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)          # Compile as static library 
+set(IMGUI_PATH  "lib/imgui")
+file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
 target_compile_definitions(ImGui PUBLIC 
-  IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  
-  GL_GLEXT_PROTOTYPES=1
-)
+  IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  GL_GLEXT_PROTOTYPES=1)
 
 # ImPlot library ----------------------------------------------------------------
 set(IMPLOT_PATH "lib/implot")
@@ -71,23 +69,8 @@ set(
   service/CoinbasePro/Product.cpp
 )
 
-# Premia Executable Linkage ------------------------------------------------------
-add_executable(
-  Premia 
-  premia.cc
-  ${PREMIA_APP_MODEL_SRC}
-  ${PREMIA_APP_VIEW_SRC}
-  # Controller 
-  core/controller.cc    
-  # Services 
-  service/Halext/Client.cpp 
-  service/Halext/User.cpp  
-  ## IEXCloud Service  
-  service/IEXCloud/Client.cpp 
-  service/IEXCloud/Parser.cpp
-  ${PREMIA_SERVICE_CB_SRC}
-  ${PREMIA_SERVICE_TDA_SRC}
-  ## InteractiveBrokers Service
+set(
+  PREMIA_SERVICE_IBKR_SRC
   service/InteractiveBrokers/Client.cpp
   service/InteractiveBrokers/Data/ContractSamples.cpp
   service/InteractiveBrokers/Data/OrderSamples.cpp
@@ -95,7 +78,22 @@ add_executable(
   service/InteractiveBrokers/Data/AvailableAlgoParams.cpp
   service/InteractiveBrokers/Data/AccountSummaryTags.cpp
   service/InteractiveBrokers/Utils.cpp
-  # GUI libraries 
+)
+
+# Premia Executable Linkage ------------------------------------------------------
+add_executable(
+  Premia 
+  premia.cc
+  core/controller.cc  
+  ${PREMIA_APP_MODEL_SRC}
+  ${PREMIA_APP_VIEW_SRC}
+  ${PREMIA_SERVICE_CB_SRC}
+  ${PREMIA_SERVICE_TDA_SRC}
+  ${PREMIA_SERVICE_IBKR_SRC}
+  service/Halext/Client.cpp 
+  service/Halext/User.cpp  
+  service/IEXCloud/Client.cpp 
+  service/IEXCloud/Parser.cpp
   ${IMGUI_PATH}/imgui.cpp 
   ${IMGUI_PATH}/imgui_demo.cpp
   ${IMGUI_PATH}/imgui_draw.cpp 
