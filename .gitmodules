@@ -25,3 +25,6 @@
 [submodule "src/lib/SDL"]
 	path = src/lib/SDL
 	url = https://github.com/libsdl-org/SDL
+[submodule "src/lib/protobuf"]
+	path = src/lib/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

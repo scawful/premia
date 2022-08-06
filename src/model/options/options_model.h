@@ -5,6 +5,7 @@
 
 #include "model/model.h"
 #include "singletons/TDA.hpp"
+#include "metatypes.h"
 
 namespace premia {
 class OptionsModel : public Model {

@@ -69,7 +69,7 @@ void OptionsModel::calculateGammaExposure() {
       double strikeGammaExposure = 100;
       double gamma =
           boost::lexical_cast<double>(eachStrike.raw_option.at("gamma"));
-      if (isnan(gamma)) {
+      if (std::isnan(gamma)) {
         gamma = 0.0;
       }
       strikeGammaExposure *= gamma;
@@ -101,7 +101,7 @@ void OptionsModel::calculateGammaExposure() {
 
       double volgaPartOne = vannaPartOne - (volatility * sqrt(daysTilExpiry));
       double volgaPartTwo = vega * (volgaPartOne / volatility);
-      if (volgaPartTwo != 0 && !isinf(volgaPartTwo)) {
+      if (volgaPartTwo != 0 && !std::isinf(volgaPartTwo)) {
         volgaExposureArray.push_back(volgaPartTwo);
       }
     }
@@ -114,7 +114,7 @@ void OptionsModel::calculateGammaExposure() {
       double strikeGammaExposure = -100;
       double gamma =
           boost::lexical_cast<double>(eachStrike.raw_option.at("gamma"));
-      if (isnan(gamma)) {
+      if (std::isnan(gamma)) {
         gamma = 0.0;
       }
       strikeGammaExposure *= gamma;
