@@ -13,7 +13,7 @@ target_link_libraries(tda_proto
 )
 target_include_directories(tda_proto 
   PUBLIC 
-    ${CMAKE_CURRENT_BINARY_DIR}/service/TDAmeritrade
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
@@ -44,8 +44,10 @@ set(
 add_library(tdameritrade ${PREMIA_SERVICE_TDA_SRC})
 target_include_directories(tdameritrade 
   PUBLIC 
-  ${CMAKE_CURRENT_BINARY_DIR}/service/TDAmeritrade
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${PROTOBUF_INCLUDE_PATH}
 )
+
 target_link_libraries(tdameritrade
   PRIVATE
     ${BOOST_LIBRARIES}
