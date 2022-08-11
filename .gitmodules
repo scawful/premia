@@ -7,3 +7,27 @@
 [submodule "libs/fredcpp"]
 	path = libs/fredcpp
 	url = https://github.com/nomadbyte/fredcpp.git
+[submodule "libs/SDL"]
+	path = libs/SDL
+	url = https://github.com/libsdl-org/SDL
+[submodule "src/libs/imgui"]
+	path = src/libs/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "src/libs/implot"]
+	path = src/libs/implot
+	url = https://github.com/epezent/implot.git
+[submodule "src/lib/imgui"]
+	path = src/lib/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "src/lib/implot"]
+	path = src/lib/implot
+	url = https://github.com/epezent/implot
+[submodule "src/lib/SDL"]
+	path = src/lib/SDL
+	url = https://github.com/libsdl-org/SDL
+[submodule "src/lib/protobuf"]
+	path = src/lib/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git
+[submodule "src/lib/abseil-cpp"]
+	path = src/lib/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp
