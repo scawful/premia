@@ -18,11 +18,12 @@ target_include_directories("TWS" PUBLIC ${TWS_PATH})
 add_library(interactive_brokers STATIC ${PREMIA_SERVICE_IBKR_SRC})
 include_directories(
   .
+  tws/
 )
 target_link_libraries(
   interactive_brokers 
   curl 
-  OpenSSL::SSL
+  ${OPENSSL_LIBRARIES}
   TWS
   ${BOOST_LIBRARIES} 
 )

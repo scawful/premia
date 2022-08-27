@@ -45,7 +45,7 @@ target_link_libraries(
   ${SDL2_LIBRARIES} 
   ${OPENGL_LIBRARIES}
   curl 
-  OpenSSL::SSL 
+  ${OPENSSL_LIBRARIES}
   gtest_main
   gtest
 )

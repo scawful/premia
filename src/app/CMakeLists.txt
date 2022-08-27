@@ -66,13 +66,13 @@ target_link_libraries(
   ${BOOST_LIBRARIES} 
   ${SDL_TARGETS}
   ${OPENGL_LIBRARIES} 
+  ${OPENSSL_LIBRARIES}
   TWS
   ImGui 
   ImPlot
   curl
-  OpenSSL::SSL
   tdameritrade
-  coinbase
+  # coinbase
   interactive_brokers
   halext
 )

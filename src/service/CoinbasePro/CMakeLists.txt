@@ -9,7 +9,7 @@ add_library(coinbase STATIC ${PREMIA_SERVICE_CB_SRC})
 target_link_libraries(
   coinbase 
   curl 
-  OpenSSL::SSL
+  OpenSSL
   ${BOOST_LIBRARIES} 
 )
 

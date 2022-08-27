@@ -1,6 +1,6 @@
 # Premia Project --------------------------------------------------------------
-find_package(protobuf CONFIG REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
+include_directories(lib/protobuf)
+include_directories(lib/grpc)
 find_package(Threads)
 find_package(CURL REQUIRED)
 
