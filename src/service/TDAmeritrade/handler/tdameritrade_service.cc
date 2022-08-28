@@ -69,7 +69,7 @@ absl::StatusOr<std::string> SendAuthorizedRequest(
   curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, JSONWrite);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.1");
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
   res = curl_easy_perform(curl);
@@ -83,12 +83,13 @@ absl::StatusOr<std::string> SendAuthorizedRequest(
 Status TDAmeritradeServiceImpl::GetUserPrincipals(
     grpc::ServerContext* context, const UserPrincipalsRequest* request,
     UserPrincipalsResponse* reply) {
+  std::cerr << "GetUserPrincipals" << std::endl;
   std::string endpoint =
       "https://api.tdameritrade.com/v1/"
       "userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
   auto response = SendAuthorizedRequest(endpoint, access_token_);
   if (!response.ok()) {
-    // some error
+    std::cerr << response.value() << std::endl;
   }
   auto json = std::move(*response);
   JsonParseOptions options;
@@ -100,7 +101,7 @@ Status TDAmeritradeServiceImpl::GetUserPrincipals(
 Status TDAmeritradeServiceImpl::GetAccount(grpc::ServerContext* context,
                                            const AccountRequest* request,
                                            AccountResponse* reply) {
-  // check_user_principals();
+  // TODO(scawful): Check the user principals before making a request.
   std::string account_url =
       "https://api.tdameritrade.com/v1/accounts/"
       "{accountNum}?fields=positions,orders";

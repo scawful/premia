@@ -1,11 +1,10 @@
-#include "app/core/TDA.hpp"
-
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
-
-#include "absl/status/status.h"
+#include <gtest/gtest.h>
 
 #include <string>
+
+#include "absl/status/status.h"
+#include "app/core/TDA.hpp"
 
 namespace premiatests::ServiceTestSuite::TDATests {
 
@@ -31,32 +30,17 @@ class TDAFixture : public ::testing::Test {
     }
     client_.addAuth(consumer_key, refresh_token);
     client_.fetch_access_token();
+    client_.CreateChannel();
   }
 };
+
+TEST_F(TDAFixture, GetUserPrincipalsOK) {
+  EXPECT_THAT(client().GetUserPrincipals(), absl::OkStatus());
+}
 
 TEST_F(TDAFixture, test_grpc) {
   std::string account_id = "some_account_id";
   EXPECT_THAT(client().GetAccount(account_id), absl::OkStatus());
-}
-
-TEST_F(TDAFixture, get_and_parse_all_account_test) {
-  std::string response = client().get_all_accounts();
-  auto data = parser().read_response(response);
-  parser().parse_all_accounts(data);
-}
-
-TEST_F(TDAFixture, get_and_parse_account_test) {
-  auto all_ids = client().get_all_account_ids();
-  std::string response = client().get_account(all_ids.at(0));
-  auto data = parser().read_response(response);
-  parser().parse_all_accounts(data);
-}
-
-TEST_F(TDAFixture, get_and_parse_option_chain_test) {
-  std::string response = client().get_option_chain(
-      "SPY", "ALL", "50", true, "ALL", "{range}", "{expMonth}", "{optionType}");
-  auto data = parser().read_response(response);
-  parser().parse_option_chain(data);
 }
 
 }  // namespace premiatests::ServiceTestSuite::TDATests
