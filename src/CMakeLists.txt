@@ -1,6 +1,4 @@
 # Premia Project --------------------------------------------------------------
-include_directories(lib/protobuf)
-include_directories(lib/grpc)
 find_package(Threads)
 find_package(CURL REQUIRED)
 
@@ -18,22 +16,6 @@ set(IMPLOT_PATH "lib/implot")
 file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp) 
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
-
-set(
-  ABSL_TARGETS   
-  absl::strings
-  absl::flags
-  absl::status
-  absl::statusor
-  absl::examine_stack
-  absl::stacktrace
-  absl::base
-  absl::config
-  absl::core_headers
-  absl::raw_logging_internal
-  absl::failure_signal_handler
-  absl::flat_hash_map
-)
 
 add_subdirectory(app)
 add_subdirectory(service)
