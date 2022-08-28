@@ -17,5 +17,6 @@ file(GLOB IMPLOT_SOURCES ${IMPLOT_PATH}/*.cpp)
 add_library("ImPlot" STATIC ${IMPLOT_SOURCES})
 target_include_directories("ImPlot" PUBLIC ${IMGUI_PATH})
 
+include_directories(service)
 add_subdirectory(app)
 add_subdirectory(service)

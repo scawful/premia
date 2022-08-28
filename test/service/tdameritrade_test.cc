@@ -1,6 +1,9 @@
 #include "app/core/TDA.hpp"
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+#include "absl/status/status.h"
 
 #include <string>
 
@@ -30,6 +33,11 @@ class TDAFixture : public ::testing::Test {
     client_.fetch_access_token();
   }
 };
+
+TEST_F(TDAFixture, test_grpc) {
+  std::string account_id = "some_account_id";
+  EXPECT_THAT(client().GetAccount(account_id), absl::OkStatus());
+}
 
 TEST_F(TDAFixture, get_and_parse_all_account_test) {
   std::string response = client().get_all_accounts();

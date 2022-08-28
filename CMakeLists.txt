@@ -65,5 +65,17 @@ set(
   absl::flat_hash_map
 )
 
+add_subdirectory(src/lib/protobuf)
+set(Protobuf_BUILD_TESTS OFF)
+set(PROTOBUF_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}
+    CACHE INTERNAL "Path to generated protobuf files.")
+include_directories(${PROTOBUF_INCLUDE_PATH})
+
+set(PROTOBUF_LIBRARY "/usr/local/Cellar/protobuf/21.5/lib/libprotobuf.dylib") # The protobuf library
+set(PROTOBUF_PROTOC_LIBRARY "/usr/local/Cellar/protobuf/21.5/lib/libprotoc.dylib")   #- The protoc library
+set(PROTOBUF_INCLUDE_DIR "/usr/local/Cellar/protobuf/21.5/include") #- The include directory for protocol buffers
+set(PROTOBUF_PROTOC_EXECUTABLE "/usr/local/Cellar/protobuf/21.5/bin") #- The protoc compiler
+find_package(gRPC REQUIRED)
+
 add_subdirectory(src)
-# add_subdirectory(test)
+add_subdirectory(test)

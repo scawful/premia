@@ -206,7 +206,7 @@ void ConsoleView::displayCommands() {
       has_color = true;
     }
     if (has_color) ImGui::PushStyleColor(ImGuiCol_Text, color);
-    ImGui::TextWrapped(item);
+    ImGui::TextWrapped("%s", item);
     if (has_color) ImGui::PopStyleColor();
   }
 

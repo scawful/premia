@@ -1,4 +1,10 @@
-#include "Client.hpp"
+#include "client.h"
+
+#include <google/protobuf/message.h>
+#include <grpc/support/log.h>
+#include <grpcpp/ext/proto_server_reflection_plugin.h>
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/health_check_service_interface.h>
 
 #include <boost/asio.hpp>
 #include <boost/asio/post.hpp>
@@ -17,10 +23,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "absl/status/status.h"
+#include "absl/strings/string_view.h"
 #include "data/Order.hpp"
 #include "data/UserPrincipals.hpp"
-#include "Parser.hpp"
-#include "Socket.hpp"
+#include "handler/tdameritrade_service.h"
+#include "parser.h"
+#include "socket.h"
+#include "src/service/TDAmeritrade/proto/tdameritrade.grpc.pb.h"
+#include "src/service/TDAmeritrade/proto/tdameritrade.pb.h"
 
 static auto string_replace(std::string &str, const std::string &from,
                            const std::string &to) -> bool {
@@ -45,7 +56,35 @@ static size_t json_write(const char *contents, size_t size, size_t nmemb,
   return new_length;
 }
 
-using namespace tda;
+namespace tda {
+
+absl::Status Client::GetAccount(const absl::string_view account_id) {
+  auto channel = grpc::CreateChannel("localhost:50051",
+                                     grpc::InsecureChannelCredentials());
+  std::unique_ptr<::TDAmeritrade::Stub> stub_(::TDAmeritrade::NewStub(channel));
+
+  AccountRequest account_request;
+  AccountResponse account_response;
+  account_request.set_accountid(account_id.data());
+  TDAmeritradeServiceImpl account_service;
+
+  // Context for the client. It could be used to convey extra information to
+  // the server and/or tweak certain RPC behaviors.
+  ClientContext account_context;
+
+  // The actual RPC.
+  Status status =
+      stub_->GetAccount(&account_context, account_request, &account_response);
+
+  // Act upon its status.
+  if (status.ok()) {
+    return absl::OkStatus();
+  } else {
+    std::cout << status.error_code() << ": " << status.error_message()
+              << std::endl;
+    return absl::InternalError(status.error_message());
+  }
+}
 
 std::string Client::get_api_interval_value(int value) const {
   return EnumAPIValues[value];
@@ -642,4 +681,5 @@ void Client::addAuth(const std::string &key, const std::string &token) {
   refresh_token = token;
 }
 
+}  // namespace tda
 }  // namespace premia

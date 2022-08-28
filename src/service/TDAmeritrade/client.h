@@ -1,6 +1,12 @@
 #ifndef Client_hpp
 #define Client_hpp
 
+#include <google/protobuf/message.h>
+#include <grpc/support/log.h>
+#include <grpcpp/ext/proto_server_reflection_plugin.h>
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/health_check_service_interface.h>
+
 #include <boost/asio.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/ssl.hpp>
@@ -17,10 +23,15 @@
 #include <string>
 #include <vector>
 
+#include "absl/status/status.h"
+#include "absl/strings/string_view.h"
 #include "data/Order.hpp"
 #include "data/UserPrincipals.hpp"
-#include "Parser.hpp"
-#include "Socket.hpp"
+#include "handler/tdameritrade_service.h"
+#include "parser.h"
+#include "socket.h"
+#include "src/service/TDAmeritrade/proto/tdameritrade.grpc.pb.h"
+#include "src/service/TDAmeritrade/proto/tdameritrade.pb.h"
 
 namespace premia {
 namespace tda {
@@ -86,6 +97,54 @@ static const std::string EnumAPIServiceName[]{
 using CURLHeader = struct curl_slist *;
 
 class Client {
+ public:
+  Client();
+  ~Client();
+
+  absl::Status GetAccount(const absl::string_view account_id);
+
+  void api_login();
+
+  // WebSocket Controls
+  void start_session(const std::string &ticker);
+  void send_logout_request();
+  void fetch_access_token();
+
+  // Accounts
+  std::string get_account(const std::string &account_id);
+  std::string get_all_accounts();
+  std::vector<std::string> get_all_account_ids();
+
+  // Quotes
+  std::string get_quote(const std::string &symbol) const;
+
+  // Watchlists
+  std::string get_watchlist_by_account(const std::string &account_id) const;
+
+  // Price History
+  std::string get_price_history(const std::string &symbol, PeriodType ptype,
+                                int period_amt, FrequencyType ftype,
+                                int freq_amt, bool ext) const;
+
+  // Option Chain
+  std::string get_option_chain(const std::string &ticker,
+                               const std::string &contractType,
+                               const std::string &strikeCount,
+                               bool includeQuotes, const std::string &strategy,
+                               const std::string &range,
+                               const std::string &expMonth,
+                               const std::string &optionType) const;
+
+  // Orders
+  std::string get_order(const std::string &account_id,
+                        const std::string &order_id) const;
+  std::string get_orders_by_query(const std::string &account_id, int maxResults,
+                                  double fromEnteredTime, double toEnteredTime,
+                                  OrderStatus status) const;
+  void place_order(const std::string &account_id, const Order &order) const;
+
+  void addAuth(const std::string &key, const std::string &token);
+
  private:
   bool request_fields[53];
   const char *quote_fields[53] = {"Symbol",
@@ -187,51 +246,6 @@ class Client {
   json::ptree create_service_request(ServiceType serv_type,
                                      const std::string &keys,
                                      const std::string &fields);
-
- public:
-  Client();
-  ~Client();
-  void api_login();
-
-  // WebSocket Controls
-  void start_session(const std::string &ticker);
-  void send_logout_request();
-  void fetch_access_token();
-
-  // Accounts
-  std::string get_account(const std::string &account_id);
-  std::string get_all_accounts();
-  std::vector<std::string> get_all_account_ids();
-
-  // Quotes
-  std::string get_quote(const std::string &symbol) const;
-
-  // Watchlists
-  std::string get_watchlist_by_account(const std::string &account_id) const;
-
-  // Price History
-  std::string get_price_history(const std::string &symbol, PeriodType ptype,
-                                int period_amt, FrequencyType ftype,
-                                int freq_amt, bool ext) const;
-
-  // Option Chain
-  std::string get_option_chain(const std::string &ticker,
-                               const std::string &contractType,
-                               const std::string &strikeCount,
-                               bool includeQuotes, const std::string &strategy,
-                               const std::string &range,
-                               const std::string &expMonth,
-                               const std::string &optionType) const;
-
-  // Orders
-  std::string get_order(const std::string &account_id,
-                        const std::string &order_id) const;
-  std::string get_orders_by_query(const std::string &account_id, int maxResults,
-                                  double fromEnteredTime, double toEnteredTime,
-                                  OrderStatus status) const;
-  void place_order(const std::string &account_id, const Order &order) const;
-
-  void addAuth(const std::string &key, const std::string &token);
 };
 
 }  // namespace tda

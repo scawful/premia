@@ -72,7 +72,7 @@ void AccountView::initPositions() {
     throw premia::NotLoggedInException();
   }
   finally { logger("[finally] : AccountView init"); }
-  Proceed;
+  PROCEED;
   int i = 0;
   for (std::string const &each_id : account_ids_std) {
     account_ids.push_back(each_id.c_str());
@@ -326,7 +326,7 @@ void AccountView::Update() {
       logger("User not logged in, loading empty account pane");
     }
     finally { isInit = true; }
-    Proceed;
+    PROCEED;
   } else {
     if (isLoggedIn) {
       DrawAccountPane();

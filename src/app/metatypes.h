@@ -104,7 +104,7 @@ class never_thrown_exception {};
   }                                \
   }                                \
   , [&]()
-#define Proceed      )
+#define PROCEED      )
 
 class Destruction : public std::exception {};
 
@@ -121,9 +121,9 @@ inline auto cons_ins_des(const C &c, const I &i, const D &d) noexcept(false)
   }
 }
 
-#define Construct   cons_ins_des([&]()
-#define Instruct , [&]()
-#define Destruct , [&]()
+#define CONSTRUCT   cons_ins_des([&]()
+#define INSTRUCT , [&]()
+#define DESTRUCT , [&]()
 #define RecursiveDestruct   ,[&]() { throw Destruction(); })
 
 #define canDestroy                          \
