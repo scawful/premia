@@ -13,8 +13,6 @@ add_executable(
   premia_test
   PremiaTest.cpp
   ServiceTestSuite/TDA.cpp
-  ../src/service/Halext/Client.cpp 
-  ../src/service/Halext/User.cpp    
   ../src/service/IEXCloud/Client.cpp 
   ../src/service/IEXCloud/Parser.cpp
   ../src/service/CoinbasePro/Account.cpp 
@@ -41,10 +39,10 @@ include_directories(
 
 target_link_libraries(
   premia_test
+  curl
   ${BOOST_LIBRARIES} 
   ${SDL2_LIBRARIES} 
   ${OPENGL_LIBRARIES}
-  curl 
   ${OPENSSL_LIBRARIES}
   gtest_main
   gtest

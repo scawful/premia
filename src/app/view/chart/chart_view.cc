@@ -14,14 +14,14 @@
 namespace premia {
 
 void ChartView::initChart() {
-  halext::ChartType chartType = halext::HLXT::getInstance().getSelectedChart();
-  if (chartType == halext::ChartType::CANDLESTICK) {
-    this->currentChart = "CANDLESTICK";
-    this->charts["CANDLESTICK"] = std::make_shared<CandleChart>();
-    this->charts["CANDLESTICK"]->importModel(model);
-  } else if (chartType == halext::ChartType::LINEPLOT) {
-    this->currentChart = "LINEPLOT";
-  }
+  // halext::ChartType chartType = halext::HLXT::getInstance().getSelectedChart();
+  // if (chartType == halext::ChartType::CANDLESTICK) {
+  //   this->currentChart = "CANDLESTICK";
+  //   this->charts["CANDLESTICK"] = std::make_shared<CandleChart>();
+  //   this->charts["CANDLESTICK"]->importModel(model);
+  // } else if (chartType == halext::ChartType::LINEPLOT) {
+  //   this->currentChart = "LINEPLOT";
+  // }
   isInit = true;
 }
 

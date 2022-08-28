@@ -17,8 +17,8 @@
 #include <string>
 #include <vector>
 
-#include "Data/Order.hpp"
-#include "Data/UserPrincipals.hpp"
+#include "data/Order.hpp"
+#include "data/UserPrincipals.hpp"
 #include "Parser.hpp"
 #include "Socket.hpp"
 

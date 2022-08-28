@@ -1,6 +1,9 @@
 #ifndef Quote_hpp
 #define Quote_hpp
 
+#include <unordered_map>
+#include <string>
+
 #include <boost/property_tree/ptree.hpp>
 
 namespace premia {

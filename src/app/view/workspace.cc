@@ -8,7 +8,7 @@
 #include <string>
 
 #include "metatypes.h"
-#include "core/HLXT.hpp"
+// #include "core/HLXT.hpp"
 #include "view/chart/subview/candle_chart.h"
 #include "view/view.h"
 
@@ -32,7 +32,6 @@ void NewMasterFrame() {
     ImGui::End();
     return;
   }
-  halext::HLXT::getInstance().setSelectedChart(0);
 }
 
 }  // namespace

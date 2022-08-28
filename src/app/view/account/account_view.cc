@@ -2,9 +2,9 @@
 
 namespace premia {
 void AccountView::Draw_balance_string(const std::string &variable) {
-  std::string str =
-      (halext::HLXT::getInstance().getPrivateBalance()) ? "***" : variable;
-  ImGui::Text("%s", str.c_str());
+  // std::string str =
+  //     (halext::HLXT::getInstance().getPrivateBalance()) ? "***" : variable;
+  // ImGui::Text("%s", str.c_str());
 }
 
 void AccountView::Draw_symbol_string(const std::string &symbol) {

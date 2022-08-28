@@ -1,28 +1,40 @@
+# find_package(gRPC REQUIRED)
+
 # set(PROTO_FILES
 #     proto/account.proto
 #     proto/option_chain.proto
 # )
 
-# add_library(tda_proto ${PROTO_FILES})
-# target_link_libraries(tda_proto
-#   PUBLIC
-#   gRPC::grpc++_reflection
-#   gRPC::grpc
-#   gRPC::grpc++
-#   protobuf::libprotobuf
+# # protobuf source files go into the lib just like any other CPP source file
+# add_library(tda-service ${PROTO_FILES})
+# target_link_libraries(tda-service
+#     PUBLIC
+#         protobuf::libprotobuf
+#         gRPC::grpc
+#         gRPC::grpc++
 # )
-# target_include_directories(tda_proto 
-#   PUBLIC 
-#     ${CMAKE_CURRENT_BINARY_DIR}
+
+# target_include_directories(tda-service
+#     PUBLIC
+#         ${CMAKE_CURRENT_BINARY_DIR}
 # )
 
 # get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
-# protobuf_generate(TARGET tda_proto LANGUAGE cpp)
+
+# # compile the message types
+# protobuf_generate(TARGET tda-service LANGUAGE cpp)
+
+# # compile the GRPC services
 # protobuf_generate(
-#   TARGET tda_proto 
-#   LANGUAGE grpc 
-#   GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc 
-#   PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}"
+#   TARGET
+#     tda-service
+#   LANGUAGE
+#     grpc
+#   GENERATE_EXTENSIONS
+#     .grpc.pb.h
+#     .grpc.pb.cc
+#   PLUGIN
+#     "protoc-gen-grpc=${grpc_cpp_plugin_location}"
 # )
 
 set(
@@ -57,7 +69,7 @@ target_link_libraries(tdameritrade
     # gRPC::grpc
     # gRPC::grpc++
     # protobuf::libprotobuf
-    # tda_proto
+    # tda-service
 )
 
 if (WIN32) 

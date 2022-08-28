@@ -38,7 +38,7 @@ void MenuView::DrawFileMenu() {
     if (ImGui::BeginMenu("Preferences")) {
       static bool privateBalance = false;
       if (ImGui::MenuItem("Private Balances", "", &privateBalance)) {
-        halext::HLXT::getInstance().setPrivateBalance(privateBalance);
+        //halext::HLXT::getInstance().setPrivateBalance(privateBalance);
       }
       ImGui::EndMenu();
     }
@@ -69,29 +69,29 @@ void MenuView::DrawTradeMenu() {
 void MenuView::DrawChartsMenu() {
   if (ImGui::BeginMenu(ICON_MD_ADD_CHART)) {
     if (ImGui::MenuItem("Line Plot", ICON_MD_SHOW_CHART)) {
-      halext::HLXT::getInstance().setSelectedChart(0);
+      //halext::HLXT::getInstance().setSelectedChart(0);
       events.at("linePlotView")();
     }
     if (ImGui::MenuItem("Candlestick", ICON_MD_CANDLESTICK_CHART)) {
-      halext::HLXT::getInstance().setSelectedChart(1);
+      //halext::HLXT::getInstance().setSelectedChart(1);
       events.at("chartView")();
     }
     if (ImGui::MenuItem("Multi Plot", ICON_MD_STACKED_LINE_CHART)) {
-      halext::HLXT::getInstance().setSelectedChart(2);
+      //halext::HLXT::getInstance().setSelectedChart(2);
       events.at("chartView")();
     }
     if (ImGui::MenuItem("Advanced", ICON_MD_MULTILINE_CHART)) {
-      halext::HLXT::getInstance().setSelectedChart(3);
+      //halext::HLXT::getInstance().setSelectedChart(3);
       events.at("chartView")();
     }
 
     if (ImGui::MenuItem("Futures", ICON_MD_AUTO_GRAPH)) {
-      halext::HLXT::getInstance().setSelectedChart(4);
+      //halext::HLXT::getInstance().setSelectedChart(4);
       events.at("chartView")();
     }
 
     if (ImGui::MenuItem("Crypto", ICON_MD_CURRENCY_BITCOIN)) {
-      halext::HLXT::getInstance().setSelectedChart(5);
+      //halext::HLXT::getInstance().setSelectedChart(5);
       events.at("chartView")();
     }
 
