@@ -101,7 +101,9 @@ class Client {
   Client();
   ~Client();
 
+  absl::Status CreateChannel();
   absl::Status GetAccount(const absl::string_view account_id);
+  absl::Status GetUserPrincipals();
 
   void api_login();
 
@@ -146,6 +148,53 @@ class Client {
   void addAuth(const std::string &key, const std::string &token);
 
  private:
+  // Flags
+  bool has_access_token = false;
+  bool has_user_principals = false;
+
+  // API std::strings
+  std::string api_key = "";
+  std::string refresh_token = "";
+  std::string access_token = "";
+
+  // API Data
+  Parser parser;
+  std::unordered_map<std::string, std::string> account_data;
+  UserPrincipals user_principals;
+  json::ptree _user_principals;
+  std::unique_ptr<TDAmeritrade::Stub> stub_;
+
+  // WebSocket session variables
+  net::io_context ioc;
+  boost::asio::thread_pool ioc_pool;
+  std::shared_ptr<tda::Socket> websocket_session;
+  std::shared_ptr<std::vector<std::string>> websocket_buffer;
+  ssl::context context{ssl::context::tlsv12_client};
+  std::vector<std::shared_ptr<std::string const>> request_queue;
+  std::vector<std::thread> ws_threads;
+
+  // std::string Manipulation
+  std::string get_api_interval_value(int value) const;
+  std::string get_api_frequency_type(int value) const;
+  std::string get_api_period_amount(int value) const;
+  std::string get_api_frequency_amount(int value) const;
+
+  // API Functions
+  std::string send_request(const std::string &endpoint) const;
+  std::string send_authorized_request(const std::string &endpoint) const;
+  void post_authorized_request(const std::string &endpoint,
+                               const std::string &data) const;
+  std::string post_access_token() const;
+  void get_user_principals();
+  void check_user_principals();
+
+  // WebSocket functions
+  json::ptree create_login_request();
+  json::ptree create_logout_request();
+  json::ptree create_service_request(ServiceType serv_type,
+                                     const std::string &keys,
+                                     const std::string &fields);
+
   bool request_fields[53];
   const char *quote_fields[53] = {"Symbol",
                                   "Bid Price",
@@ -200,52 +249,6 @@ class Client {
                                   "Quote Time in Long",
                                   "Trade Time in Long",
                                   "Regular Market Trade Time in Long"};
-
-  // Flags
-  bool has_access_token = false;
-  bool has_user_principals = false;
-
-  // API std::strings
-  std::string api_key = "";
-  std::string refresh_token = "";
-  std::string access_token = "";
-
-  // API Data
-  Parser parser;
-  std::unordered_map<std::string, std::string> account_data;
-  UserPrincipals user_principals;
-  json::ptree _user_principals;
-
-  // WebSocket session variables
-  net::io_context ioc;
-  boost::asio::thread_pool ioc_pool;
-  std::shared_ptr<tda::Socket> websocket_session;
-  std::shared_ptr<std::vector<std::string>> websocket_buffer;
-  ssl::context context{ssl::context::tlsv12_client};
-  std::vector<std::shared_ptr<std::string const>> request_queue;
-  std::vector<std::thread> ws_threads;
-
-  // std::string Manipulation
-  std::string get_api_interval_value(int value) const;
-  std::string get_api_frequency_type(int value) const;
-  std::string get_api_period_amount(int value) const;
-  std::string get_api_frequency_amount(int value) const;
-
-  // API Functions
-  std::string send_request(const std::string &endpoint) const;
-  std::string send_authorized_request(const std::string &endpoint) const;
-  void post_authorized_request(const std::string &endpoint,
-                               const std::string &data) const;
-  std::string post_access_token() const;
-  void get_user_principals();
-  void check_user_principals();
-
-  // WebSocket functions
-  json::ptree create_login_request();
-  json::ptree create_logout_request();
-  json::ptree create_service_request(ServiceType serv_type,
-                                     const std::string &keys,
-                                     const std::string &fields);
 };
 
 }  // namespace tda
