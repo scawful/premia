@@ -66,20 +66,14 @@ absl::Status Client::CreateChannel() {
 }
 
 absl::Status Client::GetAccount(const absl::string_view account_id) {
-  auto channel = grpc::CreateChannel("localhost:50051",
-                                     grpc::InsecureChannelCredentials());
-  std::unique_ptr<::TDAmeritrade::Stub> stub(::TDAmeritrade::NewStub(channel));
-
   AccountRequest account_request;
   AccountResponse account_response;
   account_request.set_accountid(account_id.data());
-  // Context for the client. It could be used to convey extra information to
-  // the server and/or tweak certain RPC behaviors.
   ClientContext account_context;
 
   // The actual RPC.
   Status status =
-      stub->GetAccount(&account_context, account_request, &account_response);
+      stub_->GetAccount(&account_context, account_request, &account_response);
 
   // Act upon its status.
   if (status.ok()) {
