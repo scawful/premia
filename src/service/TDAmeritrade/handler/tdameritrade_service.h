@@ -34,6 +34,10 @@ using CURLHeader = struct curl_slist*;
 
 class TDAmeritradeServiceImpl final : public ::TDAmeritrade::Service {
  public:
+  Status PostAccessToken(grpc::ServerContext* context,
+                         const AccessTokenRequest* request,
+                         AccessTokenResponse* reply) override;
+
   Status GetUserPrincipals(grpc::ServerContext* context,
                            const UserPrincipalsRequest* request,
                            UserPrincipalsResponse* reply) override;
@@ -44,7 +48,12 @@ class TDAmeritradeServiceImpl final : public ::TDAmeritrade::Service {
 
   Status GetAccounts(grpc::ServerContext* context,
                      const AccountRequest* request,
-                     AccountsResponse* response) override;
+                     AccountsResponse* reply) override;
+
+  // Price History Services
+  Status GetPriceHistory(grpc::ServerContext* context,
+                         const PriceHistoryRequest* request,
+                         PriceHistoryResponse* reply) override;
 
   // Option Chain Services
   Status GetOptionChain(grpc::ServerContext* context,
@@ -52,6 +61,7 @@ class TDAmeritradeServiceImpl final : public ::TDAmeritrade::Service {
                         OptionChainResponse* reply) override;
 
  private:
+  std::string client_id_;
   std::string access_token_;
 };
 

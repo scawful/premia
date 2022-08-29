@@ -62,6 +62,13 @@ absl::Status Client::CreateChannel() {
   auto channel = grpc::CreateChannel("localhost:50051",
                                      grpc::InsecureChannelCredentials());
   stub_ = ::TDAmeritrade::NewStub(channel);
+
+  ClientContext ctx_rpc;
+  AccessTokenRequest request;
+  request.set_refresh_token(refresh_token);
+  request.set_client_id(api_key);
+  AccessTokenResponse response;
+  stub_->PostAccessToken(&ctx_rpc, request, &response);
   return absl::OkStatus();
 }
 
@@ -71,15 +78,16 @@ absl::Status Client::GetAccount(const absl::string_view account_id) {
   account_request.set_accountid(account_id.data());
   ClientContext account_context;
 
-  // The actual RPC.
   Status status =
       stub_->GetAccount(&account_context, account_request, &account_response);
 
   // Act upon its status.
   if (status.ok()) {
+    std::cerr << "Account Response: " << account_response.SerializeAsString()
+              << std::endl;
     return absl::OkStatus();
   } else {
-    std::cout << status.error_code() << ": " << status.error_message()
+    std::cerr << status.error_code() << ": " << status.error_message()
               << std::endl;
     return absl::InternalError(status.error_message());
   }
@@ -90,14 +98,15 @@ absl::Status Client::GetUserPrincipals() {
   UserPrincipalsResponse response;
   ClientContext context;
 
-  // The actual RPC.
   Status status = stub_->GetUserPrincipals(&context, request, &response);
 
   // Act upon its status.
   if (status.ok()) {
+    std::cerr << "User Principals Response: " << response.SerializeAsString()
+              << std::endl;
     return absl::OkStatus();
   } else {
-    std::cout << status.error_code() << ": " << status.error_message()
+    std::cerr << status.error_code() << ": " << status.error_message()
               << std::endl;
     return absl::InternalError(status.error_message());
   }

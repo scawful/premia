@@ -3,6 +3,8 @@ option cc_enable_arenas = true;
 
 service TDAmeritrade {
 
+  rpc PostAccessToken(AccessTokenRequest) returns (AccessTokenResponse) {}
+
   rpc GetUserPrincipals(UserPrincipalsRequest)
       returns (UserPrincipalsResponse) {}
 
@@ -10,12 +12,30 @@ service TDAmeritrade {
 
   rpc GetAccounts(AccountRequest) returns (AccountsResponse) {}
 
+  rpc GetPriceHistory(PriceHistoryRequest) returns (PriceHistoryResponse) {}
+
   rpc GetOptionChain(OptionChainRequest) returns (OptionChainResponse) {}
 }
 
-message UserPrincipalsRequest {
-  repeated string fields = 1;
+message AccessTokenRequest {
+  string grant_type = 1;
+  optional string refresh_token = 2;
+  optional string access_type = 3;
+  optional string code = 4;
+  string client_id = 5;
+  optional string redirect_uri = 6;
 }
+
+message AccessTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  string token_type = 3;
+  uint32 expires_in = 4;
+  string scope = 5;
+  uint32 refresh_token_expires_in = 6;
+}
+
+message UserPrincipalsRequest { repeated string fields = 1; }
 
 message UserPrincipalsResponse {
   message Streamerinfo {
@@ -99,34 +119,199 @@ message UserPrincipalsResponse {
   Quotes quotes = 12;
   Streamersubscriptionkeys streamerSubscriptionKeys = 13;
   repeated Accounts accounts = 14;
+  string error = 15;
 }
 
 message AccountRequest { optional string accountID = 1; }
 
 message AccountResponse {
-  optional string accountId = 1;
-
   message Positions {
-    optional int32 shortQuantity = 1;
-    optional double averagePrice = 2;
-    optional double currentDayProfitLoss = 3;
-    optional double currentDayProfitLossPercentage = 4;
-    optional double longQuantity = 5;
-    optional double settledLongQuantity = 6;
-    optional double settledShortQuantity = 7;
-    optional double agedQuantity = 8;
-
-    // enum Instrument {
-    //   Equity = 0;
-    //   FixedIncome = 1;
-    //   MutualFund = 2;
-    //   CashEquivalent = 3;
-    //   Option = 4;
-    // }
-
-    optional double marketValue = 9;
+    uint32 shortQuantity = 1;
+    uint32 averagePrice = 2;
+    uint32 currentDayProfitLoss = 3;
+    uint32 currentDayProfitLossPercentage = 4;
+    uint32 longQuantity = 5;
+    uint32 settledLongQuantity = 6;
+    uint32 settledShortQuantity = 7;
+    uint32 agedQuantity = 8;
+    string instrument = 9;
+    uint32 marketValue = 10;
   }
-  optional string test = 10;
+
+  message Canceltime {
+    string date = 1;
+    bool shortFormat = 2;
+  }
+
+  message Orderlegcollection {
+    string orderLegType = 1;
+    uint32 legId = 2;
+    string instrument = 3;
+    string instruction = 4;
+    string positionEffect = 5;
+    uint32 quantity = 6;
+    string quantityType = 7;
+  }
+
+  message Replacingordercollection {}
+
+  message Childorderstrategies {}
+
+  message Orderstrategies {
+    string session = 1;
+    string duration = 2;
+    string orderType = 3;
+    Canceltime cancelTime = 4;
+    string complexOrderStrategyType = 5;
+    uint32 quantity = 6;
+    uint32 filledQuantity = 7;
+    uint32 remainingQuantity = 8;
+    string requestedDestination = 9;
+    string destinationLinkName = 10;
+    string releaseTime = 11;
+    uint32 stopPrice = 12;
+    string stopPriceLinkBasis = 13;
+    string stopPriceLinkType = 14;
+    uint32 stopPriceOffset = 15;
+    string stopType = 16;
+    string priceLinkBasis = 17;
+    string priceLinkType = 18;
+    uint32 price = 19;
+    string taxLotMethod = 20;
+    repeated Orderlegcollection orderLegCollection = 21;
+    uint32 activationPrice = 22;
+    string specialInstruction = 23;
+    string orderStrategyType = 24;
+    uint32 orderId = 25;
+    bool cancelable = 26;
+    bool editable = 27;
+    string status = 28;
+    string enteredTime = 29;
+    string closeTime = 30;
+    string tag = 31;
+    uint32 accountId = 32;
+    repeated string orderActivityCollection = 33;
+    repeated Replacingordercollection replacingOrderCollection = 34;
+    repeated Childorderstrategies childOrderStrategies = 35;
+    string statusDescription = 36;
+  }
+
+  message Initialbalances {
+    uint32 accruedInterest = 1;
+    uint32 availableFundsNonMarginableTrade = 2;
+    uint32 bondValue = 3;
+    uint32 buyingPower = 4;
+    uint32 cashBalance = 5;
+    uint32 cashAvailableForTrading = 6;
+    uint32 cashReceipts = 7;
+    uint32 dayTradingBuyingPower = 8;
+    uint32 dayTradingBuyingPowerCall = 9;
+    uint32 dayTradingEquityCall = 10;
+    uint32 equity = 11;
+    uint32 equityPercentage = 12;
+    uint32 liquidationValue = 13;
+    uint32 longMarginValue = 14;
+    uint32 longOptionMarketValue = 15;
+    uint32 longStockValue = 16;
+    uint32 maintenanceCall = 17;
+    uint32 maintenanceRequirement = 18;
+    uint32 margin = 19;
+    uint32 marginEquity = 20;
+    uint32 moneyMarketFund = 21;
+    uint32 mutualFundValue = 22;
+    uint32 regTCall = 23;
+    uint32 shortMarginValue = 24;
+    uint32 shortOptionMarketValue = 25;
+    uint32 shortStockValue = 26;
+    uint32 totalCash = 27;
+    bool isInCall = 28;
+    uint32 unsettledCash = 29;
+    uint32 pendingDeposits = 30;
+    uint32 marginBalance = 31;
+    uint32 shortBalance = 32;
+    uint32 accountValue = 33;
+  }
+
+  message Currentbalances {
+    uint32 accruedInterest = 1;
+    uint32 cashBalance = 2;
+    uint32 cashReceipts = 3;
+    uint32 longOptionMarketValue = 4;
+    uint32 liquidationValue = 5;
+    uint32 longMarketValue = 6;
+    uint32 moneyMarketFund = 7;
+    uint32 savings = 8;
+    uint32 shortMarketValue = 9;
+    uint32 pendingDeposits = 10;
+    uint32 availableFunds = 11;
+    uint32 availableFundsNonMarginableTrade = 12;
+    uint32 buyingPower = 13;
+    uint32 buyingPowerNonMarginableTrade = 14;
+    uint32 dayTradingBuyingPower = 15;
+    uint32 dayTradingBuyingPowerCall = 16;
+    uint32 equity = 17;
+    uint32 equityPercentage = 18;
+    uint32 longMarginValue = 19;
+    uint32 maintenanceCall = 20;
+    uint32 maintenanceRequirement = 21;
+    uint32 marginBalance = 22;
+    uint32 regTCall = 23;
+    uint32 shortBalance = 24;
+    uint32 shortMarginValue = 25;
+    uint32 shortOptionMarketValue = 26;
+    uint32 sma = 27;
+    uint32 mutualFundValue = 28;
+    uint32 bondValue = 29;
+    bool isInCall = 30;
+    uint32 stockBuyingPower = 31;
+    uint32 optionBuyingPower = 32;
+  }
+
+  message Projectedbalances {
+    uint32 accruedInterest = 1;
+    uint32 cashBalance = 2;
+    uint32 cashReceipts = 3;
+    uint32 longOptionMarketValue = 4;
+    uint32 liquidationValue = 5;
+    uint32 longMarketValue = 6;
+    uint32 moneyMarketFund = 7;
+    uint32 savings = 8;
+    uint32 shortMarketValue = 9;
+    uint32 pendingDeposits = 10;
+    uint32 availableFunds = 11;
+    uint32 availableFundsNonMarginableTrade = 12;
+    uint32 buyingPower = 13;
+    uint32 buyingPowerNonMarginableTrade = 14;
+    uint32 dayTradingBuyingPower = 15;
+    uint32 dayTradingBuyingPowerCall = 16;
+    uint32 equity = 17;
+    uint32 equityPercentage = 18;
+    uint32 longMarginValue = 19;
+    uint32 maintenanceCall = 20;
+    uint32 maintenanceRequirement = 21;
+    uint32 marginBalance = 22;
+    uint32 regTCall = 23;
+    uint32 shortBalance = 24;
+    uint32 shortMarginValue = 25;
+    uint32 shortOptionMarketValue = 26;
+    uint32 sma = 27;
+    uint32 mutualFundValue = 28;
+    uint32 bondValue = 29;
+    bool isInCall = 30;
+    uint32 stockBuyingPower = 31;
+    uint32 optionBuyingPower = 32;
+  }
+
+  string type = 1;
+  string accountId = 2;
+  uint32 roundTrips = 3;
+  bool isDayTrader = 4;
+  bool isClosingOnlyRestricted = 5;
+  repeated Positions positions = 6;
+  repeated Orderstrategies orderStrategies = 7;
+  Initialbalances initialBalances = 8;
+  Currentbalances currentBalances = 9;
+  Projectedbalances projectedBalances = 10;
 }
 
 message AccountsResponse { repeated AccountResponse accounts = 1; }
@@ -136,4 +321,31 @@ message OptionChainRequest { string symbol = 1; }
 message OptionChainResponse {
   string symbol = 1;
   string status = 2;
+}
+
+message PriceHistoryRequest {
+  string apikey = 1;
+  string periodType = 2;
+  string period = 3;
+  string frequencyType = 4;
+  string frequency = 5;
+  uint32 endDate = 6;
+  uint32 startDate = 7;
+  bool needExtendedHoursData = 8;
+}
+
+message PriceHistoryResponse {
+
+  message Candles {
+    uint32 close = 1;
+    uint32 datetime = 2;
+    uint32 high = 3;
+    uint32 low = 4;
+    uint32 open = 5;
+    uint32 volume = 6;
+  }
+
+  repeated Candles candles = 1;
+  bool empty = 2;
+  string symbol = 3;
 }

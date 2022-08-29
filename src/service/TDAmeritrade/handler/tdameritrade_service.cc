@@ -54,6 +54,25 @@ size_t JSONWrite(const char* contents, size_t size, size_t nmemb,
   return new_length;
 }
 
+absl::StatusOr<std::string> SendRequest(const std::string& endpoint) {
+  CURL* curl;
+  CURLcode res;
+  std::string response;
+
+  curl = curl_easy_init();
+  curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, JSONWrite);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+  curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+  res = curl_easy_perform(curl);
+
+  if (res != CURLE_OK) return absl::InternalError(curl_easy_strerror(res));
+  curl_easy_cleanup(curl);
+
+  return response;
+}
+
 absl::StatusOr<std::string> SendAuthorizedRequest(
     const std::string& endpoint, const std::string& access_token) {
   CURL* curl;
@@ -80,10 +99,61 @@ absl::StatusOr<std::string> SendAuthorizedRequest(
 }
 }  // namespace
 
+Status TDAmeritradeServiceImpl::PostAccessToken(
+    grpc::ServerContext* context, const AccessTokenRequest* request,
+    AccessTokenResponse* reply) {
+  std::cout << "PostAccessToken: ";
+  CURL* curl;
+  CURLcode res;
+  CURLHeader headers = nullptr;
+  std::string response;
+
+  curl = curl_easy_init();
+
+  curl_easy_setopt(curl, CURLOPT_URL,
+                   "https://api.tdameritrade.com/v1/oauth2/token");
+  curl_easy_setopt(curl, CURLOPT_HTTPPOST, true);
+  headers = curl_slist_append(
+      headers, "Content-Type: application/x-www-form-urlencoded");
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+  CURLHeader chunk = nullptr;  // chunked request for http1.1/200 ok
+  chunk = curl_slist_append(chunk, "Transfer-Encoding: chunked");
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+
+  // specify post data, have to url encode the refresh token
+  auto& refresh_token = request->refresh_token();
+  auto& api_key = request->client_id();
+  std::string easy_escape = curl_easy_escape(
+      curl, refresh_token.c_str(), static_cast<int>(refresh_token.length()));
+  std::string data_post =
+      "grant_type=refresh_token&refresh_token=" + easy_escape +
+      "&client_id=" + api_key;
+
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_post.c_str());
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_post.length());
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, JSONWrite);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+  curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+
+  // run the operations
+  res = curl_easy_perform(curl);
+  curl_easy_cleanup(curl);
+
+  JsonParseOptions options;
+  options.ignore_unknown_fields = true;
+  JsonStringToMessage(response, reply, options);
+
+  access_token_ = reply->access_token();
+  std::cout << access_token_ << std::endl;
+  return Status::OK;
+}
+
 Status TDAmeritradeServiceImpl::GetUserPrincipals(
     grpc::ServerContext* context, const UserPrincipalsRequest* request,
     UserPrincipalsResponse* reply) {
-  std::cerr << "GetUserPrincipals" << std::endl;
+  std::cerr << "User Principals " << std::endl;
   std::string endpoint =
       "https://api.tdameritrade.com/v1/"
       "userprincipals?fields=streamerSubscriptionKeys,streamerConnectionInfo";
@@ -122,6 +192,34 @@ Status TDAmeritradeServiceImpl::GetAccounts(grpc::ServerContext* context,
                                             const AccountRequest* request,
                                             AccountsResponse* response) {
   std::string prefix("Multiple Accounts");
+  return Status::OK;
+}
+
+Status TDAmeritradeServiceImpl::GetPriceHistory(
+    grpc::ServerContext* context, const PriceHistoryRequest* request,
+    PriceHistoryResponse* reply) {
+  std::string url =
+      "https://api.tdameritrade.com/v1/marketdata/{ticker}/"
+      "pricehistory?apikey=" +
+      client_id_ +
+      "&periodType={periodType}&period={period}&frequencyType={frequencyType}&"
+      "frequency={frequency}&needExtendedHoursData={ext}";
+
+  StringReplace(url, "{ticker}", symbol);
+  StringReplace(url, "{periodType}", get_api_interval_value(ptype));
+  StringReplace(url, "{period}", get_api_period_amount(period_amt));
+  StringReplace(url, "{frequencyType}", get_api_frequency_type(ftype));
+  StringReplace(url, "{frequency}", get_api_frequency_amount(freq_amt));
+
+  // if (!ext)
+  //   string_replace(url, "{ext}", "false");
+  // else
+  //   string_replace(url, "{ext}", "true");
+
+  auto response = SendRequest(url);
+  if (!response.ok()) {
+    // some error
+  }
   return Status::OK;
 }
 
