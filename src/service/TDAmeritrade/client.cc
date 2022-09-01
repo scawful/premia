@@ -154,13 +154,13 @@ absl::Status Client::GetOptionChain(
   OptionChainRequest request;
   OptionChainResponse response;
 
-  request.set_symbol(ticker);
-  request.set_contracttype(contractType);
-  request.set_strikecount(strikeCount);
-  request.set_strategy(strategy);
-  request.set_range(range);
-  request.set_expmonth(expMonth);
-  request.set_optiontype(optionType);
+  request.set_symbol(ticker.data());
+  request.set_contracttype(contractType.data());
+  request.set_strikecount(strikeCount.data());
+  request.set_strategy(strategy.data());
+  request.set_range(range.data());
+  request.set_expmonth(expMonth.data());
+  request.set_optiontype(optionType.data());
   request.set_includequotes(includeQuotes);
 
   Status status = stub_->GetOptionChain(&rpc_context, request, &response);
