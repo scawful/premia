@@ -101,9 +101,20 @@ class Client {
   Client();
   ~Client();
 
-  absl::Status CreateChannel();
+  void CreateChannel();
+  absl::Status PostAccessToken();
   absl::Status GetAccount(const absl::string_view account_id);
   absl::Status GetUserPrincipals();
+  absl::Status GetPriceHistory(const std::string &symbol, PeriodType ptype,
+                               int period_amt, FrequencyType ftype,
+                               int freq_amt, bool ext);
+  absl::Status GetOptionChain(absl::string_view ticker,
+                              absl::string_view contractType,
+                              absl::string_view strikeCount,
+                              absl::string_view strategy,
+                              absl::string_view range,
+                              absl::string_view expMonth,
+                              absl::string_view optionType, bool includeQuotes);
 
   void api_login();
 
@@ -172,6 +183,7 @@ class Client {
   ssl::context context{ssl::context::tlsv12_client};
   std::vector<std::shared_ptr<std::string const>> request_queue;
   std::vector<std::thread> ws_threads;
+  ClientContext rpc_context;
 
   // std::string Manipulation
   std::string get_api_interval_value(int value) const;

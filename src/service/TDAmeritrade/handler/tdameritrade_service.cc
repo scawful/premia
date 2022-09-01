@@ -205,29 +205,58 @@ Status TDAmeritradeServiceImpl::GetPriceHistory(
       "&periodType={periodType}&period={period}&frequencyType={frequencyType}&"
       "frequency={frequency}&needExtendedHoursData={ext}";
 
-  StringReplace(url, "{ticker}", symbol);
-  StringReplace(url, "{periodType}", get_api_interval_value(ptype));
-  StringReplace(url, "{period}", get_api_period_amount(period_amt));
-  StringReplace(url, "{frequencyType}", get_api_frequency_type(ftype));
-  StringReplace(url, "{frequency}", get_api_frequency_amount(freq_amt));
+  StringReplace(url, "{ticker}", request->ticker());
+  StringReplace(url, "{periodType}", request->periodtype());
+  StringReplace(url, "{period}", request->period());
+  StringReplace(url, "{frequencyType}", request->frequencytype());
+  StringReplace(url, "{frequency}", request->frequency());
 
-  // if (!ext)
-  //   string_replace(url, "{ext}", "false");
-  // else
-  //   string_replace(url, "{ext}", "true");
+  if (!request->needextendedhoursdata())
+    StringReplace(url, "{ext}", "false");
+  else
+    StringReplace(url, "{ext}", "true");
 
   auto response = SendRequest(url);
   if (!response.ok()) {
     // some error
   }
+  auto json = std::move(*response);
+  JsonParseOptions options;
+  options.ignore_unknown_fields = true;
+  JsonStringToMessage(json, reply, options);
   return Status::OK;
 }
 
 Status TDAmeritradeServiceImpl::GetOptionChain(
     grpc::ServerContext* context, const OptionChainRequest* request,
     OptionChainResponse* reply) {
-  // Call the curl code to get the OptionChain and parse it into an object for
-  // the gui to process
+  std::string url =
+      "https://api.tdameritrade.com/v1/marketdata/chains?apikey=" + client_id_ +
+      "&symbol={ticker}&contractType={contractType}&strikeCount={strikeCount}&"
+      "includeQuotes={includeQuotes}&strategy={strategy}&range={range}&"
+      "expMonth={expMonth}&optionType={optionType}";
+
+  StringReplace(url, "{ticker}", request->symbol());
+  StringReplace(url, "{contractType}", request->contracttype());
+  StringReplace(url, "{strikeCount}", request->strikecount());
+  StringReplace(url, "{strategy}", request->strategy());
+  StringReplace(url, "{range}", request->range());
+  StringReplace(url, "{expMonth}", request->expmonth());
+  StringReplace(url, "{optionType}", request->optiontype());
+
+  if (!request->includequotes())
+    StringReplace(url, "{includeQuotes}", "FALSE");
+  else
+    StringReplace(url, "{includeQuotes}", "TRUE");
+
+  auto response = SendRequest(url);
+  if (!response.ok()) {
+    // some error
+  }
+  auto json = std::move(*response);
+  JsonParseOptions options;
+  options.ignore_unknown_fields = true;
+  JsonStringToMessage(json, reply, options);
   return Status::OK;
 }
 

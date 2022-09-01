@@ -2,7 +2,6 @@ syntax = "proto3";
 option cc_enable_arenas = true;
 
 service TDAmeritrade {
-
   rpc PostAccessToken(AccessTokenRequest) returns (AccessTokenResponse) {}
 
   rpc GetUserPrincipals(UserPrincipalsRequest)
@@ -316,7 +315,16 @@ message AccountResponse {
 
 message AccountsResponse { repeated AccountResponse accounts = 1; }
 
-message OptionChainRequest { string symbol = 1; }
+message OptionChainRequest {
+  string symbol = 1;
+  string contractType = 2;
+  string strikeCount = 3;
+  bool includeQuotes = 4;
+  string strategy = 5;
+  string range = 6;
+  string expMonth = 7;
+  string optionType = 8;
+}
 
 message OptionChainResponse {
   string symbol = 1;
@@ -332,6 +340,7 @@ message PriceHistoryRequest {
   uint32 endDate = 6;
   uint32 startDate = 7;
   bool needExtendedHoursData = 8;
+  string ticker = 9;
 }
 
 message PriceHistoryResponse {
