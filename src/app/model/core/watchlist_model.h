@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "model/model.h"
-#include "service/TDAmeritrade/Data/Watchlist.hpp"
+#include "service/TDAmeritrade/data/Watchlist.hpp"
 
 namespace premia {
 class WatchlistModel : public Model {

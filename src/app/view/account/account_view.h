@@ -1,7 +1,7 @@
 #ifndef AccountView_hpp
 #define AccountView_hpp
 
-#include "core/HLXT.hpp"
+// #include "core/HLXT.hpp"
 #include "model/options/options_model.h"
 #include "view/view.h"
 

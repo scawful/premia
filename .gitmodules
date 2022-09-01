@@ -31,3 +31,6 @@
 [submodule "src/lib/abseil-cpp"]
 	path = src/lib/abseil-cpp
 	url = https://github.com/abseil/abseil-cpp
+[submodule "src/lib/grpc"]
+	path = src/lib/grpc
+	url = https://github.com/grpc/grpc.git

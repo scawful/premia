@@ -65,7 +65,7 @@ void WatchlistModel::initTDAWatchlists() {
     }
     active = true;
   }
-  Proceed;
+  PROCEED;
 }
 
 bool WatchlistModel::getOpenList(int n) { return openList.at(n); }

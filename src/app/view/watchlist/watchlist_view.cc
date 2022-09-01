@@ -225,15 +225,16 @@ void WatchlistView::addLogger(const Logger &newLogger) {
   this->logger = newLogger;
 }
 
-void WatchlistView::addEvent(const std::string &key, const EventHandler &event) {
+void WatchlistView::addEvent(const std::string &key,
+                             const EventHandler &event) {
   this->events[key] = event;
 }
 
 void WatchlistView::Update() {
-  Construct {  // runs once
+  CONSTRUCT {  // runs once
     model.addLogger(this->logger);
   }
-  Instruct {  // runs each frame
+  INSTRUCT {  // runs each frame
     DrawWatchlistMenu();
     switch (currentService) {
       case 0:
@@ -274,12 +275,12 @@ void WatchlistView::Update() {
         break;
     }
   }
-  Destruct {  // runs on throw Destruction, can be used for errors and memory
+  DESTRUCT {  // runs on throw Destruction, can be used for errors and memory
               // managment
     // user is not logged into a service
     // perhaps make a popup window that directs them to log into that service?
     // (not necessarily an error)
   }
-  Proceed;
+  PROCEED;
 }
 }  // namespace premia

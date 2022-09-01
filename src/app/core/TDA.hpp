@@ -1,16 +1,16 @@
 #ifndef TDA_hpp
 #define TDA_hpp
 
-#include "service/TDAmeritrade/Client.hpp"
-#include "service/TDAmeritrade/Data/Account.hpp"
-#include "service/TDAmeritrade/Data/OptionChain.hpp"
-#include "service/TDAmeritrade/Data/Order.hpp"
-#include "service/TDAmeritrade/Data/PriceHistory.hpp"
-#include "service/TDAmeritrade/Data/PricingStructures.hpp"
-#include "service/TDAmeritrade/Data/Quote.hpp"
-#include "service/TDAmeritrade/Data/Watchlist.hpp"
-#include "service/TDAmeritrade/Parser.hpp"
-#include "service/TDAmeritrade/Socket.hpp"
+#include "service/TDAmeritrade/client.h"
+#include "service/TDAmeritrade/parser.h"
+#include "service/TDAmeritrade/socket.h"
+#include "service/TDAmeritrade/data/Account.hpp"
+#include "service/TDAmeritrade/data/OptionChain.hpp"
+#include "service/TDAmeritrade/data/Order.hpp"
+#include "service/TDAmeritrade/data/PriceHistory.hpp"
+#include "service/TDAmeritrade/data/PricingStructures.hpp"
+#include "service/TDAmeritrade/data/Quote.hpp"
+#include "service/TDAmeritrade/data/Watchlist.hpp"
 
 namespace premia::tda {
 using Watchlists = std::vector<Watchlist>;
@@ -24,9 +24,9 @@ class TDA {
   Parser parser;
 
  public:
-  TDA(TDA const&) = delete;
-  void operator=(TDA const&) = delete;
-  static TDA& getInstance() {
+  TDA(TDA const &) = delete;
+  void operator=(TDA const &) = delete;
+  static TDA &getInstance() {
     static TDA instance;
     return instance;
   }
@@ -59,15 +59,16 @@ class TDA {
                        FrequencyType frequencyType, int periodAmount,
                        int frequencyAmount, bool extendedHoursTrading) const
       -> PriceHistory {
-    std::string response = client.get_price_history(ticker, periodType, periodAmount,
-                                               frequencyType, frequencyAmount,
-                                               extendedHoursTrading);
+    std::string response = client.get_price_history(
+        ticker, periodType, periodAmount, frequencyType, frequencyAmount,
+        extendedHoursTrading);
     return parser.parse_price_history(parser.read_response(response), ticker,
                                       frequencyType);
   }
 
-  auto getOptionChain(const std::string &ticker, const std::string &strikeCount, const std::string &strategy,
-                      const std::string &range, const std::string &expMonth,
+  auto getOptionChain(const std::string &ticker, const std::string &strikeCount,
+                      const std::string &strategy, const std::string &range,
+                      const std::string &expMonth,
                       const std::string &optionType) const -> OptionChain {
     std::string response =
         client.get_option_chain(ticker, "ALL", strikeCount, true, strategy,
@@ -75,7 +76,8 @@ class TDA {
     return parser.parse_option_chain(parser.read_response(response));
   }
 
-  auto getWatchlistsByAccount(const std::string &account_num) const -> Watchlists {
+  auto getWatchlistsByAccount(const std::string &account_num) const
+      -> Watchlists {
     std::string response = client.get_watchlist_by_account(account_num);
     return parser.parse_watchlist_data(parser.read_response(response));
   }

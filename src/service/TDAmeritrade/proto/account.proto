@@ -25,13 +25,13 @@ message AccountResponse {
     optional double settledShortQuantity = 7;
     optional double agedQuantity = 8;
 
-    enum Instrument {
-      Equity = 0;
-      FixedIncome = 1;
-      MutualFund = 2;
-      CashEquivalent = 3;
-      Option = 4;
-    }
+    // enum Instrument {
+    //   Equity = 0;
+    //   FixedIncome = 1;
+    //   MutualFund = 2;
+    //   CashEquivalent = 3;
+    //   Option = 4;
+    // }
 
     optional double marketValue = 9;
   }

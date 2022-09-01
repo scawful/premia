@@ -1,8 +1,8 @@
 #ifndef HLXT_hpp
 #define HLXT_hpp
 
-#include "service/Halext/Client.hpp"
-#include "service/Halext/User.hpp"
+// #include "service/Halext/Client.hpp"
+// #include "service/Halext/User.hpp"
 
 namespace premia {
 namespace halext {

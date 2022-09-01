@@ -66,15 +66,14 @@ target_link_libraries(
   ${BOOST_LIBRARIES} 
   ${SDL_TARGETS}
   ${OPENGL_LIBRARIES} 
-  TWS
+  ${OPENSSL_LIBRARIES}
   ImGui 
   ImPlot
   curl
-  OpenSSL::SSL
   tdameritrade
   coinbase
+  TWS
   interactive_brokers
-  halext
 )
 
 if (WIN32) 

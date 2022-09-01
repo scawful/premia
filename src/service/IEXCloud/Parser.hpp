@@ -6,8 +6,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 
-#include "Data/FundOwnership.hpp"
-#include "Data/InsiderTransactions.hpp"
+#include "data/FundOwnership.hpp"
+#include "data/InsiderTransactions.hpp"
 
 namespace premia {
 namespace iex {
