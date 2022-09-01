@@ -19,6 +19,11 @@ class ChartView : public View {
   void Update() override;
 
  private:
+  void initChart();
+  void DrawChart();
+  void DrawChartSettings();
+
+  
   int period_type = 2;
   int period_amount = 0;
   int frequency_type = 1;
@@ -32,10 +37,6 @@ class ChartView : public View {
   std::shared_ptr<ChartModel> model = std::make_shared<ChartModel>();
 
   Logger logger;
-
-  void initChart();
-  void DrawChart();
-  void DrawChartSettings();
 };
 }  // namespace premia
 

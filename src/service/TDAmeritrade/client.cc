@@ -188,12 +188,7 @@ std::string Client::get_api_frequency_amount(int value) const {
   return EnumAPIFreqAmt[value];
 }
 
-/**
- * @brief Send a request for data from the API using the json callback
- *
- * @param endpoint
- * @return std::string
- */
+// Send a request for data from the API using the json callback
 std::string Client::send_request(const std::string &endpoint) const {
   CURL *curl;
   CURLcode res;
@@ -215,14 +210,7 @@ std::string Client::send_request(const std::string &endpoint) const {
   return response;
 }
 
-/**
- * @brief Send an authorized request for data from the API using the json
- * callback
- * @author @scawful
- *
- * @param endpoint
- * @return std::string
- */
+// Send an authorized request for data from the API using the json callback
 std::string Client::send_authorized_request(const std::string &endpoint) const {
   CURL *curl;
   CURLcode res;
@@ -249,12 +237,7 @@ std::string Client::send_authorized_request(const std::string &endpoint) const {
   return response;
 }
 
-/**
- * @brief POST Request using access token
- *
- * @param endpoint
- * @param data
- */
+// POST Request using access token
 void Client::post_authorized_request(const std::string &endpoint,
                                      const std::string &data) const {
   CURL *curl;
@@ -292,13 +275,8 @@ void Client::post_authorized_request(const std::string &endpoint,
   curl_easy_cleanup(curl);
 }
 
-/**
- * @brief Send a POST request using the consumer key and refresh token to get
- * the access token
- * @author @scawful
- *
- * @return std::string
- */
+// Send a POST request using the consumer key and refresh token to get
+// the access token
 std::string Client::post_access_token() const {
   CURL *curl;
   CURLcode res;
@@ -343,10 +321,8 @@ std::string Client::post_access_token() const {
   return response;
 }
 
-/**
- * @brief Get User Principals from API endpoint
- *        Parse and store in UserPrincipals object for local use
- */
+// Get User Principals from API endpoint
+// Parse and store in UserPrincipals object for local use
 void Client::get_user_principals() {
   std::string endpoint =
       "https://api.tdameritrade.com/v1/"
@@ -486,13 +462,7 @@ void Client::api_login() {
   get_user_principals();
 }
 
-/**
- * @brief Start a WebSocket session quickly with a ticker and fields
- * @author @scawful
- *
- * @param ticker
- * @param fields
- */
+// Start a WebSocket session quickly with a ticker and fields
 void Client::start_session(const std::string &ticker) {
   std::string host;
   std::string port = "443";
@@ -514,10 +484,7 @@ void Client::start_session(const std::string &ticker) {
   websocket_session->open(host.c_str(), port.c_str());
 }
 
-/**
- * @brief WebSocket session logout request
- *
- */
+// WebSocket session logout request
 void Client::send_logout_request() {
   json::ptree logout_request = create_logout_request();
   std::stringstream logout_text_stream;
@@ -527,22 +494,15 @@ void Client::send_logout_request() {
   websocket_session->close();
 }
 
-/**
- * @brief API Access Token retrieval
- *
- */
+// API Access Token retrieval
 void Client::fetch_access_token() {
   access_token = parser.parse_access_token(post_access_token());
   has_access_token = true;
 }
 
-/**
- * @brief Request account data by the account id
- *        Return the API response after authorization
- *
- * @param account_id
- * @return std::string
- */
+// Request account data by the account id
+// Return the API response after authorization
+
 std::string Client::get_account(const std::string &account_id) {
   check_user_principals();
   std::string account_url =
@@ -552,11 +512,7 @@ std::string Client::get_account(const std::string &account_id) {
   return send_authorized_request(account_url);
 }
 
-/**
- * @brief Get all account data as a response
- *
- * @return std::string
- */
+// Get all account data as a response
 std::string Client::get_all_accounts() {
   check_user_principals();
   std::string account_url =
@@ -564,11 +520,7 @@ std::string Client::get_all_accounts() {
   return send_authorized_request(account_url);
 }
 
-/**
- * @brief Create a vector of all the account ids present on the API key
- *
- * @return std::vector<std::string>
- */
+// Create a vector of all the account ids present on the API key
 std::vector<std::string> Client::get_all_account_ids() {
   std::vector<std::string> accounts;
   api_login();
@@ -594,13 +546,8 @@ std::vector<std::string> Client::get_all_account_ids() {
   return accounts;
 }
 
-/**
- * @brief Request quote data by the instrument symbol
- *        Return the API response
- *
- * @param symbol
- * @return std::string
- */
+// Request quote data by the instrument symbol
+// Return the API response
 std::string Client::get_quote(const std::string &symbol) const {
   std::string url =
       "https://api.tdameritrade.com/v1/marketdata/{ticker}/quotes?apikey=" +
@@ -609,13 +556,8 @@ std::string Client::get_quote(const std::string &symbol) const {
   return send_request(url);
 }
 
-/**
- * @brief Prepare a request for watchlist data by an account number
- *        Return the API response
- *
- * @param account_id
- * @return std::string
- */
+// Prepare a request for watchlist data by an account number
+// Return the API response
 std::string Client::get_watchlist_by_account(
     const std::string &account_id) const {
   std::string url =
@@ -624,18 +566,8 @@ std::string Client::get_watchlist_by_account(
   return send_authorized_request(url);
 }
 
-/**
- * @brief Prepare a request from the API for price history information
- *        Return the API response
- *
- * @param symbol
- * @param ptype
- * @param period_amt
- * @param ftype
- * @param freq_amt
- * @param ext
- * @return std::string
- */
+// Prepare a request from the API for price history information
+//        Return the API response
 std::string Client::get_price_history(const std::string &symbol,
                                       PeriodType ptype, int period_amt,
                                       FrequencyType ftype, int freq_amt,
@@ -661,20 +593,8 @@ std::string Client::get_price_history(const std::string &symbol,
   return send_request(url);
 }
 
-/**
- * @brief Prepare a request from the API for option chain data
- *        Return the API response
- *
- * @param ticker
- * @param contractType
- * @param strikeCount
- * @param includeQuotes
- * @param strategy
- * @param range
- * @param expMonth
- * @param optionType
- * @return std::string
- */
+// Prepare a request from the API for option chain data
+// Return the API response
 std::string Client::get_option_chain(
     const std::string &ticker, const std::string &contractType,
     const std::string &strikeCount, bool includeQuotes,
@@ -703,13 +623,7 @@ std::string Client::get_option_chain(
   return send_request(url);
 }
 
-/**
- * @brief Retrieve order by the account and the order id
- *
- * @param account_id
- * @param order_id
- * @return std::string
- */
+// Retrieve order by the account and the order id
 std::string Client::get_order(const std::string &account_id,
                               const std::string &order_id) const {
   std::string endpoint =
@@ -719,16 +633,7 @@ std::string Client::get_order(const std::string &account_id,
   return send_authorized_request(endpoint);
 }
 
-/**
- * @brief Retrieve Order using query parameters
- *
- * @param account_id
- * @param maxResults
- * @param fromEnteredTime
- * @param toEnteredTime
- * @param status
- * @return std::string
- */
+// Retrieve Order using query parameters
 std::string Client::get_orders_by_query(const std::string &account_id,
                                         int maxResults, double fromEnteredTime,
                                         double toEnteredTime,
@@ -745,12 +650,7 @@ std::string Client::get_orders_by_query(const std::string &account_id,
   return send_authorized_request(endpoint);
 }
 
-/**
- * @brief Place an Order for the account by id
- *
- * @param account_id
- * @param order
- */
+// Place an Order for the account by id
 void Client::place_order(const std::string &account_id,
                          const Order &order) const {
   std::string endpoint =
@@ -759,12 +659,7 @@ void Client::place_order(const std::string &account_id,
   post_authorized_request(endpoint, order.getString());
 }
 
-/**
- * @brief temp function for passing key to client
- *
- * @param key
- * @param token
- */
+// temp function for passing key to client
 void Client::addAuth(const std::string &key, const std::string &token) {
   api_key = key;
   refresh_token = token;

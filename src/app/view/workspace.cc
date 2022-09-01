@@ -8,7 +8,6 @@
 #include <string>
 
 #include "metatypes.h"
-// #include "core/HLXT.hpp"
 #include "view/chart/subview/candle_chart.h"
 #include "view/view.h"
 
@@ -39,7 +38,8 @@ void NewMasterFrame() {
 void Workspace::Update() {
   NewMasterFrame();
   menu_view_.Update();
-  primary_view_.Update();
+  // primary_view_.Update();
+  chart_view_.Update();
   ImGui::End();
 }
 

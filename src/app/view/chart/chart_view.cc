@@ -14,15 +14,9 @@
 namespace premia {
 
 void ChartView::initChart() {
-  // halext::ChartType chartType =
-  // halext::HLXT::getInstance().getSelectedChart(); if (chartType ==
-  // halext::ChartType::CANDLESTICK) {
-  //   this->currentChart = "CANDLESTICK";
-  //   this->charts["CANDLESTICK"] = std::make_shared<CandleChart>();
-  //   this->charts["CANDLESTICK"]->importModel(model);
-  // } else if (chartType == halext::ChartType::LINEPLOT) {
-  //   this->currentChart = "LINEPLOT";
-  // }
+  currentChart = "CANDLESTICK";
+  charts["CANDLESTICK"] = std::make_shared<CandleChart>();
+  charts["CANDLESTICK"]->importModel(model);
   isInit = true;
 }
 
@@ -77,16 +71,11 @@ void ChartView::addEvent(const std::string& key, const EventHandler& event) {
 }
 
 void ChartView::Update() {
-  CONSTRUCT {
-    logger("[ChartView] Instruct");
+  if (!isInit) {
     initChart();
   }
-  INSTRUCT {
-    DrawChartSettings();
-    DrawChart();
-  }
-  DESTRUCT { logger("[ChartView] Destruct"); }
-  PROCEED;
+  DrawChartSettings();
+  DrawChart();
 }
 
 }  // namespace premia

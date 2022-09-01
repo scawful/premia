@@ -1,7 +1,19 @@
 #include "chart_model.h"
 
 namespace premia {
+
 void ChartModel::initCandles() {
+  std::ifstream keyfile("assets/apikey.txt");
+  std::string consumer_key;
+  std::string refresh_token;
+  if (keyfile.good()) {
+    std::stringstream buffer;
+    buffer << keyfile.rdbuf();
+    buffer >> consumer_key;
+    buffer >> refresh_token;
+    keyfile.close();
+  }
+  tda::TDA::getInstance().authUser(consumer_key, refresh_token);
   candles = priceHistory.getCandleVector();
   int numCandles = getNumCandles();
   for (int i = 0; i < numCandles; i++) {
@@ -20,41 +32,19 @@ void ChartModel::initCandles() {
   }
 }
 
-void ChartModel::initListener() {
-  this->socketListener = [this](const char* response) -> void {
-    // std::future<tda::Candle> responseFuture =
-    // std::async(this->getTDAInterface().processQuoteResponse, response);
-    // candles.push_back(responseFuture.get());
-  };
-}
-
-std::vector<double> ChartModel::getDates() const { return datesVec; }
-
-std::vector<double> ChartModel::getVolumeVector() const { return volumeVec; }
-
-double ChartModel::getDate(int i) { return datesVec.at(i); }
-
-bool ChartModel::isActive() const { return active; }
-
-tda::Quote& ChartModel::getQuote() { return quote; }
-
-int ChartModel::getNumCandles() const { return (int)candles.size(); }
-
-tda::Candle ChartModel::getCandle(int i) { return candles.at(i); }
-
-std::string ChartModel::getTickerSymbol() const { return tickerSymbol; }
-
 std::string ChartModel::getQuoteDetails() {
-  std::string quoteDetails = "Bid: $" + quote.getQuoteVariable("bidPrice") +
-                        " | Ask: $" + quote.getQuoteVariable("askPrice") +
-                        " | Open: $" + quote.getQuoteVariable("openPrice") +
-                        " | Close: $" + quote.getQuoteVariable("closePrice");
+  std::string quoteDetails =
+      "Bid: $" + quote.getQuoteVariable("bidPrice") + " | Ask: $" +
+      quote.getQuoteVariable("askPrice") + " | Open: $" +
+      quote.getQuoteVariable("openPrice") + " | Close: $" +
+      quote.getQuoteVariable("closePrice");
   return quoteDetails;
 }
 
-void ChartModel::fetchPriceHistory(const std::string &ticker, tda::PeriodType ptype,
-                                   int period_amt, tda::FrequencyType ftype,
-                                   int freq_amt, bool ext) {
+void ChartModel::fetchPriceHistory(const std::string& ticker,
+                                   tda::PeriodType ptype, int period_amt,
+                                   tda::FrequencyType ftype, int freq_amt,
+                                   bool ext) {
   if (active) {
     quote.clear();
     priceHistory.clear();

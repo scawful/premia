@@ -48,6 +48,7 @@ class Workspace {
  private:
   MenuView menu_view_;
   PrimaryView primary_view_;
+  ChartView chart_view_;
 };
 
 }  // namespace premia

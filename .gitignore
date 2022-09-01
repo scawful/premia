@@ -9,3 +9,6 @@ Makefile
 chart.csv
 apikey.txt
 .cache/
+src/lib/SDL
+src/lib/protobuf
+src/lib/

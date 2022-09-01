@@ -7,18 +7,18 @@
 
 namespace premia {
 class Model {
- private:
-  EventMap callbacks;
-  Logger consoleLogger;
-
  public:
   Model() = default;
   ~Model() = default;
 
   void addLogger(const Logger& logger);
-  void addEventHandler(const std::string &key, const EventHandler& handler);
+  void addEventHandler(const std::string& key, const EventHandler& handler);
 
   Logger& getLogger();
+
+ private:
+  EventMap callbacks;
+  Logger consoleLogger;
 };
 }  // namespace premia
 

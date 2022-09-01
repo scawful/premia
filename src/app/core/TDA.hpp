@@ -62,6 +62,7 @@ class TDA {
     std::string response = client.get_price_history(
         ticker, periodType, periodAmount, frequencyType, frequencyAmount,
         extendedHoursTrading);
+        std::cout << response << std::endl;
     return parser.parse_price_history(parser.read_response(response), ticker,
                                       frequencyType);
   }
