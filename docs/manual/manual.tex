@@ -1,18 +1,106 @@
 \documentclass[12pt, oneside]{report}
-\title{Premia}
-\author{Justin Scofield}
-\date{September 2022}
-\pagestyle{headings}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{color} 
+\usepackage{graphicx} %LaTeX package to import graphics
+\usepackage{pgfplots}
+\usepackage{mathtools,amssymb}
+\usepackage{tikz}
+\usepackage{xcolor}
 
+\graphicspath{{images/}} %configuring the graphicx package
+\definecolor{DarkGreen}{rgb}{0.0,0.4,0.0} % Comment color
+\definecolor{highlight}{RGB}{255,251,204} % Code highlight color
+
+\lstdefinestyle{Style1}{
+language=C++,
+backgroundcolor=\color{highlight}, 
+basicstyle=\footnotesize\ttfamily, % The default font size and style of the code
+breakatwhitespace=false,
+breaklines=true,
+captionpos=b, % Sets the caption position: b for bottom; t for top
+commentstyle=\usefont{T1}{pcr}{m}{sl}\color{DarkGreen},
+deletekeywords={},
+firstnumber=1, % Line numbers begin at line 1
+frame=single, 
+frameround=tttt,
+keywordstyle=\color{Blue}\bf, % Functions are bold and blue
+morekeywords={},
+numbers=left, % Location of line numbers, can take the values of: none, left, right
+numbersep=10pt, % Distance of line numbers from the code box
+numberstyle=\tiny\color{Gray}, % Style used for line numbers
+rulecolor=\color{black}, % Frame border color
+showstringspaces=false, % Don't put marks in string spaces
+showtabs=false, % Display tabs in the code as lines
+stepnumber=1, % The step distance between line numbers
+stringstyle=\color{Purple}, % Strings are purple
+tabsize=2, % Number of spaces per tab in the code
+}
+
+\newcommand{\insertcode}[2]{\begin{itemize}\item[]\lstinputlisting[caption=#2,label=#1,style=Style1]{#1}\end{itemize}} 
+
+\title{Premia $\sigma$ \\
+\large Desktop Trading and Charting Platform}
+\author{Written by Justin Scofield}
+\date{\small September 2022}
+\pagestyle{headings}
+\pgfplotsset{compat=1.7}
 \begin{document}
 \maketitle
+\pgfmathdeclarefunction{gauss}{2}{\pgfmathparse{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))}}
 
 \tableofcontents
 
+\chapter{Introduction}
+
+Premia is an amateur desktop trading and charting platform for  financial markets. Premia supports connectivity with various exchanges and backend data services. 
+
+The goal of Premia is to present market data in a simple way while still providing a sophisticated set of tools for enhancing the investment or trading process.
+
+Premia will provide support for both manual and automatic trading, with the latter being based on a variety of quantiative finance concepts and portfolio construction techniques.
+
+\section{Motivation}
+
+I began earnestly watching markets in July of 2020. This was one of the frothiest periods of the 2020-2021 bull run off of the Covid lows. As I'm writing this the Dow Jones has just entered into a bear market once again with the 10 year yield approaching 4\% by the day. I was initially enticed by high flying growth stocks and the allure of printing money off of the backs of highly liquid derivatives markets such as options. 
+
+Soon thereafter I was swiftly humbled by the market, experiencing my first correction in September of 2020.* This volatility would resolve itself, at least until March of 2021 when the foreshadowing of the coming interest rate shocks began.* This is when I became interested in asset classes besides equities, such as treasuries and commodities. 
+
+As I learned more about the world of finance, I naturally wanted to mix my software development skills with my interest in financial markets. So in July of 2021, the Premia project was born. Throughout its lifespan, the scope and nature have changed and will likely continue to change. However, there are some long term goals I have for the project beyond just personal use. 
+
+\section{Project Goals}
+
+Eventually, I plan to release Premia in a professional manner. The core program with its aggregation of exchanges and financial services which the user has access to will be free for anyone to use. However, there will be a variety of services and data that will be locked behind the Premia Pro subscription. The idea is to take a small monthly subscription fee for maintenance of the server hosting the data and the logic behind specific services. 
+
 \chapter{Getting Started}
+\insertcode{"code/test.cc"}{An example Hello World program in C++}
+\section{Compiling the application}
 \section{Connecting your accounts}
 
-\chapter{Portfolio}
+\chapter{Strategies}
+
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[no markers, domain=0:10, samples=100,
+    axis lines*=left, xlabel=Return $x$, ylabel=Events $y$,
+    height=6cm, width=10cm,
+    xticklabels={,,,,,k,,}, ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major]
+    \addplot [fill=blue!20, draw=none, domain=-3:-2] {gauss(0,1)} \closedcycle;
+    \addplot [fill=blue!20, draw=none, domain=-3:3] {gauss(0,1)} \closedcycle;
+    \addplot [fill=blue!20, draw=none, domain=-2:-1] {gauss(0,1)} \closedcycle;
+    \addplot [fill=green!20, draw=none, domain=1:2] {gauss(0,1)} \closedcycle;
+    \addplot [fill=green!20, draw=none, domain=2:3] {gauss(0,1)} \closedcycle;
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\section{Equities}
+\section{Bonds}
+\section{Options}
+\subsection{Short Term}
+\subsection{Long Term}
+
 \chapter{Charts}
+\chapter{Portfolio}
 
 \end{document}
