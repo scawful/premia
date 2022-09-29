@@ -58,15 +58,42 @@ static size_t json_write(const char *contents, size_t size, size_t nmemb,
 
 namespace tda {
 
-void Client::CreateChannel() {
+void Client::OpenBrowser() {
+  auto host = "http%3A%2F%2Flocalhost:50051";
+  auto path = absl::StrCat(
+      "https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=",
+      host, "&client_id=", absl::StrCat(api_key, "@AMER.OAUTHAP"));
+#ifdef _WIN32
+  // Note: executable path must use backslashes!
+  ::ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT);
+#else
+#if __APPLE__
+  const char *open_executable = "open";
+#else
+  const char *open_executable = "xdg-open";
+#endif
+  char command[256];
+  snprintf(command, 256, "%s \"%s\"", open_executable, path.c_str());
+  system(command);
+#endif
+}
+
+void Client::CreateChannel(bool has_refresh_token) {
   auto channel = grpc::CreateChannel("localhost:50051",
                                      grpc::InsecureChannelCredentials());
   stub_ = ::TDAmeritrade::NewStub(channel);
 
   ClientContext ctx_rpc;
   AccessTokenRequest request;
-  request.set_refresh_token(refresh_token);
-  request.set_client_id(api_key);
+  if (has_refresh_token) {
+    request.set_grant_type("refresh_token");
+    request.set_refresh_token(refresh_token);
+    request.set_client_id(api_key);
+  } else {
+    request.set_grant_type("authorization_code");
+    request.set_access_type("offline");
+    request.set_client_id(absl::StrCat(api_key, "@AMER.OAUTHAP"));
+  }
   AccessTokenResponse response;
   stub_->PostAccessToken(&ctx_rpc, request, &response);
 }
@@ -229,9 +256,6 @@ std::string Client::send_authorized_request(const std::string &endpoint) const {
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
   res = curl_easy_perform(curl);
-  // if (res != CURLE_OK)
-  //   throw premia::TDAClientException("send_authorized_request() failed",
-  //                                    curl_easy_strerror(res));
 
   curl_easy_cleanup(curl);
   return response;
@@ -267,11 +291,6 @@ void Client::post_authorized_request(const std::string &endpoint,
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
   res = curl_easy_perform(curl);
-
-  // if (res != CURLE_OK)
-  //   throw premia::TDAClientException("post_authorized_request() failed",
-  //                                    curl_easy_strerror(res));
-
   curl_easy_cleanup(curl);
 }
 
@@ -312,11 +331,6 @@ std::string Client::post_access_token() const {
 
   // run the operations
   res = curl_easy_perform(curl);
-
-  // if (res != CURLE_OK)
-  //   throw premia::TDAClientException("post_access_token() failed",
-  //                                    curl_easy_strerror(res));
-
   curl_easy_cleanup(curl);
   return response;
 }
@@ -457,10 +471,6 @@ json::ptree Client::create_service_request(ServiceType type,
 
 Client::Client() { curl_global_init(CURL_GLOBAL_SSL); }
 Client::~Client() { curl_global_cleanup(); }
-void Client::api_login() {
-  fetch_access_token();
-  get_user_principals();
-}
 
 // Start a WebSocket session quickly with a ticker and fields
 void Client::start_session(const std::string &ticker) {
@@ -523,7 +533,6 @@ std::string Client::get_all_accounts() {
 // Create a vector of all the account ids present on the API key
 std::vector<std::string> Client::get_all_account_ids() {
   std::vector<std::string> accounts;
-  api_login();
 
   for (const auto &[key, value] : _user_principals) {
     if (key == "accounts") {

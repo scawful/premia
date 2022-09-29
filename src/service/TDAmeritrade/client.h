@@ -101,7 +101,8 @@ class Client {
   Client();
   ~Client();
 
-  void CreateChannel();
+  void OpenBrowser();
+  void CreateChannel(bool has_refresh_token);
   absl::Status PostAccessToken();
   absl::Status GetAccount(const absl::string_view account_id);
   absl::Status GetUserPrincipals();
@@ -115,8 +116,6 @@ class Client {
                               absl::string_view range,
                               absl::string_view expMonth,
                               absl::string_view optionType, bool includeQuotes);
-
-  void api_login();
 
   // WebSocket Controls
   void start_session(const std::string &ticker);
