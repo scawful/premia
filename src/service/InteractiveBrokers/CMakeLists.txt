@@ -21,11 +21,12 @@ target_include_directories(interactive_brokers PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/tws
 )
 target_link_libraries(
-  interactive_brokers 
-  curl 
-  ${OPENSSL_LIBRARIES}
+  interactive_brokers
+  curl
+  OpenSSL::SSL
+  OpenSSL::Crypto
   TWS
-  ${BOOST_LIBRARIES} 
+  ${BOOST_LIBRARIES}
 )
 
 if (WIN32) 
