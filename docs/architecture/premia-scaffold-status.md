@@ -80,6 +80,9 @@ This note captures the first implementation pass after the architecture review.
 - the mobile wrapper now also exposes typed async `loadHome()`, `loadQuote()`,
   and `loadChart()` methods, plus hand-written Swift models for portfolio,
   holdings, quotes, and chart snapshots.
+- the mobile wrapper now also exposes typed async watchlist and connection
+  workflow methods, with hand-written models for watchlist rows/screens and
+  Schwab/Plaid launch states.
 
 ### Desktop migration start
 

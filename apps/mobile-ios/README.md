@@ -17,3 +17,6 @@ Current integration:
 - `PremiaAPIClient` now configures `PremiaAPIClientGeneratedAPI.basePath` and
   exposes typed async wrapper methods for bootstrap, home, quote, and chart
   loading
+- `PremiaAPIClient` also wraps watchlist loading plus Schwab and Plaid
+  connection workflow methods so SwiftUI can consume normalized app models
+  instead of generated types directly

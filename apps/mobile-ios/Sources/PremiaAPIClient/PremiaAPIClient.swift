@@ -96,6 +96,90 @@ public final class PremiaAPIClient: @unchecked Sendable {
         )
     }
 
+    @available(macOS 10.15, iOS 13.0, *)
+    public func loadWatchlists() async throws -> [PremiaWatchlistSummaryModel] {
+        let response = try await WatchlistsAPI.listWatchlists()
+        return response.data.watchlists.map(mapWatchlist)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func loadWatchlist(id: String) async throws -> PremiaWatchlistScreenSnapshot {
+        let response = try await WatchlistsAPI.getWatchlistScreen(watchlistId: id)
+        return PremiaWatchlistScreenSnapshot(
+            watchlist: mapWatchlist(response.data.watchlist),
+            availableWatchlists: response.data.availableWatchlists.map(mapWatchlist),
+            rows: response.data.rows.map(mapWatchlistRow),
+            asOf: response.meta.asOf
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func startSchwabOAuth(
+        redirectURI: String? = nil,
+        clientPlatform: String? = nil
+    ) async throws -> PremiaSchwabOAuthLaunch {
+        let request = PremiaAPIClientGeneratedAPI.StartSchwabOAuthRequest(
+            redirectUri: redirectURI,
+            clientPlatform: clientPlatform
+        )
+        let response = try await ConnectionsAPI.startSchwabOAuth(
+            startSchwabOAuthRequest: request
+        )
+        return PremiaSchwabOAuthLaunch(
+            authURL: response.data.authUrl,
+            state: response.data.state,
+            expiresAt: response.data.expiresAt
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func completeSchwabOAuth(
+        callback: String,
+        state: String? = nil
+    ) async throws -> PremiaConnectionSummary {
+        let request = PremiaAPIClientGeneratedAPI.CompleteSchwabOAuthRequest(
+            callback: callback,
+            state: state
+        )
+        let response = try await ConnectionsAPI.completeSchwabOAuth(
+            completeSchwabOAuthRequest: request
+        )
+        return mapConnection(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func createPlaidLinkToken(
+        userID: String? = nil,
+        redirectURI: String? = nil
+    ) async throws -> PremiaPlaidLinkLaunch {
+        let request = PremiaAPIClientGeneratedAPI.CreatePlaidLinkTokenRequest(
+            userId: userID,
+            redirectUri: redirectURI
+        )
+        let response = try await ConnectionsAPI.createPlaidLinkToken(
+            createPlaidLinkTokenRequest: request
+        )
+        return PremiaPlaidLinkLaunch(
+            linkToken: response.data.linkToken,
+            expiration: response.data.expiration
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func completePlaidLink(
+        publicToken: String,
+        institutionID: String? = nil
+    ) async throws -> PremiaConnectionSummary {
+        let request = PremiaAPIClientGeneratedAPI.CompletePlaidLinkRequest(
+            publicToken: publicToken,
+            institutionId: institutionID
+        )
+        let response = try await ConnectionsAPI.completePlaidLink(
+            completePlaidLinkRequest: request
+        )
+        return mapConnection(response.data)
+    }
+
     private func mapConnection(_ connection: PremiaAPIClientGeneratedAPI.ConnectionSummary) -> PremiaConnectionSummary {
         PremiaConnectionSummary(
             id: connection.provider.rawValue,
@@ -154,6 +238,19 @@ public final class PremiaAPIClient: @unchecked Sendable {
             id: watchlist.id,
             name: watchlist.name,
             instrumentCount: watchlist.instrumentCount
+        )
+    }
+
+    private func mapWatchlistRow(_ row: PremiaAPIClientGeneratedAPI.WatchlistRow) -> PremiaWatchlistRowModel {
+        PremiaWatchlistRowModel(
+            id: row.id,
+            symbol: row.symbol,
+            name: row.name,
+            lastPrice: mapMoney(row.lastPrice),
+            dayChange: mapChange(row.dayChange),
+            bid: row.bid.map(mapMoney),
+            ask: row.ask.map(mapMoney),
+            updatedAt: row.updatedAt
         )
     }
 
