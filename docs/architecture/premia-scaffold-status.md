@@ -144,6 +144,9 @@ This note captures the first implementation pass after the architecture review.
 - `src/app/view/account/account_view.cc` now prefers the provider-backed core
   account pane by default and leaves the legacy TDA account pane behind an
   explicit collapsible section.
+- `src/app/view/options/option_chain.cc` now renders option rows and underlying
+  details from normalized core snapshots instead of directly reading the old
+  TDA-style raw option maps in the view layer.
 
 ## Validation status
 

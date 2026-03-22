@@ -62,13 +62,22 @@ void OptionChainView::DrawChain() {
       ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingStretchProp;
 
   static int current_item = 0;
+  const auto& snapshot = model.getCoreSnapshot();
+  if (snapshot.expirations.empty()) {
+    ImGui::TextDisabled("No option-chain expirations available.");
+    return;
+  }
+  if (current_item >= static_cast<int>(snapshot.expirations.size())) {
+    current_item = 0;
+  }
+
   ImGui::Text("Gamma at Expiry $%.0f", model.getGammaAtExpiry(current_item));
   if (ImGui::BeginCombo("Expiration Date",
-                        model.getDateTime(current_item).c_str(),
+                        snapshot.expirations[current_item].label.c_str(),
                         ImGuiComboFlags_None)) {
-    for (int n = 0; n < model.getDateTimeArray().size(); n++) {
+    for (int n = 0; n < snapshot.expirations.size(); n++) {
       const bool is_selected = (current_item == n);
-      if (ImGui::Selectable(model.getDateTime(n).c_str(), is_selected))
+      if (ImGui::Selectable(snapshot.expirations[n].label.c_str(), is_selected))
         current_item = n;
 
       // Set the initial focus when opening the combo (scrolling + keyboard
@@ -104,128 +113,70 @@ void OptionChainView::DrawChain() {
     ImGui::TableHeadersRow();
 
     ImGuiListClipper clipper;
-    clipper.Begin(
-        (int)model.getCallOptionObj(current_item).strikePriceObj.size());
+    clipper.Begin(static_cast<int>(snapshot.expirations[current_item].rows.size()));
     while (clipper.Step()) {
       for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
+        const auto& option_row = snapshot.expirations[current_item].rows[row];
         ImGui::TableNextRow();
         for (int column = 0; column < 19; column++) {
           ImGui::TableSetColumnIndex(column);
           switch (column) {
             case 0:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["bid"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_bid.c_str());
               break;
             case 1:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["ask"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_ask.c_str());
               break;
             case 2:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["last"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_last.c_str());
               break;
             case 3:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["netChange"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_change.c_str());
               break;
             case 4:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["delta"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_delta.c_str());
               break;
             case 5:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["gamma"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_gamma.c_str());
               break;
             case 6:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["theta"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_theta.c_str());
               break;
             case 7:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["vega"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_vega.c_str());
               break;
             case 8:
-              ImGui::Text("%s", model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["openInterest"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.call_open_interest.c_str());
               break;
             case 9:
-              ImGui::Selectable(model.getCallOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["strikePrice"]
-                                    .c_str(),
-                                &select_options[row]);
+              ImGui::Selectable(option_row.strike.c_str(), &select_options[row]);
               break;
             case 10:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["bid"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_bid.c_str());
               break;
             case 11:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["ask"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_ask.c_str());
               break;
             case 12:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["last"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_last.c_str());
               break;
             case 13:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["netChange"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_change.c_str());
               break;
             case 14:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["delta"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_delta.c_str());
               break;
             case 15:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["gamma"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_gamma.c_str());
               break;
             case 16:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["theta"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_theta.c_str());
               break;
             case 17:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["vega"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_vega.c_str());
               break;
             case 18:
-              ImGui::Text("%s", model.getPutOptionObj(current_item)
-                                    .strikePriceObj[row]
-                                    .raw_option["openInterest"]
-                                    .c_str());
+              ImGui::Text("%s", option_row.put_open_interest.c_str());
               break;
             default:
               ImGui::Text("N/A %d,%d", column, row);
@@ -239,44 +190,16 @@ void OptionChainView::DrawChain() {
 }
 
 void OptionChainView::DrawUnderlying() {
+  const auto& snapshot = model.getCoreSnapshot();
   if (ImGui::TreeNode("Underlying")) {
-    ImGui::Text(
-        "%s | %s (%s)",
-        model.getOptionChainData()
-            .getUnderlyingDataVariable("description")
-            .c_str(),
-        model.getOptionChainData().getOptionChainDataVariable("symbol").c_str(),
-        model.getOptionChainData()
-            .getUnderlyingDataVariable("markPercentChange")
-            .c_str());
-    ImGui::Text(
-        "Bid: %s | Ask: %s",
-        model.getOptionChainData().getUnderlyingDataVariable("bid").c_str(),
-        model.getOptionChainData().getUnderlyingDataVariable("ask").c_str());
-    ImGui::Text(
-        "Open: %s | Close: %s",
-        model.getOptionChainData()
-            .getUnderlyingDataVariable("openPrice")
-            .c_str(),
-        model.getOptionChainData().getUnderlyingDataVariable("close").c_str());
-    ImGui::Text("High: %s | Low: %s",
-                model.getOptionChainData()
-                    .getUnderlyingDataVariable("highPrice")
-                    .c_str(),
-                model.getOptionChainData()
-                    .getUnderlyingDataVariable("lowPrice")
-                    .c_str());
-    ImGui::Text("Total Volume: %s",
-                model.getOptionChainData()
-                    .getUnderlyingDataVariable("totalVolume")
-                    .c_str());
-    ImGui::Text("Exchange: %s", model.getOptionChainData()
-                                    .getUnderlyingDataVariable("exchangeName")
-                                    .c_str());
-    ImGui::Text("Implied Volatility: %s",
-                model.getOptionChainData()
-                    .getOptionChainDataVariable("volatility")
-                    .c_str());
+    ImGui::Text("%s | %s", snapshot.description.c_str(), snapshot.symbol.c_str());
+    ImGui::Text("Bid: %s | Ask: %s", snapshot.bid.c_str(), snapshot.ask.c_str());
+    ImGui::Text("Open: %s | Close: %s", snapshot.open_price.c_str(),
+                snapshot.close_price.c_str());
+    ImGui::Text("High: %s | Low: %s", snapshot.high_price.c_str(),
+                snapshot.low_price.c_str());
+    ImGui::Text("Total Volume: %s", snapshot.total_volume.c_str());
+    ImGui::Text("Implied Volatility: %s", snapshot.volatility.c_str());
     ImGui::Text("Naive Gamma Exposure: $%.2f", model.getGammaExposure());
     ImGui::Text("Skew-Adjusted Gamma Exposure: N/A");
     ImGui::Text("GEX Flip Point: N/A");
@@ -377,6 +300,11 @@ void OptionChainView::addEvent(const std::string& key,
 }
 
 void OptionChainView::Update() {
+  if (ImGui::Button("Refresh Core Option Snapshot")) {
+    model.fetchOptionChain("SPY", "8", "SINGLE", "ALL", "ALL", "ALL");
+    model.calculateGammaExposure();
+  }
+
   if (model.isActive()) {
     if (ImGui::BeginTable("OptionChainTable", 1,
                           ImGuiTableFlags_NoBordersInBody)) {

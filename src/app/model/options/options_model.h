@@ -18,6 +18,7 @@ class OptionsModel : public Model {
   bool active = false;
   double naiveGammaExposure = 0.0;
   std::string tickerSymbol;
+  core::application::OptionChainSnapshot core_snapshot;
   tda::OptionChain optionChainData;
   std::vector<tda::OptionsDateTimeObj> callOptionArray;
   std::vector<tda::OptionsDateTimeObj> putOptionArray;
@@ -38,6 +39,7 @@ class OptionsModel : public Model {
 
  public:
   bool isActive() const;
+  const core::application::OptionChainSnapshot& getCoreSnapshot() const;
   tda::OptionChain& getOptionChainData();
 
   tda::OptionsDateTimeObj& getCallOptionObj(int index);

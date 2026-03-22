@@ -8,6 +8,10 @@
 namespace premia {
 bool OptionsModel::isActive() const { return active; }
 
+const core::application::OptionChainSnapshot& OptionsModel::getCoreSnapshot() const {
+  return core_snapshot;
+}
+
 tda::OptionChain& OptionsModel::getOptionChainData() {
   return this->optionChainData;
 }
@@ -177,6 +181,7 @@ auto OptionsModel::makeRawOptionMap(const std::map<std::string, std::string>& va
 
 void OptionsModel::loadFromCoreSnapshot(
     const core::application::OptionChainSnapshot& snapshot) {
+  core_snapshot = snapshot;
   optionChainData = tda::OptionChain();
   optionChainData.setOptionChainVariable("symbol", snapshot.symbol);
   optionChainData.setOptionChainVariable("volatility", snapshot.volatility);
