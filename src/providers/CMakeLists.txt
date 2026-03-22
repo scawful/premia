@@ -48,3 +48,41 @@ target_link_libraries(
   PRIVATE
   schwab
 )
+
+add_library(
+  premia_provider_schwab_workflows
+  schwab/workflow_provider.cc
+)
+
+target_include_directories(
+  premia_provider_schwab_workflows
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_schwab_workflows PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_schwab_workflows
+  PRIVATE
+  schwab
+)
+
+add_library(
+  premia_provider_plaid_workflows
+  plaid/workflow_provider.cc
+)
+
+target_include_directories(
+  premia_provider_plaid_workflows
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_plaid_workflows PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_plaid_workflows
+  PRIVATE
+  plaid
+)

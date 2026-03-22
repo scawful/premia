@@ -38,6 +38,9 @@ This note captures the first implementation pass after the architecture review.
 - `src/providers/schwab/market_data_provider.cc` now owns the Schwab-specific
   quote and chart parsing logic that had previously lived inside the shared core
   service.
+- `src/providers/schwab/workflow_provider.cc` and
+  `src/providers/plaid/workflow_provider.cc` now own the broker-specific
+  workflow logic for Schwab OAuth and Plaid Link.
 - watchlist summaries and watchlist-screen rows now come from a provider adapter
   backed by `assets/watchlists.json`, with TDA taking precedence when an
   authenticated watchlist provider is available.

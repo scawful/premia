@@ -17,8 +17,10 @@
 #include "Plaid/client.h"
 #include "Schwab/client.h"
 #include "premia/providers/local/watchlist_provider.hpp"
+#include "premia/providers/plaid/workflow_provider.hpp"
 #include "premia/providers/schwab/market_data_provider.hpp"
 #include "premia/providers/tda/watchlist_provider.hpp"
+#include "premia/providers/schwab/workflow_provider.hpp"
 
 namespace premia::core::application {
 
@@ -366,49 +368,17 @@ auto ScaffoldApplicationService::StartSchwabOAuth(
 
   const auto state = std::string("schwab_state_") + std::to_string(NextWorkflowId());
 
-  SchwabOAuthStartData data;
-  data.state = state;
-  data.expires_at = CurrentUtcTimestamp();
-
-  premia::schwab::Client client;
-  if (LoadSchwabClient(client)) {
-    data.auth_url = client.BuildAuthUrl();
-  } else {
-    const auto redirect_uri = request.redirect_uri.empty()
-                                  ? std::string("premia://schwab/callback")
-                                  : request.redirect_uri;
-    data.auth_url =
-        "https://api.schwabapi.com/v1/oauth/authorize?response_type=code&client_id="
-        "premia-demo-app&redirect_uri=" +
-        redirect_uri + "&state=" + state;
-  }
-  return data;
+  providers::schwab::WorkflowProvider provider(kSchwabConfigPath,
+                                               kSchwabTokenPath);
+  return provider.StartOAuth(request, state, CurrentUtcTimestamp());
 }
 
 auto ScaffoldApplicationService::CompleteSchwabOAuth(
     const SchwabOAuthCompleteRequest& request) -> ConnectionSummary {
   auto& schwab = FindConnection(Provider::kSchwab);
-
-  premia::schwab::Client client;
-  if (LoadSchwabClient(client)) {
-    if (!request.callback.empty() && client.ExchangeAuthCode(request.callback)) {
-      client.SaveTokens(kSchwabTokenPath);
-      client.GetAccountNumbers();
-      schwab.status = ConnectionStatus::kConnected;
-      schwab.last_sync_at = CurrentUtcTimestamp();
-      schwab.reauth_required = false;
-    } else if (!request.callback.empty()) {
-      schwab.status = ConnectionStatus::kReauthRequired;
-      schwab.reauth_required = true;
-    }
-    return schwab;
-  }
-
-  if (!request.callback.empty()) {
-    schwab.status = ConnectionStatus::kConnected;
-    schwab.last_sync_at = CurrentUtcTimestamp();
-    schwab.reauth_required = false;
-  }
+  providers::schwab::WorkflowProvider provider(kSchwabConfigPath,
+                                               kSchwabTokenPath);
+  schwab = provider.CompleteOAuth(request, schwab, CurrentUtcTimestamp());
   return schwab;
 }
 
@@ -417,50 +387,16 @@ auto ScaffoldApplicationService::CreatePlaidLinkToken(
   auto& plaid = FindConnection(Provider::kPlaid);
   plaid.status = ConnectionStatus::kConnecting;
 
-  premia::plaid::Client client;
-  if (LoadPlaidClient(client)) {
-    const auto user_id = request.user_id.empty() ? std::string("premia-user")
-                                                 : request.user_id;
-    auto data = ParsePlaidLinkTokenResponse(client.CreateLinkToken(user_id));
-    if (!data.link_token.empty()) {
-      return data;
-    }
-  }
-
-  PlaidLinkTokenData data;
-  const auto user_id = request.user_id.empty() ? std::string("premia-user")
-                                               : request.user_id;
-  data.link_token = "link-sandbox-" + user_id + "-" +
-                    std::to_string(NextWorkflowId());
-  data.expiration = CurrentUtcTimestamp();
-  return data;
+  providers::plaid::WorkflowProvider provider(kPlaidConfigPath, kPlaidTokenPath);
+  return provider.CreateLinkToken(request, CurrentUtcTimestamp(), NextWorkflowId());
 }
 
 auto ScaffoldApplicationService::CompletePlaidLink(
     const PlaidLinkCompleteRequest& request) -> ConnectionSummary {
   auto& plaid = FindConnection(Provider::kPlaid);
 
-  premia::plaid::Client client;
-  if (LoadPlaidClient(client)) {
-    if (!request.public_token.empty() &&
-        client.ExchangePublicToken(request.public_token)) {
-      client.SaveTokens(kPlaidTokenPath);
-      plaid.status = ConnectionStatus::kConnected;
-      plaid.last_sync_at = CurrentUtcTimestamp();
-      plaid.reauth_required = false;
-    } else if (!request.public_token.empty()) {
-      plaid.status = ConnectionStatus::kNotConnected;
-      plaid.reauth_required = false;
-      plaid.last_sync_at.clear();
-    }
-    return plaid;
-  }
-
-  if (!request.public_token.empty()) {
-    plaid.status = ConnectionStatus::kConnected;
-    plaid.last_sync_at = CurrentUtcTimestamp();
-    plaid.reauth_required = false;
-  }
+  providers::plaid::WorkflowProvider provider(kPlaidConfigPath, kPlaidTokenPath);
+  plaid = provider.CompleteLink(request, plaid, CurrentUtcTimestamp());
   return plaid;
 }
 

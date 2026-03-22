@@ -10,6 +10,10 @@ Current adapters:
   a valid `assets/tda.json` config is available.
 - `schwab/market_data_provider.cc` - Schwab quote and chart adapter used when a
   valid Schwab config and token set are available.
+- `schwab/workflow_provider.cc` - Schwab OAuth workflow adapter for start and
+  completion flows.
+- `plaid/workflow_provider.cc` - Plaid Link workflow adapter for link-token and
+  completion flows.
 
 These adapters are intentionally narrow. They let `premia_core` stop owning the
 provider-specific parsing and fallback glue directly.
