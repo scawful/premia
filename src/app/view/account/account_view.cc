@@ -311,6 +311,9 @@ void AccountView::addEvent(const std::string &key, const EventHandler &event) {
 
 void AccountView::Update() {
   if (!isInit) {
+    core_model.addLogger(logger);
+    core_model.refresh();
+
     Try {
       initPositions();
       isLoggedIn = true;
@@ -320,12 +323,18 @@ void AccountView::Update() {
     }
     finally { isInit = true; }
     PROCEED;
-  } else {
-    if (isLoggedIn) {
+  }
+
+  if (ImGui::Button("Refresh Core Account")) {
+    core_model.refresh();
+  }
+  if (isLoggedIn) {
+    ImGui::SameLine();
+    if (ImGui::CollapsingHeader("Legacy TDA Account Pane")) {
       DrawAccountPane();
-    } else {
-      DrawCoreAccountPreview();
     }
   }
+
+  DrawCoreAccountPreview();
 }
 }  // namespace premia

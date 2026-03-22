@@ -129,6 +129,9 @@ This note captures the first implementation pass after the architecture review.
   `src/app/model/options/options_model.cc` now use composition-root services
   instead of calling broker singletons directly, so more of the desktop model
   layer now depends on normalized provider-backed application contracts.
+- `src/app/view/account/account_view.cc` now prefers the provider-backed core
+  account pane by default and leaves the legacy TDA account pane behind an
+  explicit collapsible section.
 
 ## Validation status
 
