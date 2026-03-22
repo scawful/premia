@@ -94,6 +94,16 @@ class ConnectionWorkflowService {
       -> ConnectionSummary = 0;
 };
 
+class OrderService {
+ public:
+  virtual ~OrderService() = default;
+
+  virtual auto PreviewOrder(const OrderIntentRequest& request)
+      -> OrderPreviewData = 0;
+  virtual auto SubmitOrder(const OrderIntentRequest& request)
+      -> OrderSubmissionData = 0;
+};
+
 }  // namespace premia::core::application
 
 #endif  // PREMIA_CORE_APPLICATION_SERVICE_CONTRACTS_HPP

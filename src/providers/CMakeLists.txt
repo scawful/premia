@@ -108,6 +108,19 @@ target_include_directories(
 target_compile_features(premia_provider_local_options PUBLIC cxx_std_17)
 
 add_library(
+  premia_provider_local_orders
+  local/order_provider.cc
+)
+
+target_include_directories(
+  premia_provider_local_orders
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_local_orders PUBLIC cxx_std_17)
+
+add_library(
   premia_provider_tda_options
   tda/options_provider.cc
 )
@@ -122,6 +135,25 @@ target_compile_features(premia_provider_tda_options PUBLIC cxx_std_17)
 
 target_link_libraries(
   premia_provider_tda_options
+  PRIVATE
+  tdameritrade
+)
+
+add_library(
+  premia_provider_tda_orders
+  tda/order_provider.cc
+)
+
+target_include_directories(
+  premia_provider_tda_orders
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_tda_orders PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_tda_orders
   PRIVATE
   tdameritrade
 )

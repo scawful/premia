@@ -15,6 +15,7 @@ ProviderBackedApplicationService::ProviderBackedApplicationService()
       portfolio_service_(std::make_unique<detail::PortfolioAccountService>()),
       market_options_service_(std::make_unique<detail::MarketOptionsService>()),
       watchlist_service_(std::make_unique<detail::WatchlistService>()),
+      order_service_(std::make_unique<detail::OrderService>()),
       workflow_service_(std::make_unique<detail::WorkflowService>(*connection_service_)) {}
 
 ProviderBackedApplicationService::~ProviderBackedApplicationService() = default;
@@ -120,6 +121,16 @@ auto ProviderBackedApplicationService::RemoveWatchlistSymbol(
     const std::string& watchlist_id, const std::string& symbol)
     -> WatchlistSummary {
   return watchlist_service_->RemoveWatchlistSymbol(watchlist_id, symbol);
+}
+
+auto ProviderBackedApplicationService::PreviewOrder(
+    const OrderIntentRequest& request) -> OrderPreviewData {
+  return order_service_->PreviewOrder(request);
+}
+
+auto ProviderBackedApplicationService::SubmitOrder(
+    const OrderIntentRequest& request) -> OrderSubmissionData {
+  return order_service_->SubmitOrder(request);
 }
 
 auto ProviderBackedApplicationService::CreateLinkToken(

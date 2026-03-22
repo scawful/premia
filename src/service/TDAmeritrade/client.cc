@@ -469,6 +469,14 @@ void Client::place_order(const std::string &account_id,
   post_authorized_request(endpoint, order.getString());
 }
 
+void Client::place_order_payload(const std::string &account_id,
+                                 const std::string &payload) const {
+  std::string endpoint =
+      "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
+  string_replace(endpoint, "{accountId}", account_id);
+  post_authorized_request(endpoint, payload);
+}
+
 void Client::addAuth(const std::string &key, const std::string &token) {
   api_key = key;
   refresh_token = token;

@@ -392,6 +392,38 @@ auto SerializeOptionChainResponse(const application::OptionChainSnapshot& data)
                                      MakeOptionExpirationArray(data.expirations)}});
 }
 
+auto SerializeOrderPreviewResponse(const application::OrderPreviewData& data)
+    -> std::string {
+  return WriteEnvelope(json::object{{"previewId", data.preview_id},
+                                    {"accountId", data.account_id},
+                                    {"symbol", data.symbol},
+                                    {"assetType", data.asset_type},
+                                    {"instruction", data.instruction},
+                                    {"quantity", data.quantity},
+                                    {"orderType", data.order_type},
+                                    {"limitPrice", data.limit_price},
+                                    {"estimatedTotal", data.estimated_total},
+                                    {"mode", data.mode},
+                                    {"status", data.status},
+                                    {"warnings", MakeStringArray(data.warnings)}});
+}
+
+auto SerializeOrderSubmissionResponse(
+    const application::OrderSubmissionData& data) -> std::string {
+  return WriteEnvelope(json::object{{"submissionId", data.submission_id},
+                                    {"accountId", data.account_id},
+                                    {"symbol", data.symbol},
+                                    {"assetType", data.asset_type},
+                                    {"instruction", data.instruction},
+                                    {"quantity", data.quantity},
+                                    {"orderType", data.order_type},
+                                    {"limitPrice", data.limit_price},
+                                    {"mode", data.mode},
+                                    {"status", data.status},
+                                    {"submittedAt", data.submitted_at},
+                                    {"message", data.message}});
+}
+
 auto SerializeConnectionSummaryResponse(const application::ConnectionSummary& data)
     -> std::string {
   return WriteEnvelope(MakeConnectionSummary(data));

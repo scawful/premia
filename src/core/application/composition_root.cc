@@ -35,6 +35,10 @@ auto CompositionRoot::Watchlists() -> WatchlistService& {
   return app_service_;
 }
 
+auto CompositionRoot::Orders() -> OrderService& {
+  return app_service_;
+}
+
 auto CompositionRoot::Workflows() -> ConnectionWorkflowService& {
   return app_service_;
 }

@@ -56,6 +56,9 @@ This note captures the first implementation pass after the architecture review.
   watchlists when a valid `assets/tda.json` config is present.
 - `src/providers/tda/options_provider.cc` can now supply authenticated TDA
   option-chain snapshots.
+- `src/providers/local/order_provider.cc` and `src/providers/tda/order_provider.cc`
+  now back order preview and submission workflows through the shared contract
+  surface.
 - `src/providers/schwab/market_data_provider.cc` now owns the Schwab-specific
   quote and chart parsing logic that had previously lived inside the shared core
   service.
@@ -70,6 +73,9 @@ This note captures the first implementation pass after the architecture review.
 - account detail and option-chain fallback views are now backed by provider
   adapters too, letting more of the desktop UI leave singleton-driven model
   flows behind.
+- account/options flows are no longer read-only at the API layer; order preview
+  and submission routes now exist with safe local fallbacks and explicit live
+  confirmation requirements for TDA.
 - watchlist create/rename/add-symbol/remove-symbol flows are now supported
   through the local watchlist provider and the HTTP API mutation routes.
 

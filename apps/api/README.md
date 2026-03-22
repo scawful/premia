@@ -22,6 +22,8 @@ Current routes:
 - `GET /v1/screens/quotes/{symbol}`
 - `GET /v1/screens/charts/{symbol}`
 - `GET /v1/screens/options/{symbol}`
+- `POST /v1/orders/preview`
+- `POST /v1/orders/submit`
 - `GET /v1/stream/events`
 - `POST /v1/connections/schwab/oauth/start`
 - `POST /v1/connections/schwab/oauth/complete`
@@ -44,6 +46,9 @@ Route behavior today:
 - account and option-chain screen requests now flow through provider-backed core
   services as well, using TDA when valid credentials exist and local fixtures
   otherwise
+- order preview and submit requests now flow through provider-backed order
+  services, with TDA used only when valid credentials exist and a live
+  submission is explicitly confirmed
 - watchlist mutation routes are backed by the local provider adapter and persist
   changes into `assets/watchlists.json`
 

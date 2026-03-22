@@ -29,6 +29,10 @@ auto SerializeChartScreenResponse(const core::application::ChartScreenData& data
     -> std::string;
 auto SerializeOptionChainResponse(const core::application::OptionChainSnapshot& data)
     -> std::string;
+auto SerializeOrderPreviewResponse(const core::application::OrderPreviewData& data)
+    -> std::string;
+auto SerializeOrderSubmissionResponse(
+    const core::application::OrderSubmissionData& data) -> std::string;
 auto SerializeConnectionSummaryResponse(
     const core::application::ConnectionSummary& data) -> std::string;
 auto SerializeSchwabOAuthStartResponse(

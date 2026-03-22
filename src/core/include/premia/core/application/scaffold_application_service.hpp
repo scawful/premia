@@ -16,6 +16,7 @@ class ConnectionService;
 class PortfolioAccountService;
 class MarketOptionsService;
 class WatchlistService;
+class OrderService;
 class WorkflowService;
 }  // namespace detail
 
@@ -25,6 +26,7 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
                                          public MarketDataService,
                                          public OptionsService,
                                          public WatchlistService,
+                                         public OrderService,
                                          public BankLinkService,
                                          public ConnectionWorkflowService {
  public:
@@ -66,6 +68,11 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   auto RemoveWatchlistSymbol(const std::string& watchlist_id,
                              const std::string& symbol) -> WatchlistSummary override;
 
+  auto PreviewOrder(const OrderIntentRequest& request)
+      -> OrderPreviewData override;
+  auto SubmitOrder(const OrderIntentRequest& request)
+      -> OrderSubmissionData override;
+
   auto CreateLinkToken(const PlaidLinkTokenRequest& request)
       -> PlaidLinkTokenData override;
 
@@ -87,6 +94,7 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   std::unique_ptr<detail::PortfolioAccountService> portfolio_service_;
   std::unique_ptr<detail::MarketOptionsService> market_options_service_;
   std::unique_ptr<detail::WatchlistService> watchlist_service_;
+  std::unique_ptr<detail::OrderService> order_service_;
   std::unique_ptr<detail::WorkflowService> workflow_service_;
 };
 

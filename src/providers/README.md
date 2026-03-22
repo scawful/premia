@@ -12,6 +12,8 @@ Current adapters:
   desktop and API fallback flows.
 - `local/options_provider.cc` - file-backed option chain snapshot provider used
   for desktop fallback flows.
+- `local/order_provider.cc` - file-backed simulated order preview and submission
+  provider used for safe local trading workflow development.
 - `tda/portfolio_provider.cc` - authenticated TDA portfolio provider used when
   a valid `assets/tda.json` config is available.
 - `tda/account_detail_provider.cc` - authenticated TDA account detail provider
@@ -20,6 +22,8 @@ Current adapters:
   a valid `assets/tda.json` config is available.
 - `tda/options_provider.cc` - authenticated TDA option chain provider used when
   a valid `assets/tda.json` config is available.
+- `tda/order_provider.cc` - authenticated TDA order preview and live submission
+  provider, gated by valid credentials and explicit live confirmation.
 - `schwab/market_data_provider.cc` - Schwab quote and chart adapter used when a
   valid Schwab config and token set are available.
 - `schwab/workflow_provider.cc` - Schwab OAuth workflow adapter for start and

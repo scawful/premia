@@ -125,6 +125,8 @@ class Client {
                                   double fromEnteredTime, double toEnteredTime,
                                   OrderStatus status) const;
   void place_order(const std::string &account_id, const Order &order) const;
+  void place_order_payload(const std::string &account_id,
+                           const std::string &payload) const;
 
   // WebSocket Controls
   void start_session(const std::string &ticker);

@@ -56,6 +56,12 @@ class WatchlistService {
                              const std::string& symbol) -> WatchlistSummary;
 };
 
+class OrderService {
+ public:
+  auto PreviewOrder(const OrderIntentRequest& request) -> OrderPreviewData;
+  auto SubmitOrder(const OrderIntentRequest& request) -> OrderSubmissionData;
+};
+
 class WorkflowService {
  public:
   explicit WorkflowService(ConnectionService& connection_service);

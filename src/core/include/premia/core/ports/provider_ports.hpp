@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "premia/core/application/screen_models.hpp"
+#include "premia/core/application/workflow_models.hpp"
 
 namespace premia::core::ports {
 
@@ -83,6 +84,18 @@ class WatchlistMutationProviderPort {
                                   const std::string& symbol) -> WatchlistSummary = 0;
   virtual auto RemoveWatchlistSymbol(const std::string& watchlist_id,
                                      const std::string& symbol) -> WatchlistSummary = 0;
+};
+
+class OrderProviderPort {
+ public:
+  virtual ~OrderProviderPort() = default;
+
+  virtual auto PreviewOrder(
+      const premia::core::application::OrderIntentRequest& request)
+      -> premia::core::application::OrderPreviewData = 0;
+  virtual auto SubmitOrder(
+      const premia::core::application::OrderIntentRequest& request)
+      -> premia::core::application::OrderSubmissionData = 0;
 };
 
 }  // namespace premia::core::ports

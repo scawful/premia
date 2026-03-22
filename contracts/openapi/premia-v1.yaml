@@ -21,6 +21,7 @@ tags:
   - name: Quotes
   - name: Charts
   - name: Options
+  - name: Trading
   - name: Connections
   - name: Streaming
 security:
@@ -266,6 +267,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OptionChainResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/orders/preview:
+    post:
+      tags: [Trading]
+      summary: Preview an equity or option order.
+      operationId: previewOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderIntentRequest'
+      responses:
+        '200':
+          description: Order preview response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderPreviewResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/orders/submit:
+    post:
+      tags: [Trading]
+      summary: Submit an equity or option order.
+      operationId: submitOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderIntentRequest'
+      responses:
+        '200':
+          description: Order submission response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderSubmissionResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
   /v1/connections/schwab/oauth/start:
@@ -1188,6 +1229,146 @@ components:
         meta:
           requestId: req_options
           asOf: '2026-03-22T19:40:00Z'
+    OrderIntentRequest:
+      type: object
+      required: [symbol, assetType, instruction, quantity, orderType]
+      properties:
+        accountId:
+          type: string
+        symbol:
+          type: string
+        assetType:
+          type: string
+          enum: [EQUITY, OPTION]
+        instruction:
+          type: string
+          enum: [BUY, SELL, BUY_TO_OPEN, SELL_TO_CLOSE, BUY_TO_CLOSE, SELL_TO_OPEN]
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        orderType:
+          type: string
+          enum: [MARKET, LIMIT]
+        limitPrice:
+          $ref: '#/components/schemas/DecimalString'
+        duration:
+          type: string
+          nullable: true
+        session:
+          type: string
+          nullable: true
+        confirmLive:
+          type: boolean
+          default: false
+    OrderPreviewData:
+      type: object
+      required: [previewId, accountId, symbol, assetType, instruction, quantity, orderType, limitPrice, estimatedTotal, mode, status, warnings]
+      properties:
+        previewId:
+          type: string
+        accountId:
+          type: string
+        symbol:
+          type: string
+        assetType:
+          type: string
+        instruction:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        orderType:
+          type: string
+        limitPrice:
+          $ref: '#/components/schemas/DecimalString'
+        estimatedTotal:
+          $ref: '#/components/schemas/DecimalString'
+        mode:
+          type: string
+        status:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: string
+    OrderPreviewResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/OrderPreviewData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          previewId: preview_1
+          accountId: local_acc
+          symbol: AAPL
+          assetType: EQUITY
+          instruction: BUY
+          quantity: '10'
+          orderType: LIMIT
+          limitPrice: '217.00'
+          estimatedTotal: '2170.00'
+          mode: simulated
+          status: preview
+          warnings:
+            - Using fallback local price estimate.
+        meta:
+          requestId: req_order_preview
+          asOf: '2026-03-22T21:10:00Z'
+    OrderSubmissionData:
+      type: object
+      required: [submissionId, accountId, symbol, assetType, instruction, quantity, orderType, limitPrice, mode, status, submittedAt, message]
+      properties:
+        submissionId:
+          type: string
+        accountId:
+          type: string
+        symbol:
+          type: string
+        assetType:
+          type: string
+        instruction:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        orderType:
+          type: string
+        limitPrice:
+          $ref: '#/components/schemas/DecimalString'
+        mode:
+          type: string
+        status:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        message:
+          type: string
+    OrderSubmissionResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/OrderSubmissionData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          submissionId: submission_2
+          accountId: local_acc
+          symbol: AAPL
+          assetType: EQUITY
+          instruction: BUY
+          quantity: '10'
+          orderType: LIMIT
+          limitPrice: '217.00'
+          mode: simulated
+          status: accepted
+          submittedAt: '2026-03-22T21:11:00Z'
+          message: Simulated local submission accepted.
+        meta:
+          requestId: req_order_submit
+          asOf: '2026-03-22T21:11:00Z'
     ConnectionSummaryResponse:
       type: object
       required: [data, meta]

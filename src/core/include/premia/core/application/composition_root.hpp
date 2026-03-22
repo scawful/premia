@@ -16,6 +16,7 @@ class CompositionRoot {
   auto MarketData() -> MarketDataService&;
   auto Options() -> OptionsService&;
   auto Watchlists() -> WatchlistService&;
+  auto Orders() -> OrderService&;
   auto Workflows() -> ConnectionWorkflowService&;
 
  private:

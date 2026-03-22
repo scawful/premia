@@ -2,6 +2,7 @@
 #define PREMIA_CORE_APPLICATION_WORKFLOW_MODELS_HPP
 
 #include <string>
+#include <vector>
 
 namespace premia::core::application {
 
@@ -34,6 +35,49 @@ struct PlaidLinkTokenData {
 struct PlaidLinkCompleteRequest {
   std::string public_token;
   std::string institution_id;
+};
+
+struct OrderIntentRequest {
+  std::string account_id;
+  std::string symbol;
+  std::string asset_type;
+  std::string instruction;
+  std::string quantity;
+  std::string order_type;
+  std::string limit_price;
+  std::string duration;
+  std::string session;
+  bool confirm_live = false;
+};
+
+struct OrderPreviewData {
+  std::string preview_id;
+  std::string account_id;
+  std::string symbol;
+  std::string asset_type;
+  std::string instruction;
+  std::string quantity;
+  std::string order_type;
+  std::string limit_price;
+  std::string estimated_total;
+  std::string mode;
+  std::string status;
+  std::vector<std::string> warnings;
+};
+
+struct OrderSubmissionData {
+  std::string submission_id;
+  std::string account_id;
+  std::string symbol;
+  std::string asset_type;
+  std::string instruction;
+  std::string quantity;
+  std::string order_type;
+  std::string limit_price;
+  std::string mode;
+  std::string status;
+  std::string submitted_at;
+  std::string message;
 };
 
 }  // namespace premia::core::application

@@ -18,12 +18,14 @@
 #include "Schwab/client.h"
 #include "premia/providers/local/account_detail_provider.hpp"
 #include "premia/providers/local/options_provider.hpp"
+#include "premia/providers/local/order_provider.hpp"
 #include "premia/providers/local/portfolio_provider.hpp"
 #include "premia/providers/local/watchlist_provider.hpp"
 #include "premia/providers/plaid/workflow_provider.hpp"
 #include "premia/providers/schwab/market_data_provider.hpp"
 #include "premia/providers/schwab/workflow_provider.hpp"
 #include "premia/providers/tda/account_detail_provider.hpp"
+#include "premia/providers/tda/order_provider.hpp"
 #include "premia/providers/tda/options_provider.hpp"
 #include "premia/providers/tda/portfolio_provider.hpp"
 #include "premia/providers/tda/watchlist_provider.hpp"
@@ -49,6 +51,7 @@ constexpr char kWatchlistsPath[] = "assets/watchlists.json";
 constexpr char kPortfolioPath[] = "assets/portfolio.json";
 constexpr char kAccountPath[] = "assets/account.json";
 constexpr char kOptionsPath[] = "assets/options.json";
+constexpr char kOrdersPath[] = "assets/orders.json";
 
 auto MakeMoney(std::string amount) -> Money {
   return Money{std::move(amount), "USD"};
@@ -396,6 +399,28 @@ auto WatchlistService::RemoveWatchlistSymbol(const std::string& watchlist_id,
     -> WatchlistSummary {
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.RemoveWatchlistSymbol(watchlist_id, symbol);
+}
+
+auto OrderService::PreviewOrder(const OrderIntentRequest& request)
+    -> OrderPreviewData {
+  try {
+    providers::tda::OrderProvider provider(kTDAConfigPath);
+    return provider.PreviewOrder(request);
+  } catch (const std::exception&) {
+  }
+  providers::local::OrderProvider provider(kOrdersPath);
+  return provider.PreviewOrder(request);
+}
+
+auto OrderService::SubmitOrder(const OrderIntentRequest& request)
+    -> OrderSubmissionData {
+  try {
+    providers::tda::OrderProvider provider(kTDAConfigPath);
+    return provider.SubmitOrder(request);
+  } catch (const std::exception&) {
+  }
+  providers::local::OrderProvider provider(kOrdersPath);
+  return provider.SubmitOrder(request);
 }
 
 WorkflowService::WorkflowService(ConnectionService& connection_service)

@@ -145,6 +145,18 @@ auto GetRequiredString(const json::object& object, const std::string& key)
   return value;
 }
 
+auto GetOptionalBool(const json::object& object, const std::string& key,
+                     bool fallback = false) -> bool {
+  const auto it = object.find(key);
+  if (it == object.end()) {
+    return fallback;
+  }
+  if (!it->value().is_bool()) {
+    throw std::runtime_error("field '" + key + "' must be a boolean");
+  }
+  return it->value().as_bool();
+}
+
 auto HandleGet(const std::string& raw_target)
     -> http::response<http::string_body> {
   const auto [path, query] = SplitTarget(raw_target);
@@ -175,6 +187,22 @@ auto HandleGet(const std::string& raw_target)
                 .AccountDetails()
                 .GetAccountDetail()));
   }
+  if (StartsWith(path, "/v1/screens/options/")) {
+    const auto symbol = path.substr(std::string("/v1/screens/options/").size());
+    const auto params = ParseQuery(query);
+    const auto strike_count = params.count("strikeCount") ? params.at("strikeCount") : "8";
+    const auto strategy = params.count("strategy") ? params.at("strategy") : "SINGLE";
+    const auto range = params.count("range") ? params.at("range") : "ALL";
+    const auto exp_month = params.count("expMonth") ? params.at("expMonth") : "ALL";
+    const auto option_type = params.count("optionType") ? params.at("optionType") : "ALL";
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeOptionChainResponse(
+            core::application::CompositionRoot::Instance()
+                .Options()
+                .GetOptionChainSnapshot(symbol, strike_count, strategy, range,
+                                        exp_month, option_type)));
+  }
   if (path == "/v1/watchlists") {
     return MakeJsonResponse(
         http::status::ok,
@@ -202,22 +230,6 @@ auto HandleGet(const std::string& raw_target)
         http::status::ok,
         SerializeChartScreenResponse(
             service.GetChartScreen(symbol, range, interval, extended_hours)));
-  }
-  if (StartsWith(path, "/v1/screens/options/")) {
-    const auto symbol = path.substr(std::string("/v1/screens/options/").size());
-    const auto params = ParseQuery(query);
-    const auto strike_count = params.count("strikeCount") ? params.at("strikeCount") : "8";
-    const auto strategy = params.count("strategy") ? params.at("strategy") : "SINGLE";
-    const auto range = params.count("range") ? params.at("range") : "ALL";
-    const auto exp_month = params.count("expMonth") ? params.at("expMonth") : "ALL";
-    const auto option_type = params.count("optionType") ? params.at("optionType") : "ALL";
-    return MakeJsonResponse(
-        http::status::ok,
-        SerializeOptionChainResponse(
-            core::application::CompositionRoot::Instance()
-                .Options()
-                .GetOptionChainSnapshot(symbol, strike_count, strategy, range,
-                                        exp_month, option_type)));
   }
   if (path == "/v1/stream/events") {
     return MakeTextResponse(
@@ -282,6 +294,44 @@ auto HandleMutation(const http::request<http::string_body>& request)
       return MakeJsonResponse(
           http::status::ok,
           SerializeConnectionSummaryResponse(service.CompletePlaidLink(workflow_request)));
+    }
+
+    if (path == "/v1/orders/preview") {
+      core::application::OrderIntentRequest order_request;
+      order_request.account_id = GetOptionalString(payload, "accountId");
+      order_request.symbol = GetRequiredString(payload, "symbol");
+      order_request.asset_type = GetRequiredString(payload, "assetType");
+      order_request.instruction = GetRequiredString(payload, "instruction");
+      order_request.quantity = GetRequiredString(payload, "quantity");
+      order_request.order_type = GetRequiredString(payload, "orderType");
+      order_request.limit_price = GetOptionalString(payload, "limitPrice");
+      order_request.duration = GetOptionalString(payload, "duration");
+      order_request.session = GetOptionalString(payload, "session");
+      order_request.confirm_live = GetOptionalBool(payload, "confirmLive", false);
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeOrderPreviewResponse(
+              core::application::CompositionRoot::Instance().Orders().PreviewOrder(
+                  order_request)));
+    }
+
+    if (path == "/v1/orders/submit") {
+      core::application::OrderIntentRequest order_request;
+      order_request.account_id = GetOptionalString(payload, "accountId");
+      order_request.symbol = GetRequiredString(payload, "symbol");
+      order_request.asset_type = GetRequiredString(payload, "assetType");
+      order_request.instruction = GetRequiredString(payload, "instruction");
+      order_request.quantity = GetRequiredString(payload, "quantity");
+      order_request.order_type = GetRequiredString(payload, "orderType");
+      order_request.limit_price = GetOptionalString(payload, "limitPrice");
+      order_request.duration = GetOptionalString(payload, "duration");
+      order_request.session = GetOptionalString(payload, "session");
+      order_request.confirm_live = GetOptionalBool(payload, "confirmLive", false);
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeOrderSubmissionResponse(
+              core::application::CompositionRoot::Instance().Orders().SubmitOrder(
+                  order_request)));
     }
 
     if (path == "/v1/watchlists" && request.method() == http::verb::post) {
