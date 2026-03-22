@@ -32,6 +32,7 @@ class OptionChainView : public View {
   void DrawSearch();
   void DrawChain();
   void DrawUnderlying();
+  void DrawCoreOptionPreview();
 
  public:
   std::string getName() override;

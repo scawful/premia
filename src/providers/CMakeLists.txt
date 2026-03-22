@@ -25,6 +25,19 @@ target_include_directories(
 target_compile_features(premia_provider_local_portfolio PUBLIC cxx_std_17)
 
 add_library(
+  premia_provider_local_account_detail
+  local/account_detail_provider.cc
+)
+
+target_include_directories(
+  premia_provider_local_account_detail
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_local_account_detail PUBLIC cxx_std_17)
+
+add_library(
   premia_provider_tda_watchlists
   tda/watchlist_provider.cc
 )
@@ -58,6 +71,57 @@ target_compile_features(premia_provider_tda_portfolio PUBLIC cxx_std_17)
 
 target_link_libraries(
   premia_provider_tda_portfolio
+  PRIVATE
+  tdameritrade
+)
+
+add_library(
+  premia_provider_tda_account_detail
+  tda/account_detail_provider.cc
+)
+
+target_include_directories(
+  premia_provider_tda_account_detail
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_tda_account_detail PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_tda_account_detail
+  PRIVATE
+  tdameritrade
+)
+
+add_library(
+  premia_provider_local_options
+  local/options_provider.cc
+)
+
+target_include_directories(
+  premia_provider_local_options
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_local_options PUBLIC cxx_std_17)
+
+add_library(
+  premia_provider_tda_options
+  tda/options_provider.cc
+)
+
+target_include_directories(
+  premia_provider_tda_options
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_tda_options PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_tda_options
   PRIVATE
   tdameritrade
 )

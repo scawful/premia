@@ -1,0 +1,43 @@
+{
+  "account": {
+    "accountId": "local_acc",
+    "cash": "14320.00",
+    "netLiquidation": "128345.22",
+    "availableFunds": "28640.00",
+    "longMarketValue": "113024.22",
+    "shortMarketValue": "0.00",
+    "buyingPower": "28640.00",
+    "equity": "128345.22",
+    "equityPercentage": "100.00",
+    "marginBalance": "0.00",
+    "positions": [
+      {
+        "symbol": "AAPL",
+        "name": "Apple Inc.",
+        "dayProfitLoss": "54.60",
+        "dayProfitLossPercent": "0.60",
+        "averagePrice": "200.50",
+        "marketValue": "9114.00",
+        "quantity": "42"
+      },
+      {
+        "symbol": "MSFT",
+        "name": "Microsoft Corp.",
+        "dayProfitLoss": "41.22",
+        "dayProfitLossPercent": "0.55",
+        "averagePrice": "398.20",
+        "marketValue": "7561.80",
+        "quantity": "18"
+      },
+      {
+        "symbol": "SPY",
+        "name": "SPDR S&P 500 ETF",
+        "dayProfitLoss": "92.50",
+        "dayProfitLossPercent": "0.72",
+        "averagePrice": "501.30",
+        "marketValue": "12987.50",
+        "quantity": "25"
+      }
+    ]
+  }
+}

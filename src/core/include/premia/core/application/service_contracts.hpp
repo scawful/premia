@@ -26,6 +26,13 @@ class PortfolioService {
   virtual auto GetTopHoldings() const -> std::vector<HoldingRow> = 0;
 };
 
+class AccountDetailService {
+ public:
+  virtual ~AccountDetailService() = default;
+
+  virtual auto GetAccountDetail() const -> AccountDetail = 0;
+};
+
 class MarketDataService {
  public:
   virtual ~MarketDataService() = default;
@@ -34,6 +41,19 @@ class MarketDataService {
   virtual auto GetChartScreen(const std::string& symbol, const std::string& range,
                               const std::string& interval,
                               bool extended_hours) const -> ChartScreenData = 0;
+};
+
+class OptionsService {
+ public:
+  virtual ~OptionsService() = default;
+
+  virtual auto GetOptionChainSnapshot(const std::string& symbol,
+                                      const std::string& strike_count,
+                                      const std::string& strategy,
+                                      const std::string& range,
+                                      const std::string& exp_month,
+                                      const std::string& option_type) const
+      -> OptionChainSnapshot = 0;
 };
 
 class WatchlistService {

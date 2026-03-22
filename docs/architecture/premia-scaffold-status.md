@@ -35,14 +35,23 @@ This note captures the first implementation pass after the architecture review.
 - `src/providers/` now exists as a dedicated adapter layer.
 - `src/providers/local/portfolio_provider.cc` serves normalized portfolio and
   holdings data from `assets/portfolio.json` with a deterministic fallback.
+- `src/providers/local/account_detail_provider.cc` serves normalized account
+  detail and positions data from `assets/account.json` with a deterministic
+  fallback.
+- `src/providers/local/options_provider.cc` serves normalized option-chain
+  snapshot data from `assets/options.json` with a deterministic fallback.
 - `src/providers/local/watchlist_provider.cc` serves normalized watchlists from
   `assets/watchlists.json` with a deterministic fallback if that file is
   missing or malformed.
 - `src/providers/tda/portfolio_provider.cc` can now supply authenticated TDA
   portfolio summary and holdings data when a valid `assets/tda.json` config is
   present.
+- `src/providers/tda/account_detail_provider.cc` can now supply authenticated
+  TDA account detail and positions data.
 - `src/providers/tda/watchlist_provider.cc` can now supply authenticated TDA
   watchlists when a valid `assets/tda.json` config is present.
+- `src/providers/tda/options_provider.cc` can now supply authenticated TDA
+  option-chain snapshots.
 - `src/providers/schwab/market_data_provider.cc` now owns the Schwab-specific
   quote and chart parsing logic that had previously lived inside the shared core
   service.
@@ -54,6 +63,9 @@ This note captures the first implementation pass after the architecture review.
   authenticated watchlist provider is available.
 - portfolio summary and top holdings now come from provider adapters as well,
   with TDA taking precedence over the local file-backed portfolio fallback.
+- account detail and option-chain fallback views are now backed by provider
+  adapters too, letting more of the desktop UI leave singleton-driven model
+  flows behind.
 - watchlist create/rename/add-symbol/remove-symbol flows are now supported
   through the local watchlist provider and the HTTP API mutation routes.
 

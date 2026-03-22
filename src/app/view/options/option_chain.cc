@@ -9,6 +9,7 @@
 #include <string>
 
 #include "metatypes.h"
+#include "premia/core/application/composition_root.hpp"
 #include "model/options/options_model.h"
 #include "view/core/IconsMaterialDesign.h"
 #include "view/view.h"
@@ -389,6 +390,64 @@ void OptionChainView::Update() {
     }
   } else {
     DrawSearch();
+    DrawCoreOptionPreview();
+  }
+}
+
+void OptionChainView::DrawCoreOptionPreview() {
+  const auto snapshot = core::application::CompositionRoot::Instance()
+                            .Options()
+                            .GetOptionChainSnapshot("SPY", "8", "SINGLE", "ALL",
+                                                    "ALL", "ALL");
+
+  ImGui::Separator();
+  ImGui::Text("Core Options Preview");
+  ImGui::TextDisabled(
+      "This fallback view is driven by premia_core option contracts.");
+  ImGui::Text("%s | %s", snapshot.description.c_str(), snapshot.symbol.c_str());
+  ImGui::Text("Bid: %s | Ask: %s | Vol: %s", snapshot.bid.c_str(),
+              snapshot.ask.c_str(), snapshot.total_volume.c_str());
+  ImGui::Text("Volatility: %s | Gamma Exposure: %s",
+              snapshot.volatility.c_str(), snapshot.gamma_exposure.c_str());
+
+  if (!snapshot.expirations.empty()) {
+    const auto& expiry = snapshot.expirations.front();
+    ImGui::Separator();
+    ImGui::Text("Expiry: %s | Gamma @ Expiry: %s", expiry.label.c_str(),
+                expiry.gamma_at_expiry.c_str());
+
+    if (ImGui::BeginTable("CoreOptionPreview", 7,
+                          ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders |
+                              ImGuiTableFlags_SizingStretchSame)) {
+      ImGui::TableSetupColumn("Strike");
+      ImGui::TableSetupColumn("Call Bid");
+      ImGui::TableSetupColumn("Call Ask");
+      ImGui::TableSetupColumn("Call OI");
+      ImGui::TableSetupColumn("Put Bid");
+      ImGui::TableSetupColumn("Put Ask");
+      ImGui::TableSetupColumn("Put OI");
+      ImGui::TableHeadersRow();
+
+      for (const auto& row : expiry.rows) {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("%s", row.strike.c_str());
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", row.call_bid.c_str());
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("%s", row.call_ask.c_str());
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("%s", row.call_open_interest.c_str());
+        ImGui::TableSetColumnIndex(4);
+        ImGui::Text("%s", row.put_bid.c_str());
+        ImGui::TableSetColumnIndex(5);
+        ImGui::Text("%s", row.put_ask.c_str());
+        ImGui::TableSetColumnIndex(6);
+        ImGui::Text("%s", row.put_open_interest.c_str());
+      }
+
+      ImGui::EndTable();
+    }
   }
 }
 }  // namespace premia

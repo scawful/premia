@@ -11,6 +11,8 @@ namespace premia::core::ports {
 using premia::core::application::ChartScreenData;
 using premia::core::application::ConnectionSummary;
 using premia::core::application::HoldingRow;
+using premia::core::application::AccountDetail;
+using premia::core::application::OptionChainSnapshot;
 using premia::core::application::PortfolioSummary;
 using premia::core::application::QuoteDetail;
 using premia::core::application::WatchlistScreenData;
@@ -31,6 +33,13 @@ class PortfolioProviderPort {
   virtual auto GetTopHoldings() const -> std::vector<HoldingRow> = 0;
 };
 
+class AccountDetailProviderPort {
+ public:
+  virtual ~AccountDetailProviderPort() = default;
+
+  virtual auto GetAccountDetail() const -> AccountDetail = 0;
+};
+
 class MarketDataProviderPort {
  public:
   virtual ~MarketDataProviderPort() = default;
@@ -39,6 +48,19 @@ class MarketDataProviderPort {
   virtual auto GetChartScreen(const std::string& symbol, const std::string& range,
                               const std::string& interval,
                               bool extended_hours) const -> ChartScreenData = 0;
+};
+
+class OptionsProviderPort {
+ public:
+  virtual ~OptionsProviderPort() = default;
+
+  virtual auto GetOptionChainSnapshot(const std::string& symbol,
+                                      const std::string& strike_count,
+                                      const std::string& strategy,
+                                      const std::string& range,
+                                      const std::string& exp_month,
+                                      const std::string& option_type) const
+      -> OptionChainSnapshot = 0;
 };
 
 class WatchlistProviderPort {

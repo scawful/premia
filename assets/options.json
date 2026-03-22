@@ -1,0 +1,66 @@
+{
+  "symbol": "SPY",
+  "description": "SPDR S&P 500 ETF",
+  "bid": "519.45",
+  "ask": "519.54",
+  "openPrice": "516.00",
+  "closePrice": "515.80",
+  "highPrice": "520.10",
+  "lowPrice": "514.90",
+  "totalVolume": "58213422",
+  "volatility": "16.8",
+  "gammaExposure": "1245500.00",
+  "expirations": [
+    {
+      "id": "2026-04-17:26",
+      "label": "2026-04-17:26",
+      "gammaAtExpiry": "34200.00",
+      "rows": [
+        {
+          "id": "520c",
+          "strike": "520",
+          "callBid": "7.80",
+          "callAsk": "7.90",
+          "callLast": "7.85",
+          "callChange": "0.42",
+          "callDelta": "0.52",
+          "callGamma": "0.03",
+          "callTheta": "-0.08",
+          "callVega": "0.12",
+          "callOpenInterest": "845",
+          "putBid": "8.10",
+          "putAsk": "8.20",
+          "putLast": "8.15",
+          "putChange": "0.36",
+          "putDelta": "-0.48",
+          "putGamma": "0.03",
+          "putTheta": "-0.08",
+          "putVega": "0.11",
+          "putOpenInterest": "902"
+        },
+        {
+          "id": "525c",
+          "strike": "525",
+          "callBid": "5.20",
+          "callAsk": "5.30",
+          "callLast": "5.25",
+          "callChange": "0.28",
+          "callDelta": "0.41",
+          "callGamma": "0.02",
+          "callTheta": "-0.07",
+          "callVega": "0.10",
+          "callOpenInterest": "774",
+          "putBid": "10.60",
+          "putAsk": "10.75",
+          "putLast": "10.68",
+          "putChange": "0.31",
+          "putDelta": "-0.59",
+          "putGamma": "0.02",
+          "putTheta": "-0.07",
+          "putVega": "0.10",
+          "putOpenInterest": "811"
+        }
+      ]
+    }
+  ]
+}

@@ -138,6 +138,75 @@ struct WatchlistScreenData {
   std::vector<WatchlistRow> rows;
 };
 
+struct AccountPositionRow {
+  std::string symbol;
+  std::string name;
+  Money day_profit_loss;
+  std::string day_profit_loss_percent;
+  Money average_price;
+  Money market_value;
+  std::string quantity;
+};
+
+struct AccountDetail {
+  std::string account_id;
+  Money cash;
+  Money net_liquidation;
+  Money available_funds;
+  Money long_market_value;
+  Money short_market_value;
+  Money buying_power;
+  Money equity;
+  std::string equity_percentage;
+  Money margin_balance;
+  std::vector<AccountPositionRow> positions;
+};
+
+struct OptionContractPairRow {
+  std::string id;
+  std::string strike;
+  std::string call_bid;
+  std::string call_ask;
+  std::string call_last;
+  std::string call_change;
+  std::string call_delta;
+  std::string call_gamma;
+  std::string call_theta;
+  std::string call_vega;
+  std::string call_open_interest;
+  std::string put_bid;
+  std::string put_ask;
+  std::string put_last;
+  std::string put_change;
+  std::string put_delta;
+  std::string put_gamma;
+  std::string put_theta;
+  std::string put_vega;
+  std::string put_open_interest;
+};
+
+struct OptionExpirationSnapshot {
+  std::string id;
+  std::string label;
+  std::string gamma_at_expiry;
+  std::vector<OptionContractPairRow> rows;
+};
+
+struct OptionChainSnapshot {
+  std::string symbol;
+  std::string description;
+  std::string bid;
+  std::string ask;
+  std::string open_price;
+  std::string close_price;
+  std::string high_price;
+  std::string low_price;
+  std::string total_volume;
+  std::string volatility;
+  std::string gamma_exposure;
+  std::vector<OptionExpirationSnapshot> expirations;
+};
+
 struct ChartScreenData {
   Instrument instrument;
   std::string range;

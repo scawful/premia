@@ -224,23 +224,26 @@ void AccountView::DrawAccountPane() {
 }
 
 void AccountView::DrawCoreAccountPreview() {
-  const auto home = core::application::CompositionRoot::Instance().AppService()
-                        .GetHomeScreenData();
+  const auto account = core::application::CompositionRoot::Instance()
+                           .AccountDetails()
+                           .GetAccountDetail();
+  auto& portfolio_service =
+      core::application::CompositionRoot::Instance().Portfolio();
+  const auto portfolio = portfolio_service.GetPortfolioSummary();
 
   ImGui::Text("Core Account Preview");
   ImGui::TextDisabled(
       "This fallback view is driven by premia_core screen contracts.");
   ImGui::Separator();
 
-  ImGui::Text("Total Value: $%s",
-              home.portfolio.total_value.amount.c_str());
-  ImGui::Text("Cash: $%s", home.portfolio.cash.amount.c_str());
-  ImGui::Text("Buying Power: $%s",
-              home.portfolio.buying_power.amount.c_str());
+  ImGui::Text("Account ID: %s", account.account_id.c_str());
+  ImGui::Text("Total Value: $%s", portfolio.total_value.amount.c_str());
+  ImGui::Text("Cash: $%s", account.cash.amount.c_str());
+  ImGui::Text("Buying Power: $%s", account.buying_power.amount.c_str());
   ImGui::Text("Day Change: $%s (%s%%)",
-              home.portfolio.day_change.absolute.amount.c_str(),
-              home.portfolio.day_change.percent.c_str());
-  ImGui::Text("Holdings Count: %d", home.portfolio.holdings_count);
+              portfolio.day_change.absolute.amount.c_str(),
+              portfolio.day_change.percent.c_str());
+  ImGui::Text("Holdings Count: %d", portfolio.holdings_count);
   ImGui::Separator();
 
   if (ImGui::BeginTable("CoreConnections", 3,
@@ -250,7 +253,9 @@ void AccountView::DrawCoreAccountPreview() {
     ImGui::TableSetupColumn("Last Sync");
     ImGui::TableHeadersRow();
 
-    for (const auto& connection : home.connections) {
+    for (const auto& connection : core::application::CompositionRoot::Instance()
+                                       .BrokerConnections()
+                                       .GetConnections()) {
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("%s", connection.display_name.c_str());
@@ -279,7 +284,7 @@ void AccountView::DrawCoreAccountPreview() {
     ImGui::TableSetupColumn("Day Change");
     ImGui::TableHeadersRow();
 
-    for (const auto& holding : home.top_holdings) {
+    for (const auto& holding : account.positions) {
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("%s", holding.symbol.c_str());
@@ -288,8 +293,8 @@ void AccountView::DrawCoreAccountPreview() {
       ImGui::TableSetColumnIndex(2);
       ImGui::Text("$%s", holding.market_value.amount.c_str());
       ImGui::TableSetColumnIndex(3);
-      ImGui::Text("$%s (%s%%)", holding.day_change.absolute.amount.c_str(),
-                  holding.day_change.percent.c_str());
+      ImGui::Text("$%s (%s%%)", holding.day_profit_loss.amount.c_str(),
+                  holding.day_profit_loss_percent.c_str());
     }
 
     ImGui::EndTable();

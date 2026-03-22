@@ -14,7 +14,9 @@ class CompositionRoot;
 
 class ScaffoldApplicationService : public BrokerConnectionService,
                                    public PortfolioService,
+                                   public AccountDetailService,
                                    public MarketDataService,
+                                   public OptionsService,
                                    public WatchlistService,
                                    public BankLinkService,
                                    public ConnectionWorkflowService {
@@ -30,11 +32,19 @@ class ScaffoldApplicationService : public BrokerConnectionService,
 
   auto GetPortfolioSummary() const -> PortfolioSummary override;
   auto GetTopHoldings() const -> std::vector<HoldingRow> override;
+  auto GetAccountDetail() const -> AccountDetail override;
 
   auto GetQuoteDetail(const std::string& symbol) const -> QuoteDetail override;
   auto GetChartScreen(const std::string& symbol, const std::string& range,
                       const std::string& interval,
                       bool extended_hours) const -> ChartScreenData override;
+  auto GetOptionChainSnapshot(const std::string& symbol,
+                              const std::string& strike_count,
+                              const std::string& strategy,
+                              const std::string& range,
+                              const std::string& exp_month,
+                              const std::string& option_type) const
+      -> OptionChainSnapshot override;
 
   auto ListWatchlists() const -> std::vector<WatchlistSummary> override;
   auto GetWatchlistScreen(const std::string& watchlist_id) const

@@ -12,7 +12,9 @@ class CompositionRoot {
   auto AppService() -> ScaffoldApplicationService&;
   auto BrokerConnections() -> BrokerConnectionService&;
   auto Portfolio() -> PortfolioService&;
+  auto AccountDetails() -> AccountDetailService&;
   auto MarketData() -> MarketDataService&;
+  auto Options() -> OptionsService&;
   auto Watchlists() -> WatchlistService&;
   auto Workflows() -> ConnectionWorkflowService&;
 

@@ -19,7 +19,15 @@ auto CompositionRoot::Portfolio() -> PortfolioService& {
   return app_service_;
 }
 
+auto CompositionRoot::AccountDetails() -> AccountDetailService& {
+  return app_service_;
+}
+
 auto CompositionRoot::MarketData() -> MarketDataService& {
+  return app_service_;
+}
+
+auto CompositionRoot::Options() -> OptionsService& {
   return app_service_;
 }
 
