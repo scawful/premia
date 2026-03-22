@@ -107,6 +107,9 @@ This note captures the first implementation pass after the architecture review.
 - the mobile wrapper now also exposes typed async watchlist and connection
   workflow methods, with hand-written models for watchlist rows/screens and
   Schwab/Plaid launch states.
+- the mobile wrapper now also exposes watchlist mutation helpers and maps
+  generated request failures into a normalized `PremiaAPIClientError` model for
+  SwiftUI error-state handling.
 
 ### Desktop migration start
 

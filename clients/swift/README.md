@@ -15,6 +15,9 @@ Current status:
 - `apps/mobile-ios/Package.swift` now depends on the generated package via a
   local path dependency, and the hand-written client wraps it instead of only
   constructing URLs manually.
+- the hand-written client now also normalizes generated errors into a shared
+  Swift error model and exposes watchlist mutation helpers on top of the
+  generated package.
 - Local Swift package compilation is currently blocked by conflicting
   `/usr/local/include` module maps on this machine, the same environment issue
   affecting the hand-written Swift scaffold.

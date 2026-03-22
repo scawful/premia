@@ -20,3 +20,6 @@ Current integration:
 - `PremiaAPIClient` also wraps watchlist loading plus Schwab and Plaid
   connection workflow methods so SwiftUI can consume normalized app models
   instead of generated types directly
+- watchlist create/rename/add/remove mutation wrappers are now exposed, and API
+  errors are normalized into a hand-written `PremiaAPIClientError` model for
+  SwiftUI state handling

@@ -18,6 +18,19 @@ public final class PremiaAPIClient: @unchecked Sendable {
         PremiaAPIClientGeneratedAPI.basePath = configuration.baseURL.absoluteString
     }
 
+    @available(macOS 10.15, iOS 13.0, *)
+    public func performSafely<T: Sendable>(
+        _ operation: @escaping @Sendable () async throws -> T
+    ) async -> Result<T, PremiaAPIClientError> {
+        do {
+            return .success(try await operation())
+        } catch let error as PremiaAPIClientError {
+            return .failure(error)
+        } catch {
+            return .failure(mapError(error))
+        }
+    }
+
     public func bootstrapURL() -> URL {
         configuration.baseURL.appending(path: "v1/bootstrap")
     }
@@ -32,7 +45,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadBootstrap() async throws -> PremiaBootstrapSnapshot {
-        let response = try await BootstrapAPI.getBootstrap()
+        let response = try await executeMapped { try await BootstrapAPI.getBootstrap() }
         let connections = response.data.connections.map(mapConnection)
         return PremiaBootstrapSnapshot(
             environment: response.data.session.environment,
@@ -44,7 +57,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadHome() async throws -> PremiaHomeSnapshot {
-        let response = try await HomeAPI.getHomeScreen()
+        let response = try await executeMapped { try await HomeAPI.getHomeScreen() }
         return PremiaHomeSnapshot(
             connections: response.data.connections.map(mapConnection),
             portfolio: mapPortfolio(response.data.portfolio),
@@ -60,7 +73,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadQuote(symbol: String) async throws -> PremiaQuoteScreenSnapshot {
-        let response = try await QuotesAPI.getQuoteScreen(symbol: symbol)
+        let response = try await executeMapped { try await QuotesAPI.getQuoteScreen(symbol: symbol) }
         return PremiaQuoteScreenSnapshot(
             instrument: mapInstrument(response.data.instrument),
             quote: mapQuoteSnapshot(response.data.quote),
@@ -77,12 +90,14 @@ public final class PremiaAPIClient: @unchecked Sendable {
         interval: PremiaChartInterval = .oneDay,
         extendedHours: Bool = false
     ) async throws -> PremiaChartSnapshot {
-        let response = try await ChartsAPI.getChartScreen(
-            symbol: symbol,
-            range: mapChartRange(range),
-            interval: mapChartInterval(interval),
-            extendedHours: extendedHours
-        )
+        let response = try await executeMapped {
+            try await ChartsAPI.getChartScreen(
+                symbol: symbol,
+                range: mapChartRange(range),
+                interval: mapChartInterval(interval),
+                extendedHours: extendedHours
+            )
+        }
 
         return PremiaChartSnapshot(
             instrument: mapInstrument(response.data.instrument),
@@ -98,13 +113,15 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadWatchlists() async throws -> [PremiaWatchlistSummaryModel] {
-        let response = try await WatchlistsAPI.listWatchlists()
+        let response = try await executeMapped { try await WatchlistsAPI.listWatchlists() }
         return response.data.watchlists.map(mapWatchlist)
     }
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadWatchlist(id: String) async throws -> PremiaWatchlistScreenSnapshot {
-        let response = try await WatchlistsAPI.getWatchlistScreen(watchlistId: id)
+        let response = try await executeMapped {
+            try await WatchlistsAPI.getWatchlistScreen(watchlistId: id)
+        }
         return PremiaWatchlistScreenSnapshot(
             watchlist: mapWatchlist(response.data.watchlist),
             availableWatchlists: response.data.availableWatchlists.map(mapWatchlist),
@@ -122,9 +139,9 @@ public final class PremiaAPIClient: @unchecked Sendable {
             redirectUri: redirectURI,
             clientPlatform: clientPlatform
         )
-        let response = try await ConnectionsAPI.startSchwabOAuth(
-            startSchwabOAuthRequest: request
-        )
+        let response = try await executeMapped {
+            try await ConnectionsAPI.startSchwabOAuth(startSchwabOAuthRequest: request)
+        }
         return PremiaSchwabOAuthLaunch(
             authURL: response.data.authUrl,
             state: response.data.state,
@@ -141,9 +158,11 @@ public final class PremiaAPIClient: @unchecked Sendable {
             callback: callback,
             state: state
         )
-        let response = try await ConnectionsAPI.completeSchwabOAuth(
-            completeSchwabOAuthRequest: request
-        )
+        let response = try await executeMapped {
+            try await ConnectionsAPI.completeSchwabOAuth(
+                completeSchwabOAuthRequest: request
+            )
+        }
         return mapConnection(response.data)
     }
 
@@ -156,9 +175,11 @@ public final class PremiaAPIClient: @unchecked Sendable {
             userId: userID,
             redirectUri: redirectURI
         )
-        let response = try await ConnectionsAPI.createPlaidLinkToken(
-            createPlaidLinkTokenRequest: request
-        )
+        let response = try await executeMapped {
+            try await ConnectionsAPI.createPlaidLinkToken(
+                createPlaidLinkTokenRequest: request
+            )
+        }
         return PremiaPlaidLinkLaunch(
             linkToken: response.data.linkToken,
             expiration: response.data.expiration
@@ -174,10 +195,104 @@ public final class PremiaAPIClient: @unchecked Sendable {
             publicToken: publicToken,
             institutionId: institutionID
         )
-        let response = try await ConnectionsAPI.completePlaidLink(
-            completePlaidLinkRequest: request
-        )
+        let response = try await executeMapped {
+            try await ConnectionsAPI.completePlaidLink(
+                completePlaidLinkRequest: request
+            )
+        }
         return mapConnection(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func createWatchlist(name: String) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await WatchlistsAPI.createWatchlist(
+                createWatchlistRequest: PremiaAPIClientGeneratedAPI.CreateWatchlistRequest(name: name)
+            )
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func renameWatchlist(id: String, name: String) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await WatchlistsAPI.updateWatchlist(
+                watchlistId: id,
+                updateWatchlistRequest: PremiaAPIClientGeneratedAPI.UpdateWatchlistRequest(name: name)
+            )
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func addSymbol(_ symbol: String, toWatchlist id: String) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await WatchlistsAPI.addWatchlistSymbol(
+                watchlistId: id,
+                addWatchlistSymbolRequest: PremiaAPIClientGeneratedAPI.AddWatchlistSymbolRequest(symbol: symbol)
+            )
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func removeSymbol(_ symbol: String, fromWatchlist id: String) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await WatchlistsAPI.deleteWatchlistSymbol(watchlistId: id, symbol: symbol)
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    private func executeMapped<T>(_ operation: () async throws -> T) async throws -> T {
+        do {
+            return try await operation()
+        } catch let error as PremiaAPIClientError {
+            throw error
+        } catch {
+            throw mapError(error)
+        }
+    }
+
+    private func mapError(_ error: Error) -> PremiaAPIClientError {
+        if case let PremiaAPIClientGeneratedAPI.ErrorResponse.error(statusCode, data, _, underlying) = error,
+           let data,
+           let decoded = try? JSONDecoder().decode(PremiaAPIClientGeneratedAPI.ModelErrorResponse.self, from: data) {
+            return PremiaAPIClientError(
+                code: decoded.error.code,
+                message: decoded.error.message,
+                statusCode: statusCode,
+                provider: decoded.error.provider.map(mapProvider),
+                retryable: decoded.error.retryable,
+                action: mapAction(decoded.error.action)
+            )
+        }
+
+        if case let PremiaAPIClientGeneratedAPI.ErrorResponse.error(statusCode, _, _, underlying) = error {
+            return PremiaAPIClientError(
+                code: "HTTP_\(statusCode)",
+                message: String(describing: underlying),
+                statusCode: statusCode,
+                retryable: statusCode >= 500,
+                action: statusCode == 401 ? .reauth : .retry
+            )
+        }
+
+        if error is CancellationError {
+            return PremiaAPIClientError(
+                code: "CANCELLED",
+                message: "The request was cancelled.",
+                retryable: true,
+                action: .retry
+            )
+        }
+
+        return PremiaAPIClientError(
+            code: "CLIENT_ERROR",
+            message: String(describing: error),
+            retryable: false,
+            action: .unknown
+        )
     }
 
     private func mapConnection(_ connection: PremiaAPIClientGeneratedAPI.ConnectionSummary) -> PremiaConnectionSummary {
@@ -354,6 +469,27 @@ public final class PremiaAPIClient: @unchecked Sendable {
             return .degraded
         case .reauthRequired, .unknownDefaultOpenApi:
             return .reauthRequired
+        }
+    }
+
+    private func mapAction(_ action: PremiaAPIClientGeneratedAPI.ErrorDetail.Action?) -> PremiaAPIErrorAction {
+        guard let action else {
+            return .unknown
+        }
+
+        switch action {
+        case ._none:
+            return .none
+        case .retry:
+            return .retry
+        case .reconnect:
+            return .reconnect
+        case .reauth:
+            return .reauth
+        case .relink:
+            return .relink
+        case .unknownDefaultOpenApi:
+            return .unknown
         }
     }
 }
