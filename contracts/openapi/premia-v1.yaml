@@ -1,0 +1,827 @@
+openapi: 3.0.3
+info:
+  title: Premia API
+  version: 0.1.0
+  description: |
+    Premia exposes normalized application-facing endpoints for portfolio,
+    market data, watchlists, broker connections, and banking workflows.
+
+    Design constraints:
+    - Providers are implementation details behind these contracts.
+    - Money and decimal values are encoded as strings.
+    - Every response includes request metadata and freshness timestamps.
+servers:
+  - url: https://api.premia.local
+    description: Local development
+tags:
+  - name: Bootstrap
+  - name: Home
+  - name: Watchlists
+  - name: Quotes
+  - name: Charts
+  - name: Connections
+  - name: Streaming
+security:
+  - bearerAuth: []
+paths:
+  /v1/bootstrap:
+    get:
+      tags: [Bootstrap]
+      summary: Load app bootstrap state.
+      operationId: getBootstrap
+      responses:
+        '200':
+          description: App bootstrap payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BootstrapResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/home:
+    get:
+      tags: [Home]
+      summary: Load the home screen payload.
+      operationId: getHomeScreen
+      responses:
+        '200':
+          description: Home screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/watchlists:
+    get:
+      tags: [Watchlists]
+      summary: List watchlists.
+      operationId: listWatchlists
+      responses:
+        '200':
+          description: Watchlist summaries.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistsResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    post:
+      tags: [Watchlists]
+      summary: Create a watchlist.
+      operationId: createWatchlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWatchlistRequest'
+      responses:
+        '201':
+          description: Watchlist created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/watchlists/{watchlistId}:
+    get:
+      tags: [Watchlists]
+      summary: Load a watchlist screen.
+      operationId: getWatchlistScreen
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+      responses:
+        '200':
+          description: Watchlist screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/watchlists/{watchlistId}:
+    patch:
+      tags: [Watchlists]
+      summary: Update a watchlist.
+      operationId: updateWatchlist
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWatchlistRequest'
+      responses:
+        '200':
+          description: Watchlist updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/watchlists/{watchlistId}/symbols:
+    post:
+      tags: [Watchlists]
+      summary: Add a symbol to a watchlist.
+      operationId: addWatchlistSymbol
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddWatchlistSymbolRequest'
+      responses:
+        '200':
+          description: Watchlist updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/watchlists/{watchlistId}/symbols/{symbol}:
+    delete:
+      tags: [Watchlists]
+      summary: Remove a symbol from a watchlist.
+      operationId: deleteWatchlistSymbol
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+        - $ref: '#/components/parameters/Symbol'
+      responses:
+        '200':
+          description: Watchlist updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/quotes/{symbol}:
+    get:
+      tags: [Quotes]
+      summary: Load quote detail for a symbol.
+      operationId: getQuoteScreen
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+      responses:
+        '200':
+          description: Quote screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/charts/{symbol}:
+    get:
+      tags: [Charts]
+      summary: Load chart data for a symbol.
+      operationId: getChartScreen
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+        - name: range
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [1D, 5D, 1M, 3M, 6M, 1Y, 5Y, MAX]
+        - name: interval
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [1M, 5M, 15M, 1H, 1D, 1W]
+        - name: extendedHours
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Chart screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/connections/schwab/oauth/start:
+    post:
+      tags: [Connections]
+      summary: Start the Schwab OAuth flow.
+      operationId: startSchwabOAuth
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartSchwabOAuthRequest'
+      responses:
+        '200':
+          description: OAuth start payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchwabOAuthStartResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/connections/schwab/oauth/complete:
+    post:
+      tags: [Connections]
+      summary: Complete the Schwab OAuth flow.
+      operationId: completeSchwabOAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteSchwabOAuthRequest'
+      responses:
+        '200':
+          description: Updated connection state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionSummaryResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/connections/plaid/link-token:
+    post:
+      tags: [Connections]
+      summary: Create a Plaid link token.
+      operationId: createPlaidLinkToken
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlaidLinkTokenRequest'
+      responses:
+        '200':
+          description: Plaid link token payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidLinkTokenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/connections/plaid/link-complete:
+    post:
+      tags: [Connections]
+      summary: Complete the Plaid link flow.
+      operationId: completePlaidLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompletePlaidLinkRequest'
+      responses:
+        '200':
+          description: Updated connection state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionSummaryResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/stream/events:
+    get:
+      tags: [Streaming]
+      summary: Subscribe to server-sent stream events.
+      operationId: streamEvents
+      responses:
+        '200':
+          description: SSE event stream.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    WatchlistId:
+      name: watchlistId
+      in: path
+      required: true
+      schema:
+        type: string
+    Symbol:
+      name: symbol
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    ErrorResponse:
+      description: Error response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    Meta:
+      type: object
+      required: [requestId, asOf]
+      properties:
+        requestId:
+          type: string
+        asOf:
+          type: string
+          format: date-time
+    ErrorMeta:
+      type: object
+      required: [requestId]
+      properties:
+        requestId:
+          type: string
+    ErrorDetail:
+      type: object
+      required: [code, message, retryable]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        provider:
+          $ref: '#/components/schemas/Provider'
+        retryable:
+          type: boolean
+        action:
+          type: string
+          enum: [none, retry, reconnect, reauth, relink]
+    ErrorResponse:
+      type: object
+      required: [error, meta]
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+        meta:
+          $ref: '#/components/schemas/ErrorMeta'
+    Provider:
+      type: string
+      enum: [tda, schwab, ibkr, plaid, internal]
+    ConnectionStatus:
+      type: string
+      enum: [connected, connecting, not_connected, degraded, reauth_required]
+    DecimalString:
+      type: string
+      pattern: '^-?[0-9]+(\.[0-9]+)?$'
+    Money:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount:
+          $ref: '#/components/schemas/DecimalString'
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+    AbsolutePercentChange:
+      type: object
+      required: [absolute, percent]
+      properties:
+        absolute:
+          $ref: '#/components/schemas/Money'
+        percent:
+          $ref: '#/components/schemas/DecimalString'
+    CapabilityFlags:
+      type: object
+      additionalProperties:
+        type: boolean
+    ConnectionSummary:
+      type: object
+      required: [provider, status, displayName, reauthRequired, capabilities]
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+        status:
+          $ref: '#/components/schemas/ConnectionStatus'
+        displayName:
+          type: string
+        lastSyncAt:
+          type: string
+          format: date-time
+          nullable: true
+        reauthRequired:
+          type: boolean
+        capabilities:
+          $ref: '#/components/schemas/CapabilityFlags'
+    PortfolioSummary:
+      type: object
+      required: [totalValue, dayChange, cash, buyingPower, holdingsCount]
+      properties:
+        totalValue:
+          $ref: '#/components/schemas/Money'
+        dayChange:
+          $ref: '#/components/schemas/AbsolutePercentChange'
+        cash:
+          $ref: '#/components/schemas/Money'
+        buyingPower:
+          $ref: '#/components/schemas/Money'
+        holdingsCount:
+          type: integer
+          minimum: 0
+    HoldingRow:
+      type: object
+      required: [id, symbol, name, quantity, marketValue, dayChange]
+      properties:
+        id:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        marketValue:
+          $ref: '#/components/schemas/Money'
+        dayChange:
+          $ref: '#/components/schemas/AbsolutePercentChange'
+    WatchlistSummary:
+      type: object
+      required: [id, name, instrumentCount]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        instrumentCount:
+          type: integer
+          minimum: 0
+    WatchlistRow:
+      type: object
+      required: [id, symbol, name, lastPrice, dayChange, updatedAt]
+      properties:
+        id:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        lastPrice:
+          $ref: '#/components/schemas/Money'
+        dayChange:
+          $ref: '#/components/schemas/AbsolutePercentChange'
+        bid:
+          $ref: '#/components/schemas/Money'
+        ask:
+          $ref: '#/components/schemas/Money'
+        updatedAt:
+          type: string
+          format: date-time
+    Instrument:
+      type: object
+      required: [symbol, name, assetType]
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        assetType:
+          type: string
+          enum: [equity, option, etf, fund, forex, crypto, future, bond, other]
+        primaryExchange:
+          type: string
+          nullable: true
+    QuoteSnapshot:
+      type: object
+      required: [lastPrice, previousClose, volume, updatedAt]
+      properties:
+        lastPrice:
+          $ref: '#/components/schemas/Money'
+        bid:
+          $ref: '#/components/schemas/Money'
+        ask:
+          $ref: '#/components/schemas/Money'
+        open:
+          $ref: '#/components/schemas/Money'
+        high:
+          $ref: '#/components/schemas/Money'
+        low:
+          $ref: '#/components/schemas/Money'
+        previousClose:
+          $ref: '#/components/schemas/Money'
+        volume:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+    PositionSummary:
+      type: object
+      properties:
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        marketValue:
+          $ref: '#/components/schemas/Money'
+        costBasis:
+          $ref: '#/components/schemas/Money'
+        unrealizedGain:
+          $ref: '#/components/schemas/Money'
+    WatchlistMembership:
+      type: object
+      required: [isSaved, watchlistIds]
+      properties:
+        isSaved:
+          type: boolean
+        watchlistIds:
+          type: array
+          items:
+            type: string
+    QuoteDetail:
+      type: object
+      required: [instrument, quote, watchlistMembership]
+      properties:
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+        quote:
+          $ref: '#/components/schemas/QuoteSnapshot'
+        position:
+          $ref: '#/components/schemas/PositionSummary'
+        watchlistMembership:
+          $ref: '#/components/schemas/WatchlistMembership'
+    Candle:
+      type: object
+      required: [time, open, high, low, close, volume]
+      properties:
+        time:
+          type: string
+          format: date-time
+        open:
+          $ref: '#/components/schemas/DecimalString'
+        high:
+          $ref: '#/components/schemas/DecimalString'
+        low:
+          $ref: '#/components/schemas/DecimalString'
+        close:
+          $ref: '#/components/schemas/DecimalString'
+        volume:
+          type: string
+    ChartSeries:
+      type: object
+      required: [type, bars]
+      properties:
+        type:
+          type: string
+          enum: [candles, line]
+        bars:
+          type: array
+          items:
+            $ref: '#/components/schemas/Candle'
+    ChartStats:
+      type: object
+      properties:
+        change:
+          $ref: '#/components/schemas/AbsolutePercentChange'
+    BootstrapData:
+      type: object
+      required: [session, connections]
+      properties:
+        session:
+          type: object
+          required: [environment, featureFlags]
+          properties:
+            environment:
+              type: string
+            featureFlags:
+              type: object
+              additionalProperties:
+                type: boolean
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectionSummary'
+    BootstrapResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/BootstrapData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    HomeScreenData:
+      type: object
+      required: [connections, portfolio, topHoldings, watchlists, market]
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectionSummary'
+        portfolio:
+          $ref: '#/components/schemas/PortfolioSummary'
+        topHoldings:
+          type: array
+          items:
+            $ref: '#/components/schemas/HoldingRow'
+        watchlists:
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistSummary'
+        market:
+          type: object
+          required: [session]
+          properties:
+            session:
+              type: string
+              enum: [pre_market, open, post_market, closed]
+            nextTransitionAt:
+              type: string
+              format: date-time
+              nullable: true
+    HomeScreenResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/HomeScreenData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    WatchlistsData:
+      type: object
+      required: [watchlists]
+      properties:
+        watchlists:
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistSummary'
+    WatchlistsResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/WatchlistsData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    WatchlistScreenData:
+      type: object
+      required: [watchlist, availableWatchlists, rows]
+      properties:
+        watchlist:
+          $ref: '#/components/schemas/WatchlistSummary'
+        availableWatchlists:
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistSummary'
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistRow'
+    WatchlistScreenResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/WatchlistScreenData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    WatchlistResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/WatchlistSummary'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    QuoteScreenResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/QuoteDetail'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    ChartScreenData:
+      type: object
+      required: [instrument, range, interval, timezone, series]
+      properties:
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+        range:
+          type: string
+        interval:
+          type: string
+        timezone:
+          type: string
+        series:
+          $ref: '#/components/schemas/ChartSeries'
+        stats:
+          $ref: '#/components/schemas/ChartStats'
+    ChartScreenResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/ChartScreenData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    ConnectionSummaryResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/ConnectionSummary'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    StartSchwabOAuthRequest:
+      type: object
+      properties:
+        redirectUri:
+          type: string
+          format: uri
+        clientPlatform:
+          type: string
+    SchwabOAuthStartData:
+      type: object
+      required: [authUrl, state]
+      properties:
+        authUrl:
+          type: string
+          format: uri
+        state:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+    SchwabOAuthStartResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/SchwabOAuthStartData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    CompleteSchwabOAuthRequest:
+      type: object
+      required: [callback]
+      properties:
+        callback:
+          type: string
+          description: Full callback URL or raw authorization code.
+        state:
+          type: string
+    CreatePlaidLinkTokenRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        redirectUri:
+          type: string
+          format: uri
+          nullable: true
+    PlaidLinkTokenData:
+      type: object
+      required: [linkToken]
+      properties:
+        linkToken:
+          type: string
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+    PlaidLinkTokenResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/PlaidLinkTokenData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    CompletePlaidLinkRequest:
+      type: object
+      required: [publicToken]
+      properties:
+        publicToken:
+          type: string
+        institutionId:
+          type: string
+          nullable: true
+    CreateWatchlistRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+    UpdateWatchlistRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    AddWatchlistSymbolRequest:
+      type: object
+      required: [symbol]
+      properties:
+        symbol:
+          type: string

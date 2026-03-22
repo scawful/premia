@@ -1,0 +1,50 @@
+# Premia API Scaffold
+
+`apps/api/` is a thin HTTP skeleton for the future Premia application-facing
+service.
+
+Current goals:
+- exercise the normalized DTOs from `src/core/`
+- expose the first MVP routes through concrete `premia_core` scaffold services
+- provide a concrete place for auth middleware, handlers, and streaming work
+
+Current routes:
+- `GET /health`
+- `GET /v1/bootstrap`
+- `GET /v1/screens/home`
+- `GET /v1/watchlists`
+- `GET /v1/screens/watchlists/{watchlistId}`
+- `GET /v1/screens/quotes/{symbol}`
+- `GET /v1/screens/charts/{symbol}`
+- `GET /v1/stream/events`
+- `POST /v1/connections/schwab/oauth/start`
+- `POST /v1/connections/schwab/oauth/complete`
+- `POST /v1/connections/plaid/link-token`
+- `POST /v1/connections/plaid/link-complete`
+
+Planned next routes:
+- watchlist mutations
+
+Route behavior today:
+- screen queries are served by `premia::core::application::ScaffoldApplicationService`
+- Schwab and Plaid connection workflows mutate in-memory scaffold state so the
+  next `GET /v1/bootstrap` reflects the updated connection summary
+
+Build and run:
+
+```bash
+cmake -S . -B build
+cmake --build build --target premia_api
+./build/bin/premia_api --host 127.0.0.1 --port 8080
+```
+
+Smoke test:
+
+```bash
+curl http://127.0.0.1:8080/v1/bootstrap
+curl http://127.0.0.1:8080/v1/screens/home
+curl http://127.0.0.1:8080/v1/screens/quotes/AAPL
+curl -X POST http://127.0.0.1:8080/v1/connections/plaid/link-token \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"ios-user-1"}'
+```
