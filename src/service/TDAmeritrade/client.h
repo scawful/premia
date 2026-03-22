@@ -1,12 +1,6 @@
 #ifndef Client_hpp
 #define Client_hpp
 
-#include <google/protobuf/message.h>
-#include <grpc/support/log.h>
-#include <grpcpp/ext/proto_server_reflection_plugin.h>
-#include <grpcpp/grpcpp.h>
-#include <grpcpp/health_check_service_interface.h>
-
 #include <boost/asio.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/ssl.hpp>
@@ -23,15 +17,11 @@
 #include <string>
 #include <vector>
 
-#include "absl/status/status.h"
 #include "absl/strings/string_view.h"
 #include "data/Order.hpp"
 #include "data/UserPrincipals.hpp"
-#include "handler/tdameritrade_service.h"
 #include "parser.h"
 #include "socket.h"
-#include "src/service/TDAmeritrade/proto/tdameritrade.grpc.pb.h"
-#include "src/service/TDAmeritrade/proto/tdameritrade.pb.h"
 
 namespace premia {
 namespace tda {
@@ -102,25 +92,6 @@ class Client {
   ~Client();
 
   void OpenBrowser();
-  void CreateChannel(bool has_refresh_token);
-  absl::Status PostAccessToken();
-  absl::Status GetAccount(const absl::string_view account_id);
-  absl::Status GetUserPrincipals();
-  absl::Status GetPriceHistory(const std::string &symbol, PeriodType ptype,
-                               int period_amt, FrequencyType ftype,
-                               int freq_amt, bool ext);
-  absl::Status GetOptionChain(absl::string_view ticker,
-                              absl::string_view contractType,
-                              absl::string_view strikeCount,
-                              absl::string_view strategy,
-                              absl::string_view range,
-                              absl::string_view expMonth,
-                              absl::string_view optionType, bool includeQuotes);
-
-  // WebSocket Controls
-  void start_session(const std::string &ticker);
-  void send_logout_request();
-  void fetch_access_token();
 
   // Accounts
   std::string get_account(const std::string &account_id);
@@ -155,6 +126,11 @@ class Client {
                                   OrderStatus status) const;
   void place_order(const std::string &account_id, const Order &order) const;
 
+  // WebSocket Controls
+  void start_session(const std::string &ticker);
+  void send_logout_request();
+  void fetch_access_token();
+
   void addAuth(const std::string &key, const std::string &token);
 
  private:
@@ -162,7 +138,7 @@ class Client {
   bool has_access_token = false;
   bool has_user_principals = false;
 
-  // API std::strings
+  // API strings
   std::string api_key = "";
   std::string refresh_token = "";
   std::string access_token = "";
@@ -172,7 +148,6 @@ class Client {
   std::unordered_map<std::string, std::string> account_data;
   UserPrincipals user_principals;
   json::ptree _user_principals;
-  std::unique_ptr<TDAmeritrade::Stub> stub_;
 
   // WebSocket session variables
   net::io_context ioc;
@@ -182,15 +157,14 @@ class Client {
   ssl::context context{ssl::context::tlsv12_client};
   std::vector<std::shared_ptr<std::string const>> request_queue;
   std::vector<std::thread> ws_threads;
-  ClientContext rpc_context;
 
-  // std::string Manipulation
+  // String manipulation
   std::string get_api_interval_value(int value) const;
   std::string get_api_frequency_type(int value) const;
   std::string get_api_period_amount(int value) const;
   std::string get_api_frequency_amount(int value) const;
 
-  // API Functions
+  // API functions
   std::string send_request(const std::string &endpoint) const;
   std::string send_authorized_request(const std::string &endpoint) const;
   void post_authorized_request(const std::string &endpoint,
@@ -199,7 +173,7 @@ class Client {
   void get_user_principals();
   void check_user_principals();
 
-  // WebSocket functions
+  // WebSocket helpers
   json::ptree create_login_request();
   json::ptree create_logout_request();
   json::ptree create_service_request(ServiceType serv_type,

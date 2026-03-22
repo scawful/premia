@@ -7,9 +7,9 @@ set(IMGUI_PATH  "lib/imgui")
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
-target_include_directories(ImGui PUBLIC ${SDL2_INCLUDE_DIR})
-target_compile_definitions(ImGui PUBLIC 
-  IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h>  GL_GLEXT_PROTOTYPES=1)
+target_link_libraries("ImGui" PUBLIC SDL2::SDL2)
+target_compile_definitions(ImGui PUBLIC
+  IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<SDL2/SDL_opengl.h> GL_GLEXT_PROTOTYPES=1)
 
 # ImPlot library --------------------------------------------------------------
 set(IMPLOT_PATH "lib/implot")

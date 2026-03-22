@@ -21,11 +21,12 @@ include_directories(
   tws/
 )
 target_link_libraries(
-  interactive_brokers 
-  curl 
-  ${OPENSSL_LIBRARIES}
+  interactive_brokers
+  curl
+  OpenSSL::SSL
+  OpenSSL::Crypto
   TWS
-  ${BOOST_LIBRARIES} 
+  ${BOOST_LIBRARIES}
 )
 
 if (WIN32) 

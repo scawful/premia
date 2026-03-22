@@ -7,10 +7,11 @@ set(
 
 add_library(coinbase STATIC ${PREMIA_SERVICE_CB_SRC})
 target_link_libraries(
-  coinbase 
-  curl 
-  ${OPENSSL_LIBRARIES}
-  ${BOOST_LIBRARIES} 
+  coinbase
+  curl
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  ${BOOST_LIBRARIES}
 )
 
 if (WIN32) 

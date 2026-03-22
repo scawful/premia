@@ -63,11 +63,12 @@ endif()
 target_link_libraries(
   premia
   ${ABSL_TARGETS}
-  ${BOOST_LIBRARIES} 
+  ${BOOST_LIBRARIES}
   ${SDL_TARGETS}
-  ${OPENGL_LIBRARIES} 
-  ${OPENSSL_LIBRARIES}
-  ImGui 
+  OpenGL::GL
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  ImGui
   ImPlot
   curl
   tdameritrade
