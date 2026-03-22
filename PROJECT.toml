@@ -1,0 +1,30 @@
+name = "premia"
+description = "Financial market analysis and trading platform (TDAmeritrade, InteractiveBrokers)"
+tags = ["tools", "finance", "trading", "c++", "imgui", "active"]
+platforms = ["mac", "linux", "windows"]
+stage = "active"
+public = true
+is_product = false
+commercial_intent = "none"
+
+# Technology stack
+languages = ["cpp", "c"]
+build_system = "cmake"
+requires_version = {cpp = "17", cmake = "3.20"}
+
+[dependencies]
+# External system dependencies
+external = ["imgui", "curl", "openssl", "nlohmann-json"]
+
+# Build dependencies
+build = ["cmake", "ninja"]
+
+# Test dependencies
+test = []
+
+[links]
+github = "https://github.com/scawful/premia"
+
+[build]
+system = "cmake"
+command = "cmake -B build && cmake --build build"

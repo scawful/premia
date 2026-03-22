@@ -11,8 +11,8 @@ enum class ChartType { LINEPLOT, CANDLESTICK, MULTIPLOT };
 class HLXT {
  private:
   HLXT() = default;
-  User user;
-  Client client;
+  // User user;
+  // Client client;
   ChartType chartType;
   bool privateBalance = false;
 
@@ -25,8 +25,9 @@ class HLXT {
   }
 
   auto getSqueezeMetricsData() const -> std::string {
-    return client.send_request(
-        "https://squeezemetrics.com/monitor/download/SPX.csv");
+    return "";
+    // return client.send_request(
+        // "https://squeezemetrics.com/monitor/download/SPX.csv");
   }
 
   auto setPrivateBalance(bool val) -> void { privateBalance = val; }

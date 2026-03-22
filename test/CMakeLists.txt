@@ -13,23 +13,23 @@ enable_testing()
 add_executable(
   premia_test
   PremiaTest.cpp
-  service/tdameritrade_test.cc
-  ../src/service/TDAmeritrade/handler/tdameritrade_service.cc
+  # service/tdameritrade_test.cc
+  # ../src/service/TDAmeritrade/handler/tdameritrade_service.cc
   ../src/service/TDAmeritrade/parser.cc
   ../src/service/TDAmeritrade/socket.cc
   ../src/service/TDAmeritrade/client.cc
-  ../src/service/TDAmeritrade/Data/Quote.cpp 
-  ../src/service/TDAmeritrade/Data/OptionChain.cpp 
+  ../src/service/TDAmeritrade/Data/Quote.cpp
+  ../src/service/TDAmeritrade/Data/OptionChain.cpp
   ../src/service/TDAmeritrade/Data/Account.cpp
   ../src/service/TDAmeritrade/Data/Watchlist.cpp
   ../src/service/TDAmeritrade/Data/Order.cpp
   ../src/service/TDAmeritrade/Data/UserPrincipals.cpp
-  ../src/service/TDAmeritrade/Data/PriceHistory.cpp 
-  ../src/service/IEXCloud/Client.cpp 
-  ../src/service/IEXCloud/Parser.cpp
-  ../src/service/CoinbasePro/Account.cpp 
-  ../src/service/CoinbasePro/Client.cpp 
+  ../src/service/TDAmeritrade/Data/PriceHistory.cpp
+  ../src/service/CoinbasePro/Account.cpp
+  ../src/service/CoinbasePro/Client.cpp
   ../src/service/CoinbasePro/Product.cpp
+  service/schwab_test.cc
+  ../src/service/Schwab/client.cc
 )
 
 include_directories(
@@ -49,12 +49,12 @@ target_link_libraries(
   ${OPENSSL_LIBRARIES}
   gtest_main
   gtest
-  protobuf::libprotobuf
-  gRPC::grpc++_reflection
-  gRPC::grpc
-  gRPC::grpc++
-  tdameritrade
-  tda-service
+  # protobuf::libprotobuf
+  # gRPC::grpc++_reflection
+  # gRPC::grpc
+  # gRPC::grpc++
+  # tdameritrade
+  # tda-service
 )
 
 if (WIN32) 

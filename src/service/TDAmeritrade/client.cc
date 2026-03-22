@@ -1,10 +1,10 @@
 #include "client.h"
 
-#include <google/protobuf/message.h>
-#include <grpc/support/log.h>
-#include <grpcpp/ext/proto_server_reflection_plugin.h>
-#include <grpcpp/grpcpp.h>
-#include <grpcpp/health_check_service_interface.h>
+// #include <google/protobuf/message.h>
+// #include <grpc/support/log.h>
+// #include <grpcpp/ext/proto_server_reflection_plugin.h>
+// #include <grpcpp/grpcpp.h>
+// #include <grpcpp/health_check_service_interface.h>
 
 #include <boost/asio.hpp>
 #include <boost/asio/post.hpp>
@@ -27,11 +27,11 @@
 #include "absl/strings/string_view.h"
 #include "data/Order.hpp"
 #include "data/UserPrincipals.hpp"
-#include "handler/tdameritrade_service.h"
+// #include "handler/tdameritrade_service.h"
 #include "parser.h"
 #include "socket.h"
-#include "src/service/TDAmeritrade/proto/tdameritrade.grpc.pb.h"
-#include "src/service/TDAmeritrade/proto/tdameritrade.pb.h"
+// #include "src/service/TDAmeritrade/proto/tdameritrade.grpc.pb.h"
+// #include "src/service/TDAmeritrade/proto/tdameritrade.pb.h"
 
 static auto string_replace(std::string &str, const std::string &from,
                            const std::string &to) -> bool {
@@ -60,9 +60,10 @@ namespace tda {
 
 void Client::OpenBrowser() {
   auto host = "http%3A%2F%2Flocalhost:50051";
-  auto path = absl::StrCat(
-      "https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=",
-      host, "&client_id=", absl::StrCat(api_key, "@AMER.OAUTHAP"));
+  std::string path;
+  // auto path = absl::StrCat(
+      // "https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=",
+      // host, "&client_id=", absl::StrCat(api_key, "@AMER.OAUTHAP"));
 #ifdef _WIN32
   // Note: executable path must use backslashes!
   ::ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT);
@@ -78,129 +79,129 @@ void Client::OpenBrowser() {
 #endif
 }
 
-void Client::CreateChannel(bool has_refresh_token) {
-  auto channel = grpc::CreateChannel("localhost:50051",
-                                     grpc::InsecureChannelCredentials());
-  stub_ = ::TDAmeritrade::NewStub(channel);
+// void Client::CreateChannel(bool has_refresh_token) {
+//   auto channel = grpc::CreateChannel("localhost:50051",
+//                                      grpc::InsecureChannelCredentials());
+//   stub_ = ::TDAmeritrade::NewStub(channel);
 
-  ClientContext ctx_rpc;
-  AccessTokenRequest request;
-  if (has_refresh_token) {
-    request.set_grant_type("refresh_token");
-    request.set_refresh_token(refresh_token);
-    request.set_client_id(api_key);
-  } else {
-    request.set_grant_type("authorization_code");
-    request.set_access_type("offline");
-    request.set_client_id(absl::StrCat(api_key, "@AMER.OAUTHAP"));
-  }
-  AccessTokenResponse response;
-  stub_->PostAccessToken(&ctx_rpc, request, &response);
-}
+//   ClientContext ctx_rpc;
+//   AccessTokenRequest request;
+//   if (has_refresh_token) {
+//     request.set_grant_type("refresh_token");
+//     request.set_refresh_token(refresh_token);
+//     request.set_client_id(api_key);
+//   } else {
+//     request.set_grant_type("authorization_code");
+//     request.set_access_type("offline");
+//     request.set_client_id(absl::StrCat(api_key, "@AMER.OAUTHAP"));
+//   }
+//   AccessTokenResponse response;
+//   stub_->PostAccessToken(&ctx_rpc, request, &response);
+// }
 
-absl::Status Client::PostAccessToken() {
-  AccessTokenRequest request;
-  request.set_grant_type("refresh_token");
-  request.set_refresh_token(refresh_token);
-  request.set_client_id(api_key);
+// absl::Status Client::PostAccessToken() {
+//   AccessTokenRequest request;
+//   request.set_grant_type("refresh_token");
+//   request.set_refresh_token(refresh_token);
+//   request.set_client_id(api_key);
 
-  AccessTokenResponse response;
-  Status status = stub_->PostAccessToken(&rpc_context, request, &response);
+//   AccessTokenResponse response;
+//   Status status = stub_->PostAccessToken(&rpc_context, request, &response);
 
-  if (!status.ok()) {
-    std::cerr << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return absl::InternalError(status.error_message());
-  }
+//   if (!status.ok()) {
+//     std::cerr << status.error_code() << ": " << status.error_message()
+//               << std::endl;
+//     return absl::InternalError(status.error_message());
+//   }
 
-  std::cerr << "Successully received access token!" << std::endl;
-  access_token = response.access_token();
-  refresh_token = response.refresh_token();
-  return absl::OkStatus();
-}
+//   std::cerr << "Successully received access token!" << std::endl;
+//   access_token = response.access_token();
+//   refresh_token = response.refresh_token();
+//   return absl::OkStatus();
+// }
 
-absl::Status Client::GetAccount(const absl::string_view account_id) {
-  AccountRequest account_request;
-  account_request.set_accountid(account_id.data());
+// absl::Status Client::GetAccount(const absl::string_view account_id) {
+//   AccountRequest account_request;
+//   account_request.set_accountid(account_id.data());
 
-  AccountResponse account_response;
-  Status status =
-      stub_->GetAccount(&rpc_context, account_request, &account_response);
+//   AccountResponse account_response;
+//   Status status =
+//       stub_->GetAccount(&rpc_context, account_request, &account_response);
 
-  if (!status.ok()) {
-    std::cerr << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return absl::InternalError(status.error_message());
-  }
-  std::cerr << "Account Response: " << account_response.SerializeAsString()
-            << std::endl;
-  return absl::OkStatus();
-}
+//   if (!status.ok()) {
+//     std::cerr << status.error_code() << ": " << status.error_message()
+//               << std::endl;
+//     return absl::InternalError(status.error_message());
+//   }
+//   std::cerr << "Account Response: " << account_response.SerializeAsString()
+//             << std::endl;
+//   return absl::OkStatus();
+// }
 
-absl::Status Client::GetUserPrincipals() {
-  UserPrincipalsRequest request;
-  UserPrincipalsResponse response;
-  Status status = stub_->GetUserPrincipals(&rpc_context, request, &response);
+// absl::Status Client::GetUserPrincipals() {
+//   UserPrincipalsRequest request;
+//   UserPrincipalsResponse response;
+//   Status status = stub_->GetUserPrincipals(&rpc_context, request, &response);
 
-  if (!status.ok()) {
-    std::cerr << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return absl::InternalError(status.error_message());
-  }
-  std::cerr << "User Principals Response: " << response.SerializeAsString()
-            << std::endl;
-  return absl::OkStatus();
-}
+//   if (!status.ok()) {
+//     std::cerr << status.error_code() << ": " << status.error_message()
+//               << std::endl;
+//     return absl::InternalError(status.error_message());
+//   }
+//   std::cerr << "User Principals Response: " << response.SerializeAsString()
+//             << std::endl;
+//   return absl::OkStatus();
+// }
 
-absl::Status Client::GetPriceHistory(const std::string &symbol,
-                                     PeriodType ptype, int period_amt,
-                                     FrequencyType ftype, int freq_amt,
-                                     bool ext) {
-  PriceHistoryRequest request;
-  PriceHistoryResponse response;
+// absl::Status Client::GetPriceHistory(const std::string &symbol,
+//                                      PeriodType ptype, int period_amt,
+//                                      FrequencyType ftype, int freq_amt,
+//                                      bool ext) {
+//   PriceHistoryRequest request;
+//   PriceHistoryResponse response;
 
-  Status status = stub_->GetPriceHistory(&rpc_context, request, &response);
+//   Status status = stub_->GetPriceHistory(&rpc_context, request, &response);
 
-  // Act upon its status.
-  if (status.ok()) {
-    std::cerr << "Price History Response: " << response.SerializeAsString()
-              << std::endl;
-    return absl::OkStatus();
-  } else {
-    std::cerr << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return absl::InternalError(status.error_message());
-  }
-}
+//   // Act upon its status.
+//   if (status.ok()) {
+//     std::cerr << "Price History Response: " << response.SerializeAsString()
+//               << std::endl;
+//     return absl::OkStatus();
+//   } else {
+//     std::cerr << status.error_code() << ": " << status.error_message()
+//               << std::endl;
+//     return absl::InternalError(status.error_message());
+//   }
+// }
 
-absl::Status Client::GetOptionChain(
-    absl::string_view ticker, absl::string_view contractType,
-    absl::string_view strikeCount, absl::string_view strategy,
-    absl::string_view range, absl::string_view expMonth,
-    absl::string_view optionType, bool includeQuotes) {
-  OptionChainRequest request;
-  OptionChainResponse response;
+// absl::Status Client::GetOptionChain(
+//     absl::string_view ticker, absl::string_view contractType,
+//     absl::string_view strikeCount, absl::string_view strategy,
+//     absl::string_view range, absl::string_view expMonth,
+//     absl::string_view optionType, bool includeQuotes) {
+//   OptionChainRequest request;
+//   OptionChainResponse response;
 
-  request.set_symbol(ticker.data());
-  request.set_contracttype(contractType.data());
-  request.set_strikecount(strikeCount.data());
-  request.set_strategy(strategy.data());
-  request.set_range(range.data());
-  request.set_expmonth(expMonth.data());
-  request.set_optiontype(optionType.data());
-  request.set_includequotes(includeQuotes);
+//   request.set_symbol(ticker.data());
+//   request.set_contracttype(contractType.data());
+//   request.set_strikecount(strikeCount.data());
+//   request.set_strategy(strategy.data());
+//   request.set_range(range.data());
+//   request.set_expmonth(expMonth.data());
+//   request.set_optiontype(optionType.data());
+//   request.set_includequotes(includeQuotes);
 
-  Status status = stub_->GetOptionChain(&rpc_context, request, &response);
+//   Status status = stub_->GetOptionChain(&rpc_context, request, &response);
 
-  if (!status.ok()) {
-    std::cerr << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return absl::InternalError(status.error_message());
-  }
-  std::cerr << "Option Chain Response: " << response.SerializeAsString()
-            << std::endl;
-  return absl::OkStatus();
-}
+//   if (!status.ok()) {
+//     std::cerr << status.error_code() << ": " << status.error_message()
+//               << std::endl;
+//     return absl::InternalError(status.error_message());
+//   }
+//   std::cerr << "Option Chain Response: " << response.SerializeAsString()
+//             << std::endl;
+//   return absl::OkStatus();
+// }
 
 std::string Client::get_api_interval_value(int value) const {
   return EnumAPIValues[value];

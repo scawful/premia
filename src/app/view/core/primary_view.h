@@ -1,6 +1,8 @@
 #ifndef PrimaryView_hpp
 #define PrimaryView_hpp
 
+#include <memory>
+
 #include "view/menu/menu_view.h"
 #include "view/view.h"
 

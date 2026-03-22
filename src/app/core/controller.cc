@@ -1,8 +1,8 @@
 #include "controller.h"
 
 #include <SDL.h>
-#include <imgui/backends/imgui_impl_sdl.h>
-#include <imgui/backends/imgui_impl_sdlrenderer.h>
+#include <imgui/backends/imgui_impl_sdl2.h>
+#include <imgui/backends/imgui_impl_sdlrenderer2.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <implot/implot.h>
@@ -154,8 +154,8 @@ void Controller::onInput() {
           case SDLK_RETURN:
           case SDLK_BACKSPACE:
           case SDLK_TAB:
-            io.KeysDown[event.key.keysym.scancode] =
-                (event.type == SDL_KEYDOWN);
+            // io.KeysDown[event.key.keysym.scancode] =
+            // (event.type == SDL_KEYDOWN);
             break;
           default:
             break;
@@ -164,8 +164,8 @@ void Controller::onInput() {
 
       case SDL_KEYUP: {
         int key = event.key.keysym.scancode;
-        IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
-        io.KeysDown[key] = (event.type == SDL_KEYDOWN);
+        // IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
+        // io.KeysDown[key] = (event.type == SDL_KEYDOWN);
         io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
         io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
         io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
@@ -211,12 +211,12 @@ void Controller::onLoad() { workspace_.Update(); }
 void Controller::doRender() {
   SDL_RenderClear(renderer_.get());
   ImGui::Render();
-  ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+  ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer_.get());
   SDL_RenderPresent(renderer_.get());
 }
 
 void Controller::onExit() {
-  ImGui_ImplSDLRenderer_Shutdown();
+  ImGui_ImplSDLRenderer2_Shutdown();
   ImGui_ImplSDL2_Shutdown();
   ImPlot::DestroyContext();
   ImGui::DestroyContext();
@@ -225,7 +225,7 @@ void Controller::onExit() {
 
 absl::Status Controller::CreatePremiaWindow() {
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-    return absl::InternalError(
+    throw std::runtime_error(
         absl::StrFormat("SDL_Init: %s\n", SDL_GetError()));
   } else {
     window_ = std::unique_ptr<SDL_Window, sdl_deleter>(
@@ -237,7 +237,7 @@ absl::Status Controller::CreatePremiaWindow() {
                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL),
         sdl_deleter());
     if (window_ == nullptr) {
-      return absl::InternalError(
+      throw std::runtime_error(
           absl::StrFormat("SDL_CreateWindow: %s\n", SDL_GetError()));
     }
   }
@@ -250,7 +250,7 @@ absl::Status Controller::CreatePremiaRenderer() {
                          SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC),
       sdl_deleter());
   if (renderer_ == nullptr) {
-    return absl::InternalError(
+    throw std::runtime_error(
         absl::StrFormat("SDL_CreateRenderer: %s\n", SDL_GetError()));
   } else {
     SDL_SetRenderDrawBlendMode(renderer_.get(), SDL_BLENDMODE_BLEND);
@@ -265,7 +265,7 @@ absl::Status Controller::CreatePremiaGuiContext() {
 
   // Initialize ImGui for SDL
   ImGui_ImplSDL2_InitForSDLRenderer(window_.get(), renderer_.get());
-  ImGui_ImplSDLRenderer_Init(renderer_.get());
+  ImGui_ImplSDLRenderer2_Init(renderer_.get());
 
   // Load available fonts
   const ImGuiIO& io = ImGui::GetIO();
@@ -285,8 +285,8 @@ absl::Status Controller::CreatePremiaGuiContext() {
   io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 12.0f);
 
   // Build a new ImGui frame
-  ImGui_ImplSDLRenderer_NewFrame();
-  ImGui_ImplSDL2_NewFrame(window_.get());
+  ImGui_ImplSDLRenderer2_NewFrame();
+  ImGui_ImplSDL2_NewFrame();
 
   SDL_SetWindowResizable(window_.get(), SDL_TRUE);
   premia::ColorsPremia();

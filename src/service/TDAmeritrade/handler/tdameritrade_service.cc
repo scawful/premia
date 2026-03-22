@@ -139,6 +139,9 @@ Status TDAmeritradeServiceImpl::PostAccessToken(
 
   // run the operations
   res = curl_easy_perform(curl);
+  if (res!= CURLE_OK)
+    return Status::CANCELLED;
+  
   curl_easy_cleanup(curl);
 
   JsonParseOptions options;

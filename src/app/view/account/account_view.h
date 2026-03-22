@@ -7,6 +7,19 @@
 
 namespace premia {
 class AccountView : public View {
+ public:
+  std::string getName() override;
+  void addLogger(const Logger &logger) override;
+  void addEvent(const std::string &key, const EventHandler &event) override;
+  void Update() override;
+
+ private:
+  ImGuiTableFlags positionFlags =
+      ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable |
+      ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter |
+      ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable |
+      ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+
  private:
   bool isInit = false;
   bool isLoggedIn = false;
@@ -14,7 +27,7 @@ class AccountView : public View {
   Logger logger;
   // -----------------------------
   std::vector<std::string> account_ids_std;
-  std::vector<const char*> account_ids;
+  std::vector<const char *> account_ids;
   std::string default_account;
 
   std::unordered_map<std::string, tda::Quote> quotes;
@@ -31,19 +44,6 @@ class AccountView : public View {
 
   // ------------------------------
   void DrawAccountPane();
-
- public:
-  std::string getName() override;
-  void addLogger(const Logger& logger) override;
-  void addEvent(const std::string &key, const EventHandler& event) override;
-  void Update() override;
-
- private:
-  ImGuiTableFlags positionFlags =
-      ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable |
-      ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter |
-      ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable |
-      ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 };
 }  // namespace premia
 

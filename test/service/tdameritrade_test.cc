@@ -20,8 +20,8 @@ class TDAFixture : public ::testing::Test {
   inline premia::tda::Parser& parser() { return parser_; }
 
   void SetUp() override {
-    std::string consumer_key;
-    std::string refresh_token;
+    std::string consumer_key = "ELOWMHSGUFXQL4OK1NYVFGO6NF6JVTSU";
+    std::string refresh_token = "";
     std::ifstream keyfile("../assets/apikey.txt");
     if (keyfile.good()) {
       std::stringstream buffer;
@@ -34,7 +34,7 @@ class TDAFixture : public ::testing::Test {
     }
     client_.addAuth(consumer_key, refresh_token);
     client_.fetch_access_token();
-    client_.CreateChannel();
+    client_.CreateChannel(true);
   }
 };
 

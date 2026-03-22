@@ -34,8 +34,8 @@ add_executable(
   ../${IMGUI_PATH}/imgui_demo.cpp
   ../${IMGUI_PATH}/imgui_draw.cpp 
   ../${IMGUI_PATH}/imgui_widgets.cpp
-  ../${IMGUI_PATH}/backends/imgui_impl_sdl.cpp
-  ../${IMGUI_PATH}/backends/imgui_impl_sdlrenderer.cpp 
+  ../${IMGUI_PATH}/backends/imgui_impl_sdl2.cpp
+  ../${IMGUI_PATH}/backends/imgui_impl_sdlrenderer2.cpp 
   ../${IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp
   ../${IMPLOT_PATH}/implot.cpp 
   ../${IMPLOT_PATH}/implot_items.cpp 
@@ -71,8 +71,8 @@ target_link_libraries(
   ImPlot
   curl
   tdameritrade
-  coinbase
-  TWS
+  schwab
+  # coinbase
   interactive_brokers
 )
 

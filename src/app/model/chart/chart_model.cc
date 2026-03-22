@@ -4,15 +4,8 @@ namespace premia {
 
 void ChartModel::initCandles() {
   std::ifstream keyfile("assets/apikey.txt");
-  std::string consumer_key;
-  std::string refresh_token;
-  if (keyfile.good()) {
-    std::stringstream buffer;
-    buffer << keyfile.rdbuf();
-    buffer >> consumer_key;
-    buffer >> refresh_token;
-    keyfile.close();
-  }
+  std::string consumer_key = "ELOWMHSGUFXQL4OK1NYVFGO6NF6JVTSU";
+  std::string refresh_token = "";
   tda::TDA::getInstance().authUser(consumer_key, refresh_token);
   candles = priceHistory.getCandleVector();
   int numCandles = getNumCandles();

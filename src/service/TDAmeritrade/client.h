@@ -1,11 +1,11 @@
 #ifndef Client_hpp
 #define Client_hpp
 
-#include <google/protobuf/message.h>
-#include <grpc/support/log.h>
-#include <grpcpp/ext/proto_server_reflection_plugin.h>
-#include <grpcpp/grpcpp.h>
-#include <grpcpp/health_check_service_interface.h>
+// #include <google/protobuf/message.h>
+// #include <grpc/support/log.h>
+// #include <grpcpp/ext/proto_server_reflection_plugin.h>
+// #include <grpcpp/grpcpp.h>
+// #include <grpcpp/health_check_service_interface.h>
 
 #include <boost/asio.hpp>
 #include <boost/asio/post.hpp>
@@ -27,11 +27,11 @@
 #include "absl/strings/string_view.h"
 #include "data/Order.hpp"
 #include "data/UserPrincipals.hpp"
-#include "handler/tdameritrade_service.h"
+// #include "handler/tdameritrade_service.h"
 #include "parser.h"
 #include "socket.h"
-#include "src/service/TDAmeritrade/proto/tdameritrade.grpc.pb.h"
-#include "src/service/TDAmeritrade/proto/tdameritrade.pb.h"
+// #include "src/service/TDAmeritrade/proto/tdameritrade.grpc.pb.h"
+// #include "src/service/TDAmeritrade/proto/tdameritrade.pb.h"
 
 namespace premia {
 namespace tda {
@@ -172,7 +172,7 @@ class Client {
   std::unordered_map<std::string, std::string> account_data;
   UserPrincipals user_principals;
   json::ptree _user_principals;
-  std::unique_ptr<TDAmeritrade::Stub> stub_;
+  // std::unique_ptr<TDAmeritrade::Stub> stub_;
 
   // WebSocket session variables
   net::io_context ioc;
@@ -182,7 +182,7 @@ class Client {
   ssl::context context{ssl::context::tlsv12_client};
   std::vector<std::shared_ptr<std::string const>> request_queue;
   std::vector<std::thread> ws_threads;
-  ClientContext rpc_context;
+  // ClientContext rpc_context;
 
   // std::string Manipulation
   std::string get_api_interval_value(int value) const;

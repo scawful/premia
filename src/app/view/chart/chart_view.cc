@@ -74,8 +74,12 @@ void ChartView::Update() {
   if (!isInit) {
     initChart();
   }
+  if (!ImGui::Begin("Chart", nullptr)) {
+    return;
+  }
   DrawChartSettings();
   DrawChart();
+  ImGui::End();
 }
 
 }  // namespace premia

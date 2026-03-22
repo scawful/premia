@@ -16,9 +16,9 @@ add_library("TWS" STATIC ${TWS_SOURCES})
 target_include_directories("TWS" PUBLIC ${TWS_PATH})
 
 add_library(interactive_brokers STATIC ${PREMIA_SERVICE_IBKR_SRC})
-include_directories(
-  .
-  tws/
+target_include_directories(interactive_brokers PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/tws
 )
 target_link_libraries(
   interactive_brokers 

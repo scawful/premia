@@ -6,14 +6,12 @@
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
-
 #include <string>
 
-#include "view/core/IconsMaterialDesign.h"
 #include "metatypes.h"
 #include "model/options/options_model.h"
+#include "view/core/IconsMaterialDesign.h"
 #include "view/view.h"
-
 
 namespace premia {
 void OptionChainView::DrawSearch() {
@@ -372,7 +370,8 @@ void OptionChainView::addLogger(const Logger& newLogger) {
   this->logger = newLogger;
 }
 
-void OptionChainView::addEvent(const std::string &key, const EventHandler& event) {
+void OptionChainView::addEvent(const std::string& key,
+                               const EventHandler& event) {
   this->events[key] = event;
 }
 

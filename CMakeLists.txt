@@ -2,35 +2,39 @@
 cmake_minimum_required(VERSION 3.6)
 
 # C++ Standard Specifications -------------------------------------------------
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
+# set(CMAKE_C_COMPILER "/opt/homebrew/opt/llvm/bin/clang")
+# set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDL_DISABLE_IMMINTRIN_H")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSDL_DISABLE_IMMINTRIN_H")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_MODULE_LINKER_FLAGS \"-Wl,--no-undefined -Wl,--no-undefined\")
-set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS OFF)
 
 # OpenSSL library -------------------------------------------------------------
-if(APPLE)
-    set(OPENSSL_INCLUDE_DIR 
-      "/usr/local/Cellar/openssl@1.1/1.1.1q/include")
-    set(OPENSSL_CRYPTO_LIBRARY 
-      "/usr/local/Cellar/openssl@1.1/1.1.1q/lib/libcrypto.dylib")
-    set(OPENSSL_SSL_LIBRARY 
-      "/usr/local/Cellar/openssl@1.1/1.1.1q/lib/libssl.dylib")
-endif()
+# if(APPLE)
+#     set(OPENSSL_INCLUDE_DIR 
+#       "/usr/local/Cellar/openssl@1.1/1.1.1q/include")
+#     set(OPENSSL_CRYPTO_LIBRARY 
+#       "/usr/local/Cellar/openssl@1.1/1.1.1q/lib/libcrypto.dylib")
+#     set(OPENSSL_SSL_LIBRARY 
+#       "/usr/local/Cellar/openssl@1.1/1.1.1q/lib/libssl.dylib")
+# endif()
 find_package(OpenSSL REQUIRED)
 if(OPENSSL_FOUND)
-    if(APPLE)
-        include_directories(/usr/local/Cellar/openssl@1.1/1.1.1q/include)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1q/lib/libssl.dylib)
-        list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1q/lib/libcrypto.dylib)
-    else()
+    # if(APPLE)
+    #     include_directories(/usr/local/Cellar/openssl@1.1/1.1.1q/include)
+    #     list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1q/lib/libssl.dylib)
+    #     list(APPEND LIB_LIST /usr/local/Cellar/openssl@1.1/1.1.1q/lib/libcrypto.dylib)
+    # else()
         include_directories(${OPENSSL_INCLUDE_DIR})
         list(APPEND LIB_LIST ${OPENSSL_LIBRARIES})
-    endif()
+    # endif()
 endif()
 
 # Premia by Justin Scofield ---------------------------------------------------
@@ -46,9 +50,9 @@ find_package(SDL2 REQUIRED)
 # Abseil Standard Specifications ----------------------------------------------
 set(ABSL_PROPAGATE_CXX_STD ON)
 set(ABSL_CXX_STANDARD 17)
-set(ABSL_USE_GOOGLETEST_HEAD ON)
-set(ABSL_ENABLE_INSTALL ON)
-add_subdirectory(src/lib/abseil-cpp)
+# set(ABSL_USE_GOOGLETEST_HEAD ON)
+# set(ABSL_ENABLE_INSTALL ON)
+# add_subdirectory(src/lib/abseil-cpp)
 set(
   ABSL_TARGETS   
   absl::strings
@@ -65,17 +69,20 @@ set(
   absl::flat_hash_map
 )
 
-add_subdirectory(src/lib/protobuf)
-set(Protobuf_BUILD_TESTS OFF)
-set(PROTOBUF_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}
-    CACHE INTERNAL "Path to generated protobuf files.")
-include_directories(${PROTOBUF_INCLUDE_PATH})
+find_package(absl REQUIRED)
 
-set(PROTOBUF_LIBRARY "/usr/local/Cellar/protobuf/21.5/lib/libprotobuf.dylib") # The protobuf library
-set(PROTOBUF_PROTOC_LIBRARY "/usr/local/Cellar/protobuf/21.5/lib/libprotoc.dylib")   #- The protoc library
-set(PROTOBUF_INCLUDE_DIR "/usr/local/Cellar/protobuf/21.5/include") #- The include directory for protocol buffers
-set(PROTOBUF_PROTOC_EXECUTABLE "/usr/local/Cellar/protobuf/21.5/bin") #- The protoc compiler
-find_package(gRPC REQUIRED)
+# add_subdirectory(src/lib/protobuf)
+# set(Protobuf_BUILD_TESTS OFF)
+# set(PROTOBUF_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}
+#     CACHE INTERNAL "Path to generated protobuf files.")
+# include_directories(${PROTOBUF_INCLUDE_PATH})
+
+# set(PROTOBUF_LIBRARY "/opt/homebrew/Cellar/protobuf/29.3/lib/libprotobuf.dylib") # The protobuf library
+# set(PROTOBUF_PROTOC_LIBRARY "/opt/homebrew/Cellar/protobuf/29.3/lib/libprotoc.dylib")   #- The protoc library
+# set(PROTOBUF_INCLUDE_DIR "/opt/homebrew/Cellar/protobuf/29.3/include") #- The include directory for protocol buffers
+# set(PROTOBUF_PROTOC_EXECUTABLE "/opt/homebrew/Cellar/protobuf/29.3/bin") #- The protoc compiler
+# find_package(Protobuf REQUIRED)
+# find_package(gRPC REQUIRED)
 
 add_subdirectory(src)
 add_subdirectory(test)

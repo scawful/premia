@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include "core/Schwab.hpp"
 #include "core/TDA.hpp"
 #include "view/core/IconsMaterialDesign.h"
 #include "metatypes.h"
@@ -23,14 +24,15 @@ static void _IMGUISetClipboardText(void *, const char *text) {
 
 void LoginView::DrawScreen() const {
   ImGuiIO &io = ImGui::GetIO();
-  io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
-  io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
-  io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
-  io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
-  io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
-  io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
+  // io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
+  // io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
+  // io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
+  // io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
+  // io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
+  // io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
   static bool tdaAuth;
   static bool coinbaseAuth;
+  static bool schwabAuth;
   static std::string username;
   static std::string password;
 
@@ -71,17 +73,44 @@ void LoginView::DrawScreen() const {
       }
       tda::TDA::getInstance().authUser(consumer_key, refresh_token);
     }
+    if (schwabAuth) {
+      auto& schwab = schwab::Schwab::getInstance();
+      if (schwab.loadConfig()) {
+        // Try loading persisted tokens first.
+        schwab.loadTokens();
+        if (!schwab.isAuthenticated() && schwab.hasRefreshToken()) {
+          schwab.refreshAuth();
+          schwab.saveTokens();
+        }
+        if (!schwab.isAuthenticated()) {
+          if (!password.empty()) {
+            // Treat password field as the callback URL / auth code.
+            if (schwab.exchangeAuthCode(password)) {
+              schwab.saveTokens();
+            }
+          } else {
+            // No tokens and no code — open browser for first-time auth.
+            schwab.openAuthBrowser();
+          }
+        }
+        if (schwab.isAuthenticated()) {
+          schwab.bootstrapAccounts();
+        }
+      }
+    }
     events.at("login")();
   }
 
   ImGui::Separator();
-  if (ImGui::BeginTable("APIICON", 3, ImGuiTableFlags_SizingStretchSame)) {
+  if (ImGui::BeginTable("APIICON", 4, ImGuiTableFlags_SizingStretchSame)) {
     ImGui::TableNextColumn();
     ImGui::Text(ICON_MD_API);
     ImGui::TableNextColumn();
     ImGui::Checkbox("TDA", &tdaAuth);
     ImGui::TableNextColumn();
     ImGui::Checkbox("CB", &coinbaseAuth);
+    ImGui::TableNextColumn();
+    ImGui::Checkbox("Schwab", &schwabAuth);
     ImGui::EndTable();
   }
 }
