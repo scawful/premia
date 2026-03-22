@@ -27,6 +27,19 @@ This note captures the first implementation pass after the architecture review.
 - `src/core/include/premia/core/ports/provider_ports.hpp` defines provider-side
   adapter ports.
 
+### Provider extraction start
+
+- `src/providers/` now exists as a dedicated adapter layer.
+- `src/providers/local/watchlist_provider.cc` serves normalized watchlists from
+  `assets/watchlists.json` with a deterministic fallback if that file is
+  missing or malformed.
+- `src/providers/schwab/market_data_provider.cc` now owns the Schwab-specific
+  quote and chart parsing logic that had previously lived inside the shared core
+  service.
+- watchlist summaries and watchlist-screen rows now come from a provider adapter
+  backed by `assets/watchlists.json` instead of hardcoded rows inside the core
+  service.
+
 ### API scaffold
 
 - `apps/api/` now contains a buildable `premia_api` target.

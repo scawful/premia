@@ -1,0 +1,71 @@
+{
+    "watchlists": [
+        {
+            "id": "core",
+            "name": "Core",
+            "rows": [
+                {
+                    "id": "row_aapl",
+                    "symbol": "AAPL",
+                    "name": "Apple Inc.",
+                    "lastPrice": "217.00",
+                    "bid": "216.95",
+                    "ask": "217.02",
+                    "dayChangeAbsolute": "1.30",
+                    "dayChangePercent": "0.60",
+                    "updatedAt": "2026-03-22T18:44:58Z"
+                },
+                {
+                    "id": "row_msft",
+                    "symbol": "MSFT",
+                    "name": "Microsoft Corp.",
+                    "lastPrice": "420.10",
+                    "bid": "420.00",
+                    "ask": "420.15",
+                    "dayChangeAbsolute": "2.15",
+                    "dayChangePercent": "0.51",
+                    "updatedAt": "2026-03-22T18:44:59Z"
+                },
+                {
+                    "id": "row_spy",
+                    "symbol": "SPY",
+                    "name": "SPDR S&P 500 ETF",
+                    "lastPrice": "519.50",
+                    "bid": "519.45",
+                    "ask": "519.54",
+                    "dayChangeAbsolute": "3.70",
+                    "dayChangePercent": "0.72",
+                    "updatedAt": "2026-03-22T18:45:00Z"
+                }
+            ]
+        },
+        {
+            "id": "earnings",
+            "name": "Earnings",
+            "rows": [
+                {
+                    "id": "row_nvda",
+                    "symbol": "NVDA",
+                    "name": "NVIDIA Corp.",
+                    "lastPrice": "915.20",
+                    "bid": "915.10",
+                    "ask": "915.30",
+                    "dayChangeAbsolute": "12.40",
+                    "dayChangePercent": "1.37",
+                    "updatedAt": "2026-03-22T18:45:00Z"
+                },
+                {
+                    "id": "row_amzn",
+                    "symbol": "AMZN",
+                    "name": "Amazon.com Inc.",
+                    "lastPrice": "204.80",
+                    "bid": "204.75",
+                    "ask": "204.84",
+                    "dayChangeAbsolute": "1.12",
+                    "dayChangePercent": "0.55",
+                    "updatedAt": "2026-03-22T18:44:55Z"
+                }
+            ]
+        }
+    ]
+}
