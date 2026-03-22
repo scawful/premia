@@ -10,6 +10,7 @@ namespace premia::core::ports {
 
 using premia::core::application::ChartScreenData;
 using premia::core::application::ConnectionSummary;
+using premia::core::application::HoldingRow;
 using premia::core::application::PortfolioSummary;
 using premia::core::application::QuoteDetail;
 using premia::core::application::WatchlistScreenData;
@@ -27,6 +28,7 @@ class PortfolioProviderPort {
   virtual ~PortfolioProviderPort() = default;
 
   virtual auto GetPortfolioSummary() const -> PortfolioSummary = 0;
+  virtual auto GetTopHoldings() const -> std::vector<HoldingRow> = 0;
 };
 
 class MarketDataProviderPort {

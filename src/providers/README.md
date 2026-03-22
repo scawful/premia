@@ -4,8 +4,12 @@
 into the normalized core contracts.
 
 Current adapters:
+- `local/portfolio_provider.cc` - file-backed portfolio and holdings provider
+  used for desktop and API fallback flows.
 - `local/watchlist_provider.cc` - file-backed local watchlist provider used for
   desktop and API fallback flows.
+- `tda/portfolio_provider.cc` - authenticated TDA portfolio provider used when
+  a valid `assets/tda.json` config is available.
 - `tda/watchlist_provider.cc` - authenticated TDA watchlist provider used when
   a valid `assets/tda.json` config is available.
 - `schwab/market_data_provider.cc` - Schwab quote and chart adapter used when a

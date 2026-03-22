@@ -15,10 +15,12 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "Plaid/client.h"
+#include "premia/providers/local/portfolio_provider.hpp"
 #include "Schwab/client.h"
 #include "premia/providers/local/watchlist_provider.hpp"
 #include "premia/providers/plaid/workflow_provider.hpp"
 #include "premia/providers/schwab/market_data_provider.hpp"
+#include "premia/providers/tda/portfolio_provider.hpp"
 #include "premia/providers/tda/watchlist_provider.hpp"
 #include "premia/providers/schwab/workflow_provider.hpp"
 
@@ -272,12 +274,25 @@ auto ScaffoldApplicationService::GetConnection(const std::string& provider_key) 
 }
 
 auto ScaffoldApplicationService::GetPortfolioSummary() const -> PortfolioSummary {
-  return PortfolioSummary{MakeMoney("128345.22"), MakeChange("842.13", "0.66"),
-                          MakeMoney("14320.00"), MakeMoney("28640.00"), 12};
+  try {
+    providers::tda::PortfolioProvider provider("assets/tda.json");
+    return provider.GetPortfolioSummary();
+  } catch (const std::exception&) {
+  }
+
+  providers::local::PortfolioProvider provider("assets/portfolio.json");
+  return provider.GetPortfolioSummary();
 }
 
 auto ScaffoldApplicationService::GetTopHoldings() const -> std::vector<HoldingRow> {
-  return holdings_;
+  try {
+    providers::tda::PortfolioProvider provider("assets/tda.json");
+    return provider.GetTopHoldings();
+  } catch (const std::exception&) {
+  }
+
+  providers::local::PortfolioProvider provider("assets/portfolio.json");
+  return provider.GetTopHoldings();
 }
 
 auto ScaffoldApplicationService::GetQuoteDetail(const std::string& symbol) const

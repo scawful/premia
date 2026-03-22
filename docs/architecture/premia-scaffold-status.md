@@ -30,9 +30,14 @@ This note captures the first implementation pass after the architecture review.
 ### Provider extraction start
 
 - `src/providers/` now exists as a dedicated adapter layer.
+- `src/providers/local/portfolio_provider.cc` serves normalized portfolio and
+  holdings data from `assets/portfolio.json` with a deterministic fallback.
 - `src/providers/local/watchlist_provider.cc` serves normalized watchlists from
   `assets/watchlists.json` with a deterministic fallback if that file is
   missing or malformed.
+- `src/providers/tda/portfolio_provider.cc` can now supply authenticated TDA
+  portfolio summary and holdings data when a valid `assets/tda.json` config is
+  present.
 - `src/providers/tda/watchlist_provider.cc` can now supply authenticated TDA
   watchlists when a valid `assets/tda.json` config is present.
 - `src/providers/schwab/market_data_provider.cc` now owns the Schwab-specific
@@ -44,6 +49,8 @@ This note captures the first implementation pass after the architecture review.
 - watchlist summaries and watchlist-screen rows now come from a provider adapter
   backed by `assets/watchlists.json`, with TDA taking precedence when an
   authenticated watchlist provider is available.
+- portfolio summary and top holdings now come from provider adapters as well,
+  with TDA taking precedence over the local file-backed portfolio fallback.
 
 ### API scaffold
 

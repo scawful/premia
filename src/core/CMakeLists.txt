@@ -14,7 +14,9 @@ target_compile_features(premia_core PUBLIC cxx_std_17)
 target_link_libraries(
   premia_core
   PUBLIC
+  premia_provider_local_portfolio
   premia_provider_local_watchlists
+  premia_provider_tda_portfolio
   premia_provider_tda_watchlists
   premia_provider_schwab_market_data
   premia_provider_schwab_workflows

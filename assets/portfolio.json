@@ -1,0 +1,39 @@
+{
+    "portfolio": {
+        "totalValue": "128345.22",
+        "dayChangeAbsolute": "842.13",
+        "dayChangePercent": "0.66",
+        "cash": "14320.00",
+        "buyingPower": "28640.00",
+        "holdingsCount": 3
+    },
+    "holdings": [
+        {
+            "id": "holding_aapl",
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "quantity": "42",
+            "marketValue": "9114.00",
+            "dayChangeAbsolute": "54.60",
+            "dayChangePercent": "0.60"
+        },
+        {
+            "id": "holding_msft",
+            "symbol": "MSFT",
+            "name": "Microsoft Corp.",
+            "quantity": "18",
+            "marketValue": "7561.80",
+            "dayChangeAbsolute": "41.22",
+            "dayChangePercent": "0.55"
+        },
+        {
+            "id": "holding_spy",
+            "symbol": "SPY",
+            "name": "SPDR S&P 500 ETF",
+            "quantity": "25",
+            "marketValue": "12987.50",
+            "dayChangeAbsolute": "92.50",
+            "dayChangePercent": "0.72"
+        }
+    ]
+}
