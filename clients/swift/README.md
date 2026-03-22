@@ -12,6 +12,9 @@ Recommended flow:
 Current status:
 - `clients/swift/Generated/` has been generated from the current OpenAPI file.
 - The generated package manifest exists and the API/model files are present.
+- `apps/mobile-ios/Package.swift` now depends on the generated package via a
+  local path dependency, and the hand-written client wraps it instead of only
+  constructing URLs manually.
 - Local Swift package compilation is currently blocked by conflicting
   `/usr/local/include` module maps on this machine, the same environment issue
   affecting the hand-written Swift scaffold.

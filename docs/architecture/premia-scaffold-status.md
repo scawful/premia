@@ -53,6 +53,9 @@ This note captures the first implementation pass after the architecture review.
   `PremiaUI` library targets.
 - Placeholder Swift models, client configuration, and a SwiftUI
   `ConnectionStatusBadge` now exist.
+- `apps/mobile-ios/Package.swift` now depends on the local generated package and
+  `apps/mobile-ios/Sources/PremiaAPIClient/PremiaAPIClient.swift` wraps it with
+  a first typed async `loadBootstrap()` method.
 
 ### Desktop migration start
 
@@ -78,6 +81,8 @@ This note captures the first implementation pass after the architecture review.
   reports providers as disconnected unless real credentials or workflow state
   make them active
 - `swift package dump-package` in `apps/mobile-ios/` succeeds.
+- `swift package dump-package` still succeeds in `apps/mobile-ios/` after adding
+  the local generated-client dependency.
 - `npx --yes @openapitools/openapi-generator-cli generate ...` succeeds and emits
   the first generated Swift client package.
 - `swift build` in `apps/mobile-ios/` currently fails because the local machine
