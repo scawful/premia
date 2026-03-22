@@ -21,6 +21,9 @@ This note captures the first implementation pass after the architecture review.
 - the scaffold service now attempts to use real Schwab and Plaid service clients
   when valid non-placeholder config files are present, and otherwise falls back
   to deterministic demo data
+- quote and chart DTOs now try to hydrate from real Schwab market-data responses
+  when a valid authorized Schwab session exists, and otherwise keep the same
+  deterministic fallback output
 - `src/core/include/premia/core/ports/provider_ports.hpp` defines provider-side
   adapter ports.
 

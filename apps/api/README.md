@@ -32,6 +32,9 @@ Route behavior today:
 - when valid non-placeholder `assets/schwab.json` or `assets/plaid.json`
   credentials exist, the shared core service will use the real provider clients
   and persisted token files instead of the scaffold fallback
+- quote and chart requests now attempt to use real Schwab market-data responses
+  when a valid authorized Schwab client is available, otherwise they return the
+  normalized scaffold payloads
 
 Build and run:
 
