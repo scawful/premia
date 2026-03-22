@@ -1,5 +1,7 @@
 #include "premia/core/application/scaffold_application_service.hpp"
 
+#include "premia/core/application/composition_root.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <ctime>
@@ -154,8 +156,7 @@ auto ParsePlaidLinkTokenResponse(const std::string& response)
 }  // namespace
 
 auto ScaffoldApplicationService::Instance() -> ScaffoldApplicationService& {
-  static ScaffoldApplicationService instance;
-  return instance;
+  return CompositionRoot::Instance().AppService();
 }
 
 ScaffoldApplicationService::ScaffoldApplicationService() {

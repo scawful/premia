@@ -12,6 +12,7 @@
 #include <boost/json.hpp>
 
 #include "http/json.h"
+#include "premia/core/application/composition_root.hpp"
 #include "premia/core/application/scaffold_application_service.hpp"
 
 namespace premia::api::http {
@@ -147,7 +148,7 @@ auto GetRequiredString(const json::object& object, const std::string& key)
 auto HandleGet(const std::string& raw_target)
     -> http::response<http::string_body> {
   const auto [path, query] = SplitTarget(raw_target);
-  auto& service = core::application::ScaffoldApplicationService::Instance();
+  auto& service = core::application::CompositionRoot::Instance().AppService();
 
   if (path == "/health") {
     return MakeJsonResponse(http::status::ok, SerializeHealthResponse());
@@ -211,7 +212,7 @@ auto HandleMutation(const http::request<http::string_body>& request)
   const auto [path, query] = SplitTarget(target);
   (void)query;
 
-  auto& service = core::application::ScaffoldApplicationService::Instance();
+  auto& service = core::application::CompositionRoot::Instance().AppService();
 
   try {
     const auto payload = request.method() == http::verb::delete_

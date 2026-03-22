@@ -18,6 +18,9 @@ This note captures the first implementation pass after the architecture review.
 - `src/core/include/premia/core/application/scaffold_application_service.hpp`
   and `src/core/application/scaffold_application_service.cc` provide concrete
   scaffold service implementations used by both the API and the desktop app.
+- `src/core/include/premia/core/application/composition_root.hpp` and
+  `src/core/application/composition_root.cc` now provide a simple composition
+  root that assembles and exposes the provider-backed application service.
 - the scaffold service now attempts to use real Schwab and Plaid service clients
   when valid non-placeholder config files are present, and otherwise falls back
   to deterministic demo data

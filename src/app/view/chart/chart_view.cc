@@ -8,6 +8,7 @@
 #include <string>
 
 #include "metatypes.h"
+#include "premia/core/application/composition_root.hpp"
 #include "premia/core/application/scaffold_application_service.hpp"
 #include "view/chart/subview/candle_chart.h"
 #include "view/view.h"
@@ -128,7 +129,7 @@ auto ChartView::GetSelectedIntervalLabel() const -> std::string {
 
 void ChartView::DrawCoreContractPreview() {
   const std::string preview_symbol = tickerSymbol.empty() ? "AAPL" : tickerSymbol;
-  auto& service = core::application::ScaffoldApplicationService::Instance();
+  auto& service = core::application::CompositionRoot::Instance().AppService();
   const auto quote = service.GetQuoteDetail(preview_symbol);
   const auto chart = service.GetChartScreen(preview_symbol, GetSelectedRangeLabel(),
                                             GetSelectedIntervalLabel(), true);

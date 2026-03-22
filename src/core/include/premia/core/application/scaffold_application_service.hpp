@@ -10,6 +10,8 @@ namespace premia::core::application {
 
 namespace domain = premia::core::domain;
 
+class CompositionRoot;
+
 class ScaffoldApplicationService : public BrokerConnectionService,
                                    public PortfolioService,
                                    public MarketDataService,
@@ -37,6 +39,13 @@ class ScaffoldApplicationService : public BrokerConnectionService,
   auto ListWatchlists() const -> std::vector<WatchlistSummary> override;
   auto GetWatchlistScreen(const std::string& watchlist_id) const
       -> WatchlistScreenData override;
+  auto CreateWatchlist(const std::string& name) -> WatchlistSummary override;
+  auto RenameWatchlist(const std::string& watchlist_id,
+                       const std::string& name) -> WatchlistSummary override;
+  auto AddWatchlistSymbol(const std::string& watchlist_id,
+                          const std::string& symbol) -> WatchlistSummary override;
+  auto RemoveWatchlistSymbol(const std::string& watchlist_id,
+                             const std::string& symbol) -> WatchlistSummary override;
 
   auto CreateLinkToken(const PlaidLinkTokenRequest& request)
       -> PlaidLinkTokenData override;
@@ -51,6 +60,8 @@ class ScaffoldApplicationService : public BrokerConnectionService,
       -> ConnectionSummary override;
 
  private:
+  friend class CompositionRoot;
+
   ScaffoldApplicationService();
 
   auto FindConnection(domain::Provider provider) -> ConnectionSummary&;

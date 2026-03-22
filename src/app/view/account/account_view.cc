@@ -1,5 +1,6 @@
 #include "account_view.h"
 
+#include "premia/core/application/composition_root.hpp"
 #include "premia/core/application/scaffold_application_service.hpp"
 
 namespace premia {
@@ -223,7 +224,7 @@ void AccountView::DrawAccountPane() {
 }
 
 void AccountView::DrawCoreAccountPreview() {
-  const auto home = core::application::ScaffoldApplicationService::Instance()
+  const auto home = core::application::CompositionRoot::Instance().AppService()
                         .GetHomeScreenData();
 
   ImGui::Text("Core Account Preview");

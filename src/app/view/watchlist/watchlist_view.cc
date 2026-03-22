@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include "premia/core/application/composition_root.hpp"
 #include "premia/core/application/scaffold_application_service.hpp"
 #include "view/core/IconsMaterialDesign.h"
 
@@ -191,7 +192,7 @@ void WatchlistView::DrawWatchlistTable() {
 }
 
 void WatchlistView::DrawCoreWatchlistPreview() {
-  auto& service = core::application::ScaffoldApplicationService::Instance();
+  auto& service = core::application::CompositionRoot::Instance().AppService();
   const auto watchlists = service.ListWatchlists();
   if (watchlists.empty()) {
     ImGui::TextDisabled("No normalized watchlists available.");
