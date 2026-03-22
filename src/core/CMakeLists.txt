@@ -15,6 +15,7 @@ target_link_libraries(
   premia_core
   PUBLIC
   premia_provider_local_watchlists
+  premia_provider_tda_watchlists
   premia_provider_schwab_market_data
   schwab
   plaid

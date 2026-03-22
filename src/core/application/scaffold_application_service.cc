@@ -18,6 +18,7 @@
 #include "Schwab/client.h"
 #include "premia/providers/local/watchlist_provider.hpp"
 #include "premia/providers/schwab/market_data_provider.hpp"
+#include "premia/providers/tda/watchlist_provider.hpp"
 
 namespace premia::core::application {
 
@@ -330,12 +331,24 @@ auto ScaffoldApplicationService::GetChartScreen(const std::string& symbol,
 
 auto ScaffoldApplicationService::ListWatchlists() const
     -> std::vector<WatchlistSummary> {
+  try {
+    providers::tda::WatchlistProvider provider("assets/tda.json");
+    return provider.ListWatchlists();
+  } catch (const std::exception&) {
+  }
+
   providers::local::WatchlistProvider provider("assets/watchlists.json");
   return provider.ListWatchlists();
 }
 
 auto ScaffoldApplicationService::GetWatchlistScreen(
     const std::string& watchlist_id) const -> WatchlistScreenData {
+  try {
+    providers::tda::WatchlistProvider provider("assets/tda.json");
+    return provider.GetWatchlistScreen(watchlist_id);
+  } catch (const std::exception&) {
+  }
+
   providers::local::WatchlistProvider provider("assets/watchlists.json");
   return provider.GetWatchlistScreen(watchlist_id);
 }
