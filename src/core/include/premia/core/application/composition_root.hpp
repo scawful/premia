@@ -9,7 +9,7 @@ class CompositionRoot {
  public:
   static auto Instance() -> CompositionRoot&;
 
-  auto AppService() -> ScaffoldApplicationService&;
+  auto AppService() -> ProviderBackedApplicationService&;
   auto BrokerConnections() -> BrokerConnectionService&;
   auto Portfolio() -> PortfolioService&;
   auto AccountDetails() -> AccountDetailService&;
@@ -21,7 +21,7 @@ class CompositionRoot {
  private:
   CompositionRoot() = default;
 
-  ScaffoldApplicationService app_service_;
+  ProviderBackedApplicationService app_service_;
 };
 
 }  // namespace premia::core::application

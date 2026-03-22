@@ -16,8 +16,8 @@ This note captures the first implementation pass after the architecture review.
 - `src/core/include/premia/core/application/workflow_models.hpp` defines
   connection workflow DTOs for Schwab and Plaid.
 - `src/core/include/premia/core/application/scaffold_application_service.hpp`
-  and `src/core/application/scaffold_application_service.cc` provide concrete
-  scaffold service implementations used by both the API and the desktop app.
+  and `src/core/application/scaffold_application_service.cc` now define the
+  `ProviderBackedApplicationService` used by both the API and the desktop app.
 - `src/core/include/premia/core/application/composition_root.hpp` and
   `src/core/application/composition_root.cc` now provide a simple composition
   root that assembles and exposes the provider-backed application service.

@@ -12,16 +12,16 @@ namespace domain = premia::core::domain;
 
 class CompositionRoot;
 
-class ScaffoldApplicationService : public BrokerConnectionService,
-                                   public PortfolioService,
-                                   public AccountDetailService,
-                                   public MarketDataService,
-                                   public OptionsService,
-                                   public WatchlistService,
-                                   public BankLinkService,
-                                   public ConnectionWorkflowService {
+class ProviderBackedApplicationService : public BrokerConnectionService,
+                                         public PortfolioService,
+                                         public AccountDetailService,
+                                         public MarketDataService,
+                                         public OptionsService,
+                                         public WatchlistService,
+                                         public BankLinkService,
+                                         public ConnectionWorkflowService {
  public:
-  static auto Instance() -> ScaffoldApplicationService&;
+  static auto Instance() -> ProviderBackedApplicationService&;
 
   auto GetBootstrapData() const -> BootstrapData;
   auto GetHomeScreenData() const -> HomeScreenData;
@@ -69,10 +69,10 @@ class ScaffoldApplicationService : public BrokerConnectionService,
   auto CompletePlaidLink(const PlaidLinkCompleteRequest& request)
       -> ConnectionSummary override;
 
- private:
+  private:
   friend class CompositionRoot;
 
-  ScaffoldApplicationService();
+  ProviderBackedApplicationService();
 
   auto FindConnection(domain::Provider provider) -> ConnectionSummary&;
   auto FindConnection(domain::Provider provider) const -> const ConnectionSummary&;
@@ -87,6 +87,8 @@ class ScaffoldApplicationService : public BrokerConnectionService,
   std::vector<HoldingRow> holdings_;
   mutable unsigned long long workflow_counter_ = 0;
 };
+
+using ScaffoldApplicationService = ProviderBackedApplicationService;
 
 }  // namespace premia::core::application
 

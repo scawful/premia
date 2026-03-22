@@ -7,7 +7,7 @@ auto CompositionRoot::Instance() -> CompositionRoot& {
   return instance;
 }
 
-auto CompositionRoot::AppService() -> ScaffoldApplicationService& {
+auto CompositionRoot::AppService() -> ProviderBackedApplicationService& {
   return app_service_;
 }
 

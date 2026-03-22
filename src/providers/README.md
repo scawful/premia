@@ -28,4 +28,6 @@ Current adapters:
   completion flows.
 
 These adapters are intentionally narrow. They let `premia_core` stop owning the
-provider-specific parsing and fallback glue directly.
+provider-specific parsing and fallback glue directly, while
+`ProviderBackedApplicationService` coordinates them behind the application
+contracts.

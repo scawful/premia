@@ -159,11 +159,11 @@ auto ParsePlaidLinkTokenResponse(const std::string& response)
 
 }  // namespace
 
-auto ScaffoldApplicationService::Instance() -> ScaffoldApplicationService& {
+auto ProviderBackedApplicationService::Instance() -> ProviderBackedApplicationService& {
   return CompositionRoot::Instance().AppService();
 }
 
-ScaffoldApplicationService::ScaffoldApplicationService() {
+ProviderBackedApplicationService::ProviderBackedApplicationService() {
   connections_ = {
       MakeConnection(Provider::kSchwab, ConnectionStatus::kNotConnected,
                      "Charles Schwab", "", false,
@@ -199,7 +199,7 @@ ScaffoldApplicationService::ScaffoldApplicationService() {
   };
 }
 
-auto ScaffoldApplicationService::GetBootstrapData() const -> BootstrapData {
+auto ProviderBackedApplicationService::GetBootstrapData() const -> BootstrapData {
   BootstrapData data;
   data.environment = "development";
   data.feature_flags = {
@@ -212,7 +212,7 @@ auto ScaffoldApplicationService::GetBootstrapData() const -> BootstrapData {
   return data;
 }
 
-auto ScaffoldApplicationService::GetHomeScreenData() const -> HomeScreenData {
+auto ProviderBackedApplicationService::GetHomeScreenData() const -> HomeScreenData {
   HomeScreenData data;
   data.connections = GetConnections();
   data.portfolio = GetPortfolioSummary();
@@ -222,7 +222,7 @@ auto ScaffoldApplicationService::GetHomeScreenData() const -> HomeScreenData {
   return data;
 }
 
-auto ScaffoldApplicationService::GetConnections() const
+auto ProviderBackedApplicationService::GetConnections() const
     -> std::vector<ConnectionSummary> {
   auto connections = connections_;
 
@@ -264,7 +264,7 @@ auto ScaffoldApplicationService::GetConnections() const
   return connections;
 }
 
-auto ScaffoldApplicationService::GetConnection(const std::string& provider_key) const
+auto ProviderBackedApplicationService::GetConnection(const std::string& provider_key) const
     -> ConnectionSummary {
   const auto provider = domain::ProviderFromString(provider_key);
   const auto connections = GetConnections();
@@ -278,7 +278,7 @@ auto ScaffoldApplicationService::GetConnection(const std::string& provider_key) 
   return *it;
 }
 
-auto ScaffoldApplicationService::GetPortfolioSummary() const -> PortfolioSummary {
+auto ProviderBackedApplicationService::GetPortfolioSummary() const -> PortfolioSummary {
   try {
     providers::tda::PortfolioProvider provider("assets/tda.json");
     return provider.GetPortfolioSummary();
@@ -289,7 +289,7 @@ auto ScaffoldApplicationService::GetPortfolioSummary() const -> PortfolioSummary
   return provider.GetPortfolioSummary();
 }
 
-auto ScaffoldApplicationService::GetTopHoldings() const -> std::vector<HoldingRow> {
+auto ProviderBackedApplicationService::GetTopHoldings() const -> std::vector<HoldingRow> {
   try {
     providers::tda::PortfolioProvider provider("assets/tda.json");
     return provider.GetTopHoldings();
@@ -300,7 +300,7 @@ auto ScaffoldApplicationService::GetTopHoldings() const -> std::vector<HoldingRo
   return provider.GetTopHoldings();
 }
 
-auto ScaffoldApplicationService::GetAccountDetail() const -> AccountDetail {
+auto ProviderBackedApplicationService::GetAccountDetail() const -> AccountDetail {
   try {
     providers::tda::AccountDetailProvider provider("assets/tda.json");
     return provider.GetAccountDetail();
@@ -311,7 +311,7 @@ auto ScaffoldApplicationService::GetAccountDetail() const -> AccountDetail {
   return provider.GetAccountDetail();
 }
 
-auto ScaffoldApplicationService::GetQuoteDetail(const std::string& symbol) const
+auto ProviderBackedApplicationService::GetQuoteDetail(const std::string& symbol) const
     -> QuoteDetail {
   const auto fallback = BuildQuoteDetailForSymbol(symbol);
   try {
@@ -332,7 +332,7 @@ auto ScaffoldApplicationService::GetQuoteDetail(const std::string& symbol) const
   }
 }
 
-auto ScaffoldApplicationService::GetChartScreen(const std::string& symbol,
+auto ProviderBackedApplicationService::GetChartScreen(const std::string& symbol,
                                                 const std::string& range,
                                                 const std::string& interval,
                                                 bool extended_hours) const
@@ -362,7 +362,7 @@ auto ScaffoldApplicationService::GetChartScreen(const std::string& symbol,
   }
 }
 
-auto ScaffoldApplicationService::GetOptionChainSnapshot(
+auto ProviderBackedApplicationService::GetOptionChainSnapshot(
     const std::string& symbol, const std::string& strike_count,
     const std::string& strategy, const std::string& range,
     const std::string& exp_month, const std::string& option_type) const
@@ -379,7 +379,7 @@ auto ScaffoldApplicationService::GetOptionChainSnapshot(
                                          exp_month, option_type);
 }
 
-auto ScaffoldApplicationService::ListWatchlists() const
+auto ProviderBackedApplicationService::ListWatchlists() const
     -> std::vector<WatchlistSummary> {
   try {
     providers::tda::WatchlistProvider provider("assets/tda.json");
@@ -391,7 +391,7 @@ auto ScaffoldApplicationService::ListWatchlists() const
   return provider.ListWatchlists();
 }
 
-auto ScaffoldApplicationService::GetWatchlistScreen(
+auto ProviderBackedApplicationService::GetWatchlistScreen(
     const std::string& watchlist_id) const -> WatchlistScreenData {
   try {
     providers::tda::WatchlistProvider provider("assets/tda.json");
@@ -403,39 +403,39 @@ auto ScaffoldApplicationService::GetWatchlistScreen(
   return provider.GetWatchlistScreen(watchlist_id);
 }
 
-auto ScaffoldApplicationService::CreateWatchlist(const std::string& name)
+auto ProviderBackedApplicationService::CreateWatchlist(const std::string& name)
     -> WatchlistSummary {
   providers::local::WatchlistProvider provider("assets/watchlists.json");
   return provider.CreateWatchlist(name);
 }
 
-auto ScaffoldApplicationService::RenameWatchlist(const std::string& watchlist_id,
+auto ProviderBackedApplicationService::RenameWatchlist(const std::string& watchlist_id,
                                                  const std::string& name)
     -> WatchlistSummary {
   providers::local::WatchlistProvider provider("assets/watchlists.json");
   return provider.RenameWatchlist(watchlist_id, name);
 }
 
-auto ScaffoldApplicationService::AddWatchlistSymbol(const std::string& watchlist_id,
+auto ProviderBackedApplicationService::AddWatchlistSymbol(const std::string& watchlist_id,
                                                     const std::string& symbol)
     -> WatchlistSummary {
   providers::local::WatchlistProvider provider("assets/watchlists.json");
   return provider.AddWatchlistSymbol(watchlist_id, symbol);
 }
 
-auto ScaffoldApplicationService::RemoveWatchlistSymbol(const std::string& watchlist_id,
+auto ProviderBackedApplicationService::RemoveWatchlistSymbol(const std::string& watchlist_id,
                                                        const std::string& symbol)
     -> WatchlistSummary {
   providers::local::WatchlistProvider provider("assets/watchlists.json");
   return provider.RemoveWatchlistSymbol(watchlist_id, symbol);
 }
 
-auto ScaffoldApplicationService::CreateLinkToken(
+auto ProviderBackedApplicationService::CreateLinkToken(
     const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
   return CreatePlaidLinkToken(request);
 }
 
-auto ScaffoldApplicationService::StartSchwabOAuth(
+auto ProviderBackedApplicationService::StartSchwabOAuth(
     const SchwabOAuthStartRequest& request) -> SchwabOAuthStartData {
   auto& schwab = FindConnection(Provider::kSchwab);
   schwab.status = ConnectionStatus::kConnecting;
@@ -448,7 +448,7 @@ auto ScaffoldApplicationService::StartSchwabOAuth(
   return provider.StartOAuth(request, state, CurrentUtcTimestamp());
 }
 
-auto ScaffoldApplicationService::CompleteSchwabOAuth(
+auto ProviderBackedApplicationService::CompleteSchwabOAuth(
     const SchwabOAuthCompleteRequest& request) -> ConnectionSummary {
   auto& schwab = FindConnection(Provider::kSchwab);
   providers::schwab::WorkflowProvider provider(kSchwabConfigPath,
@@ -457,7 +457,7 @@ auto ScaffoldApplicationService::CompleteSchwabOAuth(
   return schwab;
 }
 
-auto ScaffoldApplicationService::CreatePlaidLinkToken(
+auto ProviderBackedApplicationService::CreatePlaidLinkToken(
     const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
   auto& plaid = FindConnection(Provider::kPlaid);
   plaid.status = ConnectionStatus::kConnecting;
@@ -466,7 +466,7 @@ auto ScaffoldApplicationService::CreatePlaidLinkToken(
   return provider.CreateLinkToken(request, CurrentUtcTimestamp(), NextWorkflowId());
 }
 
-auto ScaffoldApplicationService::CompletePlaidLink(
+auto ProviderBackedApplicationService::CompletePlaidLink(
     const PlaidLinkCompleteRequest& request) -> ConnectionSummary {
   auto& plaid = FindConnection(Provider::kPlaid);
 
@@ -475,7 +475,7 @@ auto ScaffoldApplicationService::CompletePlaidLink(
   return plaid;
 }
 
-auto ScaffoldApplicationService::FindConnection(Provider provider)
+auto ProviderBackedApplicationService::FindConnection(Provider provider)
     -> ConnectionSummary& {
   auto it = std::find_if(connections_.begin(), connections_.end(),
                          [provider](const ConnectionSummary& connection) {
@@ -487,7 +487,7 @@ auto ScaffoldApplicationService::FindConnection(Provider provider)
   return *it;
 }
 
-auto ScaffoldApplicationService::FindConnection(Provider provider) const
+auto ProviderBackedApplicationService::FindConnection(Provider provider) const
     -> const ConnectionSummary& {
   auto it = std::find_if(connections_.begin(), connections_.end(),
                          [provider](const ConnectionSummary& connection) {
@@ -499,7 +499,7 @@ auto ScaffoldApplicationService::FindConnection(Provider provider) const
   return *it;
 }
 
-auto ScaffoldApplicationService::BuildQuoteDetailForSymbol(
+auto ProviderBackedApplicationService::BuildQuoteDetailForSymbol(
     const std::string& symbol) const -> QuoteDetail {
   QuoteDetail detail;
   detail.instrument = {symbol, symbol + " Holdings Demo", "equity", "NASDAQ"};
@@ -514,7 +514,7 @@ auto ScaffoldApplicationService::BuildQuoteDetailForSymbol(
   return detail;
 }
 
-auto ScaffoldApplicationService::BuildChartSeriesForSymbol(
+auto ProviderBackedApplicationService::BuildChartSeriesForSymbol(
     const std::string& symbol, bool extended_hours) const -> ChartSeries {
   (void)symbol;
   ChartSeries series;
@@ -530,12 +530,12 @@ auto ScaffoldApplicationService::BuildChartSeriesForSymbol(
   return series;
 }
 
-auto ScaffoldApplicationService::NextWorkflowId() -> unsigned long long {
+auto ProviderBackedApplicationService::NextWorkflowId() -> unsigned long long {
   ++workflow_counter_;
   return workflow_counter_;
 }
 
-auto ScaffoldApplicationService::CurrentUtcTimestamp() const -> std::string {
+auto ProviderBackedApplicationService::CurrentUtcTimestamp() const -> std::string {
   const auto now = std::chrono::system_clock::now();
   const std::time_t now_time = std::chrono::system_clock::to_time_t(now);
   std::tm utc_time{};
