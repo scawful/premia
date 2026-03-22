@@ -59,6 +59,10 @@ This note captures the first implementation pass after the architecture review.
 - `src/app/view/chart/chart_view.cc` now renders a `premia_core` contract preview
   using `ScaffoldApplicationService`, so one active desktop screen is consuming
   normalized core DTOs instead of only broker-facing model code.
+- `src/app/view/account/account_view.cc` now shows a `premia_core` fallback
+  account/portfolio preview when the legacy TDA-driven account pane is not
+  available, giving the desktop app a second active screen that can render
+  normalized core contracts.
 
 ## Validation status
 

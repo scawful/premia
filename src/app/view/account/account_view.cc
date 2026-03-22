@@ -1,5 +1,7 @@
 #include "account_view.h"
 
+#include "premia/core/application/scaffold_application_service.hpp"
+
 namespace premia {
 void AccountView::Draw_balance_string(const std::string &variable) {
   ImGui::Text("%s", variable.c_str());
@@ -220,6 +222,79 @@ void AccountView::DrawAccountPane() {
   }
 }
 
+void AccountView::DrawCoreAccountPreview() {
+  const auto home = core::application::ScaffoldApplicationService::Instance()
+                        .GetHomeScreenData();
+
+  ImGui::Text("Core Account Preview");
+  ImGui::TextDisabled(
+      "This fallback view is driven by premia_core screen contracts.");
+  ImGui::Separator();
+
+  ImGui::Text("Total Value: $%s",
+              home.portfolio.total_value.amount.c_str());
+  ImGui::Text("Cash: $%s", home.portfolio.cash.amount.c_str());
+  ImGui::Text("Buying Power: $%s",
+              home.portfolio.buying_power.amount.c_str());
+  ImGui::Text("Day Change: $%s (%s%%)",
+              home.portfolio.day_change.absolute.amount.c_str(),
+              home.portfolio.day_change.percent.c_str());
+  ImGui::Text("Holdings Count: %d", home.portfolio.holdings_count);
+  ImGui::Separator();
+
+  if (ImGui::BeginTable("CoreConnections", 3,
+                        ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+    ImGui::TableSetupColumn("Provider");
+    ImGui::TableSetupColumn("Status");
+    ImGui::TableSetupColumn("Last Sync");
+    ImGui::TableHeadersRow();
+
+    for (const auto& connection : home.connections) {
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("%s", connection.display_name.c_str());
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%s",
+                  core::domain::ConnectionStatusToString(connection.status)
+                      .c_str());
+      ImGui::TableSetColumnIndex(2);
+      ImGui::Text("%s",
+                  connection.last_sync_at.empty()
+                      ? "-"
+                      : connection.last_sync_at.c_str());
+    }
+
+    ImGui::EndTable();
+  }
+
+  ImGui::Separator();
+
+  if (ImGui::BeginTable("CoreHoldings", 4,
+                        ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders |
+                            ImGuiTableFlags_SizingStretchSame)) {
+    ImGui::TableSetupColumn("Symbol");
+    ImGui::TableSetupColumn("Name");
+    ImGui::TableSetupColumn("Market Value");
+    ImGui::TableSetupColumn("Day Change");
+    ImGui::TableHeadersRow();
+
+    for (const auto& holding : home.top_holdings) {
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("%s", holding.symbol.c_str());
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%s", holding.name.c_str());
+      ImGui::TableSetColumnIndex(2);
+      ImGui::Text("$%s", holding.market_value.amount.c_str());
+      ImGui::TableSetColumnIndex(3);
+      ImGui::Text("$%s (%s%%)", holding.day_change.absolute.amount.c_str(),
+                  holding.day_change.percent.c_str());
+    }
+
+    ImGui::EndTable();
+  }
+}
+
 std::string AccountView::getName() { return "Account"; }
 
 void AccountView::addLogger(const Logger &newLogger) {
@@ -245,7 +320,7 @@ void AccountView::Update() {
     if (isLoggedIn) {
       DrawAccountPane();
     } else {
-      ImGui::Text("empty account pane goes here");
+      DrawCoreAccountPreview();
     }
   }
 }

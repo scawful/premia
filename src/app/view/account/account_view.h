@@ -40,6 +40,7 @@ class AccountView : public View {
   void Draw_symbol_string(const std::string &symbol);
   void Draw_balance_string(const std::string &variable);
   void Draw_positions();
+  void DrawCoreAccountPreview();
 
   // ------------------------------
   void DrawAccountPane();
