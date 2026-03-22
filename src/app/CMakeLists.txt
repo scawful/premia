@@ -82,10 +82,11 @@ if (WIN32)
   target_link_libraries(premia ws2_32)
 endif()
 
-# Assets Folder Link ----------------------------------------------------------------------------------------
+# Assets Folder Link - symlink must be next to the binary so SDL_GetBasePath()
+# can find it. CMAKE_RUNTIME_OUTPUT_DIRECTORY is build/bin/, matching the binary.
 set (source "${CMAKE_SOURCE_DIR}/assets")
-set (destination "${CMAKE_CURRENT_BINARY_DIR}/assets")
+set (destination "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
+                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
                    DEPENDS ${destination}
                    COMMENT "symbolic link resources folder from ${source} => ${destination}")

@@ -30,15 +30,24 @@ constexpr size_t SCREEN_HEIGHT = 800;
 
 namespace {
 
-// Resolve a font filename to its full path. Checks the executable's directory
-// first (where CMake symlinks the assets/ folder), then falls back to relative
-// paths from the working directory. Mirrors yaze's SetFontPath pattern.
+// Resolve a font filename to its full path. Checks paths relative to the
+// executable first (SDL_GetBasePath), then falls back to CWD-relative paths.
+// Mirrors yaze's SetFontPath / ResolveRepoFontPath pattern.
 std::string ResolveFontPath(const std::string& filename) {
   if (char* base = SDL_GetBasePath()) {
-    std::string candidate = std::string(base) + "assets/" + filename;
+    std::string base_str(base);
     SDL_free(base);
+    // Primary: assets/ next to the binary (CMake POST_BUILD symlinks here).
+    std::string candidate = base_str + "assets/" + filename;
+    if (std::filesystem::exists(candidate)) return candidate;
+    // Secondary: two levels up from binary covers build/bin/ → project root.
+    candidate = base_str + "../../assets/" + filename;
+    if (std::filesystem::exists(candidate)) return candidate;
+    // Tertiary: four levels up for nested build configurations.
+    candidate = base_str + "../../../../assets/" + filename;
     if (std::filesystem::exists(candidate)) return candidate;
   }
+  // CWD-relative fallbacks (covers running from the project root directly).
   for (const char* prefix : {"assets/", "../assets/", "../../assets/"}) {
     std::string candidate = prefix + filename;
     if (std::filesystem::exists(candidate)) return candidate;
@@ -211,7 +220,11 @@ void Controller::onInput() {
   io.MouseWheel = static_cast<float>(wheel);
 }
 
-void Controller::onLoad() { workspace_.Update(); }
+void Controller::onLoad() {
+  ImGui_ImplSDLRenderer_NewFrame();
+  ImGui_ImplSDL2_NewFrame();
+  workspace_.Update();
+}
 
 void Controller::doRender() {
   SDL_RenderClear(renderer_.get());
@@ -291,10 +304,6 @@ absl::Status Controller::CreatePremiaGuiContext() {
                                12.0f);
   io.Fonts->AddFontFromFileTTF(ResolveFontPath("Roboto-Medium.ttf").c_str(),
                                12.0f);
-
-  // Build a new ImGui frame
-  ImGui_ImplSDLRenderer_NewFrame();
-  ImGui_ImplSDL2_NewFrame();
 
   SDL_SetWindowResizable(window_.get(), SDL_TRUE);
   premia::ColorsPremia();
