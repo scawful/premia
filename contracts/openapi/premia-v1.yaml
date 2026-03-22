@@ -370,6 +370,14 @@ components:
           $ref: '#/components/schemas/ErrorDetail'
         meta:
           $ref: '#/components/schemas/ErrorMeta'
+      example:
+        error:
+          code: INVALID_REQUEST
+          message: missing required field 'callback'
+          retryable: false
+          action: retry
+        meta:
+          requestId: req_1
     Provider:
       type: string
       enum: [tda, schwab, ibkr, plaid, internal]
@@ -611,6 +619,38 @@ components:
           $ref: '#/components/schemas/BootstrapData'
         meta:
           $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          session:
+            environment: development
+            featureFlags:
+              options: false
+              banking: false
+              streaming: true
+              desktopMigration: true
+          connections:
+            - provider: schwab
+              status: not_connected
+              displayName: Charles Schwab
+              lastSyncAt: ''
+              reauthRequired: false
+              capabilities:
+                portfolio: true
+                marketData: true
+                options: true
+                banking: false
+            - provider: plaid
+              status: not_connected
+              displayName: Plaid
+              lastSyncAt: ''
+              reauthRequired: false
+              capabilities:
+                banking: true
+                transactions: true
+                portfolio: false
+        meta:
+          requestId: req_1
+          asOf: '2026-03-22T18:17:20Z'
     HomeScreenData:
       type: object
       required: [connections, portfolio, topHoldings, watchlists, market]
@@ -648,6 +688,58 @@ components:
           $ref: '#/components/schemas/HomeScreenData'
         meta:
           $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          connections:
+            - provider: schwab
+              status: connected
+              displayName: Charles Schwab
+              lastSyncAt: '2026-03-22T18:17:47Z'
+              reauthRequired: false
+              capabilities:
+                portfolio: true
+                marketData: true
+                options: true
+                banking: false
+          portfolio:
+            totalValue:
+              amount: '128345.22'
+              currency: USD
+            dayChange:
+              absolute:
+                amount: '842.13'
+                currency: USD
+              percent: '0.66'
+            cash:
+              amount: '14320.00'
+              currency: USD
+            buyingPower:
+              amount: '28640.00'
+              currency: USD
+            holdingsCount: 12
+          topHoldings:
+            - id: holding_aapl
+              symbol: AAPL
+              name: Apple Inc.
+              quantity: '42'
+              marketValue:
+                amount: '9114.00'
+                currency: USD
+              dayChange:
+                absolute:
+                  amount: '54.60'
+                  currency: USD
+                percent: '0.60'
+          watchlists:
+            - id: core
+              name: Core
+              instrumentCount: 12
+          market:
+            session: open
+            nextTransitionAt: '2026-03-22T20:00:00Z'
+        meta:
+          requestId: req_2
+          asOf: '2026-03-22T18:17:47Z'
     WatchlistsData:
       type: object
       required: [watchlists]
@@ -702,6 +794,55 @@ components:
           $ref: '#/components/schemas/QuoteDetail'
         meta:
           $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          instrument:
+            symbol: AAPL
+            name: Apple Inc.
+            assetType: equity
+            primaryExchange: NASDAQ
+          quote:
+            lastPrice:
+              amount: '217.00'
+              currency: USD
+            bid:
+              amount: '216.95'
+              currency: USD
+            ask:
+              amount: '217.02'
+              currency: USD
+            open:
+              amount: '214.10'
+              currency: USD
+            high:
+              amount: '218.22'
+              currency: USD
+            low:
+              amount: '213.90'
+              currency: USD
+            previousClose:
+              amount: '215.70'
+              currency: USD
+            volume: '53422010'
+            updatedAt: '2026-03-22T18:44:58Z'
+          position:
+            quantity: '42'
+            marketValue:
+              amount: '9114.00'
+              currency: USD
+            costBasis:
+              amount: '8421.00'
+              currency: USD
+            unrealizedGain:
+              amount: '693.00'
+              currency: USD
+          watchlistMembership:
+            isSaved: true
+            watchlistIds:
+              - core
+        meta:
+          requestId: req_3
+          asOf: '2026-03-22T18:44:58Z'
     ChartScreenData:
       type: object
       required: [instrument, range, interval, timezone, series]
@@ -726,6 +867,34 @@ components:
           $ref: '#/components/schemas/ChartScreenData'
         meta:
           $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          instrument:
+            symbol: AAPL
+            name: Apple Inc.
+            assetType: equity
+            primaryExchange: NASDAQ
+          range: 1M
+          interval: 1D
+          timezone: America/New_York
+          series:
+            type: candles
+            bars:
+              - time: '2026-03-20T20:00:00Z'
+                open: '214.10'
+                high: '218.22'
+                low: '213.90'
+                close: '217.00'
+                volume: '53422010'
+          stats:
+            change:
+              absolute:
+                amount: '8.20'
+                currency: USD
+              percent: '3.93'
+        meta:
+          requestId: req_4
+          asOf: '2026-03-22T18:44:58Z'
     ConnectionSummaryResponse:
       type: object
       required: [data, meta]
@@ -734,6 +903,21 @@ components:
           $ref: '#/components/schemas/ConnectionSummary'
         meta:
           $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          provider: schwab
+          status: connected
+          displayName: Charles Schwab
+          lastSyncAt: '2026-03-22T18:17:47Z'
+          reauthRequired: false
+          capabilities:
+            portfolio: true
+            marketData: true
+            options: true
+            banking: false
+        meta:
+          requestId: req_5
+          asOf: '2026-03-22T18:17:47Z'
     StartSchwabOAuthRequest:
       type: object
       properties:
@@ -763,6 +947,14 @@ components:
           $ref: '#/components/schemas/SchwabOAuthStartData'
         meta:
           $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          authUrl: https://api.schwabapi.com/v1/oauth/authorize?response_type=code&client_id=premia-demo-app&redirect_uri=premia://schwab/callback&state=schwab_state_1
+          state: schwab_state_1
+          expiresAt: '2026-03-22T18:17:47Z'
+        meta:
+          requestId: req_6
+          asOf: '2026-03-22T18:17:47Z'
     CompleteSchwabOAuthRequest:
       type: object
       required: [callback]
@@ -799,6 +991,13 @@ components:
           $ref: '#/components/schemas/PlaidLinkTokenData'
         meta:
           $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          linkToken: link-sandbox-demo-user-1
+          expiration: '2026-03-22T18:17:47Z'
+        meta:
+          requestId: req_7
+          asOf: '2026-03-22T18:17:47Z'
     CompletePlaidLinkRequest:
       type: object
       required: [publicToken]
