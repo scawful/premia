@@ -1,0 +1,7 @@
+projectName: PremiaAPIClientGenerated
+swiftUseApiNamespace: true
+responseAs: AsyncAwait
+useSPMFileStructure: true
+enumUnknownDefaultCase: true
+useBacktickEscapes: false
+hideGenerationTimestamp: true
