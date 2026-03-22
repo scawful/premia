@@ -1,8 +1,8 @@
 #include "controller.h"
 
 #include <SDL.h>
-#include <imgui/backends/imgui_impl_sdl2.h>
-#include <imgui/backends/imgui_impl_sdlrenderer2.h>
+#include <imgui/backends/imgui_impl_sdl.h>
+#include <imgui/backends/imgui_impl_sdlrenderer.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <implot/implot.h>
@@ -211,12 +211,12 @@ void Controller::onLoad() { workspace_.Update(); }
 void Controller::doRender() {
   SDL_RenderClear(renderer_.get());
   ImGui::Render();
-  ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer_.get());
+  ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
   SDL_RenderPresent(renderer_.get());
 }
 
 void Controller::onExit() {
-  ImGui_ImplSDLRenderer2_Shutdown();
+  ImGui_ImplSDLRenderer_Shutdown();
   ImGui_ImplSDL2_Shutdown();
   ImPlot::DestroyContext();
   ImGui::DestroyContext();
@@ -265,7 +265,7 @@ absl::Status Controller::CreatePremiaGuiContext() {
 
   // Initialize ImGui for SDL
   ImGui_ImplSDL2_InitForSDLRenderer(window_.get(), renderer_.get());
-  ImGui_ImplSDLRenderer2_Init(renderer_.get());
+  ImGui_ImplSDLRenderer_Init(renderer_.get());
 
   // Load available fonts
   const ImGuiIO& io = ImGui::GetIO();
@@ -285,7 +285,7 @@ absl::Status Controller::CreatePremiaGuiContext() {
   io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 12.0f);
 
   // Build a new ImGui frame
-  ImGui_ImplSDLRenderer2_NewFrame();
+  ImGui_ImplSDLRenderer_NewFrame();
   ImGui_ImplSDL2_NewFrame();
 
   SDL_SetWindowResizable(window_.get(), SDL_TRUE);
