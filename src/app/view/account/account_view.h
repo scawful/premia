@@ -1,7 +1,7 @@
 #ifndef AccountView_hpp
 #define AccountView_hpp
 
-#include "model/options/options_model.h"
+#include "model/account/account_model.h"
 #include "view/view.h"
 
 namespace premia {
@@ -24,6 +24,7 @@ class AccountView : public View {
   bool isLoggedIn = false;
   EventMap events;
   Logger logger;
+  AccountModel core_model;
   // -----------------------------
   std::vector<std::string> account_ids_std;
   std::vector<const char *> account_ids;

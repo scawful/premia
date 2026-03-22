@@ -224,12 +224,12 @@ void AccountView::DrawAccountPane() {
 }
 
 void AccountView::DrawCoreAccountPreview() {
-  const auto account = core::application::CompositionRoot::Instance()
-                           .AccountDetails()
-                           .GetAccountDetail();
-  auto& portfolio_service =
-      core::application::CompositionRoot::Instance().Portfolio();
-  const auto portfolio = portfolio_service.GetPortfolioSummary();
+  if (!core_model.hasData()) {
+    core_model.refresh();
+  }
+
+  const auto& account = core_model.getAccountDetail();
+  const auto& portfolio = core_model.getPortfolioSummary();
 
   ImGui::Text("Core Account Preview");
   ImGui::TextDisabled(
@@ -253,9 +253,7 @@ void AccountView::DrawCoreAccountPreview() {
     ImGui::TableSetupColumn("Last Sync");
     ImGui::TableHeadersRow();
 
-    for (const auto& connection : core::application::CompositionRoot::Instance()
-                                       .BrokerConnections()
-                                       .GetConnections()) {
+    for (const auto& connection : core_model.getConnections()) {
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("%s", connection.display_name.c_str());

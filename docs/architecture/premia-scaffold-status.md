@@ -125,6 +125,10 @@ This note captures the first implementation pass after the architecture review.
 - `src/app/view/watchlist/watchlist_view.cc` now shows a `premia_core` fallback
   watchlist table when the legacy local or TDA-driven watchlist path is not
   available, so normalized contracts cover another active desktop surface.
+- `src/app/model/account/account_model.cc` and
+  `src/app/model/options/options_model.cc` now use composition-root services
+  instead of calling broker singletons directly, so more of the desktop model
+  layer now depends on normalized provider-backed application contracts.
 
 ## Validation status
 

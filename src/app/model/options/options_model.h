@@ -2,12 +2,14 @@
 #define OptionsModel_hpp
 
 #include <cmath>
+#include <map>
 #include <string>
 #include <vector>
 
 #include "metatypes.h"
 #include "model/model.h"
-#include "core/TDA.hpp"
+#include "premia/core/application/screen_models.hpp"
+#include "service/TDAmeritrade/data/OptionChain.hpp"
 
 
 namespace premia {
@@ -63,6 +65,11 @@ class OptionsModel : public Model {
   std::vector<double>& getVegaExposureArray();
 
   std::vector<double>& getVolgaExposureArray();
+
+ private:
+  void loadFromCoreSnapshot(const core::application::OptionChainSnapshot& snapshot);
+  static auto makeRawOptionMap(const std::map<std::string, std::string>& values)
+      -> std::unordered_map<std::string, std::string>;
 };
 }  // namespace premia
 
