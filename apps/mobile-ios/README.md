@@ -25,3 +25,5 @@ Current integration:
   SwiftUI state handling
 - account and option-chain screen wrappers are now exposed too, so SwiftUI can
   consume the new account/options API surface without touching generated models
+- `PremiaOptionChainQuery` now gives SwiftUI a typed way to drive option-chain
+  filter/search state before calling the wrapper

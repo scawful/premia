@@ -112,6 +112,8 @@ This note captures the first implementation pass after the architecture review.
   SwiftUI error-state handling.
 - the mobile wrapper now also exposes typed account-detail and option-chain
   loaders on top of the generated client.
+- option-chain filter/search state now has a dedicated hand-written Swift query
+  model so SwiftUI controls can bind to one app-level type.
 
 ### Desktop migration start
 

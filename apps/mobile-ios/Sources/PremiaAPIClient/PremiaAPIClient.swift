@@ -168,6 +168,18 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
     @available(macOS 10.15, iOS 13.0, *)
+    public func loadOptionChain(query: PremiaOptionChainQuery) async throws -> PremiaOptionChainSnapshotModel {
+        try await loadOptionChain(
+            symbol: query.symbol,
+            strikeCount: query.strikeCount,
+            strategy: query.strategy,
+            range: query.range,
+            expMonth: query.expMonth,
+            optionType: query.optionType
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
     public func loadWatchlists() async throws -> [PremiaWatchlistSummaryModel] {
         let response = try await executeMapped { try await WatchlistsAPI.listWatchlists() }
         return response.data.watchlists.map(mapWatchlist)
