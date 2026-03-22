@@ -274,6 +274,11 @@ auto SerializeWatchlistScreenResponse(const application::WatchlistScreenData& da
                                     {"rows", MakeWatchlistRowArray(data.rows)}});
 }
 
+auto SerializeWatchlistResponse(const application::WatchlistSummary& data)
+    -> std::string {
+  return WriteEnvelope(MakeWatchlistSummary(data));
+}
+
 auto SerializeQuoteScreenResponse(const application::QuoteDetail& data)
     -> std::string {
   return WriteEnvelope(json::object{{"instrument", MakeInstrument(data.instrument)},

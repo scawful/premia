@@ -50,6 +50,19 @@ class WatchlistProviderPort {
       -> WatchlistScreenData = 0;
 };
 
+class WatchlistMutationProviderPort {
+ public:
+  virtual ~WatchlistMutationProviderPort() = default;
+
+  virtual auto CreateWatchlist(const std::string& name) -> WatchlistSummary = 0;
+  virtual auto RenameWatchlist(const std::string& watchlist_id,
+                               const std::string& name) -> WatchlistSummary = 0;
+  virtual auto AddWatchlistSymbol(const std::string& watchlist_id,
+                                  const std::string& symbol) -> WatchlistSummary = 0;
+  virtual auto RemoveWatchlistSymbol(const std::string& watchlist_id,
+                                     const std::string& symbol) -> WatchlistSummary = 0;
+};
+
 }  // namespace premia::core::ports
 
 #endif  // PREMIA_CORE_PORTS_PROVIDER_PORTS_HPP

@@ -43,6 +43,13 @@ class WatchlistService {
   virtual auto ListWatchlists() const -> std::vector<WatchlistSummary> = 0;
   virtual auto GetWatchlistScreen(const std::string& watchlist_id) const
       -> WatchlistScreenData = 0;
+  virtual auto CreateWatchlist(const std::string& name) -> WatchlistSummary = 0;
+  virtual auto RenameWatchlist(const std::string& watchlist_id,
+                               const std::string& name) -> WatchlistSummary = 0;
+  virtual auto AddWatchlistSymbol(const std::string& watchlist_id,
+                                  const std::string& symbol) -> WatchlistSummary = 0;
+  virtual auto RemoveWatchlistSymbol(const std::string& watchlist_id,
+                                     const std::string& symbol) -> WatchlistSummary = 0;
 };
 
 class BankLinkService {

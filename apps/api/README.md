@@ -14,6 +14,10 @@ Current routes:
 - `GET /v1/screens/home`
 - `GET /v1/watchlists`
 - `GET /v1/screens/watchlists/{watchlistId}`
+- `POST /v1/watchlists`
+- `PATCH /v1/watchlists/{watchlistId}`
+- `POST /v1/watchlists/{watchlistId}/symbols`
+- `DELETE /v1/watchlists/{watchlistId}/symbols/{symbol}`
 - `GET /v1/screens/quotes/{symbol}`
 - `GET /v1/screens/charts/{symbol}`
 - `GET /v1/stream/events`
@@ -23,7 +27,7 @@ Current routes:
 - `POST /v1/connections/plaid/link-complete`
 
 Planned next routes:
-- watchlist mutations
+- richer portfolio/account endpoints beyond current screen aggregates
 
 Route behavior today:
 - screen queries are served by `premia::core::application::ScaffoldApplicationService`
@@ -35,6 +39,8 @@ Route behavior today:
 - quote and chart requests now attempt to use real Schwab market-data responses
   when a valid authorized Schwab client is available, otherwise they return the
   normalized scaffold payloads
+- watchlist mutation routes are backed by the local provider adapter and persist
+  changes into `assets/watchlists.json`
 
 Build and run:
 

@@ -19,6 +19,8 @@ auto SerializeWatchlistsResponse(
     -> std::string;
 auto SerializeWatchlistScreenResponse(
     const core::application::WatchlistScreenData& data) -> std::string;
+auto SerializeWatchlistResponse(const core::application::WatchlistSummary& data)
+    -> std::string;
 auto SerializeQuoteScreenResponse(const core::application::QuoteDetail& data)
     -> std::string;
 auto SerializeChartScreenResponse(const core::application::ChartScreenData& data)

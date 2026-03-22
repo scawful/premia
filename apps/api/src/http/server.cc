@@ -82,6 +82,27 @@ auto ParseQuery(const std::string& query) -> std::map<std::string, std::string> 
   return values;
 }
 
+auto SplitPathSegments(const std::string& path) -> std::vector<std::string> {
+  std::vector<std::string> segments;
+  std::size_t start = 0;
+  while (start < path.size()) {
+    while (start < path.size() && path[start] == '/') {
+      ++start;
+    }
+    if (start >= path.size()) {
+      break;
+    }
+    const auto end = path.find('/', start);
+    segments.push_back(path.substr(start, end == std::string::npos ? std::string::npos
+                                                                   : end - start));
+    if (end == std::string::npos) {
+      break;
+    }
+    start = end + 1;
+  }
+  return segments;
+}
+
 auto ReadOpenApiOutline() -> std::string {
   std::ifstream file("contracts/openapi/premia-v1.yaml");
   if (!file.good()) {
@@ -193,7 +214,9 @@ auto HandleMutation(const http::request<http::string_body>& request)
   auto& service = core::application::ScaffoldApplicationService::Instance();
 
   try {
-    const auto payload = ParseJsonObject(request.body());
+    const auto payload = request.method() == http::verb::delete_
+                             ? json::object{}
+                             : ParseJsonObject(request.body());
 
     if (path == "/v1/connections/schwab/oauth/start") {
       core::application::SchwabOAuthStartRequest workflow_request;
@@ -234,6 +257,38 @@ auto HandleMutation(const http::request<http::string_body>& request)
       return MakeJsonResponse(
           http::status::ok,
           SerializeConnectionSummaryResponse(service.CompletePlaidLink(workflow_request)));
+    }
+
+    if (path == "/v1/watchlists" && request.method() == http::verb::post) {
+      return MakeJsonResponse(
+          http::status::created,
+          SerializeWatchlistResponse(
+              service.CreateWatchlist(GetRequiredString(payload, "name"))));
+    }
+
+    const auto segments = SplitPathSegments(path);
+    if (segments.size() == 3 && segments[0] == "v1" && segments[1] == "watchlists" &&
+        request.method() == http::verb::patch) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeWatchlistResponse(service.RenameWatchlist(
+              segments[2], GetRequiredString(payload, "name"))));
+    }
+
+    if (segments.size() == 4 && segments[0] == "v1" && segments[1] == "watchlists" &&
+        segments[3] == "symbols" && request.method() == http::verb::post) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeWatchlistResponse(service.AddWatchlistSymbol(
+              segments[2], GetRequiredString(payload, "symbol"))));
+    }
+
+    if (segments.size() == 5 && segments[0] == "v1" && segments[1] == "watchlists" &&
+        segments[3] == "symbols" && request.method() == http::verb::delete_) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeWatchlistResponse(
+              service.RemoveWatchlistSymbol(segments[2], segments[4])));
     }
   } catch (const std::exception& e) {
     return MakeJsonResponse(

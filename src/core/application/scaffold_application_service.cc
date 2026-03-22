@@ -370,6 +370,33 @@ auto ScaffoldApplicationService::GetWatchlistScreen(
   return provider.GetWatchlistScreen(watchlist_id);
 }
 
+auto ScaffoldApplicationService::CreateWatchlist(const std::string& name)
+    -> WatchlistSummary {
+  providers::local::WatchlistProvider provider("assets/watchlists.json");
+  return provider.CreateWatchlist(name);
+}
+
+auto ScaffoldApplicationService::RenameWatchlist(const std::string& watchlist_id,
+                                                 const std::string& name)
+    -> WatchlistSummary {
+  providers::local::WatchlistProvider provider("assets/watchlists.json");
+  return provider.RenameWatchlist(watchlist_id, name);
+}
+
+auto ScaffoldApplicationService::AddWatchlistSymbol(const std::string& watchlist_id,
+                                                    const std::string& symbol)
+    -> WatchlistSummary {
+  providers::local::WatchlistProvider provider("assets/watchlists.json");
+  return provider.AddWatchlistSymbol(watchlist_id, symbol);
+}
+
+auto ScaffoldApplicationService::RemoveWatchlistSymbol(const std::string& watchlist_id,
+                                                       const std::string& symbol)
+    -> WatchlistSummary {
+  providers::local::WatchlistProvider provider("assets/watchlists.json");
+  return provider.RemoveWatchlistSymbol(watchlist_id, symbol);
+}
+
 auto ScaffoldApplicationService::CreateLinkToken(
     const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
   return CreatePlaidLinkToken(request);

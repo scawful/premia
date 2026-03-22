@@ -51,6 +51,8 @@ This note captures the first implementation pass after the architecture review.
   authenticated watchlist provider is available.
 - portfolio summary and top holdings now come from provider adapters as well,
   with TDA taking precedence over the local file-backed portfolio fallback.
+- watchlist create/rename/add-symbol/remove-symbol flows are now supported
+  through the local watchlist provider and the HTTP API mutation routes.
 
 ### API scaffold
 

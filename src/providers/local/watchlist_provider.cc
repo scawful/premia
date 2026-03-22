@@ -1,5 +1,6 @@
 #include "premia/providers/local/watchlist_provider.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -33,6 +34,49 @@ auto BuildSummary(const application::WatchlistScreenData& screen)
   return summary;
 }
 
+auto BuildSummaryList(
+    const std::vector<application::WatchlistScreenData>& screens)
+    -> std::vector<application::WatchlistSummary> {
+  std::vector<application::WatchlistSummary> summaries;
+  summaries.reserve(screens.size());
+  for (const auto& screen : screens) {
+    summaries.push_back(BuildSummary(screen));
+  }
+  return summaries;
+}
+
+auto MakeSlug(std::string value) -> std::string {
+  std::string slug;
+  slug.reserve(value.size());
+  for (const char ch : value) {
+    if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) {
+      slug.push_back(ch);
+    } else if (ch >= 'A' && ch <= 'Z') {
+      slug.push_back(static_cast<char>(ch - 'A' + 'a'));
+    } else if (ch == ' ' || ch == '_' || ch == '-') {
+      if (!slug.empty() && slug.back() != '-') {
+        slug.push_back('-');
+      }
+    }
+  }
+  while (!slug.empty() && slug.back() == '-') {
+    slug.pop_back();
+  }
+  return slug.empty() ? "watchlist" : slug;
+}
+
+auto MakePlaceholderRow(const std::string& watchlist_id,
+                        const std::string& symbol) -> application::WatchlistRow {
+  return {watchlist_id + ":" + symbol,
+          symbol,
+          symbol,
+          MakeMoney("0.00"),
+          MakeChange("0.00", "0.00"),
+          MakeMoney("0.00"),
+          MakeMoney("0.00"),
+          ""};
+}
+
 }  // namespace
 
 WatchlistProvider::WatchlistProvider(std::string path) : path_(std::move(path)) {}
@@ -62,6 +106,90 @@ auto WatchlistProvider::GetWatchlistScreen(const std::string& watchlist_id) cons
   }
 
   return screens.front();
+}
+
+auto WatchlistProvider::CreateWatchlist(const std::string& name)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  application::WatchlistScreenData screen;
+  screen.watchlist.id = MakeSlug(name);
+  screen.watchlist.name = name.empty() ? "Watchlist" : name;
+  screen.watchlist.instrument_count = 0;
+  screens.push_back(screen);
+
+  const auto summaries = BuildSummaryList(screens);
+  for (auto& item : screens) {
+    item.available_watchlists = summaries;
+  }
+  SaveData(screens);
+  return BuildSummary(screens.back());
+}
+
+auto WatchlistProvider::RenameWatchlist(const std::string& watchlist_id,
+                                        const std::string& name)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  for (auto& screen : screens) {
+    if (screen.watchlist.id == watchlist_id) {
+      screen.watchlist.name = name;
+      const auto summaries = BuildSummaryList(screens);
+      for (auto& item : screens) {
+        item.available_watchlists = summaries;
+      }
+      SaveData(screens);
+      return BuildSummary(screen);
+    }
+  }
+  throw std::runtime_error("watchlist not found");
+}
+
+auto WatchlistProvider::AddWatchlistSymbol(const std::string& watchlist_id,
+                                           const std::string& symbol)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  for (auto& screen : screens) {
+    if (screen.watchlist.id == watchlist_id) {
+      const auto exists = std::find_if(screen.rows.begin(), screen.rows.end(),
+                                       [&symbol](const application::WatchlistRow& row) {
+                                         return row.symbol == symbol;
+                                       });
+      if (exists == screen.rows.end()) {
+        screen.rows.push_back(MakePlaceholderRow(watchlist_id, symbol));
+      }
+      screen.watchlist.instrument_count = static_cast<int>(screen.rows.size());
+      const auto summaries = BuildSummaryList(screens);
+      for (auto& item : screens) {
+        item.available_watchlists = summaries;
+      }
+      SaveData(screens);
+      return BuildSummary(screen);
+    }
+  }
+  throw std::runtime_error("watchlist not found");
+}
+
+auto WatchlistProvider::RemoveWatchlistSymbol(const std::string& watchlist_id,
+                                              const std::string& symbol)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  for (auto& screen : screens) {
+    if (screen.watchlist.id == watchlist_id) {
+      screen.rows.erase(
+          std::remove_if(screen.rows.begin(), screen.rows.end(),
+                         [&symbol](const application::WatchlistRow& row) {
+                           return row.symbol == symbol;
+                         }),
+          screen.rows.end());
+      screen.watchlist.instrument_count = static_cast<int>(screen.rows.size());
+      const auto summaries = BuildSummaryList(screens);
+      for (auto& item : screens) {
+        item.available_watchlists = summaries;
+      }
+      SaveData(screens);
+      return BuildSummary(screen);
+    }
+  }
+  throw std::runtime_error("watchlist not found");
 }
 
 auto WatchlistProvider::BuildFallbackData() const
@@ -160,6 +288,42 @@ auto WatchlistProvider::LoadData() const
   } catch (const std::exception&) {
     return BuildFallbackData();
   }
+}
+
+auto WatchlistProvider::SaveData(
+    const std::vector<application::WatchlistScreenData>& screens) const -> void {
+  pt::ptree root;
+  pt::ptree watchlists;
+  for (const auto& screen : screens) {
+    pt::ptree watchlist;
+    watchlist.put("id", screen.watchlist.id);
+    watchlist.put("name", screen.watchlist.name);
+
+    pt::ptree rows;
+    for (const auto& row : screen.rows) {
+      pt::ptree row_tree;
+      row_tree.put("id", row.id);
+      row_tree.put("symbol", row.symbol);
+      row_tree.put("name", row.name);
+      row_tree.put("lastPrice", row.last_price.amount);
+      row_tree.put("bid", row.bid.amount);
+      row_tree.put("ask", row.ask.amount);
+      row_tree.put("dayChangeAbsolute", row.day_change.absolute.amount);
+      row_tree.put("dayChangePercent", row.day_change.percent);
+      row_tree.put("updatedAt", row.updated_at);
+      rows.push_back({"", row_tree});
+    }
+
+    watchlist.add_child("rows", rows);
+    watchlists.push_back({"", watchlist});
+  }
+
+  root.add_child("watchlists", watchlists);
+  std::ofstream file(path_);
+  if (!file.good()) {
+    throw std::runtime_error("unable to save watchlists");
+  }
+  pt::write_json(file, root);
 }
 
 }  // namespace premia::providers::local
