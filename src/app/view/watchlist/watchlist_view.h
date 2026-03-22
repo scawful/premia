@@ -18,6 +18,7 @@ class WatchlistView : public View {
 
   void DrawWatchlistMenu();
   void DrawWatchlistTable();
+  void DrawCoreWatchlistPreview();
 
  public:
   std::string getName() override;

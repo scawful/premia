@@ -63,6 +63,9 @@ This note captures the first implementation pass after the architecture review.
   account/portfolio preview when the legacy TDA-driven account pane is not
   available, giving the desktop app a second active screen that can render
   normalized core contracts.
+- `src/app/view/watchlist/watchlist_view.cc` now shows a `premia_core` fallback
+  watchlist table when the legacy local or TDA-driven watchlist path is not
+  available, so normalized contracts cover another active desktop surface.
 
 ## Validation status
 
