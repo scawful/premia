@@ -14,6 +14,7 @@ add_executable(
   PremiaTest.cpp
   service/tdameritrade_test.cc
   service/schwab_test.cc
+  service/plaid_test.cc
   ../src/service/TDAmeritrade/parser.cc
   ../src/service/TDAmeritrade/socket.cc
   ../src/service/TDAmeritrade/client.cc
@@ -28,6 +29,12 @@ add_executable(
   ../src/service/CoinbasePro/Client.cpp
   ../src/service/CoinbasePro/Product.cpp
   ../src/service/Schwab/client.cc
+  ../src/service/Plaid/client.cc
+  ../src/service/Plaid/parser.cc
+  ../src/service/Plaid/data/Account.cpp
+  ../src/service/Plaid/data/Transaction.cpp
+  ../src/service/Plaid/data/Institution.cpp
+  ../src/service/Plaid/data/Balance.cpp
 )
 
 target_include_directories(premia_test

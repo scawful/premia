@@ -72,6 +72,7 @@ target_link_libraries(
   curl
   tdameritrade
   schwab
+  plaid
   # coinbase
   interactive_brokers
 )
