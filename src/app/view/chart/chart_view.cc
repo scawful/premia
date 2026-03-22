@@ -8,10 +8,64 @@
 #include <string>
 
 #include "metatypes.h"
+#include "premia/core/application/scaffold_application_service.hpp"
 #include "view/chart/subview/candle_chart.h"
 #include "view/view.h"
 
 namespace premia {
+
+namespace {
+
+auto PeriodTypeLabel(int period_type) -> const char* {
+  switch (period_type) {
+    case 0:
+      return "Day";
+    case 1:
+      return "Month";
+    case 2:
+      return "Year";
+    case 3:
+      return "YTD";
+    default:
+      return "Year";
+  }
+}
+
+auto PeriodAmountValue(int period_amount) -> const char* {
+  static const char* kValues[] = {"1", "2", "3", "4", "5",
+                                  "6", "10", "15", "20"};
+  constexpr int kCount = sizeof(kValues) / sizeof(kValues[0]);
+  if (period_amount < 0 || period_amount >= kCount) {
+    return "1";
+  }
+  return kValues[period_amount];
+}
+
+auto FrequencyTypeLabel(int frequency_type) -> const char* {
+  switch (frequency_type) {
+    case 0:
+      return "Minute";
+    case 1:
+      return "Daily";
+    case 2:
+      return "Weekly";
+    case 3:
+      return "Monthly";
+    default:
+      return "Daily";
+  }
+}
+
+auto FrequencyAmountValue(int frequency_amount) -> const char* {
+  static const char* kValues[] = {"1", "5", "10", "15", "30"};
+  constexpr int kCount = sizeof(kValues) / sizeof(kValues[0]);
+  if (frequency_amount < 0 || frequency_amount >= kCount) {
+    return "1";
+  }
+  return kValues[frequency_amount];
+}
+
+}  // namespace
 
 void ChartView::initChart() {
   currentChart = "CANDLESTICK";
@@ -62,6 +116,61 @@ void ChartView::DrawChartSettings() {
   }
 }
 
+auto ChartView::GetSelectedRangeLabel() const -> std::string {
+  return std::string(PeriodTypeLabel(period_type)) + ":" +
+         PeriodAmountValue(period_amount);
+}
+
+auto ChartView::GetSelectedIntervalLabel() const -> std::string {
+  return std::string(FrequencyTypeLabel(frequency_type)) + ":" +
+         FrequencyAmountValue(frequency_amount);
+}
+
+void ChartView::DrawCoreContractPreview() {
+  const std::string preview_symbol = tickerSymbol.empty() ? "AAPL" : tickerSymbol;
+  auto& service = core::application::ScaffoldApplicationService::Instance();
+  const auto quote = service.GetQuoteDetail(preview_symbol);
+  const auto chart = service.GetChartScreen(preview_symbol, GetSelectedRangeLabel(),
+                                            GetSelectedIntervalLabel(), true);
+
+  ImGui::Separator();
+  ImGui::Text("Core Contract Preview");
+  ImGui::TextDisabled(
+      "This block is driven by premia_core DTOs and services, not broker JSON.");
+
+  if (ImGui::BeginTable("ChartContractPreview", 5,
+                        ImGuiTableFlags_SizingStretchSame)) {
+    ImGui::TableNextColumn();
+    ImGui::Text("Symbol");
+    ImGui::TableNextColumn();
+    ImGui::Text("Range");
+    ImGui::TableNextColumn();
+    ImGui::Text("Interval");
+    ImGui::TableNextColumn();
+    ImGui::Text("Last");
+    ImGui::TableNextColumn();
+    ImGui::Text("Change");
+
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", quote.instrument.symbol.c_str());
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", chart.range.c_str());
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", chart.interval.c_str());
+    ImGui::TableNextColumn();
+    ImGui::Text("$%s", quote.quote.last_price.amount.c_str());
+    ImGui::TableNextColumn();
+    ImGui::Text("$%s (%s%%)", chart.stats.change.absolute.amount.c_str(),
+                chart.stats.change.percent.c_str());
+    ImGui::EndTable();
+  }
+
+  ImGui::Text("Series Type: %s | Bars: %d | Exchange: %s", chart.series.type.c_str(),
+              static_cast<int>(chart.series.bars.size()),
+              quote.instrument.primary_exchange.c_str());
+}
+
 std::string ChartView::getName() { return "Chart"; }
 
 void ChartView::addLogger(const Logger& newLogger) { this->logger = newLogger; }
@@ -78,6 +187,7 @@ void ChartView::Update() {
     return;
   }
   DrawChartSettings();
+  DrawCoreContractPreview();
   DrawChart();
   ImGui::End();
 }

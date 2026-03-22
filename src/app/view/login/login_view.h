@@ -7,7 +7,6 @@
 
 #include <string>
 
-#include "core/TDA.hpp"
 #include "view/core/IconsMaterialDesign.h"
 #include "metatypes.h"
 #include "model/model.h"

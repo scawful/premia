@@ -1,4 +1,5 @@
 build/**
+build-*/**
 .vscode/**
 premia.code-workspace
 apikey.hpp
@@ -9,6 +10,10 @@ Makefile
 chart.csv
 apikey.txt
 .cache/
+apps/mobile-ios/.build/**
+apps/mobile-ios/.swiftpm/**
+clients/swift/Generated/.build/**
+clients/swift/Generated/.swiftpm/**
 src/lib/SDL
 src/lib/protobuf
 src/lib/

@@ -8,6 +8,7 @@
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -26,6 +27,26 @@ namespace premia {
 
 constexpr size_t SCREEN_WIDTH = 1200;
 constexpr size_t SCREEN_HEIGHT = 800;
+
+namespace {
+
+// Resolve a font filename to its full path. Checks the executable's directory
+// first (where CMake symlinks the assets/ folder), then falls back to relative
+// paths from the working directory. Mirrors yaze's SetFontPath pattern.
+std::string ResolveFontPath(const std::string& filename) {
+  if (char* base = SDL_GetBasePath()) {
+    std::string candidate = std::string(base) + "assets/" + filename;
+    SDL_free(base);
+    if (std::filesystem::exists(candidate)) return candidate;
+  }
+  for (const char* prefix : {"assets/", "../assets/", "../../assets/"}) {
+    std::string candidate = prefix + filename;
+    if (std::filesystem::exists(candidate)) return candidate;
+  }
+  return "assets/" + filename;
+}
+
+}  // namespace
 
 static void ColorsPremia(ImGuiStyle* dst = nullptr) {
   ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
@@ -67,7 +88,6 @@ static void ColorsPremia(ImGuiStyle* dst = nullptr) {
   style->WindowTitleAlign.y = 0.50f;
   style->ButtonTextAlign.x = 0.50f;
   style->ButtonTextAlign.y = 0.50f;
-  // style->SelectableTextAlign.
 
   colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
   colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -148,24 +168,9 @@ void Controller::onInput() {
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
       case SDL_KEYDOWN:
-        switch (event.key.keysym.sym) {
-          case SDLK_UP:
-          case SDLK_DOWN:
-          case SDLK_RETURN:
-          case SDLK_BACKSPACE:
-          case SDLK_TAB:
-            // io.KeysDown[event.key.keysym.scancode] =
-            // (event.type == SDL_KEYDOWN);
-            break;
-          default:
-            break;
-        }
         break;
 
       case SDL_KEYUP: {
-        int key = event.key.keysym.scancode;
-        // IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
-        // io.KeysDown[key] = (event.type == SDL_KEYDOWN);
         io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
         io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
         io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
@@ -269,20 +274,23 @@ absl::Status Controller::CreatePremiaGuiContext() {
 
   // Load available fonts
   const ImGuiIO& io = ImGui::GetIO();
-  io.Fonts->AddFontFromFileTTF("assets/Cousine-Regular.ttf", 13.0f);
+  io.Fonts->AddFontFromFileTTF(ResolveFontPath("Cousine-Regular.ttf").c_str(),
+                               13.0f);
 
   // merge in icons from Google Material Design
   static const ImWchar icons_ranges[] = {ICON_MIN_MD, 0xf900, 0};
   ImFontConfig icons_config;
   icons_config.MergeMode = true;
-  icons_config.GlyphOffset.y = 6.0f;
+  icons_config.GlyphOffset.y = 5.0f;
   icons_config.GlyphMinAdvanceX = 13.0f;
   icons_config.PixelSnapH = true;
-  io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_MD, 18.0f, &icons_config,
-                               icons_ranges);
-  io.Fonts->AddFontFromFileTTF("assets/DroidSans.ttf", 13.0f);
-  io.Fonts->AddFontFromFileTTF("assets/Karla-Regular.ttf", 12.0f);
-  io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 12.0f);
+  io.Fonts->AddFontFromFileTTF(ResolveFontPath(FONT_ICON_FILE_NAME_MD).c_str(),
+                               18.0f, &icons_config, icons_ranges);
+  io.Fonts->AddFontFromFileTTF(ResolveFontPath("DroidSans.ttf").c_str(), 13.0f);
+  io.Fonts->AddFontFromFileTTF(ResolveFontPath("Karla-Regular.ttf").c_str(),
+                               12.0f);
+  io.Fonts->AddFontFromFileTTF(ResolveFontPath("Roboto-Medium.ttf").c_str(),
+                               12.0f);
 
   // Build a new ImGui frame
   ImGui_ImplSDLRenderer_NewFrame();

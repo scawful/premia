@@ -69,6 +69,7 @@ target_link_libraries(
   OpenSSL::Crypto
   ImGui
   ImPlot
+  premia_core
   curl
   tdameritrade
   schwab

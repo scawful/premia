@@ -11,13 +11,11 @@
 namespace premia {
 
 void WatchlistView::DrawWatchlistMenu() {
-  const int sz = 3;
+  const int sz = 2;
   const char *names[] = {
       "Local",
       "TDAmeritrade",
-      "Coinbase",
   };
-  static bool toggles[] = {true, false, false};
 
   if (ImGui::Button("Service")) ImGui::OpenPopup("service_popup");
 
@@ -45,13 +43,10 @@ void WatchlistView::DrawWatchlistTable() {
     for (int j = 0; j < model.getWatchlist(watchlistIndex).getNumInstruments();
          j++) {
       model.setQuote(
-          model.getWatchlist(watchlistIndex)
-              .getInstrumentSymbol(j),  // TODO: handle for local responses?
+          model.getWatchlist(watchlistIndex).getInstrumentSymbol(j),
           tda::TDA::getInstance().getQuote(
               model.getWatchlist(watchlistIndex).getInstrumentSymbol(j)));
     }
-    printf("DEBUG: openwatchlist index pre: %d post: %d\n", 0, watchlistIndex);
-    fflush(stdout);
     model.setOpenList(watchlistIndex);
   }
 
@@ -79,23 +74,15 @@ void WatchlistView::DrawWatchlistTable() {
       if (ImGui::InputTextWithHint("##addText", "Enter watchlist name",
                                    &addText,
                                    ImGuiInputTextFlags_EnterReturnsTrue)) {
-        printf("enter watchlist pressed?\n");
-        fflush(stdout);
-        // TODO: Insert implementation
         boost::to_upper(addText);
-
-        // Reset
         addText = "";
         ImGui::CloseCurrentPopup();
-        // TODO: Save to file
       }
       ImGui::EndPopup();
     }
     ImGui::Separator();
     if (ImGui::Button(ICON_MD_DELETE)) {
       ImGui::SetTooltip("Delete watchlist");
-      printf("delete watchlist pressed?\n");
-      fflush(stdout);
     }
     if (ImGui::IsItemHovered()) {
       ImGui::SetTooltip("Delete watchlist");
@@ -109,11 +96,7 @@ void WatchlistView::DrawWatchlistTable() {
   if (ImGui::BeginPopup("add_entry_popup")) {
     if (ImGui::InputTextWithHint("##addText", "Enter ticker", &addText,
                                  ImGuiInputTextFlags_EnterReturnsTrue)) {
-      printf("enter ticker pressed?\n");
-      fflush(stdout);
-      // TODO: Insert implementation
       boost::to_upper(addText);
-      // Ensure we don't already have said ticker
       if (!model.getWatchlist(watchlistIndex).containsTicker(addText)) {
         model.getWatchlist(watchlistIndex).addInstrument(addText, "", "Stock");
         int rIdx = model.getWatchlist(watchlistIndex).getNumInstruments() - 1;
@@ -122,7 +105,6 @@ void WatchlistView::DrawWatchlistTable() {
             tda::TDA::getInstance().getQuote(
                 model.getWatchlist(watchlistIndex).getInstrumentSymbol(rIdx)));
       }
-      // TODO: Save to file
       addText = "";
       ImGui::CloseCurrentPopup();
     }
@@ -159,14 +141,9 @@ void WatchlistView::DrawWatchlistTable() {
               if (ImGui::Selectable(symChar, &selected,
                                     ImGuiSelectableFlags_SpanAllColumns |
                                         ImGuiSelectableFlags_DontClosePopups)) {
-                printf("Selected %s\n", symChar);
-                fflush(stdout);
               }
-              // Right click
               if (ImGui::IsItemHovered() &&
                   ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-                printf("Right click-Selected %s\n", symChar);
-                fflush(stdout);
                 ImGui::OpenPopup("rowSelectPopup");
                 selectedRow = row;
               }
@@ -202,16 +179,9 @@ void WatchlistView::DrawWatchlistTable() {
     // Right click entry menu
     if (ImGui::BeginPopupContextItem("rowSelectPopup")) {
       if (ImGui::MenuItem("Delete") && selectedRow != -1) {
-        std::string symbol =
-            model.getWatchlist(watchlistIndex).getInstrumentSymbol(selectedRow);
-        auto symChar = symbol.c_str();
-        printf("delete-Selected %s\n", symChar);
-        fflush(stdout);
-        // TODO: Delete implementation given watchlistIndex, selectedRow
         model.setOpenList(watchlistIndex, 0);
         model.getWatchlist(watchlistIndex).removeInstrument(selectedRow);
         selectedRow = -1;
-        // TODO: Save to file
       }
       ImGui::EndPopup();
     }
@@ -267,9 +237,6 @@ void WatchlistView::Update() {
         } else {
           DrawWatchlistTable();
         }
-        break;
-      case 2:
-        ImGui::Text("Coinbase Watchlist");
         break;
       default:
         break;

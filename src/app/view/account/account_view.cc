@@ -2,9 +2,7 @@
 
 namespace premia {
 void AccountView::Draw_balance_string(const std::string &variable) {
-  // std::string str =
-  //     (halext::HLXT::getInstance().getPrivateBalance()) ? "***" : variable;
-  // ImGui::Text("%s", str.c_str());
+  ImGui::Text("%s", variable.c_str());
 }
 
 void AccountView::Draw_symbol_string(const std::string &symbol) {
@@ -59,7 +57,6 @@ void AccountView::load_all_accounts() {
  *
  */
 void AccountView::initPositions() {
-  // @todo move this into a model class
   Try { account_ids_std = tda::TDA::getInstance().getAllAcountNumbers(); }
   catch (const std::bad_function_call &e) {
     std::string error(e.what());
@@ -81,72 +78,6 @@ void AccountView::initPositions() {
   default_account = account_ids_std.at(0);
   load_account(default_account);
 }
-
-//     if (ImGui::BeginTable("table_sorting", 4, flags, ImVec2(0.0f,
-//     TEXT_BASE_HEIGHT * 15), 0.0f))
-//     {
-//         // Declare columns
-//         // We use the "user_id" parameter of TableSetupColumn() to specify a
-//         user id that will be stored in the sort specifications.
-//         // This is so our sort function can identify a column given our own
-//         identifier. We could also identify them based on their index!
-//         // Demonstrate using a mixture of flags among available sort-related
-//         flags:
-//         // - ImGuiTableColumnFlags_DefaultSort
-//         // - ImGuiTableColumnFlags_NoSort /
-//         ImGuiTableColumnFlags_NoSortAscending /
-//         ImGuiTableColumnFlags_NoSortDescending
-//         // - ImGuiTableColumnFlags_PreferSortAscending /
-//         ImGuiTableColumnFlags_PreferSortDescending
-//         ImGui::TableSetupColumn("ID",       ImGuiTableColumnFlags_DefaultSort
-//         | ImGuiTableColumnFlags_WidthFixed,   0.0f, MyItemColumnID_ID);
-//         ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed,
-//         0.0f, MyItemColumnID_Name); ImGui::TableSetupColumn("Action",
-//         ImGuiTableColumnFlags_NoSort               |
-//         ImGuiTableColumnFlags_WidthFixed,   0.0f, MyItemColumnID_Action);
-//         ImGui::TableSetupColumn("Quantity",
-//         ImGuiTableColumnFlags_PreferSortDescending |
-//         ImGuiTableColumnFlags_WidthStretch, 0.0f, MyItemColumnID_Quantity);
-//         ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
-//         ImGui::TableHeadersRow();
-
-//         // Sort our data if sort specs have been changed!
-//         if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
-//             if (sorts_specs->SpecsDirty)
-//             {
-//                 MyItem::s_current_sort_specs = sorts_specs; // Store in
-//                 variable accessible by the sort function. if (items.Size > 1)
-//                     qsort(&items[0], (size_t)items.Size, sizeof(items[0]),
-//                     MyItem::CompareWithSortSpecs);
-//                 MyItem::s_current_sort_specs = NULL;
-//                 sorts_specs->SpecsDirty = false;
-//             }
-
-//         // Demonstrate using clipper for large vertical lists
-//         ImGuiListClipper clipper;
-//         clipper.Begin(items.Size);
-//         while (clipper.Step())
-//             for (int row_n = clipper.DisplayStart; row_n <
-//             clipper.DisplayEnd; row_n++)
-//             {
-//                 // Display a data item
-//                 MyItem* item = &items[row_n];
-//                 ImGui::PushID(item->ID);
-//                 ImGui::TableNextRow();
-//                 ImGui::TableNextColumn();
-//                 ImGui::Text("%04d", item->ID);
-//                 ImGui::TableNextColumn();
-//                 ImGui::TextUnformatted(item->Name);
-//                 ImGui::TableNextColumn();
-//                 ImGui::SmallButton("None");
-//                 ImGui::TableNextColumn();
-//                 ImGui::Text("%d", item->Quantity);
-//                 ImGui::PopID();
-//             }
-//         ImGui::EndTable();
-//     }
-//     ImGui::TreePop();
-// }
 
 /**
  * @brief Construct the table with the current portfolio positions
@@ -232,23 +163,6 @@ void AccountView::DrawAccountPane() {
   ImGui::Text("Margin Balance: %s",
               account_data.get_balance_variable("marginBalance").c_str());
   ImGui::Separator();
-
-  //     "accruedInterest": 0,
-  //     "cashBalance": 0,
-  //     "cashReceipts": 0,
-  //     "longOptionMarketValue": 0,
-  //     "liquidationValue": 0,
-  //     "moneyMarketFund": 0,
-  //     "savings": 0,
-  //     "pendingDeposits": 0,
-  //     "dayTradingBuyingPower": 0,
-  //     "dayTradingBuyingPowerCall": 0,
-  //     "longMarginValue": 0,
-  //     "maintenanceCall": 0,
-  //     "maintenanceRequirement": 0,
-  //     "regTCall": 0,
-  //     "sma": 0,
-  //   },
 
   // Load Account IDs
   static int n = 0;

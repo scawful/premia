@@ -22,6 +22,9 @@ class ChartView : public View {
   void initChart();
   void DrawChart();
   void DrawChartSettings();
+  void DrawCoreContractPreview();
+  auto GetSelectedRangeLabel() const -> std::string;
+  auto GetSelectedIntervalLabel() const -> std::string;
 
   
   int period_type = 2;

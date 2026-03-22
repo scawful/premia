@@ -15,23 +15,8 @@
 
 namespace premia {
 
-static const char *_IMGUIGetClipboardText(void *) {
-  return SDL_GetClipboardText();
-}
-static void _IMGUISetClipboardText(void *, const char *text) {
-  SDL_SetClipboardText(text);
-}
-
 void LoginView::DrawScreen() const {
-  ImGuiIO &io = ImGui::GetIO();
-  // io.KeyMap[ImGuiKey_Backspace] = SDL_GetScancodeFromKey(SDLK_BACKSPACE);
-  // io.KeyMap[ImGuiKey_Enter] = SDL_GetScancodeFromKey(SDLK_RETURN);
-  // io.KeyMap[ImGuiKey_UpArrow] = SDL_GetScancodeFromKey(SDLK_UP);
-  // io.KeyMap[ImGuiKey_DownArrow] = SDL_GetScancodeFromKey(SDLK_DOWN);
-  // io.KeyMap[ImGuiKey_Tab] = SDL_GetScancodeFromKey(SDLK_TAB);
-  // io.KeyMap[ImGuiKey_ModCtrl] = SDL_GetScancodeFromKey(SDLK_LCTRL);
   static bool tdaAuth;
-  static bool coinbaseAuth;
   static bool schwabAuth;
   static std::string username;
   static std::string password;
@@ -102,13 +87,11 @@ void LoginView::DrawScreen() const {
   }
 
   ImGui::Separator();
-  if (ImGui::BeginTable("APIICON", 4, ImGuiTableFlags_SizingStretchSame)) {
+  if (ImGui::BeginTable("APIICON", 3, ImGuiTableFlags_SizingStretchSame)) {
     ImGui::TableNextColumn();
     ImGui::Text(ICON_MD_API);
     ImGui::TableNextColumn();
     ImGui::Checkbox("TDA", &tdaAuth);
-    ImGui::TableNextColumn();
-    ImGui::Checkbox("CB", &coinbaseAuth);
     ImGui::TableNextColumn();
     ImGui::Checkbox("Schwab", &schwabAuth);
     ImGui::EndTable();
