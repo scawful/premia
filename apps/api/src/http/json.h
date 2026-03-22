@@ -14,6 +14,8 @@ auto SerializeBootstrapResponse(const core::application::BootstrapData& data)
     -> std::string;
 auto SerializeHomeScreenResponse(const core::application::HomeScreenData& data)
     -> std::string;
+auto SerializeAccountScreenResponse(const core::application::AccountDetail& data)
+    -> std::string;
 auto SerializeWatchlistsResponse(
     const std::vector<core::application::WatchlistSummary>& watchlists)
     -> std::string;
@@ -24,6 +26,8 @@ auto SerializeWatchlistResponse(const core::application::WatchlistSummary& data)
 auto SerializeQuoteScreenResponse(const core::application::QuoteDetail& data)
     -> std::string;
 auto SerializeChartScreenResponse(const core::application::ChartScreenData& data)
+    -> std::string;
+auto SerializeOptionChainResponse(const core::application::OptionChainSnapshot& data)
     -> std::string;
 auto SerializeConnectionSummaryResponse(
     const core::application::ConnectionSummary& data) -> std::string;

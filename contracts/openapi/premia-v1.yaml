@@ -16,9 +16,11 @@ servers:
 tags:
   - name: Bootstrap
   - name: Home
+  - name: Account
   - name: Watchlists
   - name: Quotes
   - name: Charts
+  - name: Options
   - name: Connections
   - name: Streaming
 security:
@@ -50,6 +52,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HomeScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/account:
+    get:
+      tags: [Account]
+      summary: Load the account screen payload.
+      operationId: getAccountScreen
+      responses:
+        '200':
+          description: Account screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountScreenResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
   /v1/watchlists:
@@ -209,6 +225,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChartScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/options/{symbol}:
+    get:
+      tags: [Options]
+      summary: Load option chain data for a symbol.
+      operationId: getOptionChainScreen
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+        - name: strikeCount
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: strategy
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: range
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: expMonth
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: optionType
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Option chain screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionChainResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
   /v1/connections/schwab/oauth/start:
@@ -740,6 +797,105 @@ components:
         meta:
           requestId: req_2
           asOf: '2026-03-22T18:17:47Z'
+    AccountPositionRow:
+      type: object
+      required: [symbol, name, dayProfitLoss, dayProfitLossPercent, averagePrice, marketValue, quantity]
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        dayProfitLoss:
+          $ref: '#/components/schemas/Money'
+        dayProfitLossPercent:
+          $ref: '#/components/schemas/DecimalString'
+        averagePrice:
+          $ref: '#/components/schemas/Money'
+        marketValue:
+          $ref: '#/components/schemas/Money'
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+    AccountDetail:
+      type: object
+      required: [accountId, cash, netLiquidation, availableFunds, longMarketValue, shortMarketValue, buyingPower, equity, equityPercentage, marginBalance, positions]
+      properties:
+        accountId:
+          type: string
+        cash:
+          $ref: '#/components/schemas/Money'
+        netLiquidation:
+          $ref: '#/components/schemas/Money'
+        availableFunds:
+          $ref: '#/components/schemas/Money'
+        longMarketValue:
+          $ref: '#/components/schemas/Money'
+        shortMarketValue:
+          $ref: '#/components/schemas/Money'
+        buyingPower:
+          $ref: '#/components/schemas/Money'
+        equity:
+          $ref: '#/components/schemas/Money'
+        equityPercentage:
+          $ref: '#/components/schemas/DecimalString'
+        marginBalance:
+          $ref: '#/components/schemas/Money'
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountPositionRow'
+    AccountScreenResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountDetail'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          accountId: local_acc
+          cash:
+            amount: '14320.00'
+            currency: USD
+          netLiquidation:
+            amount: '128345.22'
+            currency: USD
+          availableFunds:
+            amount: '28640.00'
+            currency: USD
+          longMarketValue:
+            amount: '113024.22'
+            currency: USD
+          shortMarketValue:
+            amount: '0.00'
+            currency: USD
+          buyingPower:
+            amount: '28640.00'
+            currency: USD
+          equity:
+            amount: '128345.22'
+            currency: USD
+          equityPercentage: '100.00'
+          marginBalance:
+            amount: '0.00'
+            currency: USD
+          positions:
+            - symbol: AAPL
+              name: Apple Inc.
+              dayProfitLoss:
+                amount: '54.60'
+                currency: USD
+              dayProfitLossPercent: '0.60'
+              averagePrice:
+                amount: '200.50'
+                currency: USD
+              marketValue:
+                amount: '9114.00'
+                currency: USD
+              quantity: '42'
+        meta:
+          requestId: req_account
+          asOf: '2026-03-22T19:25:32Z'
     WatchlistsData:
       type: object
       required: [watchlists]
@@ -895,6 +1051,143 @@ components:
         meta:
           requestId: req_4
           asOf: '2026-03-22T18:44:58Z'
+    OptionContractPairRow:
+      type: object
+      required: [id, strike, callBid, callAsk, callLast, callChange, callDelta, callGamma, callTheta, callVega, callOpenInterest, putBid, putAsk, putLast, putChange, putDelta, putGamma, putTheta, putVega, putOpenInterest]
+      properties:
+        id:
+          type: string
+        strike:
+          type: string
+        callBid:
+          $ref: '#/components/schemas/DecimalString'
+        callAsk:
+          $ref: '#/components/schemas/DecimalString'
+        callLast:
+          $ref: '#/components/schemas/DecimalString'
+        callChange:
+          $ref: '#/components/schemas/DecimalString'
+        callDelta:
+          $ref: '#/components/schemas/DecimalString'
+        callGamma:
+          $ref: '#/components/schemas/DecimalString'
+        callTheta:
+          $ref: '#/components/schemas/DecimalString'
+        callVega:
+          $ref: '#/components/schemas/DecimalString'
+        callOpenInterest:
+          type: string
+        putBid:
+          $ref: '#/components/schemas/DecimalString'
+        putAsk:
+          $ref: '#/components/schemas/DecimalString'
+        putLast:
+          $ref: '#/components/schemas/DecimalString'
+        putChange:
+          $ref: '#/components/schemas/DecimalString'
+        putDelta:
+          $ref: '#/components/schemas/DecimalString'
+        putGamma:
+          $ref: '#/components/schemas/DecimalString'
+        putTheta:
+          $ref: '#/components/schemas/DecimalString'
+        putVega:
+          $ref: '#/components/schemas/DecimalString'
+        putOpenInterest:
+          type: string
+    OptionExpirationSnapshot:
+      type: object
+      required: [id, label, gammaAtExpiry, rows]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        gammaAtExpiry:
+          $ref: '#/components/schemas/DecimalString'
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptionContractPairRow'
+    OptionChainSnapshot:
+      type: object
+      required: [symbol, description, bid, ask, openPrice, closePrice, highPrice, lowPrice, totalVolume, volatility, gammaExposure, expirations]
+      properties:
+        symbol:
+          type: string
+        description:
+          type: string
+        bid:
+          $ref: '#/components/schemas/DecimalString'
+        ask:
+          $ref: '#/components/schemas/DecimalString'
+        openPrice:
+          $ref: '#/components/schemas/DecimalString'
+        closePrice:
+          $ref: '#/components/schemas/DecimalString'
+        highPrice:
+          $ref: '#/components/schemas/DecimalString'
+        lowPrice:
+          $ref: '#/components/schemas/DecimalString'
+        totalVolume:
+          type: string
+        volatility:
+          $ref: '#/components/schemas/DecimalString'
+        gammaExposure:
+          $ref: '#/components/schemas/DecimalString'
+        expirations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptionExpirationSnapshot'
+    OptionChainResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/OptionChainSnapshot'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          symbol: SPY
+          description: SPDR S&P 500 ETF
+          bid: '519.45'
+          ask: '519.54'
+          openPrice: '516.00'
+          closePrice: '515.80'
+          highPrice: '520.10'
+          lowPrice: '514.90'
+          totalVolume: '58213422'
+          volatility: '16.8'
+          gammaExposure: '1245500.00'
+          expirations:
+            - id: '2026-04-17:26'
+              label: '2026-04-17:26'
+              gammaAtExpiry: '34200.00'
+              rows:
+                - id: 520c
+                  strike: '520'
+                  callBid: '7.80'
+                  callAsk: '7.90'
+                  callLast: '7.85'
+                  callChange: '0.42'
+                  callDelta: '0.52'
+                  callGamma: '0.03'
+                  callTheta: '-0.08'
+                  callVega: '0.12'
+                  callOpenInterest: '845'
+                  putBid: '8.10'
+                  putAsk: '8.20'
+                  putLast: '8.15'
+                  putChange: '0.36'
+                  putDelta: '-0.48'
+                  putGamma: '0.03'
+                  putTheta: '-0.08'
+                  putVega: '0.11'
+                  putOpenInterest: '902'
+        meta:
+          requestId: req_options
+          asOf: '2026-03-22T19:40:00Z'
     ConnectionSummaryResponse:
       type: object
       required: [data, meta]

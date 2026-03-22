@@ -147,6 +147,22 @@ auto MakeWatchlistRowArray(const std::vector<application::WatchlistRow>& rows)
   return array;
 }
 
+auto MakeAccountPositionArray(
+    const std::vector<application::AccountPositionRow>& positions) -> json::array {
+  json::array array;
+  for (const auto& position : positions) {
+    array.emplace_back(json::object{{"symbol", position.symbol},
+                                    {"name", position.name},
+                                    {"dayProfitLoss", MakeMoney(position.day_profit_loss)},
+                                    {"dayProfitLossPercent",
+                                     position.day_profit_loss_percent},
+                                    {"averagePrice", MakeMoney(position.average_price)},
+                                    {"marketValue", MakeMoney(position.market_value)},
+                                    {"quantity", position.quantity}});
+  }
+  return array;
+}
+
 auto MakeInstrument(const application::Instrument& instrument) -> json::object {
   return {
       {"symbol", instrument.symbol},
@@ -213,6 +229,42 @@ auto MakeChartSeries(const application::ChartSeries& series) -> json::object {
   };
 }
 
+auto MakeOptionExpirationArray(
+    const std::vector<application::OptionExpirationSnapshot>& expirations)
+    -> json::array {
+  json::array array;
+  for (const auto& expiration : expirations) {
+    json::array rows;
+    for (const auto& row : expiration.rows) {
+      rows.emplace_back(json::object{{"id", row.id},
+                                     {"strike", row.strike},
+                                     {"callBid", row.call_bid},
+                                     {"callAsk", row.call_ask},
+                                     {"callLast", row.call_last},
+                                     {"callChange", row.call_change},
+                                     {"callDelta", row.call_delta},
+                                     {"callGamma", row.call_gamma},
+                                     {"callTheta", row.call_theta},
+                                     {"callVega", row.call_vega},
+                                     {"callOpenInterest", row.call_open_interest},
+                                     {"putBid", row.put_bid},
+                                     {"putAsk", row.put_ask},
+                                     {"putLast", row.put_last},
+                                     {"putChange", row.put_change},
+                                     {"putDelta", row.put_delta},
+                                     {"putGamma", row.put_gamma},
+                                     {"putTheta", row.put_theta},
+                                     {"putVega", row.put_vega},
+                                     {"putOpenInterest", row.put_open_interest}});
+    }
+    array.emplace_back(json::object{{"id", expiration.id},
+                                    {"label", expiration.label},
+                                    {"gammaAtExpiry", expiration.gamma_at_expiry},
+                                    {"rows", rows}});
+  }
+  return array;
+}
+
 auto WriteEnvelope(const json::value& data) -> std::string {
   return json::serialize(json::object{{"data", data}, {"meta", MakeMeta()}});
 }
@@ -259,6 +311,27 @@ auto SerializeHomeScreenResponse(const application::HomeScreenData& data)
                                                    data.market.next_transition_at}}}});
 }
 
+auto SerializeAccountScreenResponse(const application::AccountDetail& data)
+    -> std::string {
+  return WriteEnvelope(json::object{{"accountId", data.account_id},
+                                    {"cash", MakeMoney(data.cash)},
+                                    {"netLiquidation",
+                                     MakeMoney(data.net_liquidation)},
+                                    {"availableFunds",
+                                     MakeMoney(data.available_funds)},
+                                    {"longMarketValue",
+                                     MakeMoney(data.long_market_value)},
+                                    {"shortMarketValue",
+                                     MakeMoney(data.short_market_value)},
+                                    {"buyingPower", MakeMoney(data.buying_power)},
+                                    {"equity", MakeMoney(data.equity)},
+                                    {"equityPercentage", data.equity_percentage},
+                                    {"marginBalance",
+                                     MakeMoney(data.margin_balance)},
+                                    {"positions",
+                                     MakeAccountPositionArray(data.positions)}});
+}
+
 auto SerializeWatchlistsResponse(
     const std::vector<application::WatchlistSummary>& watchlists)
     -> std::string {
@@ -300,6 +373,23 @@ auto SerializeChartScreenResponse(const application::ChartScreenData& data)
                                      json::object{{"change",
                                                    MakeAbsolutePercentChange(
                                                        data.stats.change)}}}});
+}
+
+auto SerializeOptionChainResponse(const application::OptionChainSnapshot& data)
+    -> std::string {
+  return WriteEnvelope(json::object{{"symbol", data.symbol},
+                                    {"description", data.description},
+                                    {"bid", data.bid},
+                                    {"ask", data.ask},
+                                    {"openPrice", data.open_price},
+                                    {"closePrice", data.close_price},
+                                    {"highPrice", data.high_price},
+                                    {"lowPrice", data.low_price},
+                                    {"totalVolume", data.total_volume},
+                                    {"volatility", data.volatility},
+                                    {"gammaExposure", data.gamma_exposure},
+                                    {"expirations",
+                                     MakeOptionExpirationArray(data.expirations)}});
 }
 
 auto SerializeConnectionSummaryResponse(const application::ConnectionSummary& data)

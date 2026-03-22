@@ -23,3 +23,5 @@ Current integration:
 - watchlist create/rename/add/remove mutation wrappers are now exposed, and API
   errors are normalized into a hand-written `PremiaAPIClientError` model for
   SwiftUI state handling
+- account and option-chain screen wrappers are now exposed too, so SwiftUI can
+  consume the new account/options API surface without touching generated models

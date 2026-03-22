@@ -72,6 +72,25 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
     @available(macOS 10.15, iOS 13.0, *)
+    public func loadAccount() async throws -> PremiaAccountDetailSnapshot {
+        let response = try await executeMapped { try await AccountAPI.getAccountScreen() }
+        return PremiaAccountDetailSnapshot(
+            accountID: response.data.accountId,
+            cash: mapMoney(response.data.cash),
+            netLiquidation: mapMoney(response.data.netLiquidation),
+            availableFunds: mapMoney(response.data.availableFunds),
+            longMarketValue: mapMoney(response.data.longMarketValue),
+            shortMarketValue: mapMoney(response.data.shortMarketValue),
+            buyingPower: mapMoney(response.data.buyingPower),
+            equity: mapMoney(response.data.equity),
+            equityPercentage: response.data.equityPercentage,
+            marginBalance: mapMoney(response.data.marginBalance),
+            positions: response.data.positions.map(mapAccountPosition),
+            asOf: response.meta.asOf
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
     public func loadQuote(symbol: String) async throws -> PremiaQuoteScreenSnapshot {
         let response = try await executeMapped { try await QuotesAPI.getQuoteScreen(symbol: symbol) }
         return PremiaQuoteScreenSnapshot(
@@ -107,6 +126,43 @@ public final class PremiaAPIClient: @unchecked Sendable {
             seriesType: response.data.series.type.rawValue,
             candles: response.data.series.bars.map(mapCandle),
             change: response.data.stats.map { mapChange($0.change) },
+            asOf: response.meta.asOf
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func loadOptionChain(
+        symbol: String,
+        strikeCount: String = "8",
+        strategy: String = "SINGLE",
+        range: String = "ALL",
+        expMonth: String = "ALL",
+        optionType: String = "ALL"
+    ) async throws -> PremiaOptionChainSnapshotModel {
+        let response = try await executeMapped {
+            try await OptionsAPI.getOptionChainScreen(
+                symbol: symbol,
+                strikeCount: strikeCount,
+                strategy: strategy,
+                range: range,
+                expMonth: expMonth,
+                optionType: optionType
+            )
+        }
+
+        return PremiaOptionChainSnapshotModel(
+            symbol: response.data.symbol,
+            description: response.data.description,
+            bid: response.data.bid,
+            ask: response.data.ask,
+            openPrice: response.data.openPrice,
+            closePrice: response.data.closePrice,
+            highPrice: response.data.highPrice,
+            lowPrice: response.data.lowPrice,
+            totalVolume: response.data.totalVolume,
+            volatility: response.data.volatility,
+            gammaExposure: response.data.gammaExposure,
+            expirations: response.data.expirations.map(mapOptionExpiration),
             asOf: response.meta.asOf
         )
     }
@@ -348,6 +404,18 @@ public final class PremiaAPIClient: @unchecked Sendable {
         )
     }
 
+    private func mapAccountPosition(_ position: PremiaAPIClientGeneratedAPI.AccountPositionRow) -> PremiaAccountPositionModel {
+        PremiaAccountPositionModel(
+            symbol: position.symbol,
+            name: position.name,
+            dayProfitLoss: mapMoney(position.dayProfitLoss),
+            dayProfitLossPercent: position.dayProfitLossPercent,
+            averagePrice: mapMoney(position.averagePrice),
+            marketValue: mapMoney(position.marketValue),
+            quantity: position.quantity
+        )
+    }
+
     private func mapWatchlist(_ watchlist: PremiaAPIClientGeneratedAPI.WatchlistSummary) -> PremiaWatchlistSummaryModel {
         PremiaWatchlistSummaryModel(
             id: watchlist.id,
@@ -401,6 +469,40 @@ public final class PremiaAPIClient: @unchecked Sendable {
             low: candle.low,
             close: candle.close,
             volume: candle.volume
+        )
+    }
+
+    private func mapOptionExpiration(_ expiration: PremiaAPIClientGeneratedAPI.OptionExpirationSnapshot) -> PremiaOptionExpirationSnapshotModel {
+        PremiaOptionExpirationSnapshotModel(
+            id: expiration.id,
+            label: expiration.label,
+            gammaAtExpiry: expiration.gammaAtExpiry,
+            rows: expiration.rows.map(mapOptionRow)
+        )
+    }
+
+    private func mapOptionRow(_ row: PremiaAPIClientGeneratedAPI.OptionContractPairRow) -> PremiaOptionContractPairRowModel {
+        PremiaOptionContractPairRowModel(
+            id: row.id,
+            strike: row.strike,
+            callBid: row.callBid,
+            callAsk: row.callAsk,
+            callLast: row.callLast,
+            callChange: row.callChange,
+            callDelta: row.callDelta,
+            callGamma: row.callGamma,
+            callTheta: row.callTheta,
+            callVega: row.callVega,
+            callOpenInterest: row.callOpenInterest,
+            putBid: row.putBid,
+            putAsk: row.putAsk,
+            putLast: row.putLast,
+            putChange: row.putChange,
+            putDelta: row.putDelta,
+            putGamma: row.putGamma,
+            putTheta: row.putTheta,
+            putVega: row.putVega,
+            putOpenInterest: row.putOpenInterest
         )
     }
 

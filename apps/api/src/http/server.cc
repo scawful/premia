@@ -167,6 +167,14 @@ auto HandleGet(const std::string& raw_target)
         http::status::ok,
         SerializeHomeScreenResponse(service.GetHomeScreenData()));
   }
+  if (path == "/v1/screens/account") {
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeAccountScreenResponse(
+            core::application::CompositionRoot::Instance()
+                .AccountDetails()
+                .GetAccountDetail()));
+  }
   if (path == "/v1/watchlists") {
     return MakeJsonResponse(
         http::status::ok,
@@ -194,6 +202,22 @@ auto HandleGet(const std::string& raw_target)
         http::status::ok,
         SerializeChartScreenResponse(
             service.GetChartScreen(symbol, range, interval, extended_hours)));
+  }
+  if (StartsWith(path, "/v1/screens/options/")) {
+    const auto symbol = path.substr(std::string("/v1/screens/options/").size());
+    const auto params = ParseQuery(query);
+    const auto strike_count = params.count("strikeCount") ? params.at("strikeCount") : "8";
+    const auto strategy = params.count("strategy") ? params.at("strategy") : "SINGLE";
+    const auto range = params.count("range") ? params.at("range") : "ALL";
+    const auto exp_month = params.count("expMonth") ? params.at("expMonth") : "ALL";
+    const auto option_type = params.count("optionType") ? params.at("optionType") : "ALL";
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeOptionChainResponse(
+            core::application::CompositionRoot::Instance()
+                .Options()
+                .GetOptionChainSnapshot(symbol, strike_count, strategy, range,
+                                        exp_month, option_type)));
   }
   if (path == "/v1/stream/events") {
     return MakeTextResponse(

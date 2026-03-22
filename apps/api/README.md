@@ -12,6 +12,7 @@ Current routes:
 - `GET /health`
 - `GET /v1/bootstrap`
 - `GET /v1/screens/home`
+- `GET /v1/screens/account`
 - `GET /v1/watchlists`
 - `GET /v1/screens/watchlists/{watchlistId}`
 - `POST /v1/watchlists`
@@ -20,6 +21,7 @@ Current routes:
 - `DELETE /v1/watchlists/{watchlistId}/symbols/{symbol}`
 - `GET /v1/screens/quotes/{symbol}`
 - `GET /v1/screens/charts/{symbol}`
+- `GET /v1/screens/options/{symbol}`
 - `GET /v1/stream/events`
 - `POST /v1/connections/schwab/oauth/start`
 - `POST /v1/connections/schwab/oauth/complete`
@@ -39,6 +41,9 @@ Route behavior today:
 - quote and chart requests now attempt to use real Schwab market-data responses
   when a valid authorized Schwab client is available, otherwise they return the
   normalized scaffold payloads
+- account and option-chain screen requests now flow through provider-backed core
+  services as well, using TDA when valid credentials exist and local fixtures
+  otherwise
 - watchlist mutation routes are backed by the local provider adapter and persist
   changes into `assets/watchlists.json`
 

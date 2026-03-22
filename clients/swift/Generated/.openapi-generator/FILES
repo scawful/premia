@@ -7,10 +7,12 @@ PremiaAPIClientGenerated.podspec
 README.md
 Sources/PremiaAPIClientGenerated/APIHelper.swift
 Sources/PremiaAPIClientGenerated/APIs.swift
+Sources/PremiaAPIClientGenerated/APIs/AccountAPI.swift
 Sources/PremiaAPIClientGenerated/APIs/BootstrapAPI.swift
 Sources/PremiaAPIClientGenerated/APIs/ChartsAPI.swift
 Sources/PremiaAPIClientGenerated/APIs/ConnectionsAPI.swift
 Sources/PremiaAPIClientGenerated/APIs/HomeAPI.swift
+Sources/PremiaAPIClientGenerated/APIs/OptionsAPI.swift
 Sources/PremiaAPIClientGenerated/APIs/QuotesAPI.swift
 Sources/PremiaAPIClientGenerated/APIs/StreamingAPI.swift
 Sources/PremiaAPIClientGenerated/APIs/WatchlistsAPI.swift
@@ -21,6 +23,9 @@ Sources/PremiaAPIClientGenerated/JSONDataEncoding.swift
 Sources/PremiaAPIClientGenerated/JSONEncodingHelper.swift
 Sources/PremiaAPIClientGenerated/Models.swift
 Sources/PremiaAPIClientGenerated/Models/AbsolutePercentChange.swift
+Sources/PremiaAPIClientGenerated/Models/AccountDetail.swift
+Sources/PremiaAPIClientGenerated/Models/AccountPositionRow.swift
+Sources/PremiaAPIClientGenerated/Models/AccountScreenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/AddWatchlistSymbolRequest.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapData.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapDataSession.swift
@@ -47,6 +52,10 @@ Sources/PremiaAPIClientGenerated/Models/Instrument.swift
 Sources/PremiaAPIClientGenerated/Models/Meta.swift
 Sources/PremiaAPIClientGenerated/Models/ModelErrorResponse.swift
 Sources/PremiaAPIClientGenerated/Models/Money.swift
+Sources/PremiaAPIClientGenerated/Models/OptionChainResponse.swift
+Sources/PremiaAPIClientGenerated/Models/OptionChainSnapshot.swift
+Sources/PremiaAPIClientGenerated/Models/OptionContractPairRow.swift
+Sources/PremiaAPIClientGenerated/Models/OptionExpirationSnapshot.swift
 Sources/PremiaAPIClientGenerated/Models/PlaidLinkTokenData.swift
 Sources/PremiaAPIClientGenerated/Models/PlaidLinkTokenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/PortfolioSummary.swift
@@ -72,6 +81,10 @@ Sources/PremiaAPIClientGenerated/SynchronizedDictionary.swift
 Sources/PremiaAPIClientGenerated/URLSessionImplementations.swift
 Sources/PremiaAPIClientGenerated/Validation.swift
 docs/AbsolutePercentChange.md
+docs/AccountAPI.md
+docs/AccountDetail.md
+docs/AccountPositionRow.md
+docs/AccountScreenResponse.md
 docs/AddWatchlistSymbolRequest.md
 docs/BootstrapAPI.md
 docs/BootstrapData.md
@@ -102,6 +115,11 @@ docs/Instrument.md
 docs/Meta.md
 docs/ModelErrorResponse.md
 docs/Money.md
+docs/OptionChainResponse.md
+docs/OptionChainSnapshot.md
+docs/OptionContractPairRow.md
+docs/OptionExpirationSnapshot.md
+docs/OptionsAPI.md
 docs/PlaidLinkTokenData.md
 docs/PlaidLinkTokenResponse.md
 docs/PortfolioSummary.md

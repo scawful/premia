@@ -18,6 +18,8 @@ Current status:
 - the hand-written client now also normalizes generated errors into a shared
   Swift error model and exposes watchlist mutation helpers on top of the
   generated package.
+- the generated client now includes account and options screen APIs, and the
+  hand-written wrapper maps them into app-level Swift models.
 - Local Swift package compilation is currently blocked by conflicting
   `/usr/local/include` module maps on this machine, the same environment issue
   affecting the hand-written Swift scaffold.

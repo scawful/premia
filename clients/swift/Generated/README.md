@@ -33,6 +33,7 @@ All URIs are relative to *https://api.premia.local*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AccountAPI* | [**getAccountScreen**](docs/AccountAPI.md#getaccountscreen) | **GET** /v1/screens/account | Load the account screen payload.
 *BootstrapAPI* | [**getBootstrap**](docs/BootstrapAPI.md#getbootstrap) | **GET** /v1/bootstrap | Load app bootstrap state.
 *ChartsAPI* | [**getChartScreen**](docs/ChartsAPI.md#getchartscreen) | **GET** /v1/screens/charts/{symbol} | Load chart data for a symbol.
 *ConnectionsAPI* | [**completePlaidLink**](docs/ConnectionsAPI.md#completeplaidlink) | **POST** /v1/connections/plaid/link-complete | Complete the Plaid link flow.
@@ -40,6 +41,7 @@ Class | Method | HTTP request | Description
 *ConnectionsAPI* | [**createPlaidLinkToken**](docs/ConnectionsAPI.md#createplaidlinktoken) | **POST** /v1/connections/plaid/link-token | Create a Plaid link token.
 *ConnectionsAPI* | [**startSchwabOAuth**](docs/ConnectionsAPI.md#startschwaboauth) | **POST** /v1/connections/schwab/oauth/start | Start the Schwab OAuth flow.
 *HomeAPI* | [**getHomeScreen**](docs/HomeAPI.md#gethomescreen) | **GET** /v1/screens/home | Load the home screen payload.
+*OptionsAPI* | [**getOptionChainScreen**](docs/OptionsAPI.md#getoptionchainscreen) | **GET** /v1/screens/options/{symbol} | Load option chain data for a symbol.
 *QuotesAPI* | [**getQuoteScreen**](docs/QuotesAPI.md#getquotescreen) | **GET** /v1/screens/quotes/{symbol} | Load quote detail for a symbol.
 *StreamingAPI* | [**streamEvents**](docs/StreamingAPI.md#streamevents) | **GET** /v1/stream/events | Subscribe to server-sent stream events.
 *WatchlistsAPI* | [**addWatchlistSymbol**](docs/WatchlistsAPI.md#addwatchlistsymbol) | **POST** /v1/watchlists/{watchlistId}/symbols | Add a symbol to a watchlist.
@@ -53,6 +55,9 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [AbsolutePercentChange](docs/AbsolutePercentChange.md)
+ - [AccountDetail](docs/AccountDetail.md)
+ - [AccountPositionRow](docs/AccountPositionRow.md)
+ - [AccountScreenResponse](docs/AccountScreenResponse.md)
  - [AddWatchlistSymbolRequest](docs/AddWatchlistSymbolRequest.md)
  - [BootstrapData](docs/BootstrapData.md)
  - [BootstrapDataSession](docs/BootstrapDataSession.md)
@@ -79,6 +84,10 @@ Class | Method | HTTP request | Description
  - [Meta](docs/Meta.md)
  - [ModelErrorResponse](docs/ModelErrorResponse.md)
  - [Money](docs/Money.md)
+ - [OptionChainResponse](docs/OptionChainResponse.md)
+ - [OptionChainSnapshot](docs/OptionChainSnapshot.md)
+ - [OptionContractPairRow](docs/OptionContractPairRow.md)
+ - [OptionExpirationSnapshot](docs/OptionExpirationSnapshot.md)
  - [PlaidLinkTokenData](docs/PlaidLinkTokenData.md)
  - [PlaidLinkTokenResponse](docs/PlaidLinkTokenResponse.md)
  - [PortfolioSummary](docs/PortfolioSummary.md)

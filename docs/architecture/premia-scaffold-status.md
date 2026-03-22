@@ -110,6 +110,8 @@ This note captures the first implementation pass after the architecture review.
 - the mobile wrapper now also exposes watchlist mutation helpers and maps
   generated request failures into a normalized `PremiaAPIClientError` model for
   SwiftUI error-state handling.
+- the mobile wrapper now also exposes typed account-detail and option-chain
+  loaders on top of the generated client.
 
 ### Desktop migration start
 
@@ -131,6 +133,8 @@ This note captures the first implementation pass after the architecture review.
 - `cmake --build build-arch-next --target premia` succeeds.
 - `premia_api` screen endpoints and connection workflow routes return valid JSON
   with correct booleans and arrays.
+- `premia_api` now also serves account and option-chain screen payloads through
+  the same provider-backed core service layer.
 - placeholder config files do not trigger live provider calls; bootstrap now
   reports providers as disconnected unless real credentials or workflow state
   make them active
