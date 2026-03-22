@@ -29,6 +29,9 @@ Route behavior today:
 - screen queries are served by `premia::core::application::ScaffoldApplicationService`
 - Schwab and Plaid connection workflows mutate in-memory scaffold state so the
   next `GET /v1/bootstrap` reflects the updated connection summary
+- when valid non-placeholder `assets/schwab.json` or `assets/plaid.json`
+  credentials exist, the shared core service will use the real provider clients
+  and persisted token files instead of the scaffold fallback
 
 Build and run:
 

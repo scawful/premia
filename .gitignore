@@ -9,6 +9,7 @@ CMakeCache.txt
 Makefile
 chart.csv
 apikey.txt
+assets/*tokens*.json
 .cache/
 apps/mobile-ios/.build/**
 apps/mobile-ios/.swiftpm/**

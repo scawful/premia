@@ -10,3 +10,10 @@ target_include_directories(
 )
 
 target_compile_features(premia_core PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_core
+  PUBLIC
+  schwab
+  plaid
+)

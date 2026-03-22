@@ -1,0 +1,5 @@
+{
+    "app_key": "YOUR_SCHWAB_APP_KEY",
+    "app_secret": "YOUR_SCHWAB_APP_SECRET",
+    "redirect_uri": "https://127.0.0.1"
+}

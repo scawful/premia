@@ -3,11 +3,19 @@
 #include <algorithm>
 #include <chrono>
 #include <ctime>
+#include <fstream>
 #include <iomanip>
 #include <map>
 #include <sstream>
-#include <string>
 #include <stdexcept>
+#include <string>
+#include <utility>
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+#include "Plaid/client.h"
+#include "Schwab/client.h"
 
 namespace premia::core::application {
 
@@ -19,6 +27,12 @@ using domain::AbsolutePercentChange;
 using domain::ConnectionStatus;
 using domain::Money;
 using domain::Provider;
+namespace pt = boost::property_tree;
+
+constexpr char kSchwabConfigPath[] = "assets/schwab.json";
+constexpr char kSchwabTokenPath[] = "assets/schwab_tokens.json";
+constexpr char kPlaidConfigPath[] = "assets/plaid.json";
+constexpr char kPlaidTokenPath[] = "assets/plaid_tokens.json";
 
 auto MakeMoney(std::string amount) -> Money {
   return Money{std::move(amount), "USD"};
@@ -44,6 +58,92 @@ auto MakeConnection(Provider provider, ConnectionStatus status,
   return summary;
 }
 
+auto IsPlaceholderValue(const std::string& value) -> bool {
+  return value.empty() || value.rfind("YOUR_", 0) == 0;
+}
+
+auto ReadJsonTree(const std::string& path, pt::ptree& tree) -> bool {
+  std::ifstream file(path);
+  if (!file.good()) {
+    return false;
+  }
+
+  try {
+    pt::read_json(file, tree);
+  } catch (const std::exception&) {
+    return false;
+  }
+  return true;
+}
+
+auto HasFile(const std::string& path) -> bool {
+  std::ifstream file(path);
+  return file.good();
+}
+
+auto HasUsableSchwabConfig() -> bool {
+  pt::ptree tree;
+  if (!ReadJsonTree(kSchwabConfigPath, tree)) {
+    return false;
+  }
+
+  const auto app_key = tree.get<std::string>("app_key", "");
+  const auto app_secret = tree.get<std::string>("app_secret", "");
+  return !IsPlaceholderValue(app_key) && !IsPlaceholderValue(app_secret);
+}
+
+auto HasUsablePlaidConfig() -> bool {
+  pt::ptree tree;
+  if (!ReadJsonTree(kPlaidConfigPath, tree)) {
+    return false;
+  }
+
+  const auto client_id = tree.get<std::string>("client_id", "");
+  const auto secret = tree.get<std::string>("secret", "");
+  return !IsPlaceholderValue(client_id) && !IsPlaceholderValue(secret);
+}
+
+auto LoadSchwabClient(premia::schwab::Client& client) -> bool {
+  if (!HasUsableSchwabConfig()) {
+    return false;
+  }
+  if (!client.LoadConfig(kSchwabConfigPath)) {
+    return false;
+  }
+  client.LoadTokens(kSchwabTokenPath);
+  return true;
+}
+
+auto LoadPlaidClient(premia::plaid::Client& client) -> bool {
+  if (!HasUsablePlaidConfig()) {
+    return false;
+  }
+  if (!client.LoadConfig(kPlaidConfigPath)) {
+    return false;
+  }
+  client.LoadTokens(kPlaidTokenPath);
+  return true;
+}
+
+auto ParsePlaidLinkTokenResponse(const std::string& response)
+    -> PlaidLinkTokenData {
+  PlaidLinkTokenData data;
+  if (response.empty()) {
+    return data;
+  }
+
+  try {
+    std::istringstream ss(response);
+    pt::ptree tree;
+    pt::read_json(ss, tree);
+    data.link_token = tree.get<std::string>("link_token", "");
+    data.expiration = tree.get<std::string>("expiration", "");
+  } catch (const std::exception&) {
+  }
+
+  return data;
+}
+
 }  // namespace
 
 auto ScaffoldApplicationService::Instance() -> ScaffoldApplicationService& {
@@ -53,8 +153,8 @@ auto ScaffoldApplicationService::Instance() -> ScaffoldApplicationService& {
 
 ScaffoldApplicationService::ScaffoldApplicationService() {
   connections_ = {
-      MakeConnection(Provider::kSchwab, ConnectionStatus::kConnected,
-                     "Charles Schwab", "2026-03-22T18:40:00Z", false,
+      MakeConnection(Provider::kSchwab, ConnectionStatus::kNotConnected,
+                     "Charles Schwab", "", false,
                      {{"portfolio", true},
                       {"marketData", true},
                       {"options", true},
@@ -112,12 +212,58 @@ auto ScaffoldApplicationService::GetHomeScreenData() const -> HomeScreenData {
 
 auto ScaffoldApplicationService::GetConnections() const
     -> std::vector<ConnectionSummary> {
-  return connections_;
+  auto connections = connections_;
+
+  for (auto& connection : connections) {
+    if (connection.provider == Provider::kSchwab) {
+      premia::schwab::Client client;
+      if (LoadSchwabClient(client)) {
+        if (client.HasValidAccessToken()) {
+          connection.status = ConnectionStatus::kConnected;
+          connection.reauth_required = false;
+        } else if (client.HasValidRefreshToken()) {
+          connection.status = ConnectionStatus::kDegraded;
+          connection.reauth_required = false;
+        } else if (HasFile(kSchwabTokenPath)) {
+          connection.status = ConnectionStatus::kReauthRequired;
+          connection.reauth_required = true;
+        } else {
+          connection.status = ConnectionStatus::kNotConnected;
+          connection.reauth_required = false;
+          connection.last_sync_at.clear();
+        }
+      }
+    }
+
+    if (connection.provider == Provider::kPlaid) {
+      premia::plaid::Client client;
+      if (LoadPlaidClient(client)) {
+        connection.status =
+            client.HasAccessToken() ? ConnectionStatus::kConnected
+                                    : ConnectionStatus::kNotConnected;
+        connection.reauth_required = false;
+        if (!client.HasAccessToken()) {
+          connection.last_sync_at.clear();
+        }
+      }
+    }
+  }
+
+  return connections;
 }
 
 auto ScaffoldApplicationService::GetConnection(const std::string& provider_key) const
     -> ConnectionSummary {
-  return FindConnection(domain::ProviderFromString(provider_key));
+  const auto provider = domain::ProviderFromString(provider_key);
+  const auto connections = GetConnections();
+  auto it = std::find_if(connections.begin(), connections.end(),
+                         [provider](const ConnectionSummary& connection) {
+                           return connection.provider == provider;
+                         });
+  if (it == connections.end()) {
+    throw std::out_of_range("provider connection not found");
+  }
+  return *it;
 }
 
 auto ScaffoldApplicationService::GetPortfolioSummary() const -> PortfolioSummary {
@@ -154,8 +300,8 @@ auto ScaffoldApplicationService::ListWatchlists() const
   return watchlists_;
 }
 
-auto ScaffoldApplicationService::GetWatchlistScreen(const std::string& watchlist_id) const
-    -> WatchlistScreenData {
+auto ScaffoldApplicationService::GetWatchlistScreen(
+    const std::string& watchlist_id) const -> WatchlistScreenData {
   WatchlistScreenData data;
   data.available_watchlists = watchlists_;
   data.watchlist = watchlists_.front();
@@ -180,8 +326,8 @@ auto ScaffoldApplicationService::GetWatchlistScreen(const std::string& watchlist
   return data;
 }
 
-auto ScaffoldApplicationService::CreateLinkToken(const PlaidLinkTokenRequest& request)
-    -> PlaidLinkTokenData {
+auto ScaffoldApplicationService::CreateLinkToken(
+    const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
   return CreatePlaidLinkToken(request);
 }
 
@@ -192,23 +338,45 @@ auto ScaffoldApplicationService::StartSchwabOAuth(
   schwab.reauth_required = false;
 
   const auto state = std::string("schwab_state_") + std::to_string(NextWorkflowId());
-  const auto redirect_uri = request.redirect_uri.empty()
-                                ? std::string("premia://schwab/callback")
-                                : request.redirect_uri;
 
   SchwabOAuthStartData data;
   data.state = state;
   data.expires_at = CurrentUtcTimestamp();
-  data.auth_url =
-      "https://api.schwabapi.com/v1/oauth/authorize?response_type=code&client_id="
-      "premia-demo-app&redirect_uri=" +
-      redirect_uri + "&state=" + state;
+
+  premia::schwab::Client client;
+  if (LoadSchwabClient(client)) {
+    data.auth_url = client.BuildAuthUrl();
+  } else {
+    const auto redirect_uri = request.redirect_uri.empty()
+                                  ? std::string("premia://schwab/callback")
+                                  : request.redirect_uri;
+    data.auth_url =
+        "https://api.schwabapi.com/v1/oauth/authorize?response_type=code&client_id="
+        "premia-demo-app&redirect_uri=" +
+        redirect_uri + "&state=" + state;
+  }
   return data;
 }
 
 auto ScaffoldApplicationService::CompleteSchwabOAuth(
     const SchwabOAuthCompleteRequest& request) -> ConnectionSummary {
   auto& schwab = FindConnection(Provider::kSchwab);
+
+  premia::schwab::Client client;
+  if (LoadSchwabClient(client)) {
+    if (!request.callback.empty() && client.ExchangeAuthCode(request.callback)) {
+      client.SaveTokens(kSchwabTokenPath);
+      client.GetAccountNumbers();
+      schwab.status = ConnectionStatus::kConnected;
+      schwab.last_sync_at = CurrentUtcTimestamp();
+      schwab.reauth_required = false;
+    } else if (!request.callback.empty()) {
+      schwab.status = ConnectionStatus::kReauthRequired;
+      schwab.reauth_required = true;
+    }
+    return schwab;
+  }
+
   if (!request.callback.empty()) {
     schwab.status = ConnectionStatus::kConnected;
     schwab.last_sync_at = CurrentUtcTimestamp();
@@ -222,8 +390,20 @@ auto ScaffoldApplicationService::CreatePlaidLinkToken(
   auto& plaid = FindConnection(Provider::kPlaid);
   plaid.status = ConnectionStatus::kConnecting;
 
+  premia::plaid::Client client;
+  if (LoadPlaidClient(client)) {
+    const auto user_id = request.user_id.empty() ? std::string("premia-user")
+                                                 : request.user_id;
+    auto data = ParsePlaidLinkTokenResponse(client.CreateLinkToken(user_id));
+    if (!data.link_token.empty()) {
+      return data;
+    }
+  }
+
   PlaidLinkTokenData data;
-  data.link_token = "link-sandbox-" + request.user_id + "-" +
+  const auto user_id = request.user_id.empty() ? std::string("premia-user")
+                                               : request.user_id;
+  data.link_token = "link-sandbox-" + user_id + "-" +
                     std::to_string(NextWorkflowId());
   data.expiration = CurrentUtcTimestamp();
   return data;
@@ -232,6 +412,23 @@ auto ScaffoldApplicationService::CreatePlaidLinkToken(
 auto ScaffoldApplicationService::CompletePlaidLink(
     const PlaidLinkCompleteRequest& request) -> ConnectionSummary {
   auto& plaid = FindConnection(Provider::kPlaid);
+
+  premia::plaid::Client client;
+  if (LoadPlaidClient(client)) {
+    if (!request.public_token.empty() &&
+        client.ExchangePublicToken(request.public_token)) {
+      client.SaveTokens(kPlaidTokenPath);
+      plaid.status = ConnectionStatus::kConnected;
+      plaid.last_sync_at = CurrentUtcTimestamp();
+      plaid.reauth_required = false;
+    } else if (!request.public_token.empty()) {
+      plaid.status = ConnectionStatus::kNotConnected;
+      plaid.reauth_required = false;
+      plaid.last_sync_at.clear();
+    }
+    return plaid;
+  }
+
   if (!request.public_token.empty()) {
     plaid.status = ConnectionStatus::kConnected;
     plaid.last_sync_at = CurrentUtcTimestamp();
@@ -264,8 +461,8 @@ auto ScaffoldApplicationService::FindConnection(Provider provider) const
   return *it;
 }
 
-auto ScaffoldApplicationService::BuildQuoteDetailForSymbol(const std::string& symbol) const
-    -> QuoteDetail {
+auto ScaffoldApplicationService::BuildQuoteDetailForSymbol(
+    const std::string& symbol) const -> QuoteDetail {
   QuoteDetail detail;
   detail.instrument = {symbol, symbol + " Holdings Demo", "equity", "NASDAQ"};
   detail.quote = QuoteSnapshot{MakeMoney("217.00"), MakeMoney("216.95"),

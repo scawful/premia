@@ -18,6 +18,9 @@ This note captures the first implementation pass after the architecture review.
 - `src/core/include/premia/core/application/scaffold_application_service.hpp`
   and `src/core/application/scaffold_application_service.cc` provide concrete
   scaffold service implementations used by both the API and the desktop app.
+- the scaffold service now attempts to use real Schwab and Plaid service clients
+  when valid non-placeholder config files are present, and otherwise falls back
+  to deterministic demo data
 - `src/core/include/premia/core/ports/provider_ports.hpp` defines provider-side
   adapter ports.
 
@@ -38,6 +41,8 @@ This note captures the first implementation pass after the architecture review.
   - `POST /v1/connections/schwab/oauth/complete`
   - `POST /v1/connections/plaid/link-token`
   - `POST /v1/connections/plaid/link-complete`
+- these workflow routes now use real provider clients when valid config exists,
+  and otherwise preserve a safe local scaffold fallback for development
 - `GET /openapi` exposes the checked-in contract file.
 
 ### Swift client and UI scaffold
@@ -62,6 +67,9 @@ This note captures the first implementation pass after the architecture review.
 - `cmake --build build-arch-next --target premia` succeeds.
 - `premia_api` screen endpoints and connection workflow routes return valid JSON
   with correct booleans and arrays.
+- placeholder config files do not trigger live provider calls; bootstrap now
+  reports providers as disconnected unless real credentials or workflow state
+  make them active
 - `swift package dump-package` in `apps/mobile-ios/` succeeds.
 - `npx --yes @openapitools/openapi-generator-cli generate ...` succeeds and emits
   the first generated Swift client package.
