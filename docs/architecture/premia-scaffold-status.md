@@ -21,6 +21,10 @@ This note captures the first implementation pass after the architecture review.
 - `src/core/include/premia/core/application/composition_root.hpp` and
   `src/core/application/composition_root.cc` now provide a simple composition
   root that assembles and exposes the provider-backed application service.
+- `src/core/application/provider_service_components.hpp` and
+  `src/core/application/provider_service_components.cc` now split connection,
+  portfolio/account, market/options, watchlist, and workflow logic into smaller
+  composed services behind the provider-backed application service.
 - the scaffold service now attempts to use real Schwab and Plaid service clients
   when valid non-placeholder config files are present, and otherwise falls back
   to deterministic demo data

@@ -2,202 +2,22 @@
 
 #include "premia/core/application/composition_root.hpp"
 
-#include <algorithm>
-#include <chrono>
-#include <ctime>
-#include <fstream>
-#include <iomanip>
-#include <map>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <utility>
-
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
-#include "Plaid/client.h"
-#include "premia/providers/local/account_detail_provider.hpp"
-#include "premia/providers/local/options_provider.hpp"
-#include "premia/providers/local/portfolio_provider.hpp"
-#include "Schwab/client.h"
-#include "premia/providers/local/watchlist_provider.hpp"
-#include "premia/providers/plaid/workflow_provider.hpp"
-#include "premia/providers/schwab/market_data_provider.hpp"
-#include "premia/providers/tda/account_detail_provider.hpp"
-#include "premia/providers/tda/portfolio_provider.hpp"
-#include "premia/providers/tda/watchlist_provider.hpp"
-#include "premia/providers/tda/options_provider.hpp"
-#include "premia/providers/schwab/workflow_provider.hpp"
+#include "provider_service_components.hpp"
 
 namespace premia::core::application {
-
-namespace domain = premia::core::domain;
-
-namespace {
-
-using domain::AbsolutePercentChange;
-using domain::ConnectionStatus;
-using domain::Money;
-using domain::Provider;
-namespace pt = boost::property_tree;
-
-constexpr char kSchwabConfigPath[] = "assets/schwab.json";
-constexpr char kSchwabTokenPath[] = "assets/schwab_tokens.json";
-constexpr char kPlaidConfigPath[] = "assets/plaid.json";
-constexpr char kPlaidTokenPath[] = "assets/plaid_tokens.json";
-
-auto MakeMoney(std::string amount) -> Money {
-  return Money{std::move(amount), "USD"};
-}
-
-auto MakeChange(std::string absolute, std::string percent)
-    -> AbsolutePercentChange {
-  return AbsolutePercentChange{MakeMoney(std::move(absolute)), std::move(percent)};
-}
-
-auto MakeConnection(Provider provider, ConnectionStatus status,
-                    std::string display_name, std::string last_sync_at,
-                    bool reauth_required,
-                    std::map<std::string, bool> capabilities)
-    -> ConnectionSummary {
-  ConnectionSummary summary;
-  summary.provider = provider;
-  summary.status = status;
-  summary.display_name = std::move(display_name);
-  summary.last_sync_at = std::move(last_sync_at);
-  summary.reauth_required = reauth_required;
-  summary.capabilities = std::move(capabilities);
-  return summary;
-}
-
-auto IsPlaceholderValue(const std::string& value) -> bool {
-  return value.empty() || value.rfind("YOUR_", 0) == 0;
-}
-
-auto ReadJsonTree(const std::string& path, pt::ptree& tree) -> bool {
-  std::ifstream file(path);
-  if (!file.good()) {
-    return false;
-  }
-
-  try {
-    pt::read_json(file, tree);
-  } catch (const std::exception&) {
-    return false;
-  }
-  return true;
-}
-
-auto HasFile(const std::string& path) -> bool {
-  std::ifstream file(path);
-  return file.good();
-}
-
-auto HasUsableSchwabConfig() -> bool {
-  pt::ptree tree;
-  if (!ReadJsonTree(kSchwabConfigPath, tree)) {
-    return false;
-  }
-
-  const auto app_key = tree.get<std::string>("app_key", "");
-  const auto app_secret = tree.get<std::string>("app_secret", "");
-  return !IsPlaceholderValue(app_key) && !IsPlaceholderValue(app_secret);
-}
-
-auto HasUsablePlaidConfig() -> bool {
-  pt::ptree tree;
-  if (!ReadJsonTree(kPlaidConfigPath, tree)) {
-    return false;
-  }
-
-  const auto client_id = tree.get<std::string>("client_id", "");
-  const auto secret = tree.get<std::string>("secret", "");
-  return !IsPlaceholderValue(client_id) && !IsPlaceholderValue(secret);
-}
-
-auto LoadSchwabClient(premia::schwab::Client& client) -> bool {
-  if (!HasUsableSchwabConfig()) {
-    return false;
-  }
-  if (!client.LoadConfig(kSchwabConfigPath)) {
-    return false;
-  }
-  client.LoadTokens(kSchwabTokenPath);
-  return true;
-}
-
-auto LoadPlaidClient(premia::plaid::Client& client) -> bool {
-  if (!HasUsablePlaidConfig()) {
-    return false;
-  }
-  if (!client.LoadConfig(kPlaidConfigPath)) {
-    return false;
-  }
-  client.LoadTokens(kPlaidTokenPath);
-  return true;
-}
-
-auto ParsePlaidLinkTokenResponse(const std::string& response)
-    -> PlaidLinkTokenData {
-  PlaidLinkTokenData data;
-  if (response.empty()) {
-    return data;
-  }
-
-  try {
-    std::istringstream ss(response);
-    pt::ptree tree;
-    pt::read_json(ss, tree);
-    data.link_token = tree.get<std::string>("link_token", "");
-    data.expiration = tree.get<std::string>("expiration", "");
-  } catch (const std::exception&) {
-  }
-
-  return data;
-}
-
-}  // namespace
 
 auto ProviderBackedApplicationService::Instance() -> ProviderBackedApplicationService& {
   return CompositionRoot::Instance().AppService();
 }
 
-ProviderBackedApplicationService::ProviderBackedApplicationService() {
-  connections_ = {
-      MakeConnection(Provider::kSchwab, ConnectionStatus::kNotConnected,
-                     "Charles Schwab", "", false,
-                     {{"portfolio", true},
-                      {"marketData", true},
-                      {"options", true},
-                      {"banking", false}}),
-      MakeConnection(Provider::kPlaid, ConnectionStatus::kNotConnected, "Plaid",
-                     "", false,
-                     {{"banking", true},
-                      {"transactions", true},
-                      {"portfolio", false}}),
-      MakeConnection(Provider::kIBKR, ConnectionStatus::kDegraded,
-                     "Interactive Brokers", "2026-03-22T18:31:00Z", false,
-                     {{"portfolio", true},
-                      {"marketData", false},
-                      {"trading", false}}),
-  };
+ProviderBackedApplicationService::ProviderBackedApplicationService()
+    : connection_service_(std::make_unique<detail::ConnectionService>()),
+      portfolio_service_(std::make_unique<detail::PortfolioAccountService>()),
+      market_options_service_(std::make_unique<detail::MarketOptionsService>()),
+      watchlist_service_(std::make_unique<detail::WatchlistService>()),
+      workflow_service_(std::make_unique<detail::WorkflowService>(*connection_service_)) {}
 
-  watchlists_ = {
-      {"core", "Core", 12},
-      {"earnings", "Earnings", 8},
-      {"macro", "Macro", 6},
-  };
-
-  holdings_ = {
-      {"holding_aapl", "AAPL", "Apple Inc.", "42", MakeMoney("9114.00"),
-       MakeChange("54.60", "0.60")},
-      {"holding_msft", "MSFT", "Microsoft Corp.", "18",
-       MakeMoney("7561.80"), MakeChange("41.22", "0.55")},
-      {"holding_spy", "SPY", "SPDR S&P 500 ETF", "25", MakeMoney("12987.50"),
-       MakeChange("92.50", "0.72")},
-  };
-}
+ProviderBackedApplicationService::~ProviderBackedApplicationService() = default;
 
 auto ProviderBackedApplicationService::GetBootstrapData() const -> BootstrapData {
   BootstrapData data;
@@ -208,158 +28,56 @@ auto ProviderBackedApplicationService::GetBootstrapData() const -> BootstrapData
       {"streaming", true},
       {"desktopMigration", true},
   };
-  data.connections = GetConnections();
+  data.connections = connection_service_->GetConnections();
   return data;
 }
 
 auto ProviderBackedApplicationService::GetHomeScreenData() const -> HomeScreenData {
   HomeScreenData data;
-  data.connections = GetConnections();
-  data.portfolio = GetPortfolioSummary();
-  data.top_holdings = GetTopHoldings();
-  data.watchlists = ListWatchlists();
+  data.connections = connection_service_->GetConnections();
+  data.portfolio = portfolio_service_->GetPortfolioSummary();
+  data.top_holdings = portfolio_service_->GetTopHoldings();
+  data.watchlists = watchlist_service_->ListWatchlists();
   data.market = MarketSummary{"open", "2026-03-22T20:00:00Z"};
   return data;
 }
 
 auto ProviderBackedApplicationService::GetConnections() const
     -> std::vector<ConnectionSummary> {
-  auto connections = connections_;
-
-  for (auto& connection : connections) {
-    if (connection.provider == Provider::kSchwab) {
-      premia::schwab::Client client;
-      if (LoadSchwabClient(client)) {
-        if (client.HasValidAccessToken()) {
-          connection.status = ConnectionStatus::kConnected;
-          connection.reauth_required = false;
-        } else if (client.HasValidRefreshToken()) {
-          connection.status = ConnectionStatus::kDegraded;
-          connection.reauth_required = false;
-        } else if (HasFile(kSchwabTokenPath)) {
-          connection.status = ConnectionStatus::kReauthRequired;
-          connection.reauth_required = true;
-        } else {
-          connection.status = ConnectionStatus::kNotConnected;
-          connection.reauth_required = false;
-          connection.last_sync_at.clear();
-        }
-      }
-    }
-
-    if (connection.provider == Provider::kPlaid) {
-      premia::plaid::Client client;
-      if (LoadPlaidClient(client)) {
-        connection.status =
-            client.HasAccessToken() ? ConnectionStatus::kConnected
-                                    : ConnectionStatus::kNotConnected;
-        connection.reauth_required = false;
-        if (!client.HasAccessToken()) {
-          connection.last_sync_at.clear();
-        }
-      }
-    }
-  }
-
-  return connections;
+  return connection_service_->GetConnections();
 }
 
-auto ProviderBackedApplicationService::GetConnection(const std::string& provider_key) const
-    -> ConnectionSummary {
-  const auto provider = domain::ProviderFromString(provider_key);
-  const auto connections = GetConnections();
-  auto it = std::find_if(connections.begin(), connections.end(),
-                         [provider](const ConnectionSummary& connection) {
-                           return connection.provider == provider;
-                         });
-  if (it == connections.end()) {
-    throw std::out_of_range("provider connection not found");
-  }
-  return *it;
+auto ProviderBackedApplicationService::GetConnection(
+    const std::string& provider_key) const -> ConnectionSummary {
+  return connection_service_->GetConnection(provider_key);
 }
 
-auto ProviderBackedApplicationService::GetPortfolioSummary() const -> PortfolioSummary {
-  try {
-    providers::tda::PortfolioProvider provider("assets/tda.json");
-    return provider.GetPortfolioSummary();
-  } catch (const std::exception&) {
-  }
-
-  providers::local::PortfolioProvider provider("assets/portfolio.json");
-  return provider.GetPortfolioSummary();
+auto ProviderBackedApplicationService::GetPortfolioSummary() const
+    -> PortfolioSummary {
+  return portfolio_service_->GetPortfolioSummary();
 }
 
-auto ProviderBackedApplicationService::GetTopHoldings() const -> std::vector<HoldingRow> {
-  try {
-    providers::tda::PortfolioProvider provider("assets/tda.json");
-    return provider.GetTopHoldings();
-  } catch (const std::exception&) {
-  }
-
-  providers::local::PortfolioProvider provider("assets/portfolio.json");
-  return provider.GetTopHoldings();
+auto ProviderBackedApplicationService::GetTopHoldings() const
+    -> std::vector<HoldingRow> {
+  return portfolio_service_->GetTopHoldings();
 }
 
 auto ProviderBackedApplicationService::GetAccountDetail() const -> AccountDetail {
-  try {
-    providers::tda::AccountDetailProvider provider("assets/tda.json");
-    return provider.GetAccountDetail();
-  } catch (const std::exception&) {
-  }
-
-  providers::local::AccountDetailProvider provider("assets/account.json");
-  return provider.GetAccountDetail();
+  return portfolio_service_->GetAccountDetail();
 }
 
 auto ProviderBackedApplicationService::GetQuoteDetail(const std::string& symbol) const
     -> QuoteDetail {
-  const auto fallback = BuildQuoteDetailForSymbol(symbol);
-  try {
-    providers::schwab::MarketDataProvider provider(kSchwabConfigPath,
-                                                   kSchwabTokenPath);
-    auto detail = provider.GetQuoteDetail(symbol);
-    detail.position = fallback.position;
-    detail.watchlist_membership = fallback.watchlist_membership;
-    if (detail.instrument.name.empty()) {
-      detail.instrument.name = fallback.instrument.name;
-    }
-    if (detail.instrument.primary_exchange.empty()) {
-      detail.instrument.primary_exchange = fallback.instrument.primary_exchange;
-    }
-    return detail;
-  } catch (const std::exception&) {
-    return fallback;
-  }
+  return market_options_service_->GetQuoteDetail(symbol);
 }
 
 auto ProviderBackedApplicationService::GetChartScreen(const std::string& symbol,
-                                                const std::string& range,
-                                                const std::string& interval,
-                                                bool extended_hours) const
+                                                      const std::string& range,
+                                                      const std::string& interval,
+                                                      bool extended_hours) const
     -> ChartScreenData {
-  ChartScreenData fallback;
-  fallback.instrument = {symbol, symbol + " Holdings Demo", "equity", "NASDAQ"};
-  fallback.range = range.empty() ? "1M" : range;
-  fallback.interval = interval.empty() ? "1D" : interval;
-  fallback.timezone = "America/New_York";
-  fallback.series = BuildChartSeriesForSymbol(symbol, extended_hours);
-  fallback.stats = ChartStats{MakeChange("8.20", "3.93")};
-
-  try {
-    providers::schwab::MarketDataProvider provider(kSchwabConfigPath,
-                                                   kSchwabTokenPath);
-    auto chart = provider.GetChartScreen(symbol, fallback.range, fallback.interval,
-                                         extended_hours);
-    if (chart.instrument.name.empty()) {
-      chart.instrument.name = fallback.instrument.name;
-    }
-    if (chart.series.bars.empty()) {
-      return fallback;
-    }
-    return chart;
-  } catch (const std::exception&) {
-    return fallback;
-  }
+  return market_options_service_->GetChartScreen(symbol, range, interval,
+                                                 extended_hours);
 }
 
 auto ProviderBackedApplicationService::GetOptionChainSnapshot(
@@ -367,186 +85,66 @@ auto ProviderBackedApplicationService::GetOptionChainSnapshot(
     const std::string& strategy, const std::string& range,
     const std::string& exp_month, const std::string& option_type) const
     -> OptionChainSnapshot {
-  try {
-    providers::tda::OptionsProvider provider("assets/tda.json");
-    return provider.GetOptionChainSnapshot(symbol, strike_count, strategy, range,
-                                           exp_month, option_type);
-  } catch (const std::exception&) {
-  }
-
-  providers::local::OptionsProvider provider("assets/options.json");
-  return provider.GetOptionChainSnapshot(symbol, strike_count, strategy, range,
-                                         exp_month, option_type);
+  return market_options_service_->GetOptionChainSnapshot(symbol, strike_count,
+                                                         strategy, range,
+                                                         exp_month, option_type);
 }
 
 auto ProviderBackedApplicationService::ListWatchlists() const
     -> std::vector<WatchlistSummary> {
-  try {
-    providers::tda::WatchlistProvider provider("assets/tda.json");
-    return provider.ListWatchlists();
-  } catch (const std::exception&) {
-  }
-
-  providers::local::WatchlistProvider provider("assets/watchlists.json");
-  return provider.ListWatchlists();
+  return watchlist_service_->ListWatchlists();
 }
 
 auto ProviderBackedApplicationService::GetWatchlistScreen(
     const std::string& watchlist_id) const -> WatchlistScreenData {
-  try {
-    providers::tda::WatchlistProvider provider("assets/tda.json");
-    return provider.GetWatchlistScreen(watchlist_id);
-  } catch (const std::exception&) {
-  }
-
-  providers::local::WatchlistProvider provider("assets/watchlists.json");
-  return provider.GetWatchlistScreen(watchlist_id);
+  return watchlist_service_->GetWatchlistScreen(watchlist_id);
 }
 
 auto ProviderBackedApplicationService::CreateWatchlist(const std::string& name)
     -> WatchlistSummary {
-  providers::local::WatchlistProvider provider("assets/watchlists.json");
-  return provider.CreateWatchlist(name);
+  return watchlist_service_->CreateWatchlist(name);
 }
 
-auto ProviderBackedApplicationService::RenameWatchlist(const std::string& watchlist_id,
-                                                 const std::string& name)
-    -> WatchlistSummary {
-  providers::local::WatchlistProvider provider("assets/watchlists.json");
-  return provider.RenameWatchlist(watchlist_id, name);
+auto ProviderBackedApplicationService::RenameWatchlist(
+    const std::string& watchlist_id, const std::string& name) -> WatchlistSummary {
+  return watchlist_service_->RenameWatchlist(watchlist_id, name);
 }
 
-auto ProviderBackedApplicationService::AddWatchlistSymbol(const std::string& watchlist_id,
-                                                    const std::string& symbol)
+auto ProviderBackedApplicationService::AddWatchlistSymbol(
+    const std::string& watchlist_id, const std::string& symbol)
     -> WatchlistSummary {
-  providers::local::WatchlistProvider provider("assets/watchlists.json");
-  return provider.AddWatchlistSymbol(watchlist_id, symbol);
+  return watchlist_service_->AddWatchlistSymbol(watchlist_id, symbol);
 }
 
-auto ProviderBackedApplicationService::RemoveWatchlistSymbol(const std::string& watchlist_id,
-                                                       const std::string& symbol)
+auto ProviderBackedApplicationService::RemoveWatchlistSymbol(
+    const std::string& watchlist_id, const std::string& symbol)
     -> WatchlistSummary {
-  providers::local::WatchlistProvider provider("assets/watchlists.json");
-  return provider.RemoveWatchlistSymbol(watchlist_id, symbol);
+  return watchlist_service_->RemoveWatchlistSymbol(watchlist_id, symbol);
 }
 
 auto ProviderBackedApplicationService::CreateLinkToken(
     const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
-  return CreatePlaidLinkToken(request);
+  return workflow_service_->CreateLinkToken(request);
 }
 
 auto ProviderBackedApplicationService::StartSchwabOAuth(
     const SchwabOAuthStartRequest& request) -> SchwabOAuthStartData {
-  auto& schwab = FindConnection(Provider::kSchwab);
-  schwab.status = ConnectionStatus::kConnecting;
-  schwab.reauth_required = false;
-
-  const auto state = std::string("schwab_state_") + std::to_string(NextWorkflowId());
-
-  providers::schwab::WorkflowProvider provider(kSchwabConfigPath,
-                                               kSchwabTokenPath);
-  return provider.StartOAuth(request, state, CurrentUtcTimestamp());
+  return workflow_service_->StartSchwabOAuth(request);
 }
 
 auto ProviderBackedApplicationService::CompleteSchwabOAuth(
     const SchwabOAuthCompleteRequest& request) -> ConnectionSummary {
-  auto& schwab = FindConnection(Provider::kSchwab);
-  providers::schwab::WorkflowProvider provider(kSchwabConfigPath,
-                                               kSchwabTokenPath);
-  schwab = provider.CompleteOAuth(request, schwab, CurrentUtcTimestamp());
-  return schwab;
+  return workflow_service_->CompleteSchwabOAuth(request);
 }
 
 auto ProviderBackedApplicationService::CreatePlaidLinkToken(
     const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
-  auto& plaid = FindConnection(Provider::kPlaid);
-  plaid.status = ConnectionStatus::kConnecting;
-
-  providers::plaid::WorkflowProvider provider(kPlaidConfigPath, kPlaidTokenPath);
-  return provider.CreateLinkToken(request, CurrentUtcTimestamp(), NextWorkflowId());
+  return workflow_service_->CreatePlaidLinkToken(request);
 }
 
 auto ProviderBackedApplicationService::CompletePlaidLink(
     const PlaidLinkCompleteRequest& request) -> ConnectionSummary {
-  auto& plaid = FindConnection(Provider::kPlaid);
-
-  providers::plaid::WorkflowProvider provider(kPlaidConfigPath, kPlaidTokenPath);
-  plaid = provider.CompleteLink(request, plaid, CurrentUtcTimestamp());
-  return plaid;
-}
-
-auto ProviderBackedApplicationService::FindConnection(Provider provider)
-    -> ConnectionSummary& {
-  auto it = std::find_if(connections_.begin(), connections_.end(),
-                         [provider](const ConnectionSummary& connection) {
-                           return connection.provider == provider;
-                         });
-  if (it == connections_.end()) {
-    throw std::out_of_range("provider connection not found");
-  }
-  return *it;
-}
-
-auto ProviderBackedApplicationService::FindConnection(Provider provider) const
-    -> const ConnectionSummary& {
-  auto it = std::find_if(connections_.begin(), connections_.end(),
-                         [provider](const ConnectionSummary& connection) {
-                           return connection.provider == provider;
-                         });
-  if (it == connections_.end()) {
-    throw std::out_of_range("provider connection not found");
-  }
-  return *it;
-}
-
-auto ProviderBackedApplicationService::BuildQuoteDetailForSymbol(
-    const std::string& symbol) const -> QuoteDetail {
-  QuoteDetail detail;
-  detail.instrument = {symbol, symbol + " Holdings Demo", "equity", "NASDAQ"};
-  detail.quote = QuoteSnapshot{MakeMoney("217.00"), MakeMoney("216.95"),
-                               MakeMoney("217.02"), MakeMoney("214.10"),
-                               MakeMoney("218.22"), MakeMoney("213.90"),
-                               MakeMoney("215.70"), "53422010",
-                               "2026-03-22T18:44:58Z"};
-  detail.position = PositionSummary{"42", MakeMoney("9114.00"),
-                                    MakeMoney("8421.00"), MakeMoney("693.00")};
-  detail.watchlist_membership = WatchlistMembership{true, {"core"}};
-  return detail;
-}
-
-auto ProviderBackedApplicationService::BuildChartSeriesForSymbol(
-    const std::string& symbol, bool extended_hours) const -> ChartSeries {
-  (void)symbol;
-  ChartSeries series;
-  series.type = extended_hours ? "line" : "candles";
-  series.bars = {
-      {"2026-03-18T20:00:00Z", "212.40", "214.60", "211.80", "213.90",
-       "48221001"},
-      {"2026-03-19T20:00:00Z", "213.95", "216.40", "213.10", "215.70",
-       "50110221"},
-      {"2026-03-20T20:00:00Z", "214.10", "218.22", "213.90", "217.00",
-       "53422010"},
-  };
-  return series;
-}
-
-auto ProviderBackedApplicationService::NextWorkflowId() -> unsigned long long {
-  ++workflow_counter_;
-  return workflow_counter_;
-}
-
-auto ProviderBackedApplicationService::CurrentUtcTimestamp() const -> std::string {
-  const auto now = std::chrono::system_clock::now();
-  const std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-  std::tm utc_time{};
-#if defined(_WIN32)
-  gmtime_s(&utc_time, &now_time);
-#else
-  gmtime_r(&now_time, &utc_time);
-#endif
-  std::ostringstream oss;
-  oss << std::put_time(&utc_time, "%Y-%m-%dT%H:%M:%SZ");
-  return oss.str();
+  return workflow_service_->CompletePlaidLink(request);
 }
 
 }  // namespace premia::core::application

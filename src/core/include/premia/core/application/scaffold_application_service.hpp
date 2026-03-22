@@ -1,6 +1,7 @@
 #ifndef PREMIA_CORE_APPLICATION_SCAFFOLD_APPLICATION_SERVICE_HPP
 #define PREMIA_CORE_APPLICATION_SCAFFOLD_APPLICATION_SERVICE_HPP
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -8,9 +9,15 @@
 
 namespace premia::core::application {
 
-namespace domain = premia::core::domain;
-
 class CompositionRoot;
+
+namespace detail {
+class ConnectionService;
+class PortfolioAccountService;
+class MarketOptionsService;
+class WatchlistService;
+class WorkflowService;
+}  // namespace detail
 
 class ProviderBackedApplicationService : public BrokerConnectionService,
                                          public PortfolioService,
@@ -22,6 +29,8 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
                                          public ConnectionWorkflowService {
  public:
   static auto Instance() -> ProviderBackedApplicationService&;
+
+  ~ProviderBackedApplicationService();
 
   auto GetBootstrapData() const -> BootstrapData;
   auto GetHomeScreenData() const -> HomeScreenData;
@@ -69,23 +78,16 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   auto CompletePlaidLink(const PlaidLinkCompleteRequest& request)
       -> ConnectionSummary override;
 
-  private:
+ private:
   friend class CompositionRoot;
 
   ProviderBackedApplicationService();
 
-  auto FindConnection(domain::Provider provider) -> ConnectionSummary&;
-  auto FindConnection(domain::Provider provider) const -> const ConnectionSummary&;
-  auto BuildQuoteDetailForSymbol(const std::string& symbol) const -> QuoteDetail;
-  auto BuildChartSeriesForSymbol(const std::string& symbol,
-                                 bool extended_hours) const -> ChartSeries;
-  auto NextWorkflowId() -> unsigned long long;
-  auto CurrentUtcTimestamp() const -> std::string;
-
-  std::vector<ConnectionSummary> connections_;
-  std::vector<WatchlistSummary> watchlists_;
-  std::vector<HoldingRow> holdings_;
-  mutable unsigned long long workflow_counter_ = 0;
+  std::unique_ptr<detail::ConnectionService> connection_service_;
+  std::unique_ptr<detail::PortfolioAccountService> portfolio_service_;
+  std::unique_ptr<detail::MarketOptionsService> market_options_service_;
+  std::unique_ptr<detail::WatchlistService> watchlist_service_;
+  std::unique_ptr<detail::WorkflowService> workflow_service_;
 };
 
 using ScaffoldApplicationService = ProviderBackedApplicationService;

@@ -1,6 +1,7 @@
 add_library(
   premia_core STATIC
   application/composition_root.cc
+  application/provider_service_components.cc
   application/scaffold_application_service.cc
 )
 
