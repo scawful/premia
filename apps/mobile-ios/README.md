@@ -15,4 +15,5 @@ Current integration:
 - `apps/mobile-ios/Package.swift` depends on the local generated package at
   `clients/swift/Generated/`
 - `PremiaAPIClient` now configures `PremiaAPIClientGeneratedAPI.basePath` and
-  exposes `loadBootstrap()` as the first typed async wrapper method
+  exposes typed async wrapper methods for bootstrap, home, quote, and chart
+  loading

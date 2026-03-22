@@ -72,6 +72,9 @@ This note captures the first implementation pass after the architecture review.
 - `apps/mobile-ios/Package.swift` now depends on the local generated package and
   `apps/mobile-ios/Sources/PremiaAPIClient/PremiaAPIClient.swift` wraps it with
   a first typed async `loadBootstrap()` method.
+- the mobile wrapper now also exposes typed async `loadHome()`, `loadQuote()`,
+  and `loadChart()` methods, plus hand-written Swift models for portfolio,
+  holdings, quotes, and chart snapshots.
 
 ### Desktop migration start
 
