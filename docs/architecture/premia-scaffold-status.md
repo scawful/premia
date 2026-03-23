@@ -134,6 +134,9 @@ This note captures the first implementation pass after the architecture review.
   the generated trading API.
 - the mobile wrapper now also exposes order-list/history loaders and a simple
   SwiftUI `OrdersListView` for rendering provider-backed order records.
+- `apps/mobile-ios/Sources/PremiaUI/` now contains a real tab-based SwiftUI
+  navigation shell with home, account, watchlists, quote/chart, and orders
+  screens built on top of the wrapper layer.
 
 ### Desktop migration start
 
@@ -163,6 +166,8 @@ This note captures the first implementation pass after the architecture review.
 - the active `src/app/` desktop paths no longer depend on direct
   `tda::TDA::getInstance()` calls; the old singleton usage has been removed from
   login, console, and legacy watchlist model paths as well.
+- the chart and watchlist desktop paths now stay on provider-backed core data
+  rather than rebuilding active rendering around direct TDA singleton lookups.
 
 ## Validation status
 
