@@ -137,6 +137,8 @@ This note captures the first implementation pass after the architecture review.
 - `apps/mobile-ios/Sources/PremiaUI/` now contains a real tab-based SwiftUI
   navigation shell with home, account, watchlists, quote/chart, and orders
   screens built on top of the wrapper layer.
+- `PremiaMobile/` now contains an XcodeGen-backed iOS app host that launches
+  `PremiaRootView` as a real Simulator-buildable app target.
 
 ### Desktop migration start
 
@@ -193,6 +195,7 @@ This note captures the first implementation pass after the architecture review.
   `~/.local/share/premia/swift-sdk-shadow-backup/`.
 - `swift package dump-package` in `clients/swift/Generated/` succeeds with the
   Swift 6 generator output.
+- `xcodebuild -project PremiaMobile/PremiaMobile.xcodeproj -scheme PremiaMobile -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build` succeeds.
 
 ## Immediate next moves
 

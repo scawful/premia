@@ -11,6 +11,12 @@ This package is intentionally small and hand-written for now. The generated
 OpenAPI client should eventually live under `clients/swift/Generated/`, with
 hand-written adapters bridging it into the `PremiaAPIClient` target.
 
+App host:
+- `PremiaMobile/` now contains an XcodeGen-backed iOS app host that renders
+  `PremiaRootView`
+- generate/update the Xcode project with `xcodegen generate --spec PremiaMobile/project.yml`
+- build for Simulator with `xcodebuild -project PremiaMobile/PremiaMobile.xcodeproj -scheme PremiaMobile -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+
 Current integration:
 - `apps/mobile-ios/Package.swift` depends on the local generated package at
   `clients/swift/Generated/`

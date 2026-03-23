@@ -1,0 +1,42 @@
+name: PremiaMobile
+
+options:
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 0.1.0
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+
+packages:
+  PremiaMobilePackage:
+    path: ../apps/mobile-ios
+
+targets:
+  PremiaMobile:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App
+    dependencies:
+      - package: PremiaMobilePackage
+        product: PremiaUI
+      - package: PremiaMobilePackage
+        product: PremiaAPIClient
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.scawful.premiamobile
+        PRODUCT_NAME: PremiaMobile
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads: YES
+
+schemes:
+  PremiaMobile:
+    build:
+      targets:
+        PremiaMobile: all

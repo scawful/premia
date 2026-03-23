@@ -1,0 +1,344 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0CF0A0ED45F254FB5AC515F0 /* PremiaAPIClient in Frameworks */ = {isa = PBXBuildFile; productRef = 0B0DC0906A61CC68FB443BD6 /* PremiaAPIClient */; };
+		6B091D9169081020BE042EC7 /* RuntimeConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA33FE493BA7E65C67FD8AF9 /* RuntimeConfiguration.swift */; };
+		931EF99D0547EDAB37E43277 /* PremiaMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DCE46832F3775B0F111AB0 /* PremiaMobileApp.swift */; };
+		C669C8B1B3B8DCDBE0AE2DF2 /* PremiaUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37F27EC5C4C3BB64BA837F7B /* PremiaUI */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4853D8623A9DF6A40C4BE9FF /* mobile-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "mobile-ios"; path = "../apps/mobile-ios"; sourceTree = SOURCE_ROOT; };
+		988C51B13D2E163FE3E6948E /* PremiaMobile.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PremiaMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0DCE46832F3775B0F111AB0 /* PremiaMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiaMobileApp.swift; sourceTree = "<group>"; };
+		CA33FE493BA7E65C67FD8AF9 /* RuntimeConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeConfiguration.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0C267B43D1AB4666BC25673E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C669C8B1B3B8DCDBE0AE2DF2 /* PremiaUI in Frameworks */,
+				0CF0A0ED45F254FB5AC515F0 /* PremiaAPIClient in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4E5CB204E22472146BFC7121 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				4853D8623A9DF6A40C4BE9FF /* mobile-ios */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		60C961E7A88B692880176035 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A0DCE46832F3775B0F111AB0 /* PremiaMobileApp.swift */,
+				CA33FE493BA7E65C67FD8AF9 /* RuntimeConfiguration.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		7970E69EE98C9C771F1765AD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				988C51B13D2E163FE3E6948E /* PremiaMobile.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BCE3D8A0B780057B2C1E33DD = {
+			isa = PBXGroup;
+			children = (
+				60C961E7A88B692880176035 /* App */,
+				4E5CB204E22472146BFC7121 /* Packages */,
+				7970E69EE98C9C771F1765AD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FE6BB0DAE2DCD918C5BA9129 /* PremiaMobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 49D554F9BD7FF8FF009BEF22 /* Build configuration list for PBXNativeTarget "PremiaMobile" */;
+			buildPhases = (
+				CA762E30F97F8E518539B495 /* Sources */,
+				0C267B43D1AB4666BC25673E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PremiaMobile;
+			packageProductDependencies = (
+				37F27EC5C4C3BB64BA837F7B /* PremiaUI */,
+				0B0DC0906A61CC68FB443BD6 /* PremiaAPIClient */,
+			);
+			productName = PremiaMobile;
+			productReference = 988C51B13D2E163FE3E6948E /* PremiaMobile.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		469C207F6BBCE6F8BB6E64B0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = F7E4A4C8D59409939FFDF058 /* Build configuration list for PBXProject "PremiaMobile" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = BCE3D8A0B780057B2C1E33DD;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F62201342BD01363657384A7 /* XCLocalSwiftPackageReference "../apps/mobile-ios" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FE6BB0DAE2DCD918C5BA9129 /* PremiaMobile */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CA762E30F97F8E518539B495 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				931EF99D0547EDAB37E43277 /* PremiaMobileApp.swift in Sources */,
+				6B091D9169081020BE042EC7 /* RuntimeConfiguration.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		401008D429BAC95E1805BC33 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		D58CD647AE8105AC0474DF4D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		F04001F99E27822E314D6734 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.scawful.premiamobile;
+				PRODUCT_NAME = PremiaMobile;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F4BCC2E4ABBAE8C593F6BFC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.scawful.premiamobile;
+				PRODUCT_NAME = PremiaMobile;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		49D554F9BD7FF8FF009BEF22 /* Build configuration list for PBXNativeTarget "PremiaMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4BCC2E4ABBAE8C593F6BFC2 /* Debug */,
+				F04001F99E27822E314D6734 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F7E4A4C8D59409939FFDF058 /* Build configuration list for PBXProject "PremiaMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D58CD647AE8105AC0474DF4D /* Debug */,
+				401008D429BAC95E1805BC33 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		F62201342BD01363657384A7 /* XCLocalSwiftPackageReference "../apps/mobile-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../apps/mobile-ios";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0B0DC0906A61CC68FB443BD6 /* PremiaAPIClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PremiaAPIClient;
+		};
+		37F27EC5C4C3BB64BA837F7B /* PremiaUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PremiaUI;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 469C207F6BBCE6F8BB6E64B0 /* Project object */;
+}
