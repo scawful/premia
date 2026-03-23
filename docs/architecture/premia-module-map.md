@@ -136,6 +136,13 @@ premia-domain -> nothing
 - `src/service/TDAmeritrade/proto/` -> keep only if needed for internal-only
   service boundaries; do not force mobile contracts to mirror current gRPC work
 
+### Desktop path note
+
+- active desktop path: `src/app/view/`, `src/app/model/`, and `premia_core`
+  provider-backed services
+- archived desktop path: `src/app/view/legacy/` is preserved for historical
+  reference only and is not compiled into the active `premia` target
+
 ## Capability map by provider
 
 ### Schwab
