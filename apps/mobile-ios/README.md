@@ -17,6 +17,11 @@ App host:
 - generate/update the Xcode project with `xcodegen generate --spec PremiaMobile/project.yml`
 - build for Simulator with `xcodebuild -project PremiaMobile/PremiaMobile.xcodeproj -scheme PremiaMobile -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
 
+Tests:
+- `swift test --package-path apps/mobile-ios`
+- current Swift test coverage includes order-model round trips plus smoke tests
+  for `PremiaRootView`, `PremiaAppSession`, and `OrdersListView`
+
 Current integration:
 - `apps/mobile-ios/Package.swift` depends on the local generated package at
   `clients/swift/Generated/`

@@ -37,11 +37,29 @@ add_executable(
   ../src/service/Plaid/data/Balance.cpp
 )
 
+add_executable(
+  premia_provider_core_test
+  providers/local_order_provider_test.cc
+  providers/tda_guardrail_test.cc
+  core/order_service_test.cc
+)
+
 target_include_directories(premia_test
   PUBLIC
   ../src
   ../src/app
   ../src/lib
+  ../src/service
+  ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+target_include_directories(premia_provider_core_test
+  PUBLIC
+  ../src
+  ../src/app
+  ../src/core/include
+  ../src/providers/include
+  ../src/core/application
   ../src/service
   ${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -59,9 +77,28 @@ target_link_libraries(
   gtest
 )
 
+target_link_libraries(
+  premia_provider_core_test
+  premia_core
+  tdameritrade
+  schwab
+  plaid
+  curl
+  ${BOOST_LIBRARIES}
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  absl::strings
+  absl::str_format
+  gmock
+  gtest_main
+  gtest
+)
+
 if(WIN32)
   target_link_libraries(premia_test ws2_32)
+  target_link_libraries(premia_provider_core_test ws2_32)
 endif()
 
 include(GoogleTest)
 gtest_discover_tests(premia_test)
+gtest_discover_tests(premia_provider_core_test)

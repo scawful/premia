@@ -170,6 +170,9 @@ This note captures the first implementation pass after the architecture review.
   login, console, and legacy watchlist model paths as well.
 - the chart and watchlist desktop paths now stay on provider-backed core data
   rather than rebuilding active rendering around direct TDA singleton lookups.
+- unused singleton-era app facades and dead desktop models have been deleted,
+  including the old app-local `TDA.hpp`, `Schwab.hpp`, `Plaid.hpp`,
+  `ConsoleModel`, and `WatchlistModel` files.
 
 ## Validation status
 
@@ -196,6 +199,10 @@ This note captures the first implementation pass after the architecture review.
 - `swift package dump-package` in `clients/swift/Generated/` succeeds with the
   Swift 6 generator output.
 - `xcodebuild -project PremiaMobile/PremiaMobile.xcodeproj -scheme PremiaMobile -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build` succeeds.
+- `./build-next-providers/bin/premia_provider_core_test` passes provider-backed
+  order fallback and guardrail tests.
+- `swift test --package-path apps/mobile-ios` passes Swift model and SwiftUI
+  smoke tests.
 
 ## Immediate next moves
 
