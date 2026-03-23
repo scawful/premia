@@ -77,6 +77,16 @@ auto ParseJson(const std::string& body) -> pt::ptree {
   return tree;
 }
 
+auto FindConnectionStatus(const pt::ptree& tree, const std::string& provider)
+    -> std::string {
+  for (const auto& item : tree.get_child("data.connections")) {
+    if (item.second.get<std::string>("provider") == provider) {
+      return item.second.get<std::string>("status");
+    }
+  }
+  return "";
+}
+
 auto MakeTempWorkspace(const std::string& name) -> fs::path {
   const auto path = fs::temp_directory_path() / name;
   fs::remove_all(path);
@@ -261,6 +271,69 @@ TEST_F(ApiIntegrationFixture, ReplaceOrderCreatesNewOpenOrderAndHistoryEntries) 
   ASSERT_EQ(history.status_code, 200);
   const auto history_tree = ParseJson(history.body);
   EXPECT_EQ(history_tree.get_child("data.orders").size(), 2u);
+}
+
+TEST_F(ApiIntegrationFixture, SchwabWorkflowUpdatesBootstrapState) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  const auto start = HttpRequest(
+      "POST", Url("/v1/connections/schwab/oauth/start"),
+      R"({"redirectUri":"premia://schwab/callback","clientPlatform":"desktop"})");
+  ASSERT_EQ(start.status_code, 200);
+  const auto start_tree = ParseJson(start.body);
+  EXPECT_NE(start_tree.get<std::string>("data.state"), "");
+  EXPECT_NE(start_tree.get<std::string>("data.authUrl").find("oauth/authorize"),
+            std::string::npos);
+
+  const auto bootstrap_after_start = HttpRequest("GET", Url("/v1/bootstrap"));
+  ASSERT_EQ(bootstrap_after_start.status_code, 200);
+  auto bootstrap_tree = ParseJson(bootstrap_after_start.body);
+  EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "schwab"), "connecting");
+
+  const auto complete = HttpRequest(
+      "POST", Url("/v1/connections/schwab/oauth/complete"),
+      R"({"callback":"demo-auth-code","state":"ignored"})");
+  ASSERT_EQ(complete.status_code, 200);
+  const auto complete_tree = ParseJson(complete.body);
+  EXPECT_EQ(complete_tree.get<std::string>("data.provider"), "schwab");
+  EXPECT_EQ(complete_tree.get<std::string>("data.status"), "connected");
+
+  const auto bootstrap_after_complete = HttpRequest("GET", Url("/v1/bootstrap"));
+  ASSERT_EQ(bootstrap_after_complete.status_code, 200);
+  bootstrap_tree = ParseJson(bootstrap_after_complete.body);
+  EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "schwab"), "connected");
+}
+
+TEST_F(ApiIntegrationFixture, PlaidWorkflowUpdatesBootstrapState) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  const auto start = HttpRequest(
+      "POST", Url("/v1/connections/plaid/link-token"),
+      R"({"userId":"integration-user"})");
+  ASSERT_EQ(start.status_code, 200);
+  const auto start_tree = ParseJson(start.body);
+  EXPECT_NE(start_tree.get<std::string>("data.linkToken").find("link-sandbox-"),
+            std::string::npos);
+
+  const auto bootstrap_after_start = HttpRequest("GET", Url("/v1/bootstrap"));
+  ASSERT_EQ(bootstrap_after_start.status_code, 200);
+  auto bootstrap_tree = ParseJson(bootstrap_after_start.body);
+  EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "plaid"), "connecting");
+
+  const auto complete = HttpRequest(
+      "POST", Url("/v1/connections/plaid/link-complete"),
+      R"({"publicToken":"public-sandbox-token","institutionId":"ins_123"})");
+  ASSERT_EQ(complete.status_code, 200);
+  const auto complete_tree = ParseJson(complete.body);
+  EXPECT_EQ(complete_tree.get<std::string>("data.provider"), "plaid");
+  EXPECT_EQ(complete_tree.get<std::string>("data.status"), "connected");
+
+  const auto bootstrap_after_complete = HttpRequest("GET", Url("/v1/bootstrap"));
+  ASSERT_EQ(bootstrap_after_complete.status_code, 200);
+  bootstrap_tree = ParseJson(bootstrap_after_complete.body);
+  EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "plaid"), "connected");
 }
 
 }  // namespace premiatests::ApiIntegrationTests
