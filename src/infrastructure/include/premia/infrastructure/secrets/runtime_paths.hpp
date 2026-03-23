@@ -9,6 +9,7 @@ namespace premia::infrastructure::secrets {
 enum class ProviderKind {
   kTDA,
   kSchwab,
+  kIBKR,
   kPlaid,
 };
 

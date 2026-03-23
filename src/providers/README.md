@@ -33,6 +33,13 @@ Current adapters:
   when a valid Schwab config and token set are available.
 - `schwab/workflow_provider.cc` - Schwab OAuth workflow adapter for start and
   completion flows.
+- `ibkr/account_detail_provider.cc` - read-only IBKR/TWS account detail and
+  positions provider for a configured local TWS or IB Gateway session.
+
+IBKR notes:
+- the current IBKR provider is intentionally read-only
+- it expects a local config in `assets/ibkr.json` or the runtime provider store
+- it is designed to avoid the sample-client FA mutation flows
 - `plaid/workflow_provider.cc` - Plaid Link workflow adapter for link-token and
   completion flows.
 

@@ -50,6 +50,8 @@ Route behavior today:
 - account and option-chain screen requests now flow through provider-backed core
   services as well, using TDA when valid credentials exist and local fixtures
   otherwise
+- account reads now also support live Schwab first and a secondary read-only
+  IBKR path when a local TWS or IB Gateway session is configured and running
 - order preview and submit requests now flow through provider-backed order
   services, with TDA used only when valid credentials exist and a live
   submission is explicitly confirmed

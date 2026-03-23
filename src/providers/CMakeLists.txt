@@ -235,6 +235,27 @@ target_link_libraries(
 )
 
 add_library(
+  premia_provider_ibkr_account_detail
+  ibkr/account_detail_provider.cc
+)
+
+target_include_directories(
+  premia_provider_ibkr_account_detail
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src/service/InteractiveBrokers/tws
+)
+
+target_compile_features(premia_provider_ibkr_account_detail PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_ibkr_account_detail
+  PRIVATE
+  TWS
+  ${BOOST_LIBRARIES}
+)
+
+add_library(
   premia_provider_plaid_workflows
   plaid/workflow_provider.cc
 )

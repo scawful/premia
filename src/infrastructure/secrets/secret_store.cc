@@ -15,6 +15,8 @@ auto ProviderName(ProviderKind provider) -> std::string {
       return "tda";
     case ProviderKind::kSchwab:
       return "schwab";
+    case ProviderKind::kIBKR:
+      return "ibkr";
     case ProviderKind::kPlaid:
       return "plaid";
   }

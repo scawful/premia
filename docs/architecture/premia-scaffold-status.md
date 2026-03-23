@@ -61,6 +61,8 @@ This note captures the first implementation pass after the architecture review.
   exists.
 - `src/providers/schwab/options_provider.cc` can now supply live Schwab option
   chains when a valid authenticated Schwab session exists.
+- `src/providers/ibkr/account_detail_provider.cc` now provides a read-only IBKR
+  account and positions path for configured local TWS or IB Gateway sessions.
 - `src/providers/local/order_provider.cc` and `src/providers/tda/order_provider.cc`
   now back order preview and submission workflows through the shared contract
   surface.
@@ -94,6 +96,9 @@ This note captures the first implementation pass after the architecture review.
 - the active desktop and mobile UX now explicitly present Charles Schwab as the
   primary brokerage across the provider-backed account, watchlist, chart, and
   order surfaces.
+- IBKR is now wired as a secondary read-only account source behind Schwab in the
+  provider-backed account stack, ready for live verification when TWS or IB
+  Gateway is running locally.
 - account/options flows are no longer read-only at the API layer; order preview
   and submission routes now exist with safe local fallbacks and explicit live
   confirmation requirements for TDA.

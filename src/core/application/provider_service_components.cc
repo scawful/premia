@@ -25,6 +25,7 @@
 #include "premia/providers/local/portfolio_provider.hpp"
 #include "premia/providers/local/watchlist_provider.hpp"
 #include "premia/providers/plaid/workflow_provider.hpp"
+#include "premia/providers/ibkr/account_detail_provider.hpp"
 #include "premia/providers/schwab/account_detail_provider.hpp"
 #include "premia/providers/schwab/market_data_provider.hpp"
 #include "premia/providers/schwab/options_provider.hpp"
@@ -49,6 +50,7 @@ using domain::Provider;
 namespace pt = boost::property_tree;
 
 constexpr char kTDAConfigPath[] = "assets/tda.json";
+constexpr char kIBKRConfigPath[] = "assets/ibkr.json";
 constexpr char kSchwabConfigPath[] = "assets/schwab.json";
 constexpr char kSchwabTokenPath[] = "assets/schwab_tokens.json";
 constexpr char kPlaidConfigPath[] = "assets/plaid.json";
@@ -124,6 +126,16 @@ auto HasUsableTdaConfigAt(const std::string& path) -> bool {
   const auto consumer_key = tree.get<std::string>("consumer_key", "");
   const auto refresh_token = tree.get<std::string>("refresh_token", "");
   return !IsPlaceholderValue(consumer_key) && !IsPlaceholderValue(refresh_token);
+}
+
+auto HasUsableIbkrConfigAt(const std::string& path) -> bool {
+  pt::ptree tree;
+  if (!ReadJsonTree(path, tree)) {
+    return false;
+  }
+  const auto host = tree.get<std::string>("host", "");
+  const auto port = tree.get<int>("port", 0);
+  return !host.empty() && port > 0;
 }
 
 auto HasUsableSchwabConfigAt(const std::string& path) -> bool {
@@ -206,6 +218,11 @@ auto ResolveTokenPath(secrets::ProviderKind provider,
 auto TdaConfigPath() -> std::string {
   return ResolveConfigPath(secrets::ProviderKind::kTDA, kTDAConfigPath,
                            HasUsableTdaConfigAt);
+}
+
+auto IbkrConfigPath() -> std::string {
+  return ResolveConfigPath(secrets::ProviderKind::kIBKR, kIBKRConfigPath,
+                           HasUsableIbkrConfigAt);
 }
 
 auto SchwabConfigPath() -> std::string {
@@ -322,8 +339,8 @@ ConnectionService::ConnectionService() {
                      {{"banking", true},
                       {"transactions", true},
                       {"portfolio", false}}),
-      MakeConnection(Provider::kIBKR, ConnectionStatus::kDegraded,
-                     "Interactive Brokers", "2026-03-22T18:31:00Z", false,
+      MakeConnection(Provider::kIBKR, ConnectionStatus::kNotConnected,
+                     "Interactive Brokers", "", false,
                      {{"portfolio", true},
                       {"marketData", false},
                       {"trading", false}}),
@@ -364,6 +381,23 @@ auto ConnectionService::GetConnections() const -> std::vector<ConnectionSummary>
         }
       }
     }
+
+    if (connection.provider == Provider::kIBKR) {
+      const auto config_path = IbkrConfigPath();
+      if (!HasUsableIbkrConfigAt(config_path)) {
+        connection.status = ConnectionStatus::kNotConnected;
+        connection.last_sync_at.clear();
+      } else {
+        try {
+          providers::ibkr::AccountDetailProvider provider(config_path);
+          (void)provider.GetAccountDetail();
+          connection.status = ConnectionStatus::kConnected;
+          connection.last_sync_at.clear();
+        } catch (const std::exception&) {
+          connection.status = ConnectionStatus::kDegraded;
+        }
+      }
+    }
   }
   return connections;
 }
@@ -401,6 +435,11 @@ auto PortfolioAccountService::GetPortfolioSummary() const -> PortfolioSummary {
   } catch (const std::exception&) {
   }
   try {
+    providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
+    return MakePortfolioSummaryFromAccount(provider.GetAccountDetail());
+  } catch (const std::exception&) {
+  }
+  try {
     providers::tda::PortfolioProvider provider(TdaConfigPath());
     return provider.GetPortfolioSummary();
   } catch (const std::exception&) {
@@ -417,6 +456,11 @@ auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> 
   } catch (const std::exception&) {
   }
   try {
+    providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
+    return MakeHoldingsFromAccount(provider.GetAccountDetail());
+  } catch (const std::exception&) {
+  }
+  try {
     providers::tda::PortfolioProvider provider(TdaConfigPath());
     return provider.GetTopHoldings();
   } catch (const std::exception&) {
@@ -429,6 +473,11 @@ auto PortfolioAccountService::GetAccountDetail() const -> AccountDetail {
   try {
     providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
                                                       SchwabTokenPath());
+    return provider.GetAccountDetail();
+  } catch (const std::exception&) {
+  }
+  try {
+    providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
     return provider.GetAccountDetail();
   } catch (const std::exception&) {
   }
