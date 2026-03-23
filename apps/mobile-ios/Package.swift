@@ -28,5 +28,6 @@ let package = Package(
         .target(name: "PremiaUI", dependencies: ["PremiaModels", "PremiaAPIClient"]),
         .testTarget(name: "PremiaModelsTests", dependencies: ["PremiaModels"]),
         .testTarget(name: "PremiaUITests", dependencies: ["PremiaUI", "PremiaModels", "PremiaAPIClient"]),
+        .testTarget(name: "PremiaAPIClientIntegrationTests", dependencies: ["PremiaAPIClient", "PremiaModels"]),
     ]
 )

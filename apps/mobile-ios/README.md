@@ -21,6 +21,10 @@ Tests:
 - `swift test --package-path apps/mobile-ios`
 - current Swift test coverage includes order-model round trips plus smoke tests
   for `PremiaRootView`, `PremiaAppSession`, and `OrdersListView`
+- API wrapper integration coverage also exists in
+  `PremiaAPIClientIntegrationTests`, which launches the local `premia_api`
+  binary and exercises account, options, trading, and connection workflow
+  wrappers end to end
 
 Current integration:
 - `apps/mobile-ios/Package.swift` depends on the local generated package at

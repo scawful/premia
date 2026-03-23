@@ -202,10 +202,15 @@ This note captures the first implementation pass after the architecture review.
 - `./build-next-providers/bin/premia_provider_core_test` passes provider-backed
   order fallback and guardrail tests.
 - `./build-next-providers/bin/premia_api_integration_test` now exercises the
-  provider-backed account, options, and trading/history HTTP routes through the
-  real `premia_api` binary against isolated fixture workspaces.
+  provider-backed account, options, trading/history, and connection workflow
+  HTTP routes through the real `premia_api` binary against isolated fixture
+  workspaces.
 - `swift test --package-path apps/mobile-ios` passes Swift model and SwiftUI
   smoke tests.
+- `swift test --package-path apps/mobile-ios` also now passes
+  `PremiaAPIClientIntegrationTests`, which launch the local `premia_api` binary
+  and validate account, options, order lifecycle/history, and connection
+  workflow wrappers end to end.
 
 ## Immediate next moves
 
