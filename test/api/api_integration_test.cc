@@ -87,6 +87,22 @@ auto FindConnectionStatus(const pt::ptree& tree, const std::string& provider)
   return "";
 }
 
+auto FindConnectionReauthRequired(const pt::ptree& tree,
+                                  const std::string& provider) -> bool {
+  for (const auto& item : tree.get_child("data.connections")) {
+    if (item.second.get<std::string>("provider") == provider) {
+      return item.second.get<bool>("reauthRequired");
+    }
+  }
+  return false;
+}
+
+void WriteWorkspaceAsset(const fs::path& workspace, const std::string& name,
+                        const std::string& content) {
+  std::ofstream output(workspace / "assets" / name);
+  output << content;
+}
+
 auto MakeTempWorkspace(const std::string& name) -> fs::path {
   const auto path = fs::temp_directory_path() / name;
   fs::remove_all(path);
@@ -334,6 +350,33 @@ TEST_F(ApiIntegrationFixture, PlaidWorkflowUpdatesBootstrapState) {
   ASSERT_EQ(bootstrap_after_complete.status_code, 200);
   bootstrap_tree = ParseJson(bootstrap_after_complete.body);
   EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "plaid"), "connected");
+}
+
+TEST_F(ApiIntegrationFixture, SeededProviderTokensDriveBootstrapStates) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  WriteWorkspaceAsset(
+      workspace_, "schwab.json",
+      R"({"app_key":"real-looking-key","app_secret":"real-looking-secret"})");
+  WriteWorkspaceAsset(
+      workspace_, "schwab_tokens.json",
+      R"({"refresh_token":"expired-refresh","refresh_token_expires_at":1})");
+  WriteWorkspaceAsset(
+      workspace_, "plaid.json",
+      R"({"client_id":"real-looking-client-id","secret":"real-looking-secret"})");
+  WriteWorkspaceAsset(
+      workspace_, "plaid_tokens.json",
+      R"({"access_token":"access-sandbox-demo"})");
+
+  const auto bootstrap = HttpRequest("GET", Url("/v1/bootstrap"));
+  ASSERT_EQ(bootstrap.status_code, 200);
+  const auto bootstrap_tree = ParseJson(bootstrap.body);
+
+  EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "schwab"), "reauth_required");
+  EXPECT_TRUE(FindConnectionReauthRequired(bootstrap_tree, "schwab"));
+  EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "plaid"), "connected");
+  EXPECT_FALSE(FindConnectionReauthRequired(bootstrap_tree, "plaid"));
 }
 
 }  // namespace premiatests::ApiIntegrationTests
