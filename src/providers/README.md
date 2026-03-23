@@ -39,6 +39,7 @@ Current adapters:
 IBKR notes:
 - the current IBKR provider is intentionally read-only
 - it expects a local config in `assets/ibkr.json` or the runtime provider store
+- the checked-in default now targets a local paper TWS session on `127.0.0.1:7497`
 - it is designed to avoid the sample-client FA mutation flows
 - `plaid/workflow_provider.cc` - Plaid Link workflow adapter for link-token and
   completion flows.

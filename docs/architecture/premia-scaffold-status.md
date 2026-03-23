@@ -63,6 +63,8 @@ This note captures the first implementation pass after the architecture review.
   chains when a valid authenticated Schwab session exists.
 - `src/providers/ibkr/account_detail_provider.cc` now provides a read-only IBKR
   account and positions path for configured local TWS or IB Gateway sessions.
+- the default checked-in IBKR config now points at a local paper TWS session on
+  `127.0.0.1:7497` for safer live verification.
 - `src/providers/local/order_provider.cc` and `src/providers/tda/order_provider.cc`
   now back order preview and submission workflows through the shared contract
   surface.
