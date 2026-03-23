@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.WatchlistMembership")
 public typealias WatchlistMembership = PremiaAPIClientGeneratedAPI.WatchlistMembership
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct WatchlistMembership: Codable, JSONEncodable, Hashable {
+public struct WatchlistMembership: Sendable, Codable, Hashable {
 
     public var isSaved: Bool
     public var watchlistIds: [String]

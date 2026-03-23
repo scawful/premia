@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.PortfolioSummary")
 public typealias PortfolioSummary = PremiaAPIClientGeneratedAPI.PortfolioSummary
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct PortfolioSummary: Codable, JSONEncodable, Hashable {
+public struct PortfolioSummary: Sendable, Codable, Hashable {
 
     public static let holdingsCountRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: nil, exclusiveMaximum: false, multipleOf: nil)
     public var totalValue: Money

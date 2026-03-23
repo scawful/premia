@@ -9,8 +9,8 @@ import Foundation
 import FoundationNetworking
 #endif
 
-protocol JSONEncodable {
-    func encodeToJSON() -> Any
+protocol ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable
 }
 
 /// An enum where the last case value can be used as a default catch-all.
@@ -37,11 +37,15 @@ extension CaseIterableDefaultsLast {
 
 /// A flexible type that can be encoded (`.encodeNull` or `.encodeValue`)
 /// or not encoded (`.encodeNothing`). Intended for request payloads.
-public enum NullEncodable<Wrapped: Hashable>: Hashable {
+public enum NullEncodable<Wrapped> {
     case encodeNothing
     case encodeNull
     case encodeValue(Wrapped)
 }
+
+extension NullEncodable: Equatable where Wrapped: Equatable {}
+extension NullEncodable: Hashable where Wrapped: Hashable {}
+extension NullEncodable: Sendable where Wrapped: Sendable {}
 
 extension NullEncodable: Codable where Wrapped: Codable {
     public init(from decoder: Decoder) throws {
@@ -65,11 +69,11 @@ extension NullEncodable: Codable where Wrapped: Codable {
     }
 }
 
-public enum ErrorResponse: Error {
+public enum ErrorResponse: Error, Sendable {
     case error(Int, Data?, URLResponse?, Error)
 }
 
-public enum DownloadException: Error {
+public enum DownloadException: Error, Sendable {
     case responseDataMissing
     case responseFailed
     case requestMissing
@@ -77,7 +81,7 @@ public enum DownloadException: Error {
     case requestMissingURL
 }
 
-public enum DecodableRequestBuilderError: Error {
+public enum DecodableRequestBuilderError: Error, Sendable {
     case emptyDataResponse
     case nilHTTPResponse
     case unsuccessfulHTTPStatusCode
@@ -85,7 +89,7 @@ public enum DecodableRequestBuilderError: Error {
     case generalError(Error)
 }
 
-open class Response<T> {
+public struct Response<T> {
     public let statusCode: Int
     public let header: [String: String]
     public let body: T
@@ -98,7 +102,7 @@ open class Response<T> {
         self.bodyData = bodyData
     }
 
-    public convenience init(response: HTTPURLResponse, body: T, bodyData: Data?) {
+    public init(response: HTTPURLResponse, body: T, bodyData: Data?) {
         let rawHeader = response.allHeaderFields
         var responseHeader = [String: String]()
         for (key, value) in rawHeader {
@@ -109,21 +113,28 @@ open class Response<T> {
         self.init(statusCode: response.statusCode, header: responseHeader, body: body, bodyData: bodyData)
     }
 }
+extension Response : Sendable where T : Sendable {}
 
 public final class RequestTask: @unchecked Sendable {
     private let lock = NSRecursiveLock()
     private var task: URLSessionDataTaskProtocol?
 
     internal func set(task: URLSessionDataTaskProtocol) {
-        lock.lock()
-        defer { lock.unlock() }
-        self.task = task
+        lock.withLock {
+            self.task = task
+        }
+    }
+
+    internal func get() -> URLSessionDataTaskProtocol? {
+        lock.withLock {
+            task
+        }
     }
 
     public func cancel() {
-        lock.lock()
-        defer { lock.unlock() }
-        task?.cancel()
-        task = nil
+        lock.withLock {
+            task?.cancel()
+            task = nil
+        }
     }
 }

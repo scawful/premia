@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.Meta")
 public typealias Meta = PremiaAPIClientGeneratedAPI.Meta
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct Meta: Codable, JSONEncodable, Hashable {
+public struct Meta: Sendable, Codable, Hashable {
 
     public var requestId: String
     public var asOf: Date

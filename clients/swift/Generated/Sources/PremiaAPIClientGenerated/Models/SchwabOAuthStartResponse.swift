@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.SchwabOAuthStartResponse")
 public typealias SchwabOAuthStartResponse = PremiaAPIClientGeneratedAPI.SchwabOAuthStartResponse
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct SchwabOAuthStartResponse: Codable, JSONEncodable, Hashable {
+public struct SchwabOAuthStartResponse: Sendable, Codable, Hashable {
 
     public var data: SchwabOAuthStartData
     public var meta: Meta

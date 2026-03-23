@@ -6,18 +6,15 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.Instrument")
 public typealias Instrument = PremiaAPIClientGeneratedAPI.Instrument
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct Instrument: Codable, JSONEncodable, Hashable {
+public struct Instrument: Sendable, Codable, Hashable {
 
-    public enum AssetType: String, Codable, CaseIterable, CaseIterableDefaultsLast {
+    public enum AssetType: String, Sendable, Codable, CaseIterable, CaseIterableDefaultsLast {
         case equity = "equity"
         case option = "option"
         case etf = "etf"

@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -24,11 +21,11 @@ open class OptionsAPI {
      - parameter range: (query)  (optional)
      - parameter expMonth: (query)  (optional)
      - parameter optionType: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: OptionChainResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func getOptionChainScreen(symbol: String, strikeCount: String? = nil, strategy: String? = nil, range: String? = nil, expMonth: String? = nil, optionType: String? = nil) async throws -> OptionChainResponse {
-        return try await getOptionChainScreenWithRequestBuilder(symbol: symbol, strikeCount: strikeCount, strategy: strategy, range: range, expMonth: expMonth, optionType: optionType).execute().body
+    open class func getOptionChainScreen(symbol: String, strikeCount: String? = nil, strategy: String? = nil, range: String? = nil, expMonth: String? = nil, optionType: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> OptionChainResponse {
+        return try await getOptionChainScreenWithRequestBuilder(symbol: symbol, strikeCount: strikeCount, strategy: strategy, range: range, expMonth: expMonth, optionType: optionType, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -43,34 +40,35 @@ open class OptionsAPI {
      - parameter range: (query)  (optional)
      - parameter expMonth: (query)  (optional)
      - parameter optionType: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<OptionChainResponse> 
      */
-    open class func getOptionChainScreenWithRequestBuilder(symbol: String, strikeCount: String? = nil, strategy: String? = nil, range: String? = nil, expMonth: String? = nil, optionType: String? = nil) -> RequestBuilder<OptionChainResponse> {
+    open class func getOptionChainScreenWithRequestBuilder(symbol: String, strikeCount: String? = nil, strategy: String? = nil, range: String? = nil, expMonth: String? = nil, optionType: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<OptionChainResponse> {
         var localVariablePath = "/v1/screens/options/{symbol}"
         let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
         let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         var localVariableUrlComponents = URLComponents(string: localVariableURLString)
         localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems([
-            "strikeCount": (wrappedValue: strikeCount?.encodeToJSON(), isExplode: true),
-            "strategy": (wrappedValue: strategy?.encodeToJSON(), isExplode: true),
-            "range": (wrappedValue: range?.encodeToJSON(), isExplode: true),
-            "expMonth": (wrappedValue: expMonth?.encodeToJSON(), isExplode: true),
-            "optionType": (wrappedValue: optionType?.encodeToJSON(), isExplode: true),
+            "strikeCount": (wrappedValue: strikeCount?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+            "strategy": (wrappedValue: strategy?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+            "range": (wrappedValue: range?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+            "expMonth": (wrappedValue: expMonth?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+            "optionType": (wrappedValue: optionType?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
         ])
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<OptionChainResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<OptionChainResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

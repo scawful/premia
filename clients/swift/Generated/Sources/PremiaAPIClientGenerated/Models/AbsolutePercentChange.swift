@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.AbsolutePercentChange")
 public typealias AbsolutePercentChange = PremiaAPIClientGeneratedAPI.AbsolutePercentChange
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct AbsolutePercentChange: Codable, JSONEncodable, Hashable {
+public struct AbsolutePercentChange: Sendable, Codable, Hashable {
 
     public static let percentRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public var absolute: Money

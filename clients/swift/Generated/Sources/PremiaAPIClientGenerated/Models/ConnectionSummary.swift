@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.ConnectionSummary")
 public typealias ConnectionSummary = PremiaAPIClientGeneratedAPI.ConnectionSummary
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct ConnectionSummary: Codable, JSONEncodable, Hashable {
+public struct ConnectionSummary: Sendable, Codable, Hashable {
 
     public var provider: Provider
     public var status: ConnectionStatus

@@ -8,106 +8,96 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
-extension Bool: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension Bool: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension Float: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension Float: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension Int: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension Int: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension Int32: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension Int32: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension Int64: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension Int64: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension Double: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension Double: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension Decimal: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension Decimal: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension String: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension String: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension URL: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension URL: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension UUID: JSONEncodable {
-    func encodeToJSON() -> Any { self }
+extension UUID: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable { self }
 }
 
-extension RawRepresentable where RawValue: JSONEncodable {
-    func encodeToJSON() -> Any { return self.rawValue }
+extension RawRepresentable where RawValue: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable {
+        rawValue.asParameter(codableHelper: codableHelper)
+    }
 }
 
-private func encodeIfPossible<T>(_ object: T) -> Any {
-    if let encodableObject = object as? JSONEncodable {
-        return encodableObject.encodeToJSON()
+private func encodeIfPossible<T: Sendable>(_ object: T, codableHelper: CodableHelper) -> any Sendable {
+    if let encodableObject = object as? ParameterConvertible {
+        return encodableObject.asParameter(codableHelper: codableHelper)
     } else {
         return object
     }
 }
 
-extension Array: JSONEncodable {
-    func encodeToJSON() -> Any {
-        return self.map(encodeIfPossible)
+extension Array where Element: Sendable {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable {
+        return self.map { encodeIfPossible($0, codableHelper: codableHelper) }
     }
 }
 
-extension Set: JSONEncodable {
-    func encodeToJSON() -> Any {
-        return Array(self).encodeToJSON()
+extension Set where Element: Sendable {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable {
+        return Array(self).asParameter(codableHelper: codableHelper)
     }
 }
 
-extension Dictionary: JSONEncodable {
-    func encodeToJSON() -> Any {
-        var dictionary = [AnyHashable: Any]()
+extension Dictionary where Key: Sendable, Value: Sendable {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable {
+        var dictionary = [Key: any Sendable]()
         for (key, value) in self {
-            dictionary[key] = encodeIfPossible(value)
+            dictionary[key] = encodeIfPossible(value, codableHelper: codableHelper)
         }
         return dictionary
     }
 }
 
-extension Data: JSONEncodable {
-    func encodeToJSON() -> Any {
+extension Data: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable {
         return self.base64EncodedString(options: Data.Base64EncodingOptions())
     }
 }
 
-extension Date: JSONEncodable {
-    func encodeToJSON() -> Any {
-        return CodableHelper.dateFormatter.string(from: self)
+extension Date: ParameterConvertible {
+    func asParameter(codableHelper: CodableHelper) -> any Sendable {
+        return codableHelper.dateFormatter.string(from: self)
     }
 }
 
-extension JSONEncodable where Self: Encodable {
-    func encodeToJSON() -> Any {
-        guard let data = try? CodableHelper.jsonEncoder.encode(self) else {
-            fatalError("Could not encode to json: \(self)")
-        }
-        return data.encodeToJSON()
-    }
-}
-
-extension String: CodingKey {
+extension String: @retroactive CodingKey {
 
     public var stringValue: String {
         return self
@@ -227,10 +217,4 @@ extension KeyedDecodingContainerProtocol {
         return decimalValue
     }
 
-}
-
-extension HTTPURLResponse {
-    var isStatusCodeSuccessful: Bool {
-        return Configuration.successfulStatusCodeRange.contains(statusCode)
-    }
 }

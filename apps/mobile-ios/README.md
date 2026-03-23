@@ -27,3 +27,6 @@ Current integration:
   consume the new account/options API surface without touching generated models
 - `PremiaOptionChainQuery` now gives SwiftUI a typed way to drive option-chain
   filter/search state before calling the wrapper
+- order preview and submission wrappers are now exposed via typed app-level
+  models so SwiftUI can drive trading flows without depending on generated
+  request/response types directly

@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -18,11 +15,11 @@ open class HomeAPI {
     /**
      Load the home screen payload.
      
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: HomeScreenResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func getHomeScreen() async throws -> HomeScreenResponse {
-        return try await getHomeScreenWithRequestBuilder().execute().body
+    open class func getHomeScreen(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> HomeScreenResponse {
+        return try await getHomeScreenWithRequestBuilder(apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -31,24 +28,25 @@ open class HomeAPI {
      - Bearer Token:
        - type: http
        - name: bearerAuth
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<HomeScreenResponse> 
      */
-    open class func getHomeScreenWithRequestBuilder() -> RequestBuilder<HomeScreenResponse> {
+    open class func getHomeScreenWithRequestBuilder(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<HomeScreenResponse> {
         let localVariablePath = "/v1/screens/home"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<HomeScreenResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<HomeScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

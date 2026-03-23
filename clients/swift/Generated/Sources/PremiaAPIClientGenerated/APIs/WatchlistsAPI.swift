@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -20,11 +17,11 @@ open class WatchlistsAPI {
      
      - parameter watchlistId: (path)  
      - parameter addWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: WatchlistResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func addWatchlistSymbol(watchlistId: String, addWatchlistSymbolRequest: AddWatchlistSymbolRequest) async throws -> WatchlistResponse {
-        return try await addWatchlistSymbolWithRequestBuilder(watchlistId: watchlistId, addWatchlistSymbolRequest: addWatchlistSymbolRequest).execute().body
+    open class func addWatchlistSymbol(watchlistId: String, addWatchlistSymbolRequest: AddWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await addWatchlistSymbolWithRequestBuilder(watchlistId: watchlistId, addWatchlistSymbolRequest: addWatchlistSymbolRequest, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -35,38 +32,39 @@ open class WatchlistsAPI {
        - name: bearerAuth
      - parameter watchlistId: (path)  
      - parameter addWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<WatchlistResponse> 
      */
-    open class func addWatchlistSymbolWithRequestBuilder(watchlistId: String, addWatchlistSymbolRequest: AddWatchlistSymbolRequest) -> RequestBuilder<WatchlistResponse> {
+    open class func addWatchlistSymbolWithRequestBuilder(watchlistId: String, addWatchlistSymbolRequest: AddWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
         var localVariablePath = "/v1/watchlists/{watchlistId}/symbols"
         let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
         let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: addWatchlistSymbolRequest)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: addWatchlistSymbolRequest, codableHelper: apiConfiguration.codableHelper)
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             "Content-Type": "application/json",
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
      Create a watchlist.
      
      - parameter createWatchlistRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: WatchlistResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func createWatchlist(createWatchlistRequest: CreateWatchlistRequest) async throws -> WatchlistResponse {
-        return try await createWatchlistWithRequestBuilder(createWatchlistRequest: createWatchlistRequest).execute().body
+    open class func createWatchlist(createWatchlistRequest: CreateWatchlistRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await createWatchlistWithRequestBuilder(createWatchlistRequest: createWatchlistRequest, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -76,24 +74,25 @@ open class WatchlistsAPI {
        - type: http
        - name: bearerAuth
      - parameter createWatchlistRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<WatchlistResponse> 
      */
-    open class func createWatchlistWithRequestBuilder(createWatchlistRequest: CreateWatchlistRequest) -> RequestBuilder<WatchlistResponse> {
+    open class func createWatchlistWithRequestBuilder(createWatchlistRequest: CreateWatchlistRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
         let localVariablePath = "/v1/watchlists"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: createWatchlistRequest)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: createWatchlistRequest, codableHelper: apiConfiguration.codableHelper)
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             "Content-Type": "application/json",
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
@@ -101,11 +100,11 @@ open class WatchlistsAPI {
      
      - parameter watchlistId: (path)  
      - parameter symbol: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: WatchlistResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func deleteWatchlistSymbol(watchlistId: String, symbol: String) async throws -> WatchlistResponse {
-        return try await deleteWatchlistSymbolWithRequestBuilder(watchlistId: watchlistId, symbol: symbol).execute().body
+    open class func deleteWatchlistSymbol(watchlistId: String, symbol: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await deleteWatchlistSymbolWithRequestBuilder(watchlistId: watchlistId, symbol: symbol, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -116,9 +115,10 @@ open class WatchlistsAPI {
        - name: bearerAuth
      - parameter watchlistId: (path)  
      - parameter symbol: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<WatchlistResponse> 
      */
-    open class func deleteWatchlistSymbolWithRequestBuilder(watchlistId: String, symbol: String) -> RequestBuilder<WatchlistResponse> {
+    open class func deleteWatchlistSymbolWithRequestBuilder(watchlistId: String, symbol: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
         var localVariablePath = "/v1/watchlists/{watchlistId}/symbols/{symbol}"
         let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
         let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -126,31 +126,31 @@ open class WatchlistsAPI {
         let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
         let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "DELETE", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "DELETE", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
      Load a watchlist screen.
      
      - parameter watchlistId: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: WatchlistScreenResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func getWatchlistScreen(watchlistId: String) async throws -> WatchlistScreenResponse {
-        return try await getWatchlistScreenWithRequestBuilder(watchlistId: watchlistId).execute().body
+    open class func getWatchlistScreen(watchlistId: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistScreenResponse {
+        return try await getWatchlistScreenWithRequestBuilder(watchlistId: watchlistId, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -160,37 +160,38 @@ open class WatchlistsAPI {
        - type: http
        - name: bearerAuth
      - parameter watchlistId: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<WatchlistScreenResponse> 
      */
-    open class func getWatchlistScreenWithRequestBuilder(watchlistId: String) -> RequestBuilder<WatchlistScreenResponse> {
+    open class func getWatchlistScreenWithRequestBuilder(watchlistId: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistScreenResponse> {
         var localVariablePath = "/v1/screens/watchlists/{watchlistId}"
         let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
         let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<WatchlistScreenResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<WatchlistScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
      List watchlists.
      
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: WatchlistsResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func listWatchlists() async throws -> WatchlistsResponse {
-        return try await listWatchlistsWithRequestBuilder().execute().body
+    open class func listWatchlists(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistsResponse {
+        return try await listWatchlistsWithRequestBuilder(apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -199,24 +200,25 @@ open class WatchlistsAPI {
      - Bearer Token:
        - type: http
        - name: bearerAuth
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<WatchlistsResponse> 
      */
-    open class func listWatchlistsWithRequestBuilder() -> RequestBuilder<WatchlistsResponse> {
+    open class func listWatchlistsWithRequestBuilder(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistsResponse> {
         let localVariablePath = "/v1/watchlists"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<WatchlistsResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<WatchlistsResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
@@ -224,11 +226,11 @@ open class WatchlistsAPI {
      
      - parameter watchlistId: (path)  
      - parameter updateWatchlistRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: WatchlistResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func updateWatchlist(watchlistId: String, updateWatchlistRequest: UpdateWatchlistRequest) async throws -> WatchlistResponse {
-        return try await updateWatchlistWithRequestBuilder(watchlistId: watchlistId, updateWatchlistRequest: updateWatchlistRequest).execute().body
+    open class func updateWatchlist(watchlistId: String, updateWatchlistRequest: UpdateWatchlistRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await updateWatchlistWithRequestBuilder(watchlistId: watchlistId, updateWatchlistRequest: updateWatchlistRequest, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -239,27 +241,28 @@ open class WatchlistsAPI {
        - name: bearerAuth
      - parameter watchlistId: (path)  
      - parameter updateWatchlistRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<WatchlistResponse> 
      */
-    open class func updateWatchlistWithRequestBuilder(watchlistId: String, updateWatchlistRequest: UpdateWatchlistRequest) -> RequestBuilder<WatchlistResponse> {
+    open class func updateWatchlistWithRequestBuilder(watchlistId: String, updateWatchlistRequest: UpdateWatchlistRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
         var localVariablePath = "/v1/watchlists/{watchlistId}"
         let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
         let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: updateWatchlistRequest)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: updateWatchlistRequest, codableHelper: apiConfiguration.codableHelper)
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             "Content-Type": "application/json",
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "PATCH", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "PATCH", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

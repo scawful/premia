@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.Provider")
 public typealias Provider = PremiaAPIClientGeneratedAPI.Provider
 
 extension PremiaAPIClientGeneratedAPI {
 
-public enum Provider: String, Codable, CaseIterable, CaseIterableDefaultsLast {
+public enum Provider: String, Sendable, Codable, CaseIterable, CaseIterableDefaultsLast {
     case tda = "tda"
     case schwab = "schwab"
     case ibkr = "ibkr"

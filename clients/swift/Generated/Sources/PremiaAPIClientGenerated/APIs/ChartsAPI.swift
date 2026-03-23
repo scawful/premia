@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -18,7 +15,7 @@ open class ChartsAPI {
     /**
      * enum for parameter range
      */
-    public enum ModelRange_getChartScreen: String, CaseIterable {
+    public enum ModelRange_getChartScreen: String, Sendable, CaseIterable {
         case _1d = "1D"
         case _5d = "5D"
         case _1m = "1M"
@@ -32,7 +29,7 @@ open class ChartsAPI {
     /**
      * enum for parameter interval
      */
-    public enum Interval_getChartScreen: String, CaseIterable {
+    public enum Interval_getChartScreen: String, Sendable, CaseIterable {
         case _1m = "1M"
         case _5m = "5M"
         case _15m = "15M"
@@ -48,11 +45,11 @@ open class ChartsAPI {
      - parameter range: (query)  (optional)
      - parameter interval: (query)  (optional)
      - parameter extendedHours: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: ChartScreenResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func getChartScreen(symbol: String, range: ModelRange_getChartScreen? = nil, interval: Interval_getChartScreen? = nil, extendedHours: Bool? = nil) async throws -> ChartScreenResponse {
-        return try await getChartScreenWithRequestBuilder(symbol: symbol, range: range, interval: interval, extendedHours: extendedHours).execute().body
+    open class func getChartScreen(symbol: String, range: ModelRange_getChartScreen? = nil, interval: Interval_getChartScreen? = nil, extendedHours: Bool? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> ChartScreenResponse {
+        return try await getChartScreenWithRequestBuilder(symbol: symbol, range: range, interval: interval, extendedHours: extendedHours, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -65,32 +62,33 @@ open class ChartsAPI {
      - parameter range: (query)  (optional)
      - parameter interval: (query)  (optional)
      - parameter extendedHours: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<ChartScreenResponse> 
      */
-    open class func getChartScreenWithRequestBuilder(symbol: String, range: ModelRange_getChartScreen? = nil, interval: Interval_getChartScreen? = nil, extendedHours: Bool? = nil) -> RequestBuilder<ChartScreenResponse> {
+    open class func getChartScreenWithRequestBuilder(symbol: String, range: ModelRange_getChartScreen? = nil, interval: Interval_getChartScreen? = nil, extendedHours: Bool? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<ChartScreenResponse> {
         var localVariablePath = "/v1/screens/charts/{symbol}"
         let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
         let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         var localVariableUrlComponents = URLComponents(string: localVariableURLString)
         localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems([
-            "range": (wrappedValue: range?.encodeToJSON(), isExplode: true),
-            "interval": (wrappedValue: interval?.encodeToJSON(), isExplode: true),
-            "extendedHours": (wrappedValue: extendedHours?.encodeToJSON(), isExplode: true),
+            "range": (wrappedValue: range?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+            "interval": (wrappedValue: interval?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+            "extendedHours": (wrappedValue: extendedHours?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
         ])
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<ChartScreenResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<ChartScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

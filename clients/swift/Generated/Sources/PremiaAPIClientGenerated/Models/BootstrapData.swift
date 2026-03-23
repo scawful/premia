@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.BootstrapData")
 public typealias BootstrapData = PremiaAPIClientGeneratedAPI.BootstrapData
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct BootstrapData: Codable, JSONEncodable, Hashable {
+public struct BootstrapData: Sendable, Codable, Hashable {
 
     public var session: BootstrapDataSession
     public var connections: [ConnectionSummary]

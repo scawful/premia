@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.StartSchwabOAuthRequest")
 public typealias StartSchwabOAuthRequest = PremiaAPIClientGeneratedAPI.StartSchwabOAuthRequest
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct StartSchwabOAuthRequest: Codable, JSONEncodable, Hashable {
+public struct StartSchwabOAuthRequest: Sendable, Codable, Hashable {
 
     public var redirectUri: String?
     public var clientPlatform: String?

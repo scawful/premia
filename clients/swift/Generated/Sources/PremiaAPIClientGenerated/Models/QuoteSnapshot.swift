@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.QuoteSnapshot")
 public typealias QuoteSnapshot = PremiaAPIClientGeneratedAPI.QuoteSnapshot
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct QuoteSnapshot: Codable, JSONEncodable, Hashable {
+public struct QuoteSnapshot: Sendable, Codable, Hashable {
 
     public var lastPrice: Money
     public var bid: Money?

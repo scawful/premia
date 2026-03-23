@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.Candle")
 public typealias Candle = PremiaAPIClientGeneratedAPI.Candle
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct Candle: Codable, JSONEncodable, Hashable {
+public struct Candle: Sendable, Codable, Hashable {
 
     public static let _openRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public static let highRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")

@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.OptionExpirationSnapshot")
 public typealias OptionExpirationSnapshot = PremiaAPIClientGeneratedAPI.OptionExpirationSnapshot
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct OptionExpirationSnapshot: Codable, JSONEncodable, Hashable {
+public struct OptionExpirationSnapshot: Sendable, Codable, Hashable {
 
     public static let gammaAtExpiryRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public var id: String
@@ -50,5 +47,4 @@ public struct OptionExpirationSnapshot: Codable, JSONEncodable, Hashable {
 
 }
 
-@available(iOS 13, tvOS 13, watchOS 6, macOS 10.15, *)
 extension PremiaAPIClientGeneratedAPI.OptionExpirationSnapshot: Identifiable {}

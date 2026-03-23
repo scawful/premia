@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.ChartScreenResponse")
 public typealias ChartScreenResponse = PremiaAPIClientGeneratedAPI.ChartScreenResponse
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct ChartScreenResponse: Codable, JSONEncodable, Hashable {
+public struct ChartScreenResponse: Sendable, Codable, Hashable {
 
     public var data: ChartScreenData
     public var meta: Meta

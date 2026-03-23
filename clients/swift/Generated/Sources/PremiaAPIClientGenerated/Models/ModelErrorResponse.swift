@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.ModelErrorResponse")
 public typealias ModelErrorResponse = PremiaAPIClientGeneratedAPI.ModelErrorResponse
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct ModelErrorResponse: Codable, JSONEncodable, Hashable {
+public struct ModelErrorResponse: Sendable, Codable, Hashable {
 
     public var error: ErrorDetail
     public var meta: ErrorMeta

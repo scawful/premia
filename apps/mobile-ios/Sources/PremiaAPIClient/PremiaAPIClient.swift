@@ -12,10 +12,12 @@ public struct PremiaAPIConfiguration: Sendable, Equatable {
 
 public final class PremiaAPIClient: @unchecked Sendable {
     public let configuration: PremiaAPIConfiguration
+    private let apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration
 
     public init(configuration: PremiaAPIConfiguration) {
         self.configuration = configuration
-        PremiaAPIClientGeneratedAPI.basePath = configuration.baseURL.absoluteString
+        self.apiConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared
+        self.apiConfiguration.basePath = configuration.baseURL.absoluteString
     }
 
     @available(macOS 10.15, iOS 13.0, *)
@@ -45,7 +47,9 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadBootstrap() async throws -> PremiaBootstrapSnapshot {
-        let response = try await executeMapped { try await BootstrapAPI.getBootstrap() }
+        let response = try await executeMapped {
+            try await BootstrapAPI.getBootstrap(apiConfiguration: apiConfiguration)
+        }
         let connections = response.data.connections.map(mapConnection)
         return PremiaBootstrapSnapshot(
             environment: response.data.session.environment,
@@ -57,7 +61,9 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadHome() async throws -> PremiaHomeSnapshot {
-        let response = try await executeMapped { try await HomeAPI.getHomeScreen() }
+        let response = try await executeMapped {
+            try await HomeAPI.getHomeScreen(apiConfiguration: apiConfiguration)
+        }
         return PremiaHomeSnapshot(
             connections: response.data.connections.map(mapConnection),
             portfolio: mapPortfolio(response.data.portfolio),
@@ -73,7 +79,9 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadAccount() async throws -> PremiaAccountDetailSnapshot {
-        let response = try await executeMapped { try await AccountAPI.getAccountScreen() }
+        let response = try await executeMapped {
+            try await AccountAPI.getAccountScreen(apiConfiguration: apiConfiguration)
+        }
         return PremiaAccountDetailSnapshot(
             accountID: response.data.accountId,
             cash: mapMoney(response.data.cash),
@@ -92,7 +100,9 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadQuote(symbol: String) async throws -> PremiaQuoteScreenSnapshot {
-        let response = try await executeMapped { try await QuotesAPI.getQuoteScreen(symbol: symbol) }
+        let response = try await executeMapped {
+            try await QuotesAPI.getQuoteScreen(symbol: symbol, apiConfiguration: apiConfiguration)
+        }
         return PremiaQuoteScreenSnapshot(
             instrument: mapInstrument(response.data.instrument),
             quote: mapQuoteSnapshot(response.data.quote),
@@ -114,7 +124,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
                 symbol: symbol,
                 range: mapChartRange(range),
                 interval: mapChartInterval(interval),
-                extendedHours: extendedHours
+                extendedHours: extendedHours,
+                apiConfiguration: apiConfiguration
             )
         }
 
@@ -146,7 +157,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
                 strategy: strategy,
                 range: range,
                 expMonth: expMonth,
-                optionType: optionType
+                optionType: optionType,
+                apiConfiguration: apiConfiguration
             )
         }
 
@@ -181,14 +193,19 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadWatchlists() async throws -> [PremiaWatchlistSummaryModel] {
-        let response = try await executeMapped { try await WatchlistsAPI.listWatchlists() }
+        let response = try await executeMapped {
+            try await WatchlistsAPI.listWatchlists(apiConfiguration: apiConfiguration)
+        }
         return response.data.watchlists.map(mapWatchlist)
     }
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadWatchlist(id: String) async throws -> PremiaWatchlistScreenSnapshot {
         let response = try await executeMapped {
-            try await WatchlistsAPI.getWatchlistScreen(watchlistId: id)
+            try await WatchlistsAPI.getWatchlistScreen(
+                watchlistId: id,
+                apiConfiguration: apiConfiguration
+            )
         }
         return PremiaWatchlistScreenSnapshot(
             watchlist: mapWatchlist(response.data.watchlist),
@@ -208,7 +225,10 @@ public final class PremiaAPIClient: @unchecked Sendable {
             clientPlatform: clientPlatform
         )
         let response = try await executeMapped {
-            try await ConnectionsAPI.startSchwabOAuth(startSchwabOAuthRequest: request)
+            try await ConnectionsAPI.startSchwabOAuth(
+                startSchwabOAuthRequest: request,
+                apiConfiguration: apiConfiguration
+            )
         }
         return PremiaSchwabOAuthLaunch(
             authURL: response.data.authUrl,
@@ -228,7 +248,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
         )
         let response = try await executeMapped {
             try await ConnectionsAPI.completeSchwabOAuth(
-                completeSchwabOAuthRequest: request
+                completeSchwabOAuthRequest: request,
+                apiConfiguration: apiConfiguration
             )
         }
         return mapConnection(response.data)
@@ -245,7 +266,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
         )
         let response = try await executeMapped {
             try await ConnectionsAPI.createPlaidLinkToken(
-                createPlaidLinkTokenRequest: request
+                createPlaidLinkTokenRequest: request,
+                apiConfiguration: apiConfiguration
             )
         }
         return PremiaPlaidLinkLaunch(
@@ -265,7 +287,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
         )
         let response = try await executeMapped {
             try await ConnectionsAPI.completePlaidLink(
-                completePlaidLinkRequest: request
+                completePlaidLinkRequest: request,
+                apiConfiguration: apiConfiguration
             )
         }
         return mapConnection(response.data)
@@ -275,7 +298,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
     public func createWatchlist(name: String) async throws -> PremiaWatchlistSummaryModel {
         let response = try await executeMapped {
             try await WatchlistsAPI.createWatchlist(
-                createWatchlistRequest: PremiaAPIClientGeneratedAPI.CreateWatchlistRequest(name: name)
+                createWatchlistRequest: PremiaAPIClientGeneratedAPI.CreateWatchlistRequest(name: name),
+                apiConfiguration: apiConfiguration
             )
         }
         return mapWatchlist(response.data)
@@ -286,7 +310,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
         let response = try await executeMapped {
             try await WatchlistsAPI.updateWatchlist(
                 watchlistId: id,
-                updateWatchlistRequest: PremiaAPIClientGeneratedAPI.UpdateWatchlistRequest(name: name)
+                updateWatchlistRequest: PremiaAPIClientGeneratedAPI.UpdateWatchlistRequest(name: name),
+                apiConfiguration: apiConfiguration
             )
         }
         return mapWatchlist(response.data)
@@ -297,7 +322,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
         let response = try await executeMapped {
             try await WatchlistsAPI.addWatchlistSymbol(
                 watchlistId: id,
-                addWatchlistSymbolRequest: PremiaAPIClientGeneratedAPI.AddWatchlistSymbolRequest(symbol: symbol)
+                addWatchlistSymbolRequest: PremiaAPIClientGeneratedAPI.AddWatchlistSymbolRequest(symbol: symbol),
+                apiConfiguration: apiConfiguration
             )
         }
         return mapWatchlist(response.data)
@@ -306,9 +332,35 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func removeSymbol(_ symbol: String, fromWatchlist id: String) async throws -> PremiaWatchlistSummaryModel {
         let response = try await executeMapped {
-            try await WatchlistsAPI.deleteWatchlistSymbol(watchlistId: id, symbol: symbol)
+            try await WatchlistsAPI.deleteWatchlistSymbol(
+                watchlistId: id,
+                symbol: symbol,
+                apiConfiguration: apiConfiguration
+            )
         }
         return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func previewOrder(_ intent: PremiaOrderIntent) async throws -> PremiaOrderPreview {
+        let response = try await executeMapped {
+            try await TradingAPI.previewOrder(
+                orderIntentRequest: mapOrderIntent(intent),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapOrderPreview(response.data, asOf: response.meta.asOf)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func submitOrder(_ intent: PremiaOrderIntent) async throws -> PremiaOrderSubmission {
+        let response = try await executeMapped {
+            try await TradingAPI.submitOrder(
+                orderIntentRequest: mapOrderIntent(intent),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapOrderSubmission(response.data, asOf: response.meta.asOf)
     }
 
     @available(macOS 10.15, iOS 13.0, *)
@@ -323,7 +375,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
     private func mapError(_ error: Error) -> PremiaAPIClientError {
-        if case let PremiaAPIClientGeneratedAPI.ErrorResponse.error(statusCode, data, _, underlying) = error,
+        if case let ErrorResponse.error(statusCode, data, _, _) = error,
            let data,
            let decoded = try? JSONDecoder().decode(PremiaAPIClientGeneratedAPI.ModelErrorResponse.self, from: data) {
             return PremiaAPIClientError(
@@ -336,7 +388,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             )
         }
 
-        if case let PremiaAPIClientGeneratedAPI.ErrorResponse.error(statusCode, _, _, underlying) = error {
+        if case let ErrorResponse.error(statusCode, _, _, underlying) = error {
             return PremiaAPIClientError(
                 code: "HTTP_\(statusCode)",
                 message: String(describing: underlying),
@@ -446,6 +498,57 @@ public final class PremiaAPIClient: @unchecked Sendable {
             bid: row.bid.map(mapMoney),
             ask: row.ask.map(mapMoney),
             updatedAt: row.updatedAt
+        )
+    }
+
+    private func mapOrderIntent(_ intent: PremiaOrderIntent) -> PremiaAPIClientGeneratedAPI.OrderIntentRequest {
+        PremiaAPIClientGeneratedAPI.OrderIntentRequest(
+            accountId: intent.accountID,
+            symbol: intent.symbol,
+            assetType: mapAssetType(intent.assetType),
+            instruction: mapInstruction(intent.instruction),
+            quantity: intent.quantity,
+            orderType: mapOrderType(intent.orderType),
+            limitPrice: intent.limitPrice,
+            duration: intent.duration,
+            session: intent.session,
+            confirmLive: intent.confirmLive
+        )
+    }
+
+    private func mapOrderPreview(_ preview: PremiaAPIClientGeneratedAPI.OrderPreviewData, asOf: Date?) -> PremiaOrderPreview {
+        PremiaOrderPreview(
+            previewID: preview.previewId,
+            accountID: preview.accountId,
+            symbol: preview.symbol,
+            assetType: mapAssetTypeValue(preview.assetType),
+            instruction: mapInstructionValue(preview.instruction),
+            quantity: preview.quantity,
+            orderType: mapOrderTypeValue(preview.orderType),
+            limitPrice: preview.limitPrice,
+            estimatedTotal: preview.estimatedTotal,
+            mode: preview.mode,
+            status: preview.status,
+            warnings: preview.warnings,
+            asOf: asOf
+        )
+    }
+
+    private func mapOrderSubmission(_ submission: PremiaAPIClientGeneratedAPI.OrderSubmissionData, asOf: Date?) -> PremiaOrderSubmission {
+        PremiaOrderSubmission(
+            submissionID: submission.submissionId,
+            accountID: submission.accountId,
+            symbol: submission.symbol,
+            assetType: mapAssetTypeValue(submission.assetType),
+            instruction: mapInstructionValue(submission.instruction),
+            quantity: submission.quantity,
+            orderType: mapOrderTypeValue(submission.orderType),
+            limitPrice: submission.limitPrice,
+            mode: submission.mode,
+            status: submission.status,
+            submittedAt: submission.submittedAt,
+            message: submission.message,
+            asOf: asOf
         )
     }
 
@@ -605,5 +708,52 @@ public final class PremiaAPIClient: @unchecked Sendable {
         case .unknownDefaultOpenApi:
             return .unknown
         }
+    }
+
+    private func mapAssetType(_ assetType: PremiaAssetType) -> PremiaAPIClientGeneratedAPI.OrderIntentRequest.AssetType {
+        switch assetType {
+        case .equity:
+            return .equity
+        case .option:
+            return .option
+        }
+    }
+
+    private func mapInstruction(_ instruction: PremiaOrderInstruction) -> PremiaAPIClientGeneratedAPI.OrderIntentRequest.Instruction {
+        switch instruction {
+        case .buy:
+            return .buy
+        case .sell:
+            return .sell
+        case .buyToOpen:
+            return .buyToOpen
+        case .sellToClose:
+            return .sellToClose
+        case .buyToClose:
+            return .buyToClose
+        case .sellToOpen:
+            return .sellToOpen
+        }
+    }
+
+    private func mapOrderType(_ orderType: PremiaOrderType) -> PremiaAPIClientGeneratedAPI.OrderIntentRequest.OrderType {
+        switch orderType {
+        case .market:
+            return .market
+        case .limit:
+            return .limit
+        }
+    }
+
+    private func mapAssetTypeValue(_ value: String) -> PremiaAssetType {
+        PremiaAssetType(rawValue: value) ?? .equity
+    }
+
+    private func mapInstructionValue(_ value: String) -> PremiaOrderInstruction {
+        PremiaOrderInstruction(rawValue: value) ?? .buy
+    }
+
+    private func mapOrderTypeValue(_ value: String) -> PremiaOrderType {
+        PremiaOrderType(rawValue: value) ?? .limit
     }
 }

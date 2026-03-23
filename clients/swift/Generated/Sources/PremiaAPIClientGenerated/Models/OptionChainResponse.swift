@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.OptionChainResponse")
 public typealias OptionChainResponse = PremiaAPIClientGeneratedAPI.OptionChainResponse
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct OptionChainResponse: Codable, JSONEncodable, Hashable {
+public struct OptionChainResponse: Sendable, Codable, Hashable {
 
     public var data: OptionChainSnapshot
     public var meta: Meta

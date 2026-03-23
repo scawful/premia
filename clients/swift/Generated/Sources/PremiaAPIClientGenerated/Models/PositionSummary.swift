@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.PositionSummary")
 public typealias PositionSummary = PremiaAPIClientGeneratedAPI.PositionSummary
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct PositionSummary: Codable, JSONEncodable, Hashable {
+public struct PositionSummary: Sendable, Codable, Hashable {
 
     public static let quantityRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public var quantity: String?

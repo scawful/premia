@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.Money")
 public typealias Money = PremiaAPIClientGeneratedAPI.Money
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct Money: Codable, JSONEncodable, Hashable {
+public struct Money: Sendable, Codable, Hashable {
 
     public static let amountRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public static let currencyRule = StringRule(minLength: 3, maxLength: 3, pattern: nil)

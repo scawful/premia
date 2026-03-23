@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.OptionContractPairRow")
 public typealias OptionContractPairRow = PremiaAPIClientGeneratedAPI.OptionContractPairRow
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct OptionContractPairRow: Codable, JSONEncodable, Hashable {
+public struct OptionContractPairRow: Sendable, Codable, Hashable {
 
     public static let callBidRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public static let callAskRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
@@ -129,5 +126,4 @@ public struct OptionContractPairRow: Codable, JSONEncodable, Hashable {
 
 }
 
-@available(iOS 13, tvOS 13, watchOS 6, macOS 10.15, *)
 extension PremiaAPIClientGeneratedAPI.OptionContractPairRow: Identifiable {}

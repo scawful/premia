@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.CreatePlaidLinkTokenRequest")
 public typealias CreatePlaidLinkTokenRequest = PremiaAPIClientGeneratedAPI.CreatePlaidLinkTokenRequest
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct CreatePlaidLinkTokenRequest: Codable, JSONEncodable, Hashable {
+public struct CreatePlaidLinkTokenRequest: Sendable, Codable, Hashable {
 
     public var userId: String?
     public var redirectUri: String?

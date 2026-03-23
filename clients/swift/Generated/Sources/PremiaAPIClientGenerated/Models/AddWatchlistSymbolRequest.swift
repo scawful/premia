@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.AddWatchlistSymbolRequest")
 public typealias AddWatchlistSymbolRequest = PremiaAPIClientGeneratedAPI.AddWatchlistSymbolRequest
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct AddWatchlistSymbolRequest: Codable, JSONEncodable, Hashable {
+public struct AddWatchlistSymbolRequest: Sendable, Codable, Hashable {
 
     public var symbol: String
 

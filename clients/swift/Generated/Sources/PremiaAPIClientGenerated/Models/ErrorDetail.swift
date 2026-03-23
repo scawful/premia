@@ -6,18 +6,15 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.ErrorDetail")
 public typealias ErrorDetail = PremiaAPIClientGeneratedAPI.ErrorDetail
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct ErrorDetail: Codable, JSONEncodable, Hashable {
+public struct ErrorDetail: Sendable, Codable, Hashable {
 
-    public enum Action: String, Codable, CaseIterable, CaseIterableDefaultsLast {
+    public enum Action: String, Sendable, Codable, CaseIterable, CaseIterableDefaultsLast {
         case _none = "none"
         case retry = "retry"
         case reconnect = "reconnect"

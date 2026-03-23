@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -19,11 +16,11 @@ open class ConnectionsAPI {
      Complete the Plaid link flow.
      
      - parameter completePlaidLinkRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: ConnectionSummaryResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func completePlaidLink(completePlaidLinkRequest: CompletePlaidLinkRequest) async throws -> ConnectionSummaryResponse {
-        return try await completePlaidLinkWithRequestBuilder(completePlaidLinkRequest: completePlaidLinkRequest).execute().body
+    open class func completePlaidLink(completePlaidLinkRequest: CompletePlaidLinkRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> ConnectionSummaryResponse {
+        return try await completePlaidLinkWithRequestBuilder(completePlaidLinkRequest: completePlaidLinkRequest, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -33,35 +30,36 @@ open class ConnectionsAPI {
        - type: http
        - name: bearerAuth
      - parameter completePlaidLinkRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<ConnectionSummaryResponse> 
      */
-    open class func completePlaidLinkWithRequestBuilder(completePlaidLinkRequest: CompletePlaidLinkRequest) -> RequestBuilder<ConnectionSummaryResponse> {
+    open class func completePlaidLinkWithRequestBuilder(completePlaidLinkRequest: CompletePlaidLinkRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<ConnectionSummaryResponse> {
         let localVariablePath = "/v1/connections/plaid/link-complete"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: completePlaidLinkRequest)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: completePlaidLinkRequest, codableHelper: apiConfiguration.codableHelper)
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             "Content-Type": "application/json",
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<ConnectionSummaryResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<ConnectionSummaryResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
      Complete the Schwab OAuth flow.
      
      - parameter completeSchwabOAuthRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: ConnectionSummaryResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func completeSchwabOAuth(completeSchwabOAuthRequest: CompleteSchwabOAuthRequest) async throws -> ConnectionSummaryResponse {
-        return try await completeSchwabOAuthWithRequestBuilder(completeSchwabOAuthRequest: completeSchwabOAuthRequest).execute().body
+    open class func completeSchwabOAuth(completeSchwabOAuthRequest: CompleteSchwabOAuthRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> ConnectionSummaryResponse {
+        return try await completeSchwabOAuthWithRequestBuilder(completeSchwabOAuthRequest: completeSchwabOAuthRequest, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -71,35 +69,36 @@ open class ConnectionsAPI {
        - type: http
        - name: bearerAuth
      - parameter completeSchwabOAuthRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<ConnectionSummaryResponse> 
      */
-    open class func completeSchwabOAuthWithRequestBuilder(completeSchwabOAuthRequest: CompleteSchwabOAuthRequest) -> RequestBuilder<ConnectionSummaryResponse> {
+    open class func completeSchwabOAuthWithRequestBuilder(completeSchwabOAuthRequest: CompleteSchwabOAuthRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<ConnectionSummaryResponse> {
         let localVariablePath = "/v1/connections/schwab/oauth/complete"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: completeSchwabOAuthRequest)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: completeSchwabOAuthRequest, codableHelper: apiConfiguration.codableHelper)
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             "Content-Type": "application/json",
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<ConnectionSummaryResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<ConnectionSummaryResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
      Create a Plaid link token.
      
      - parameter createPlaidLinkTokenRequest: (body)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: PlaidLinkTokenResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func createPlaidLinkToken(createPlaidLinkTokenRequest: CreatePlaidLinkTokenRequest? = nil) async throws -> PlaidLinkTokenResponse {
-        return try await createPlaidLinkTokenWithRequestBuilder(createPlaidLinkTokenRequest: createPlaidLinkTokenRequest).execute().body
+    open class func createPlaidLinkToken(createPlaidLinkTokenRequest: CreatePlaidLinkTokenRequest? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> PlaidLinkTokenResponse {
+        return try await createPlaidLinkTokenWithRequestBuilder(createPlaidLinkTokenRequest: createPlaidLinkTokenRequest, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -109,35 +108,36 @@ open class ConnectionsAPI {
        - type: http
        - name: bearerAuth
      - parameter createPlaidLinkTokenRequest: (body)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<PlaidLinkTokenResponse> 
      */
-    open class func createPlaidLinkTokenWithRequestBuilder(createPlaidLinkTokenRequest: CreatePlaidLinkTokenRequest? = nil) -> RequestBuilder<PlaidLinkTokenResponse> {
+    open class func createPlaidLinkTokenWithRequestBuilder(createPlaidLinkTokenRequest: CreatePlaidLinkTokenRequest? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<PlaidLinkTokenResponse> {
         let localVariablePath = "/v1/connections/plaid/link-token"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: createPlaidLinkTokenRequest)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: createPlaidLinkTokenRequest, codableHelper: apiConfiguration.codableHelper)
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             "Content-Type": "application/json",
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<PlaidLinkTokenResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<PlaidLinkTokenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
      Start the Schwab OAuth flow.
      
      - parameter startSchwabOAuthRequest: (body)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: SchwabOAuthStartResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func startSchwabOAuth(startSchwabOAuthRequest: StartSchwabOAuthRequest? = nil) async throws -> SchwabOAuthStartResponse {
-        return try await startSchwabOAuthWithRequestBuilder(startSchwabOAuthRequest: startSchwabOAuthRequest).execute().body
+    open class func startSchwabOAuth(startSchwabOAuthRequest: StartSchwabOAuthRequest? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> SchwabOAuthStartResponse {
+        return try await startSchwabOAuthWithRequestBuilder(startSchwabOAuthRequest: startSchwabOAuthRequest, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -147,24 +147,25 @@ open class ConnectionsAPI {
        - type: http
        - name: bearerAuth
      - parameter startSchwabOAuthRequest: (body)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<SchwabOAuthStartResponse> 
      */
-    open class func startSchwabOAuthWithRequestBuilder(startSchwabOAuthRequest: StartSchwabOAuthRequest? = nil) -> RequestBuilder<SchwabOAuthStartResponse> {
+    open class func startSchwabOAuthWithRequestBuilder(startSchwabOAuthRequest: StartSchwabOAuthRequest? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<SchwabOAuthStartResponse> {
         let localVariablePath = "/v1/connections/schwab/oauth/start"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: startSchwabOAuthRequest)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: startSchwabOAuthRequest, codableHelper: apiConfiguration.codableHelper)
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             "Content-Type": "application/json",
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<SchwabOAuthStartResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<SchwabOAuthStartResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

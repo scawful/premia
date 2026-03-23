@@ -5,7 +5,7 @@ derived from `contracts/openapi/premia-v1.yaml`.
 
 Recommended flow:
 1. Keep `contracts/openapi/premia-v1.yaml` as the canonical client contract.
-2. Use OpenAPI Generator to emit a Swift package into `clients/swift/Generated/`.
+2. Use OpenAPI Generator to emit a Swift 6 package into `clients/swift/Generated/`.
 3. Wrap the generated client in a thin hand-written adapter before exposing it
    to SwiftUI screens.
 
@@ -29,7 +29,7 @@ Suggested generation command:
 ```bash
 npx --yes @openapitools/openapi-generator-cli generate \
   -i contracts/openapi/premia-v1.yaml \
-  -g swift5 \
+  -g swift6 \
   -o clients/swift/Generated \
   -c clients/swift/openapi-generator-config.yaml
 ```

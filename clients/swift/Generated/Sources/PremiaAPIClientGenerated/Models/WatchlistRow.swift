@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.WatchlistRow")
 public typealias WatchlistRow = PremiaAPIClientGeneratedAPI.WatchlistRow
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct WatchlistRow: Codable, JSONEncodable, Hashable {
+public struct WatchlistRow: Sendable, Codable, Hashable {
 
     public var id: String
     public var symbol: String
@@ -65,5 +62,4 @@ public struct WatchlistRow: Codable, JSONEncodable, Hashable {
 
 }
 
-@available(iOS 13, tvOS 13, watchOS 6, macOS 10.15, *)
 extension PremiaAPIClientGeneratedAPI.WatchlistRow: Identifiable {}

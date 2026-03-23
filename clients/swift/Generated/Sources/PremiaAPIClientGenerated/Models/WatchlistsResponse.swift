@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.WatchlistsResponse")
 public typealias WatchlistsResponse = PremiaAPIClientGeneratedAPI.WatchlistsResponse
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct WatchlistsResponse: Codable, JSONEncodable, Hashable {
+public struct WatchlistsResponse: Sendable, Codable, Hashable {
 
     public var data: WatchlistsData
     public var meta: Meta

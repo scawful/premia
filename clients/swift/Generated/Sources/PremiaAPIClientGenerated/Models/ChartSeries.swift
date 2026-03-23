@@ -6,18 +6,15 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.ChartSeries")
 public typealias ChartSeries = PremiaAPIClientGeneratedAPI.ChartSeries
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct ChartSeries: Codable, JSONEncodable, Hashable {
+public struct ChartSeries: Sendable, Codable, Hashable {
 
-    public enum ModelType: String, Codable, CaseIterable, CaseIterableDefaultsLast {
+    public enum ModelType: String, Sendable, Codable, CaseIterable, CaseIterableDefaultsLast {
         case candles = "candles"
         case line = "line"
         case unknownDefaultOpenApi = "unknown_default_open_api"

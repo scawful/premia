@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.AccountDetail")
 public typealias AccountDetail = PremiaAPIClientGeneratedAPI.AccountDetail
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct AccountDetail: Codable, JSONEncodable, Hashable {
+public struct AccountDetail: Sendable, Codable, Hashable {
 
     public static let equityPercentageRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public var accountId: String

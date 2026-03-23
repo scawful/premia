@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.ConnectionStatus")
 public typealias ConnectionStatus = PremiaAPIClientGeneratedAPI.ConnectionStatus
 
 extension PremiaAPIClientGeneratedAPI {
 
-public enum ConnectionStatus: String, Codable, CaseIterable, CaseIterableDefaultsLast {
+public enum ConnectionStatus: String, Sendable, Codable, CaseIterable, CaseIterableDefaultsLast {
     case connected = "connected"
     case connecting = "connecting"
     case notConnected = "not_connected"

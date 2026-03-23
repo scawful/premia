@@ -28,7 +28,7 @@ Suggested generation command:
 ```bash
 npx --yes @openapitools/openapi-generator-cli generate \
   -i contracts/openapi/premia-v1.yaml \
-  -g swift5 \
+  -g swift6 \
   -o clients/swift/Generated \
   -c clients/swift/openapi-generator-config.yaml
 ```

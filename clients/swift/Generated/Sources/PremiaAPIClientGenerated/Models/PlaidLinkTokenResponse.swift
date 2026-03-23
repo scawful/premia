@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.PlaidLinkTokenResponse")
 public typealias PlaidLinkTokenResponse = PremiaAPIClientGeneratedAPI.PlaidLinkTokenResponse
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct PlaidLinkTokenResponse: Codable, JSONEncodable, Hashable {
+public struct PlaidLinkTokenResponse: Sendable, Codable, Hashable {
 
     public var data: PlaidLinkTokenData
     public var meta: Meta

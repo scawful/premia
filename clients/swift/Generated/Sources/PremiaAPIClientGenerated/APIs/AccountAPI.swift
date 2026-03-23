@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -18,11 +15,11 @@ open class AccountAPI {
     /**
      Load the account screen payload.
      
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: AccountScreenResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func getAccountScreen() async throws -> AccountScreenResponse {
-        return try await getAccountScreenWithRequestBuilder().execute().body
+    open class func getAccountScreen(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> AccountScreenResponse {
+        return try await getAccountScreenWithRequestBuilder(apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -31,24 +28,25 @@ open class AccountAPI {
      - Bearer Token:
        - type: http
        - name: bearerAuth
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<AccountScreenResponse> 
      */
-    open class func getAccountScreenWithRequestBuilder() -> RequestBuilder<AccountScreenResponse> {
+    open class func getAccountScreenWithRequestBuilder(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<AccountScreenResponse> {
         let localVariablePath = "/v1/screens/account"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<AccountScreenResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<AccountScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

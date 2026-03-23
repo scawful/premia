@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.ChartStats")
 public typealias ChartStats = PremiaAPIClientGeneratedAPI.ChartStats
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct ChartStats: Codable, JSONEncodable, Hashable {
+public struct ChartStats: Sendable, Codable, Hashable {
 
     public var change: AbsolutePercentChange?
 

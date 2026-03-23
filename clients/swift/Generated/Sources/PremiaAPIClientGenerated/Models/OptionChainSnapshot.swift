@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.OptionChainSnapshot")
 public typealias OptionChainSnapshot = PremiaAPIClientGeneratedAPI.OptionChainSnapshot
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct OptionChainSnapshot: Codable, JSONEncodable, Hashable {
+public struct OptionChainSnapshot: Sendable, Codable, Hashable {
 
     public static let bidRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public static let askRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")

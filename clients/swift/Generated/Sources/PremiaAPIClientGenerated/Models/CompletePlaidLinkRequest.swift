@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.CompletePlaidLinkRequest")
 public typealias CompletePlaidLinkRequest = PremiaAPIClientGeneratedAPI.CompletePlaidLinkRequest
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct CompletePlaidLinkRequest: Codable, JSONEncodable, Hashable {
+public struct CompletePlaidLinkRequest: Sendable, Codable, Hashable {
 
     public var publicToken: String
     public var institutionId: String?

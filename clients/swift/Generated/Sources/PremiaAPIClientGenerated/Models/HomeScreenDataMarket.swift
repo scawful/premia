@@ -6,18 +6,15 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.HomeScreenDataMarket")
 public typealias HomeScreenDataMarket = PremiaAPIClientGeneratedAPI.HomeScreenDataMarket
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct HomeScreenDataMarket: Codable, JSONEncodable, Hashable {
+public struct HomeScreenDataMarket: Sendable, Codable, Hashable {
 
-    public enum Session: String, Codable, CaseIterable, CaseIterableDefaultsLast {
+    public enum Session: String, Sendable, Codable, CaseIterable, CaseIterableDefaultsLast {
         case preMarket = "pre_market"
         case _open = "open"
         case postMarket = "post_market"

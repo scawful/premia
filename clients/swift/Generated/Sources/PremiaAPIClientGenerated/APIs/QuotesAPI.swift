@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -19,11 +16,11 @@ open class QuotesAPI {
      Load quote detail for a symbol.
      
      - parameter symbol: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: QuoteScreenResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func getQuoteScreen(symbol: String) async throws -> QuoteScreenResponse {
-        return try await getQuoteScreenWithRequestBuilder(symbol: symbol).execute().body
+    open class func getQuoteScreen(symbol: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> QuoteScreenResponse {
+        return try await getQuoteScreenWithRequestBuilder(symbol: symbol, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -33,27 +30,28 @@ open class QuotesAPI {
        - type: http
        - name: bearerAuth
      - parameter symbol: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<QuoteScreenResponse> 
      */
-    open class func getQuoteScreenWithRequestBuilder(symbol: String) -> RequestBuilder<QuoteScreenResponse> {
+    open class func getQuoteScreenWithRequestBuilder(symbol: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<QuoteScreenResponse> {
         var localVariablePath = "/v1/screens/quotes/{symbol}"
         let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
         let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<QuoteScreenResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<QuoteScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

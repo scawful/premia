@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 extension PremiaAPIClientGeneratedAPI {
 
@@ -18,11 +15,11 @@ open class BootstrapAPI {
     /**
      Load app bootstrap state.
      
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: BootstrapResponse
      */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func getBootstrap() async throws -> BootstrapResponse {
-        return try await getBootstrapWithRequestBuilder().execute().body
+    open class func getBootstrap(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> BootstrapResponse {
+        return try await getBootstrapWithRequestBuilder(apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -31,24 +28,25 @@ open class BootstrapAPI {
      - Bearer Token:
        - type: http
        - name: bearerAuth
+     - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<BootstrapResponse> 
      */
-    open class func getBootstrapWithRequestBuilder() -> RequestBuilder<BootstrapResponse> {
+    open class func getBootstrapWithRequestBuilder(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<BootstrapResponse> {
         let localVariablePath = "/v1/bootstrap"
-        let localVariableURLString = PremiaAPIClientGeneratedAPI.basePath + localVariablePath
-        let localVariableParameters: [String: Any]? = nil
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
 
         let localVariableUrlComponents = URLComponents(string: localVariableURLString)
 
-        let localVariableNillableHeaders: [String: Any?] = [
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :
         ]
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<BootstrapResponse>.Type = PremiaAPIClientGeneratedAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<BootstrapResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 }
 }

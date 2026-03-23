@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.AccountPositionRow")
 public typealias AccountPositionRow = PremiaAPIClientGeneratedAPI.AccountPositionRow
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct AccountPositionRow: Codable, JSONEncodable, Hashable {
+public struct AccountPositionRow: Sendable, Codable, Hashable {
 
     public static let dayProfitLossPercentRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")
     public static let quantityRule = StringRule(minLength: nil, maxLength: nil, pattern: "/^-?[0-9]+(\\.[0-9]+)?$/")

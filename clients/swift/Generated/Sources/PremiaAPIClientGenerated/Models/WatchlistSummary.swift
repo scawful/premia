@@ -6,16 +6,13 @@
 //
 
 import Foundation
-#if canImport(AnyCodable)
-import AnyCodable
-#endif
 
 @available(*, deprecated, renamed: "PremiaAPIClientGeneratedAPI.WatchlistSummary")
 public typealias WatchlistSummary = PremiaAPIClientGeneratedAPI.WatchlistSummary
 
 extension PremiaAPIClientGeneratedAPI {
 
-public struct WatchlistSummary: Codable, JSONEncodable, Hashable {
+public struct WatchlistSummary: Sendable, Codable, Hashable {
 
     public static let instrumentCountRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: nil, exclusiveMaximum: false, multipleOf: nil)
     public var id: String
@@ -46,5 +43,4 @@ public struct WatchlistSummary: Codable, JSONEncodable, Hashable {
 
 }
 
-@available(iOS 13, tvOS 13, watchOS 6, macOS 10.15, *)
 extension PremiaAPIClientGeneratedAPI.WatchlistSummary: Identifiable {}

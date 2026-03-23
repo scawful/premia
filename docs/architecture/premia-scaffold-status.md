@@ -124,6 +124,8 @@ This note captures the first implementation pass after the architecture review.
   loaders on top of the generated client.
 - option-chain filter/search state now has a dedicated hand-written Swift query
   model so SwiftUI controls can bind to one app-level type.
+- the mobile wrapper now also exposes typed order preview/submission models and
+  methods, so trading flows can start from app-level Swift types too.
 
 ### Desktop migration start
 
@@ -161,6 +163,8 @@ This note captures the first implementation pass after the architecture review.
   reports providers as disconnected unless real credentials or workflow state
   make them active
 - `swift package dump-package` in `apps/mobile-ios/` succeeds.
+- `clients/swift/Generated/` has been migrated from the deprecated `swift5`
+  generator to the `swift6` generator.
 - `swift package dump-package` still succeeds in `apps/mobile-ios/` after adding
   the local generated-client dependency.
 - `npx --yes @openapitools/openapi-generator-cli generate ...` succeeds and emits
