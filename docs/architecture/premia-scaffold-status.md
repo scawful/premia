@@ -173,6 +173,8 @@ This note captures the first implementation pass after the architecture review.
 - unused singleton-era app facades and dead desktop models have been deleted,
   including the old app-local `TDA.hpp`, `Schwab.hpp`, `Plaid.hpp`,
   `ConsoleModel`, and `WatchlistModel` files.
+- `src/app/view/legacy/` is now explicitly documented as archival-only UI code
+  that is preserved for reference but not compiled into the active desktop app.
 
 ## Validation status
 

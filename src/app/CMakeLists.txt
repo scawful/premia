@@ -22,6 +22,9 @@ set(
   view/chart/subview/line_plot_chart.cc
 )
 
+# Note: src/app/view/legacy/ is intentionally preserved as archival UI code and
+# is not part of the active desktop build.
+
 add_executable(
   premia 
   premia.cc
