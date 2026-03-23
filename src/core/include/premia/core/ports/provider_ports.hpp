@@ -96,6 +96,12 @@ class OrderProviderPort {
   virtual auto SubmitOrder(
       const premia::core::application::OrderIntentRequest& request)
       -> premia::core::application::OrderSubmissionData = 0;
+  virtual auto CancelOrder(
+      const premia::core::application::OrderCancelRequest& request)
+      -> premia::core::application::OrderCancellationData = 0;
+  virtual auto ReplaceOrder(
+      const premia::core::application::OrderReplaceRequest& request)
+      -> premia::core::application::OrderReplacementData = 0;
 };
 
 }  // namespace premia::core::ports

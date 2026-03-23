@@ -424,6 +424,33 @@ auto SerializeOrderSubmissionResponse(
                                     {"message", data.message}});
 }
 
+auto SerializeOrderCancellationResponse(
+    const application::OrderCancellationData& data) -> std::string {
+  return WriteEnvelope(json::object{{"orderId", data.order_id},
+                                    {"accountId", data.account_id},
+                                    {"mode", data.mode},
+                                    {"status", data.status},
+                                    {"cancelledAt", data.cancelled_at},
+                                    {"message", data.message}});
+}
+
+auto SerializeOrderReplacementResponse(
+    const application::OrderReplacementData& data) -> std::string {
+  return WriteEnvelope(json::object{{"replacementId", data.replacement_id},
+                                    {"replacedOrderId", data.replaced_order_id},
+                                    {"accountId", data.account_id},
+                                    {"symbol", data.symbol},
+                                    {"assetType", data.asset_type},
+                                    {"instruction", data.instruction},
+                                    {"quantity", data.quantity},
+                                    {"orderType", data.order_type},
+                                    {"limitPrice", data.limit_price},
+                                    {"mode", data.mode},
+                                    {"status", data.status},
+                                    {"submittedAt", data.submitted_at},
+                                    {"message", data.message}});
+}
+
 auto SerializeConnectionSummaryResponse(const application::ConnectionSummary& data)
     -> std::string {
   return WriteEnvelope(MakeConnectionSummary(data));

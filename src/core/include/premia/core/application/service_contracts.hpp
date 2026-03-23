@@ -102,6 +102,10 @@ class OrderService {
       -> OrderPreviewData = 0;
   virtual auto SubmitOrder(const OrderIntentRequest& request)
       -> OrderSubmissionData = 0;
+  virtual auto CancelOrder(const OrderCancelRequest& request)
+      -> OrderCancellationData = 0;
+  virtual auto ReplaceOrder(const OrderReplaceRequest& request)
+      -> OrderReplacementData = 0;
 };
 
 }  // namespace premia::core::application

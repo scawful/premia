@@ -1,5 +1,6 @@
 #include "premia/providers/local/order_provider.hpp"
 
+#include <atomic>
 #include <chrono>
 #include <ctime>
 #include <fstream>
@@ -18,6 +19,8 @@ namespace pt = boost::property_tree;
 
 namespace {
 
+std::atomic<unsigned long long> g_order_counter{0};
+
 auto ParseDouble(const std::string& value) -> double {
   try {
     return boost::lexical_cast<double>(value);
@@ -30,6 +33,11 @@ auto FormatDouble(double value) -> std::string {
   std::ostringstream oss;
   oss << std::fixed << std::setprecision(2) << value;
   return oss.str();
+}
+
+auto MakeRuntimeId(const std::string& prefix) -> std::string {
+  const auto ticks = std::chrono::steady_clock::now().time_since_epoch().count();
+  return prefix + "_" + std::to_string(ticks);
 }
 
 auto DefaultPriceForSymbol(const std::string& symbol) -> std::string {
@@ -57,7 +65,7 @@ auto OrderProvider::PreviewOrder(const application::OrderIntentRequest& request)
                                MultiplierForAssetType(request.asset_type);
 
   application::OrderPreviewData data;
-  data.preview_id = "preview_" + std::to_string(NextId());
+  data.preview_id = MakeRuntimeId("preview");
   data.account_id = request.account_id.empty() ? "local_acc" : request.account_id;
   data.symbol = request.symbol;
   data.asset_type = request.asset_type;
@@ -96,7 +104,7 @@ auto OrderProvider::SubmitOrder(const application::OrderIntentRequest& request)
   }
 
   pt::ptree order;
-  order.put("submissionId", "submission_" + std::to_string(NextId()));
+  order.put("submissionId", MakeRuntimeId("submission"));
   order.put("accountId", preview.account_id);
   order.put("symbol", preview.symbol);
   order.put("assetType", preview.asset_type);
@@ -132,6 +140,80 @@ auto OrderProvider::SubmitOrder(const application::OrderIntentRequest& request)
   return data;
 }
 
+auto OrderProvider::CancelOrder(const application::OrderCancelRequest& request)
+    -> application::OrderCancellationData {
+  pt::ptree root;
+  {
+    std::ifstream input(path_);
+    if (input.good()) {
+      try {
+        pt::read_json(input, root);
+      } catch (const std::exception&) {
+        root = pt::ptree{};
+      }
+    }
+  }
+
+  pt::ptree orders;
+  if (auto child = root.get_child_optional("orders")) {
+    orders = child.get();
+  }
+  bool found = false;
+  for (auto& order : orders) {
+    if (order.second.get<std::string>("submissionId", "") == request.order_id) {
+      order.second.put("status", "cancelled");
+      order.second.put("cancelledAt", CurrentUtcTimestamp());
+      order.second.put("message", request.confirm_live
+                                     ? "Simulated live cancellation accepted."
+                                     : "Simulated local cancellation accepted.");
+      found = true;
+      break;
+    }
+  }
+  if (!found) {
+    throw std::runtime_error("order not found");
+  }
+
+  root.put_child("orders", orders);
+  std::ofstream output(path_);
+  pt::write_json(output, root);
+
+  application::OrderCancellationData data;
+  data.order_id = request.order_id;
+  data.account_id = request.account_id.empty() ? "local_acc" : request.account_id;
+  data.mode = request.confirm_live ? "simulated_confirmed" : "simulated";
+  data.status = "cancelled";
+  data.cancelled_at = CurrentUtcTimestamp();
+  data.message = request.confirm_live
+                     ? "Simulated live cancellation accepted."
+                     : "Simulated local cancellation accepted.";
+  return data;
+}
+
+auto OrderProvider::ReplaceOrder(const application::OrderReplaceRequest& request)
+    -> application::OrderReplacementData {
+  const auto cancel = CancelOrder(
+      {request.replacement.account_id, request.order_id,
+       request.replacement.confirm_live});
+  const auto submission = SubmitOrder(request.replacement);
+
+  application::OrderReplacementData data;
+  data.replacement_id = submission.submission_id;
+  data.replaced_order_id = request.order_id;
+  data.account_id = submission.account_id;
+  data.symbol = submission.symbol;
+  data.asset_type = submission.asset_type;
+  data.instruction = submission.instruction;
+  data.quantity = submission.quantity;
+  data.order_type = submission.order_type;
+  data.limit_price = submission.limit_price;
+  data.mode = submission.mode;
+  data.status = submission.status;
+  data.submitted_at = submission.submitted_at;
+  data.message = cancel.message + " Replacement accepted.";
+  return data;
+}
+
 auto OrderProvider::CurrentUtcTimestamp() const -> std::string {
   const auto now = std::chrono::system_clock::now();
   const std::time_t now_time = std::chrono::system_clock::to_time_t(now);
@@ -147,8 +229,7 @@ auto OrderProvider::CurrentUtcTimestamp() const -> std::string {
 }
 
 auto OrderProvider::NextId() -> unsigned long long {
-  ++counter_;
-  return counter_;
+  return ++g_order_counter;
 }
 
 }  // namespace premia::providers::local

@@ -133,6 +133,16 @@ auto ProviderBackedApplicationService::SubmitOrder(
   return order_service_->SubmitOrder(request);
 }
 
+auto ProviderBackedApplicationService::CancelOrder(
+    const OrderCancelRequest& request) -> OrderCancellationData {
+  return order_service_->CancelOrder(request);
+}
+
+auto ProviderBackedApplicationService::ReplaceOrder(
+    const OrderReplaceRequest& request) -> OrderReplacementData {
+  return order_service_->ReplaceOrder(request);
+}
+
 auto ProviderBackedApplicationService::CreateLinkToken(
     const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
   return workflow_service_->CreateLinkToken(request);

@@ -59,6 +59,8 @@ This note captures the first implementation pass after the architecture review.
 - `src/providers/local/order_provider.cc` and `src/providers/tda/order_provider.cc`
   now back order preview and submission workflows through the shared contract
   surface.
+- those order providers now also support cancel and replace flows through the
+  same provider-backed contract surface.
 - `src/providers/schwab/market_data_provider.cc` now owns the Schwab-specific
   quote and chart parsing logic that had previously lived inside the shared core
   service.
@@ -126,6 +128,8 @@ This note captures the first implementation pass after the architecture review.
   model so SwiftUI controls can bind to one app-level type.
 - the mobile wrapper now also exposes typed order preview/submission models and
   methods, so trading flows can start from app-level Swift types too.
+- the mobile wrapper now also exposes typed cancel/replace order flows on top of
+  the generated trading API.
 
 ### Desktop migration start
 

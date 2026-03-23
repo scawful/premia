@@ -309,6 +309,58 @@ paths:
                 $ref: '#/components/schemas/OrderSubmissionResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
+  /v1/orders/{orderId}/cancel:
+    post:
+      tags: [Trading]
+      summary: Cancel an existing order.
+      operationId: cancelOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCancelRequest'
+      responses:
+        '200':
+          description: Order cancellation response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCancellationResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/orders/{orderId}/replace:
+    post:
+      tags: [Trading]
+      summary: Replace an existing order.
+      operationId: replaceOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderReplaceRequest'
+      responses:
+        '200':
+          description: Order replacement response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderReplacementResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /v1/connections/schwab/oauth/start:
     post:
       tags: [Connections]
@@ -1369,6 +1421,112 @@ components:
         meta:
           requestId: req_order_submit
           asOf: '2026-03-22T21:11:00Z'
+    OrderCancelRequest:
+      type: object
+      properties:
+        accountId:
+          type: string
+        confirmLive:
+          type: boolean
+          default: false
+    OrderCancellationData:
+      type: object
+      required: [orderId, accountId, mode, status, cancelledAt, message]
+      properties:
+        orderId:
+          type: string
+        accountId:
+          type: string
+        mode:
+          type: string
+        status:
+          type: string
+        cancelledAt:
+          type: string
+          format: date-time
+        message:
+          type: string
+    OrderCancellationResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/OrderCancellationData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          orderId: submission_2
+          accountId: local_acc
+          mode: simulated
+          status: cancelled
+          cancelledAt: '2026-03-22T21:15:00Z'
+          message: Simulated local cancellation accepted.
+        meta:
+          requestId: req_order_cancel
+          asOf: '2026-03-22T21:15:00Z'
+    OrderReplaceRequest:
+      allOf:
+        - $ref: '#/components/schemas/OrderIntentRequest'
+        - type: object
+          required: [symbol, assetType, instruction, quantity, orderType]
+    OrderReplacementData:
+      type: object
+      required: [replacementId, replacedOrderId, accountId, symbol, assetType, instruction, quantity, orderType, limitPrice, mode, status, submittedAt, message]
+      properties:
+        replacementId:
+          type: string
+        replacedOrderId:
+          type: string
+        accountId:
+          type: string
+        symbol:
+          type: string
+        assetType:
+          type: string
+        instruction:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        orderType:
+          type: string
+        limitPrice:
+          $ref: '#/components/schemas/DecimalString'
+        mode:
+          type: string
+        status:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        message:
+          type: string
+    OrderReplacementResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/OrderReplacementData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          replacementId: submission_3
+          replacedOrderId: submission_2
+          accountId: local_acc
+          symbol: AAPL
+          assetType: EQUITY
+          instruction: BUY
+          quantity: '5'
+          orderType: LIMIT
+          limitPrice: '216.50'
+          mode: simulated
+          status: accepted
+          submittedAt: '2026-03-22T21:16:00Z'
+          message: Simulated local cancellation accepted. Replacement accepted.
+        meta:
+          requestId: req_order_replace
+          asOf: '2026-03-22T21:16:00Z'
     ConnectionSummaryResponse:
       type: object
       required: [data, meta]

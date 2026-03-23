@@ -80,6 +80,42 @@ struct OrderSubmissionData {
   std::string message;
 };
 
+struct OrderCancelRequest {
+  std::string account_id;
+  std::string order_id;
+  bool confirm_live = false;
+};
+
+struct OrderCancellationData {
+  std::string order_id;
+  std::string account_id;
+  std::string mode;
+  std::string status;
+  std::string cancelled_at;
+  std::string message;
+};
+
+struct OrderReplaceRequest {
+  std::string order_id;
+  OrderIntentRequest replacement;
+};
+
+struct OrderReplacementData {
+  std::string replacement_id;
+  std::string replaced_order_id;
+  std::string account_id;
+  std::string symbol;
+  std::string asset_type;
+  std::string instruction;
+  std::string quantity;
+  std::string order_type;
+  std::string limit_price;
+  std::string mode;
+  std::string status;
+  std::string submitted_at;
+  std::string message;
+};
+
 }  // namespace premia::core::application
 
 #endif  // PREMIA_CORE_APPLICATION_WORKFLOW_MODELS_HPP

@@ -33,6 +33,10 @@ auto SerializeOrderPreviewResponse(const core::application::OrderPreviewData& da
     -> std::string;
 auto SerializeOrderSubmissionResponse(
     const core::application::OrderSubmissionData& data) -> std::string;
+auto SerializeOrderCancellationResponse(
+    const core::application::OrderCancellationData& data) -> std::string;
+auto SerializeOrderReplacementResponse(
+    const core::application::OrderReplacementData& data) -> std::string;
 auto SerializeConnectionSummaryResponse(
     const core::application::ConnectionSummary& data) -> std::string;
 auto SerializeSchwabOAuthStartResponse(

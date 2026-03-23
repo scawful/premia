@@ -146,6 +146,52 @@ void Client::post_authorized_request(const std::string &endpoint,
   curl_easy_cleanup(curl);
 }
 
+void Client::put_authorized_request(const std::string &endpoint,
+                                    const std::string &data) const {
+  CURL *curl;
+  CURLcode res;
+  CURLHeader headers = nullptr;
+  std::string response;
+
+  curl = curl_easy_init();
+  curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+
+  std::string auth_bearer = "Authorization: Bearer " + access_token;
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  headers = curl_slist_append(headers, auth_bearer.c_str());
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.length());
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  res = curl_easy_perform(curl);
+  curl_easy_cleanup(curl);
+}
+
+void Client::delete_authorized_request(const std::string &endpoint) const {
+  CURL *curl;
+  CURLcode res;
+  CURLHeader headers = nullptr;
+  std::string response;
+
+  curl = curl_easy_init();
+  curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+
+  std::string auth_bearer = "Authorization: Bearer " + access_token;
+  headers = curl_slist_append(headers, auth_bearer.c_str());
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  res = curl_easy_perform(curl);
+  curl_easy_cleanup(curl);
+}
+
 std::string Client::post_access_token() const {
   CURL *curl;
   CURLcode res;
@@ -475,6 +521,25 @@ void Client::place_order_payload(const std::string &account_id,
       "https://api.tdameritrade.com/v1/accounts/{accountId}/orders";
   string_replace(endpoint, "{accountId}", account_id);
   post_authorized_request(endpoint, payload);
+}
+
+void Client::replace_order_payload(const std::string &account_id,
+                                   const std::string &order_id,
+                                   const std::string &payload) const {
+  std::string endpoint =
+      "https://api.tdameritrade.com/v1/accounts/{accountId}/orders/{orderId}";
+  string_replace(endpoint, "{accountId}", account_id);
+  string_replace(endpoint, "{orderId}", order_id);
+  put_authorized_request(endpoint, payload);
+}
+
+void Client::cancel_order(const std::string &account_id,
+                          const std::string &order_id) const {
+  std::string endpoint =
+      "https://api.tdameritrade.com/v1/accounts/{accountId}/orders/{orderId}";
+  string_replace(endpoint, "{accountId}", account_id);
+  string_replace(endpoint, "{orderId}", order_id);
+  delete_authorized_request(endpoint);
 }
 
 void Client::addAuth(const std::string &key, const std::string &token) {

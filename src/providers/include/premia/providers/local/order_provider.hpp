@@ -15,6 +15,10 @@ class OrderProvider : public core::ports::OrderProviderPort {
       -> core::application::OrderPreviewData override;
   auto SubmitOrder(const core::application::OrderIntentRequest& request)
       -> core::application::OrderSubmissionData override;
+  auto CancelOrder(const core::application::OrderCancelRequest& request)
+      -> core::application::OrderCancellationData override;
+  auto ReplaceOrder(const core::application::OrderReplaceRequest& request)
+      -> core::application::OrderReplacementData override;
 
  private:
   auto CurrentUtcTimestamp() const -> std::string;

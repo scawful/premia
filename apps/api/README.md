@@ -24,6 +24,8 @@ Current routes:
 - `GET /v1/screens/options/{symbol}`
 - `POST /v1/orders/preview`
 - `POST /v1/orders/submit`
+- `POST /v1/orders/{orderId}/cancel`
+- `POST /v1/orders/{orderId}/replace`
 - `GET /v1/stream/events`
 - `POST /v1/connections/schwab/oauth/start`
 - `POST /v1/connections/schwab/oauth/complete`
@@ -49,6 +51,9 @@ Route behavior today:
 - order preview and submit requests now flow through provider-backed order
   services, with TDA used only when valid credentials exist and a live
   submission is explicitly confirmed
+- order cancel and replace requests follow the same safety model: simulated
+  local behavior by default, live TDA behavior only when real credentials exist
+  and live confirmation is explicit
 - watchlist mutation routes are backed by the local provider adapter and persist
   changes into `assets/watchlists.json`
 

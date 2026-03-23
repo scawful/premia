@@ -423,6 +423,28 @@ auto OrderService::SubmitOrder(const OrderIntentRequest& request)
   return provider.SubmitOrder(request);
 }
 
+auto OrderService::CancelOrder(const OrderCancelRequest& request)
+    -> OrderCancellationData {
+  try {
+    providers::tda::OrderProvider provider(kTDAConfigPath);
+    return provider.CancelOrder(request);
+  } catch (const std::exception&) {
+  }
+  providers::local::OrderProvider provider(kOrdersPath);
+  return provider.CancelOrder(request);
+}
+
+auto OrderService::ReplaceOrder(const OrderReplaceRequest& request)
+    -> OrderReplacementData {
+  try {
+    providers::tda::OrderProvider provider(kTDAConfigPath);
+    return provider.ReplaceOrder(request);
+  } catch (const std::exception&) {
+  }
+  providers::local::OrderProvider provider(kOrdersPath);
+  return provider.ReplaceOrder(request);
+}
+
 WorkflowService::WorkflowService(ConnectionService& connection_service)
     : connection_service_(connection_service) {}
 

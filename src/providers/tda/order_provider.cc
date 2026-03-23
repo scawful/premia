@@ -197,6 +197,79 @@ auto OrderProvider::SubmitOrder(const application::OrderIntentRequest& request)
   return data;
 }
 
+auto OrderProvider::CancelOrder(const application::OrderCancelRequest& request)
+    -> application::OrderCancellationData {
+  if (!HasUsableConfig()) {
+    throw std::runtime_error("tda order config unavailable");
+  }
+
+  pt::ptree tree;
+  ReadConfigTree(config_path_, tree);
+  ::premia::tda::Client client;
+  client.addAuth(tree.get<std::string>("consumer_key"),
+                 tree.get<std::string>("refresh_token"));
+  client.fetch_access_token();
+  const auto account_id = ResolveAccountId(client, request.account_id);
+
+  application::OrderCancellationData data;
+  data.order_id = request.order_id;
+  data.account_id = account_id;
+  data.cancelled_at = CurrentUtcTimestamp();
+
+  if (!request.confirm_live) {
+    data.mode = "preview";
+    data.status = "not_cancelled";
+    data.message = "Set confirmLive=true to cancel a live order.";
+    return data;
+  }
+
+  client.cancel_order(account_id, request.order_id);
+  data.mode = "live";
+  data.status = "cancelled";
+  data.message = "Live order cancellation submitted to TDA.";
+  return data;
+}
+
+auto OrderProvider::ReplaceOrder(const application::OrderReplaceRequest& request)
+    -> application::OrderReplacementData {
+  auto preview = PreviewOrder(request.replacement);
+
+  application::OrderReplacementData data;
+  data.replaced_order_id = request.order_id;
+  data.account_id = preview.account_id;
+  data.symbol = preview.symbol;
+  data.asset_type = preview.asset_type;
+  data.instruction = preview.instruction;
+  data.quantity = preview.quantity;
+  data.order_type = preview.order_type;
+  data.limit_price = preview.limit_price;
+  data.submitted_at = CurrentUtcTimestamp();
+
+  if (!request.replacement.confirm_live) {
+    data.replacement_id = "tda_replace_preview_" + request.order_id;
+    data.mode = "preview";
+    data.status = "not_replaced";
+    data.message = "Set confirmLive=true to replace a live order.";
+    return data;
+  }
+
+  pt::ptree tree;
+  ReadConfigTree(config_path_, tree);
+  ::premia::tda::Client client;
+  client.addAuth(tree.get<std::string>("consumer_key"),
+                 tree.get<std::string>("refresh_token"));
+  client.fetch_access_token();
+  const auto account_id = ResolveAccountId(client, request.replacement.account_id);
+  const auto payload = BuildPayload(request.replacement, account_id);
+  client.replace_order_payload(account_id, request.order_id, payload);
+
+  data.replacement_id = "tda_replace_" + request.order_id;
+  data.mode = "live";
+  data.status = "replaced";
+  data.message = "Live order replacement submitted to TDA.";
+  return data;
+}
+
 auto OrderProvider::CurrentUtcTimestamp() const -> std::string {
   const auto now = std::chrono::system_clock::now();
   const std::time_t now_time = std::chrono::system_clock::to_time_t(now);

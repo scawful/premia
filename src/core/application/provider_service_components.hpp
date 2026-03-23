@@ -60,6 +60,8 @@ class OrderService {
  public:
   auto PreviewOrder(const OrderIntentRequest& request) -> OrderPreviewData;
   auto SubmitOrder(const OrderIntentRequest& request) -> OrderSubmissionData;
+  auto CancelOrder(const OrderCancelRequest& request) -> OrderCancellationData;
+  auto ReplaceOrder(const OrderReplaceRequest& request) -> OrderReplacementData;
 };
 
 class WorkflowService {

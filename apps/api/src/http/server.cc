@@ -334,6 +334,42 @@ auto HandleMutation(const http::request<http::string_body>& request)
                   order_request)));
     }
 
+    const auto segments = SplitPathSegments(path);
+    if (segments.size() == 4 && segments[0] == "v1" && segments[1] == "orders" &&
+        segments[3] == "cancel") {
+      core::application::OrderCancelRequest cancel_request;
+      cancel_request.account_id = GetOptionalString(payload, "accountId");
+      cancel_request.order_id = segments[2];
+      cancel_request.confirm_live = GetOptionalBool(payload, "confirmLive", false);
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeOrderCancellationResponse(
+              core::application::CompositionRoot::Instance().Orders().CancelOrder(
+                  cancel_request)));
+    }
+
+    if (segments.size() == 4 && segments[0] == "v1" && segments[1] == "orders" &&
+        segments[3] == "replace") {
+      core::application::OrderReplaceRequest replace_request;
+      replace_request.order_id = segments[2];
+      replace_request.replacement.account_id = GetOptionalString(payload, "accountId");
+      replace_request.replacement.symbol = GetRequiredString(payload, "symbol");
+      replace_request.replacement.asset_type = GetRequiredString(payload, "assetType");
+      replace_request.replacement.instruction = GetRequiredString(payload, "instruction");
+      replace_request.replacement.quantity = GetRequiredString(payload, "quantity");
+      replace_request.replacement.order_type = GetRequiredString(payload, "orderType");
+      replace_request.replacement.limit_price = GetOptionalString(payload, "limitPrice");
+      replace_request.replacement.duration = GetOptionalString(payload, "duration");
+      replace_request.replacement.session = GetOptionalString(payload, "session");
+      replace_request.replacement.confirm_live =
+          GetOptionalBool(payload, "confirmLive", false);
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeOrderReplacementResponse(
+              core::application::CompositionRoot::Instance().Orders().ReplaceOrder(
+                  replace_request)));
+    }
+
     if (path == "/v1/watchlists" && request.method() == http::verb::post) {
       return MakeJsonResponse(
           http::status::created,
@@ -341,7 +377,6 @@ auto HandleMutation(const http::request<http::string_body>& request)
               service.CreateWatchlist(GetRequiredString(payload, "name"))));
     }
 
-    const auto segments = SplitPathSegments(path);
     if (segments.size() == 3 && segments[0] == "v1" && segments[1] == "watchlists" &&
         request.method() == http::verb::patch) {
       return MakeJsonResponse(

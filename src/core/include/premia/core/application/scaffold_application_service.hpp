@@ -72,6 +72,10 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
       -> OrderPreviewData override;
   auto SubmitOrder(const OrderIntentRequest& request)
       -> OrderSubmissionData override;
+  auto CancelOrder(const OrderCancelRequest& request)
+      -> OrderCancellationData override;
+  auto ReplaceOrder(const OrderReplaceRequest& request)
+      -> OrderReplacementData override;
 
   auto CreateLinkToken(const PlaidLinkTokenRequest& request)
       -> PlaidLinkTokenData override;

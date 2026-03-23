@@ -127,6 +127,11 @@ class Client {
   void place_order(const std::string &account_id, const Order &order) const;
   void place_order_payload(const std::string &account_id,
                            const std::string &payload) const;
+  void replace_order_payload(const std::string &account_id,
+                             const std::string &order_id,
+                             const std::string &payload) const;
+  void cancel_order(const std::string &account_id,
+                    const std::string &order_id) const;
 
   // WebSocket Controls
   void start_session(const std::string &ticker);
@@ -171,6 +176,9 @@ class Client {
   std::string send_authorized_request(const std::string &endpoint) const;
   void post_authorized_request(const std::string &endpoint,
                                const std::string &data) const;
+  void put_authorized_request(const std::string &endpoint,
+                              const std::string &data) const;
+  void delete_authorized_request(const std::string &endpoint) const;
   std::string post_access_token() const;
   void get_user_principals();
   void check_user_principals();
