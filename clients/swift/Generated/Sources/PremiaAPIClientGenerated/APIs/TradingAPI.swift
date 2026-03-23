@@ -57,6 +57,90 @@ open class TradingAPI {
     }
 
     /**
+     List currently open orders.
+     
+     - parameter accountId: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: OrderRecordsResponse
+     */
+    open class func getOpenOrders(accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> OrderRecordsResponse {
+        return try await getOpenOrdersWithRequestBuilder(accountId: accountId, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     List currently open orders.
+     - GET /v1/orders/open
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter accountId: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<OrderRecordsResponse> 
+     */
+    open class func getOpenOrdersWithRequestBuilder(accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<OrderRecordsResponse> {
+        let localVariablePath = "/v1/orders/open"
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
+
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems([
+            "accountId": (wrappedValue: accountId?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+        ])
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            :
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<OrderRecordsResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
+     List historical orders.
+     
+     - parameter accountId: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: OrderRecordsResponse
+     */
+    open class func getOrderHistory(accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> OrderRecordsResponse {
+        return try await getOrderHistoryWithRequestBuilder(accountId: accountId, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     List historical orders.
+     - GET /v1/orders/history
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter accountId: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<OrderRecordsResponse> 
+     */
+    open class func getOrderHistoryWithRequestBuilder(accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<OrderRecordsResponse> {
+        let localVariablePath = "/v1/orders/history"
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
+
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems([
+            "accountId": (wrappedValue: accountId?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+        ])
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            :
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<OrderRecordsResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
      Preview an equity or option order.
      
      - parameter orderIntentRequest: (body)  

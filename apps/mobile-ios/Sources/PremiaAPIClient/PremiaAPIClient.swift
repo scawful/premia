@@ -390,6 +390,28 @@ public final class PremiaAPIClient: @unchecked Sendable {
         return mapOrderReplacement(response.data, asOf: response.meta.asOf)
     }
 
+    @available(macOS 10.15, iOS 13.0, *)
+    public func loadOpenOrders(accountID: String? = nil) async throws -> [PremiaOrderRecord] {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.TradingAPI.getOpenOrders(
+                accountId: accountID,
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return response.data.orders.map(mapOrderRecord)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func loadOrderHistory(accountID: String? = nil) async throws -> [PremiaOrderRecord] {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.TradingAPI.getOrderHistory(
+                accountId: accountID,
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return response.data.orders.map(mapOrderRecord)
+    }
+
 
     @available(macOS 10.15, iOS 13.0, *)
     private func executeMapped<T>(_ operation: () async throws -> T) async throws -> T {
@@ -624,6 +646,24 @@ public final class PremiaAPIClient: @unchecked Sendable {
             submittedAt: replacement.submittedAt,
             message: replacement.message,
             asOf: asOf
+        )
+    }
+
+    private func mapOrderRecord(_ record: PremiaAPIClientGeneratedAPI.OrderRecordData) -> PremiaOrderRecord {
+        PremiaOrderRecord(
+            id: record.orderId,
+            accountID: record.accountId,
+            symbol: record.symbol,
+            assetType: mapAssetTypeValue(record.assetType),
+            instruction: mapInstructionValue(record.instruction),
+            quantity: record.quantity,
+            orderType: mapOrderTypeValue(record.orderType),
+            limitPrice: record.limitPrice,
+            mode: record.mode,
+            status: record.status,
+            submittedAt: record.submittedAt,
+            updatedAt: record.updatedAt,
+            message: record.message
         )
     }
 

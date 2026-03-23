@@ -32,3 +32,5 @@ Current integration:
   request/response types directly
 - order cancellation and replacement wrappers are also exposed with typed app-
   level models for editing existing orders from SwiftUI state
+- open-order and order-history loaders are now exposed, along with a simple
+  `OrdersListView` SwiftUI surface for provider-backed order records

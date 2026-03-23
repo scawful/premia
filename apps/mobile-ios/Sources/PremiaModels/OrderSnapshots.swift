@@ -184,3 +184,35 @@ public struct PremiaOrderReplacement: Codable, Sendable, Equatable {
         self.asOf = asOf
     }
 }
+
+public struct PremiaOrderRecord: Codable, Sendable, Equatable, Identifiable {
+    public let id: String
+    public let accountID: String
+    public let symbol: String
+    public let assetType: PremiaAssetType
+    public let instruction: PremiaOrderInstruction
+    public let quantity: String
+    public let orderType: PremiaOrderType
+    public let limitPrice: String
+    public let mode: String
+    public let status: String
+    public let submittedAt: Date?
+    public let updatedAt: Date?
+    public let message: String
+
+    public init(id: String, accountID: String, symbol: String, assetType: PremiaAssetType, instruction: PremiaOrderInstruction, quantity: String, orderType: PremiaOrderType, limitPrice: String, mode: String, status: String, submittedAt: Date?, updatedAt: Date?, message: String) {
+        self.id = id
+        self.accountID = accountID
+        self.symbol = symbol
+        self.assetType = assetType
+        self.instruction = instruction
+        self.quantity = quantity
+        self.orderType = orderType
+        self.limitPrice = limitPrice
+        self.mode = mode
+        self.status = status
+        self.submittedAt = submittedAt
+        self.updatedAt = updatedAt
+        self.message = message
+    }
+}

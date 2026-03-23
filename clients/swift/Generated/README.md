@@ -45,6 +45,8 @@ Class | Method | HTTP request | Description
 *QuotesAPI* | [**getQuoteScreen**](docs/QuotesAPI.md#getquotescreen) | **GET** /v1/screens/quotes/{symbol} | Load quote detail for a symbol.
 *StreamingAPI* | [**streamEvents**](docs/StreamingAPI.md#streamevents) | **GET** /v1/stream/events | Subscribe to server-sent stream events.
 *TradingAPI* | [**cancelOrder**](docs/TradingAPI.md#cancelorder) | **POST** /v1/orders/{orderId}/cancel | Cancel an existing order.
+*TradingAPI* | [**getOpenOrders**](docs/TradingAPI.md#getopenorders) | **GET** /v1/orders/open | List currently open orders.
+*TradingAPI* | [**getOrderHistory**](docs/TradingAPI.md#getorderhistory) | **GET** /v1/orders/history | List historical orders.
 *TradingAPI* | [**previewOrder**](docs/TradingAPI.md#previeworder) | **POST** /v1/orders/preview | Preview an equity or option order.
 *TradingAPI* | [**replaceOrder**](docs/TradingAPI.md#replaceorder) | **POST** /v1/orders/{orderId}/replace | Replace an existing order.
 *TradingAPI* | [**submitOrder**](docs/TradingAPI.md#submitorder) | **POST** /v1/orders/submit | Submit an equity or option order.
@@ -98,6 +100,9 @@ Class | Method | HTTP request | Description
  - [OrderIntentRequest](docs/OrderIntentRequest.md)
  - [OrderPreviewData](docs/OrderPreviewData.md)
  - [OrderPreviewResponse](docs/OrderPreviewResponse.md)
+ - [OrderRecordData](docs/OrderRecordData.md)
+ - [OrderRecordsResponse](docs/OrderRecordsResponse.md)
+ - [OrderRecordsResponseData](docs/OrderRecordsResponseData.md)
  - [OrderReplaceRequest](docs/OrderReplaceRequest.md)
  - [OrderReplacementData](docs/OrderReplacementData.md)
  - [OrderReplacementResponse](docs/OrderReplacementResponse.md)

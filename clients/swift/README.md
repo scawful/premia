@@ -23,6 +23,8 @@ Current status:
 - the generated client now also includes trading preview/submit/cancel/replace
   APIs, with the hand-written wrapper translating them into app-level order
   models.
+- the generated client now also includes open-order and order-history APIs, with
+  the hand-written wrapper translating them into app-level order-record models.
 - Local Swift package compilation now succeeds after moving the conflicting
   SDK-shadow headers and modulemaps from `/usr/local/include` into
   `~/.local/share/premia/swift-sdk-shadow-backup/`.

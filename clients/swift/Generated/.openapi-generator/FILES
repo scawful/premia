@@ -67,6 +67,9 @@ Sources/PremiaAPIClientGenerated/Models/OrderCancellationResponse.swift
 Sources/PremiaAPIClientGenerated/Models/OrderIntentRequest.swift
 Sources/PremiaAPIClientGenerated/Models/OrderPreviewData.swift
 Sources/PremiaAPIClientGenerated/Models/OrderPreviewResponse.swift
+Sources/PremiaAPIClientGenerated/Models/OrderRecordData.swift
+Sources/PremiaAPIClientGenerated/Models/OrderRecordsResponse.swift
+Sources/PremiaAPIClientGenerated/Models/OrderRecordsResponseData.swift
 Sources/PremiaAPIClientGenerated/Models/OrderReplaceRequest.swift
 Sources/PremiaAPIClientGenerated/Models/OrderReplacementData.swift
 Sources/PremiaAPIClientGenerated/Models/OrderReplacementResponse.swift
@@ -138,6 +141,9 @@ docs/OrderCancellationResponse.md
 docs/OrderIntentRequest.md
 docs/OrderPreviewData.md
 docs/OrderPreviewResponse.md
+docs/OrderRecordData.md
+docs/OrderRecordsResponse.md
+docs/OrderRecordsResponseData.md
 docs/OrderReplaceRequest.md
 docs/OrderReplacementData.md
 docs/OrderReplacementResponse.md

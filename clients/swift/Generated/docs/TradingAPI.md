@@ -5,6 +5,8 @@ All URIs are relative to *https://api.premia.local*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**cancelOrder**](TradingAPI.md#cancelorder) | **POST** /v1/orders/{orderId}/cancel | Cancel an existing order.
+[**getOpenOrders**](TradingAPI.md#getopenorders) | **GET** /v1/orders/open | List currently open orders.
+[**getOrderHistory**](TradingAPI.md#getorderhistory) | **GET** /v1/orders/history | List historical orders.
 [**previewOrder**](TradingAPI.md#previeworder) | **POST** /v1/orders/preview | Preview an equity or option order.
 [**replaceOrder**](TradingAPI.md#replaceorder) | **POST** /v1/orders/{orderId}/replace | Replace an existing order.
 [**submitOrder**](TradingAPI.md#submitorder) | **POST** /v1/orders/submit | Submit an equity or option order.
@@ -56,6 +58,102 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getOpenOrders**
+```swift
+    open class func getOpenOrders(accountId: String? = nil, completion: @escaping (_ data: OrderRecordsResponse?, _ error: Error?) -> Void)
+```
+
+List currently open orders.
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import PremiaAPIClientGenerated
+
+let accountId = "accountId_example" // String |  (optional)
+
+// List currently open orders.
+TradingAPI.getOpenOrders(accountId: accountId) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **accountId** | **String** |  | [optional] 
+
+### Return type
+
+[**OrderRecordsResponse**](OrderRecordsResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getOrderHistory**
+```swift
+    open class func getOrderHistory(accountId: String? = nil, completion: @escaping (_ data: OrderRecordsResponse?, _ error: Error?) -> Void)
+```
+
+List historical orders.
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import PremiaAPIClientGenerated
+
+let accountId = "accountId_example" // String |  (optional)
+
+// List historical orders.
+TradingAPI.getOrderHistory(accountId: accountId) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **accountId** | **String** |  | [optional] 
+
+### Return type
+
+[**OrderRecordsResponse**](OrderRecordsResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
