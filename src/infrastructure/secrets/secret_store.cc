@@ -59,6 +59,29 @@ auto HexEncode(const std::string& value) -> std::string {
   return encoded;
 }
 
+auto HexDecode(const std::string& value) -> std::optional<std::string> {
+  if (value.size() % 2 != 0) {
+    return std::nullopt;
+  }
+  auto hex_value = [](char ch) -> int {
+    if (ch >= '0' && ch <= '9') return ch - '0';
+    if (ch >= 'a' && ch <= 'f') return ch - 'a' + 10;
+    if (ch >= 'A' && ch <= 'F') return ch - 'A' + 10;
+    return -1;
+  };
+  std::string decoded;
+  decoded.reserve(value.size() / 2);
+  for (std::size_t i = 0; i < value.size(); i += 2) {
+    const auto hi = hex_value(value[i]);
+    const auto lo = hex_value(value[i + 1]);
+    if (hi < 0 || lo < 0) {
+      return std::nullopt;
+    }
+    decoded.push_back(static_cast<char>((hi << 4) | lo));
+  }
+  return decoded;
+}
+
 auto RunCommandCapture(const std::string& command) -> std::optional<std::string> {
   std::array<char, 256> buffer{};
   std::string output;
@@ -114,7 +137,14 @@ auto LoadSecret(ProviderKind provider, SecretKind kind)
   const auto command = std::string("/usr/bin/security find-generic-password -s ") +
                        ShellEscape(service_name) + " -a " +
                        ShellEscape(account_name) + " -w 2>/dev/null";
-  return RunCommandCapture(command);
+  auto result = RunCommandCapture(command);
+  if (!result) {
+    return std::nullopt;
+  }
+  if (auto decoded = HexDecode(*result)) {
+    return decoded;
+  }
+  return result;
 #endif
 }
 
