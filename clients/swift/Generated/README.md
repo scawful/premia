@@ -44,7 +44,9 @@ Class | Method | HTTP request | Description
 *OptionsAPI* | [**getOptionChainScreen**](docs/OptionsAPI.md#getoptionchainscreen) | **GET** /v1/screens/options/{symbol} | Load option chain data for a symbol.
 *QuotesAPI* | [**getQuoteScreen**](docs/QuotesAPI.md#getquotescreen) | **GET** /v1/screens/quotes/{symbol} | Load quote detail for a symbol.
 *StreamingAPI* | [**streamEvents**](docs/StreamingAPI.md#streamevents) | **GET** /v1/stream/events | Subscribe to server-sent stream events.
+*TradingAPI* | [**cancelOrder**](docs/TradingAPI.md#cancelorder) | **POST** /v1/orders/{orderId}/cancel | Cancel an existing order.
 *TradingAPI* | [**previewOrder**](docs/TradingAPI.md#previeworder) | **POST** /v1/orders/preview | Preview an equity or option order.
+*TradingAPI* | [**replaceOrder**](docs/TradingAPI.md#replaceorder) | **POST** /v1/orders/{orderId}/replace | Replace an existing order.
 *TradingAPI* | [**submitOrder**](docs/TradingAPI.md#submitorder) | **POST** /v1/orders/submit | Submit an equity or option order.
 *WatchlistsAPI* | [**addWatchlistSymbol**](docs/WatchlistsAPI.md#addwatchlistsymbol) | **POST** /v1/watchlists/{watchlistId}/symbols | Add a symbol to a watchlist.
 *WatchlistsAPI* | [**createWatchlist**](docs/WatchlistsAPI.md#createwatchlist) | **POST** /v1/watchlists | Create a watchlist.
@@ -90,9 +92,15 @@ Class | Method | HTTP request | Description
  - [OptionChainSnapshot](docs/OptionChainSnapshot.md)
  - [OptionContractPairRow](docs/OptionContractPairRow.md)
  - [OptionExpirationSnapshot](docs/OptionExpirationSnapshot.md)
+ - [OrderCancelRequest](docs/OrderCancelRequest.md)
+ - [OrderCancellationData](docs/OrderCancellationData.md)
+ - [OrderCancellationResponse](docs/OrderCancellationResponse.md)
  - [OrderIntentRequest](docs/OrderIntentRequest.md)
  - [OrderPreviewData](docs/OrderPreviewData.md)
  - [OrderPreviewResponse](docs/OrderPreviewResponse.md)
+ - [OrderReplaceRequest](docs/OrderReplaceRequest.md)
+ - [OrderReplacementData](docs/OrderReplacementData.md)
+ - [OrderReplacementResponse](docs/OrderReplacementResponse.md)
  - [OrderSubmissionData](docs/OrderSubmissionData.md)
  - [OrderSubmissionResponse](docs/OrderSubmissionResponse.md)
  - [PlaidLinkTokenData](docs/PlaidLinkTokenData.md)

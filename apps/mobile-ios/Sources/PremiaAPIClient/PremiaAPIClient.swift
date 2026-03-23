@@ -364,6 +364,60 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
     @available(macOS 10.15, iOS 13.0, *)
+    public func cancelOrder(orderID: String, accountID: String? = nil, confirmLive: Bool = false) async throws -> PremiaOrderCancellation {
+        let response = try await executeMapped {
+            try await TradingAPI.cancelOrder(
+                orderId: orderID,
+                orderCancelRequest: PremiaAPIClientGeneratedAPI.OrderCancelRequest(
+                    accountId: accountID,
+                    confirmLive: confirmLive
+                ),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapOrderCancellation(response.data, asOf: response.meta.asOf)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func replaceOrder(_ replacement: PremiaOrderReplaceIntent) async throws -> PremiaOrderReplacement {
+        let response = try await executeMapped {
+            try await TradingAPI.replaceOrder(
+                orderId: replacement.orderID,
+                orderReplaceRequest: mapOrderReplaceIntent(replacement),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapOrderReplacement(response.data, asOf: response.meta.asOf)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func cancelOrder(orderID: String, accountID: String? = nil, confirmLive: Bool = false) async throws -> PremiaOrderCancellation {
+        let response = try await executeMapped {
+            try await TradingAPI.cancelOrder(
+                orderId: orderID,
+                orderCancelRequest: PremiaAPIClientGeneratedAPI.OrderCancelRequest(
+                    accountId: accountID,
+                    confirmLive: confirmLive
+                ),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapOrderCancellation(response.data, asOf: response.meta.asOf)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func replaceOrder(_ replacement: PremiaOrderReplaceIntent) async throws -> PremiaOrderReplacement {
+        let response = try await executeMapped {
+            try await TradingAPI.replaceOrder(
+                orderId: replacement.orderID,
+                orderReplaceRequest: mapOrderReplaceIntent(replacement),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapOrderReplacement(response.data, asOf: response.meta.asOf)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
     private func executeMapped<T>(_ operation: () async throws -> T) async throws -> T {
         do {
             return try await operation()
@@ -516,6 +570,38 @@ public final class PremiaAPIClient: @unchecked Sendable {
         )
     }
 
+    private func mapOrderReplaceIntent(_ replacement: PremiaOrderReplaceIntent) -> PremiaAPIClientGeneratedAPI.OrderReplaceRequest {
+        let intent = replacement.replacement
+        return PremiaAPIClientGeneratedAPI.OrderReplaceRequest(
+            accountId: intent.accountID,
+            symbol: intent.symbol,
+            assetType: mapAssetType(intent.assetType),
+            instruction: mapInstruction(intent.instruction),
+            quantity: intent.quantity,
+            orderType: mapOrderType(intent.orderType),
+            limitPrice: intent.limitPrice,
+            duration: intent.duration,
+            session: intent.session,
+            confirmLive: intent.confirmLive
+        )
+    }
+
+    private func mapOrderReplaceIntent(_ replacement: PremiaOrderReplaceIntent) -> PremiaAPIClientGeneratedAPI.OrderReplaceRequest {
+        let intent = replacement.replacement
+        return PremiaAPIClientGeneratedAPI.OrderReplaceRequest(
+            accountId: intent.accountID,
+            symbol: intent.symbol,
+            assetType: mapAssetType(intent.assetType),
+            instruction: mapInstruction(intent.instruction),
+            quantity: intent.quantity,
+            orderType: mapOrderType(intent.orderType),
+            limitPrice: intent.limitPrice,
+            duration: intent.duration,
+            session: intent.session,
+            confirmLive: intent.confirmLive
+        )
+    }
+
     private func mapOrderPreview(_ preview: PremiaAPIClientGeneratedAPI.OrderPreviewData, asOf: Date?) -> PremiaOrderPreview {
         PremiaOrderPreview(
             previewID: preview.previewId,
@@ -548,6 +634,68 @@ public final class PremiaAPIClient: @unchecked Sendable {
             status: submission.status,
             submittedAt: submission.submittedAt,
             message: submission.message,
+            asOf: asOf
+        )
+    }
+
+    private func mapOrderCancellation(_ cancellation: PremiaAPIClientGeneratedAPI.OrderCancellationData, asOf: Date?) -> PremiaOrderCancellation {
+        PremiaOrderCancellation(
+            orderID: cancellation.orderId,
+            accountID: cancellation.accountId,
+            mode: cancellation.mode,
+            status: cancellation.status,
+            cancelledAt: cancellation.cancelledAt,
+            message: cancellation.message,
+            asOf: asOf
+        )
+    }
+
+    private func mapOrderReplacement(_ replacement: PremiaAPIClientGeneratedAPI.OrderReplacementData, asOf: Date?) -> PremiaOrderReplacement {
+        PremiaOrderReplacement(
+            replacementID: replacement.replacementId,
+            replacedOrderID: replacement.replacedOrderId,
+            accountID: replacement.accountId,
+            symbol: replacement.symbol,
+            assetType: mapAssetTypeValue(replacement.assetType),
+            instruction: mapInstructionValue(replacement.instruction),
+            quantity: replacement.quantity,
+            orderType: mapOrderTypeValue(replacement.orderType),
+            limitPrice: replacement.limitPrice,
+            mode: replacement.mode,
+            status: replacement.status,
+            submittedAt: replacement.submittedAt,
+            message: replacement.message,
+            asOf: asOf
+        )
+    }
+
+    private func mapOrderCancellation(_ cancellation: PremiaAPIClientGeneratedAPI.OrderCancellationData, asOf: Date?) -> PremiaOrderCancellation {
+        PremiaOrderCancellation(
+            orderID: cancellation.orderId,
+            accountID: cancellation.accountId,
+            mode: cancellation.mode,
+            status: cancellation.status,
+            cancelledAt: cancellation.cancelledAt,
+            message: cancellation.message,
+            asOf: asOf
+        )
+    }
+
+    private func mapOrderReplacement(_ replacement: PremiaAPIClientGeneratedAPI.OrderReplacementData, asOf: Date?) -> PremiaOrderReplacement {
+        PremiaOrderReplacement(
+            replacementID: replacement.replacementId,
+            replacedOrderID: replacement.replacedOrderId,
+            accountID: replacement.accountId,
+            symbol: replacement.symbol,
+            assetType: mapAssetTypeValue(replacement.assetType),
+            instruction: mapInstructionValue(replacement.instruction),
+            quantity: replacement.quantity,
+            orderType: mapOrderTypeValue(replacement.orderType),
+            limitPrice: replacement.limitPrice,
+            mode: replacement.mode,
+            status: replacement.status,
+            submittedAt: replacement.submittedAt,
+            message: replacement.message,
             asOf: asOf
         )
     }

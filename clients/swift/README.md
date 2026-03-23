@@ -20,6 +20,9 @@ Current status:
   generated package.
 - the generated client now includes account and options screen APIs, and the
   hand-written wrapper maps them into app-level Swift models.
+- the generated client now also includes trading preview/submit/cancel/replace
+  APIs, with the hand-written wrapper translating them into app-level order
+  models.
 - Local Swift package compilation is currently blocked by conflicting
   `/usr/local/include` module maps on this machine, the same environment issue
   affecting the hand-written Swift scaffold.

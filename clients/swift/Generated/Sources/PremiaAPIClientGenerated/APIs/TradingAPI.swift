@@ -13,6 +13,50 @@ extension PremiaAPIClientGeneratedAPI {
 open class TradingAPI {
 
     /**
+     Cancel an existing order.
+     
+     - parameter orderId: (path)  
+     - parameter orderCancelRequest: (body)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: OrderCancellationResponse
+     */
+    open class func cancelOrder(orderId: String, orderCancelRequest: OrderCancelRequest? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> OrderCancellationResponse {
+        return try await cancelOrderWithRequestBuilder(orderId: orderId, orderCancelRequest: orderCancelRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Cancel an existing order.
+     - POST /v1/orders/{orderId}/cancel
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter orderId: (path)  
+     - parameter orderCancelRequest: (body)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<OrderCancellationResponse> 
+     */
+    open class func cancelOrderWithRequestBuilder(orderId: String, orderCancelRequest: OrderCancelRequest? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<OrderCancellationResponse> {
+        var localVariablePath = "/v1/orders/{orderId}/cancel"
+        let orderIdPreEscape = "\(APIHelper.mapValueToPathItem(orderId))"
+        let orderIdPostEscape = orderIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{orderId}", with: orderIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: orderCancelRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<OrderCancellationResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
      Preview an equity or option order.
      
      - parameter orderIntentRequest: (body)  
@@ -47,6 +91,50 @@ open class TradingAPI {
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
         let localVariableRequestBuilder: RequestBuilder<OrderPreviewResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
+     Replace an existing order.
+     
+     - parameter orderId: (path)  
+     - parameter orderReplaceRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: OrderReplacementResponse
+     */
+    open class func replaceOrder(orderId: String, orderReplaceRequest: OrderReplaceRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> OrderReplacementResponse {
+        return try await replaceOrderWithRequestBuilder(orderId: orderId, orderReplaceRequest: orderReplaceRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Replace an existing order.
+     - POST /v1/orders/{orderId}/replace
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter orderId: (path)  
+     - parameter orderReplaceRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<OrderReplacementResponse> 
+     */
+    open class func replaceOrderWithRequestBuilder(orderId: String, orderReplaceRequest: OrderReplaceRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<OrderReplacementResponse> {
+        var localVariablePath = "/v1/orders/{orderId}/replace"
+        let orderIdPreEscape = "\(APIHelper.mapValueToPathItem(orderId))"
+        let orderIdPostEscape = orderIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{orderId}", with: orderIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: orderReplaceRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<OrderReplacementResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
         return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }

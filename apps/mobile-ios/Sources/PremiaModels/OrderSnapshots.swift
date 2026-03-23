@@ -87,3 +87,41 @@ public struct PremiaOrderSubmission: Codable, Sendable, Equatable {
     public let message: String
     public let asOf: Date?
 }
+
+
+public struct PremiaOrderCancellation: Codable, Sendable, Equatable {
+    public let orderID: String
+    public let accountID: String
+    public let mode: String
+    public let status: String
+    public let cancelledAt: Date?
+    public let message: String
+    public let asOf: Date?
+}
+
+public struct PremiaOrderReplaceIntent: Codable, Sendable, Equatable {
+    public let orderID: String
+    public let replacement: PremiaOrderIntent
+
+    public init(orderID: String, replacement: PremiaOrderIntent) {
+        self.orderID = orderID
+        self.replacement = replacement
+    }
+}
+
+public struct PremiaOrderReplacement: Codable, Sendable, Equatable {
+    public let replacementID: String
+    public let replacedOrderID: String
+    public let accountID: String
+    public let symbol: String
+    public let assetType: PremiaAssetType
+    public let instruction: PremiaOrderInstruction
+    public let quantity: String
+    public let orderType: PremiaOrderType
+    public let limitPrice: String
+    public let mode: String
+    public let status: String
+    public let submittedAt: Date?
+    public let message: String
+    public let asOf: Date?
+}

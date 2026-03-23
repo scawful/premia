@@ -30,3 +30,5 @@ Current integration:
 - order preview and submission wrappers are now exposed via typed app-level
   models so SwiftUI can drive trading flows without depending on generated
   request/response types directly
+- order cancellation and replacement wrappers are also exposed with typed app-
+  level models for editing existing orders from SwiftUI state
