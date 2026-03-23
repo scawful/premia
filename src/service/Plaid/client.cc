@@ -9,6 +9,7 @@
 #include <string>
 
 #include "premia/infrastructure/secrets/runtime_paths.hpp"
+#include "premia/infrastructure/secrets/secret_store.hpp"
 
 namespace premia {
 namespace plaid {
@@ -78,6 +79,9 @@ bool Client::SaveConfig(const std::string& config_path) const {
       std::cerr << "[Plaid] SaveConfig error: unable to write secure config file\n";
       return false;
     }
+    premia::infrastructure::secrets::SaveSecret(
+        premia::infrastructure::secrets::ProviderKind::kPlaid,
+        premia::infrastructure::secrets::SecretKind::kConfig, buffer.str());
   } catch (const std::exception& e) {
     std::cerr << "[Plaid] SaveConfig error: " << e.what() << "\n";
     return false;
@@ -114,6 +118,9 @@ void Client::SaveTokens(const std::string& token_path) const {
                                                           buffer.str())) {
       std::cerr << "[Plaid] SaveTokens error: unable to write secure token file\n";
     }
+    premia::infrastructure::secrets::SaveSecret(
+        premia::infrastructure::secrets::ProviderKind::kPlaid,
+        premia::infrastructure::secrets::SecretKind::kTokens, buffer.str());
   } catch (const std::exception& e) {
     std::cerr << "[Plaid] SaveTokens error: " << e.what() << "\n";
   }

@@ -30,6 +30,7 @@ final class PremiaAPITestServer {
         process.arguments = ["--host", "127.0.0.1", "--port", "\(port)"]
         var environment = ProcessInfo.processInfo.environment
         environment["PREMIA_RUNTIME_DIR"] = workspaceURL.appendingPathComponent(".runtime").path
+        environment["PREMIA_DISABLE_KEYCHAIN"] = "1"
         process.environment = environment
         process.standardOutput = Pipe()
         process.standardError = Pipe()

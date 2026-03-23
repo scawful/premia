@@ -16,6 +16,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "premia/infrastructure/secrets/runtime_paths.hpp"
+#include "premia/infrastructure/secrets/secret_store.hpp"
 #include "Plaid/client.h"
 #include "Schwab/client.h"
 #include "premia/providers/local/account_detail_provider.hpp"
@@ -98,6 +99,16 @@ auto ReadJsonTree(const std::string& path, pt::ptree& tree) -> bool {
   return true;
 }
 
+auto ReadTextFile(const std::string& path) -> std::string {
+  std::ifstream input(path, std::ios::binary);
+  if (!input.good()) {
+    return "";
+  }
+  std::ostringstream buffer;
+  buffer << input.rdbuf();
+  return buffer.str();
+}
+
 auto HasFile(const std::string& path) -> bool {
   std::ifstream file(path);
   return file.good();
@@ -139,11 +150,23 @@ auto ResolveConfigPath(secrets::ProviderKind provider,
     -> std::string {
   const auto runtime_path = secrets::ProviderConfigPath(provider);
   const auto runtime_path_string = runtime_path.string();
+  if (auto secret = secrets::LoadSecret(provider, secrets::SecretKind::kConfig)) {
+    secrets::WriteSecureText(runtime_path, *secret);
+    return runtime_path_string;
+  }
   if (is_usable(runtime_path_string)) {
+    if (secrets::KeychainEnabled()) {
+      secrets::SaveSecret(provider, secrets::SecretKind::kConfig,
+                          ReadTextFile(runtime_path_string));
+    }
     return runtime_path_string;
   }
   if (is_usable(legacy_path)) {
     secrets::CopyFileToSecureStore(legacy_path, runtime_path);
+    if (secrets::KeychainEnabled()) {
+      secrets::SaveSecret(provider, secrets::SecretKind::kConfig,
+                          ReadTextFile(legacy_path));
+    }
     return runtime_path_string;
   }
   if (secrets::FileExists(runtime_path)) {
@@ -155,11 +178,23 @@ auto ResolveConfigPath(secrets::ProviderKind provider,
 auto ResolveTokenPath(secrets::ProviderKind provider,
                       const std::string& legacy_path) -> std::string {
   const auto runtime_path = secrets::ProviderTokenPath(provider);
+  if (auto secret = secrets::LoadSecret(provider, secrets::SecretKind::kTokens)) {
+    secrets::WriteSecureText(runtime_path, *secret);
+    return runtime_path.string();
+  }
   if (secrets::FileExists(runtime_path)) {
+    if (secrets::KeychainEnabled()) {
+      secrets::SaveSecret(provider, secrets::SecretKind::kTokens,
+                          ReadTextFile(runtime_path.string()));
+    }
     return runtime_path.string();
   }
   if (secrets::FileExists(legacy_path)) {
     secrets::CopyFileToSecureStore(legacy_path, runtime_path);
+    if (secrets::KeychainEnabled()) {
+      secrets::SaveSecret(provider, secrets::SecretKind::kTokens,
+                          ReadTextFile(legacy_path));
+    }
     return runtime_path.string();
   }
   secrets::EnsureProviderDir(provider);

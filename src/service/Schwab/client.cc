@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "premia/infrastructure/secrets/runtime_paths.hpp"
+#include "premia/infrastructure/secrets/secret_store.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -112,6 +113,9 @@ void Client::SaveTokens(const std::string& token_path) const {
                                                           buffer.str())) {
       std::cerr << "[Schwab] SaveTokens error: unable to write secure token file\n";
     }
+    premia::infrastructure::secrets::SaveSecret(
+        premia::infrastructure::secrets::ProviderKind::kSchwab,
+        premia::infrastructure::secrets::SecretKind::kTokens, buffer.str());
   } catch (const std::exception& e) {
     std::cerr << "[Schwab] SaveTokens error: " << e.what() << "\n";
   }

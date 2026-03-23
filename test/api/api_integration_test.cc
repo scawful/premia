@@ -142,6 +142,7 @@ class PremiaApiProcess {
       chdir(workspace_.c_str());
       const auto runtime_dir = (workspace_ / ".runtime").string();
       setenv("PREMIA_RUNTIME_DIR", runtime_dir.c_str(), 1);
+      setenv("PREMIA_DISABLE_KEYCHAIN", "1", 1);
       const auto port_string = std::to_string(port_);
       execl(PREMIA_API_BIN, PREMIA_API_BIN, "--host", kHost, "--port",
             port_string.c_str(), nullptr);
