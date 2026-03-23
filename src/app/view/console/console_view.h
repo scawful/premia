@@ -8,7 +8,6 @@
 
 #include "metatypes.h"
 #include "view/core/IconsMaterialDesign.h"
-#include "core/TDA.hpp"
 #include "core/TWS.hpp"
 #include "view/view.h"
 

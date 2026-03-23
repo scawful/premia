@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+
 #include "premia/core/application/composition_root.hpp"
 
 namespace premia {

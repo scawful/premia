@@ -95,6 +95,7 @@ ViewManager::ViewManager() {
   addEventHandler("optionChainView", [this]() -> void {
     setCurrentView(std::make_shared<OptionChainView>());
   });
+  addEventHandler("login", [this]() -> void { setLoggedIn(); });
 }
 
 void ViewManager::transferEvents() const {

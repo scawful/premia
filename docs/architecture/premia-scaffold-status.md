@@ -160,9 +160,9 @@ This note captures the first implementation pass after the architecture review.
 - `src/app/model/chart/chart_model.cc` and `src/app/view/watchlist/watchlist_view.cc`
   now avoid direct TDA singleton usage on their active paths, further shifting
   desktop behavior onto provider-backed core contracts.
-- the remaining direct `tda::TDA::getInstance()` usage in `src/app/` is now
-  isolated to the legacy login and console/socket paths, rather than the active
-  chart, watchlist, account, and options rendering flows.
+- the active `src/app/` desktop paths no longer depend on direct
+  `tda::TDA::getInstance()` calls; the old singleton usage has been removed from
+  login, console, and legacy watchlist model paths as well.
 
 ## Validation status
 

@@ -1,5 +1,7 @@
 #include "watchlist_model.h"
 
+#include "premia/core/application/composition_root.hpp"
+
 namespace premia {
 
 void WatchlistModel::resetWatchlist() {
@@ -39,33 +41,39 @@ void WatchlistModel::initLocalWatchlist() {
 
 void WatchlistModel::initTDAWatchlists() {
   resetWatchlist();
-  std::string account_num;
-  Try { account_num = tda::TDA::getInstance().getDefaultAccount(); }
-  catch (const std::out_of_range& e) {
-    std::string error(e.what());
-    logger("[error] " + error);
-    throw premia::NotLoggedInException();
-  }
-  catch (const boost::property_tree::ptree_error& e) {
-    std::string error(e.what());
-    logger("[error] " + error);
-    throw premia::NotLoggedInException();
-  }
-  finally {
-    watchlists = tda::TDA::getInstance().getWatchlistsByAccount(account_num);
+  try {
+    auto& service = core::application::CompositionRoot::Instance().Watchlists();
+    const auto summaries = service.ListWatchlists();
+    for (size_t i = 0; i < summaries.size(); ++i) {
+      auto screen = service.GetWatchlistScreen(summaries[i].id);
+      tda::Watchlist watchlist;
+      watchlist.setName(screen.watchlist.name);
+      watchlist.setId(static_cast<int>(i));
+      watchlist.setAccountId(screen.watchlist.id);
 
-    for (int i = 0; i < watchlists.size(); i++) {
-      watchlistNames.push_back(watchlists[i].getName());
-      openList.push_back(0);
+      for (const auto& row : screen.rows) {
+        watchlist.addInstrument(row.symbol, row.name, "Stock");
+        tda::Quote quote;
+        quote.setQuoteVariable("bidPrice", row.bid.amount);
+        quote.setQuoteVariable("askPrice", row.ask.amount);
+        quote.setQuoteVariable("openPrice", row.last_price.amount);
+        quote.setQuoteVariable("closePrice", row.last_price.amount);
+        quotes[row.symbol] = quote;
+      }
+
+      watchlists.push_back(watchlist);
+      watchlistNames.push_back(watchlist.getName());
+      openList.push_back(1);
     }
 
-    watchlistNamesChar.clear();
-    for (std::string const& str : watchlistNames) {
-      watchlistNamesChar.push_back(str.data());
+    for (const std::string& str : watchlistNames) {
+      watchlistNamesChar.push_back(str.c_str());
     }
-    active = true;
+    active = !watchlists.empty();
+  } catch (const std::exception& e) {
+    logger(std::string("[error] ") + e.what());
+    throw premia::NotLoggedInException();
   }
-  PROCEED;
 }
 
 bool WatchlistModel::getOpenList(int n) { return openList.at(n); }

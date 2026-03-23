@@ -1,8 +1,6 @@
 #ifndef Model_hpp
 #define Model_hpp
 
-#include "core/TDA.hpp"
-#include "core/TWS.hpp"
 #include "premia.h"
 
 namespace premia {

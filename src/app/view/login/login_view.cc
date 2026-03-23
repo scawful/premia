@@ -6,8 +6,7 @@
 
 #include <string>
 
-#include "core/Schwab.hpp"
-#include "core/TDA.hpp"
+#include "premia/core/application/composition_root.hpp"
 #include "view/core/IconsMaterialDesign.h"
 #include "metatypes.h"
 #include "model/model.h"
@@ -20,6 +19,7 @@ void LoginView::DrawScreen() const {
   static bool schwabAuth;
   static std::string username;
   static std::string password;
+  static std::string statusMessage;
 
   if (ImGui::BeginTable("split", 2, ImGuiTableFlags_None)) {
     ImGui::TableNextColumn();
@@ -39,51 +39,30 @@ void LoginView::DrawScreen() const {
   }
 
   if (ImGui::Button("Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f))) {
+    bool shouldEnterWorkspace = true;
+
     if (tdaAuth) {
-      std::ifstream keyfile("assets/apikey.txt");
-      std::string consumer_key = username;
-      std::string refresh_token = password;
-      if (keyfile.good()) {
-        try {
-          std::stringstream buffer;
-          buffer << keyfile.rdbuf();
-          buffer >> consumer_key;
-          buffer >> refresh_token;
-          keyfile.close();
-        } catch (int e) {
-          // If issue reading key file, use the keys in the fields
-          consumer_key = username;
-          refresh_token = password;
-        }
-      }
-      tda::TDA::getInstance().authUser(consumer_key, refresh_token);
+      statusMessage =
+          "TDA now uses provider-backed config from assets/tda.json; no direct login call is needed.";
+      if (logger) logger(std::string(statusMessage));
     }
     if (schwabAuth) {
-      auto& schwab = schwab::Schwab::getInstance();
-      if (schwab.loadConfig()) {
-        // Try loading persisted tokens first.
-        schwab.loadTokens();
-        if (!schwab.isAuthenticated() && schwab.hasRefreshToken()) {
-          schwab.refreshAuth();
-          schwab.saveTokens();
-        }
-        if (!schwab.isAuthenticated()) {
-          if (!password.empty()) {
-            // Treat password field as the callback URL / auth code.
-            if (schwab.exchangeAuthCode(password)) {
-              schwab.saveTokens();
-            }
-          } else {
-            // No tokens and no code — open browser for first-time auth.
-            schwab.openAuthBrowser();
-          }
-        }
-        if (schwab.isAuthenticated()) {
-          schwab.bootstrapAccounts();
-        }
+      auto& workflows = core::application::CompositionRoot::Instance().Workflows();
+      if (!password.empty()) {
+        const auto result = workflows.CompleteSchwabOAuth({password, username});
+        statusMessage = "Schwab workflow state: " + result.display_name + " -> " +
+                        core::domain::ConnectionStatusToString(result.status);
+      } else {
+        const auto launch = workflows.StartSchwabOAuth({username, "desktop"});
+        statusMessage = "Open this Schwab auth URL in a browser: " + launch.auth_url;
+        shouldEnterWorkspace = false;
       }
+      if (logger) logger(std::string(statusMessage));
     }
-    events.at("login")();
+
+    if (shouldEnterWorkspace && events.count("login")) {
+      events.at("login")();
+    }
   }
 
   ImGui::Separator();
@@ -95,6 +74,10 @@ void LoginView::DrawScreen() const {
     ImGui::TableNextColumn();
     ImGui::Checkbox("Schwab", &schwabAuth);
     ImGui::EndTable();
+  }
+  if (!statusMessage.empty()) {
+    ImGui::Separator();
+    ImGui::TextWrapped("%s", statusMessage.c_str());
   }
 }
 

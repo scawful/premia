@@ -1,5 +1,10 @@
 #include "console_view.h"
 
+#include <chrono>
+#include <ctime>
+
+#include "premia/core/application/composition_root.hpp"
+
 namespace premia {
 
 // Portable helpers
@@ -169,12 +174,15 @@ void ConsoleView::executeCommand(const char* command_line) {
   } else if (Stricmp(command_line, "RUN_TWS") == 0) {
     tws::TWS::getInstance().runClient("127.0.0.1", 7496, 0);
   } else if (Stricmp(command_line, "CLOSE_SOCKET") == 0) {
-    addLogStd("Ending WebSocket session...");
-    tda::TDA::getInstance().sendSocketLogout();
+    addLogStd("No provider-backed TDA socket session is active in this console path.");
   } else if (command_string.substr(0, 10) == "LOAD_QUOTE") {
     std::string ticker = command_string.substr(11, command_string.size());
-    addLogStd("Opening WebSocket session and requesting QUOTE for " + ticker);
-    tda::TDA::getInstance().sendChartRequestToSocket(ticker);
+    const auto quote = core::application::CompositionRoot::Instance()
+                           .MarketData()
+                           .GetQuoteDetail(ticker);
+    addLogStd("Loaded quote for " + ticker + ": last=" +
+              quote.quote.last_price.amount + " bid=" + quote.quote.bid.amount +
+              " ask=" + quote.quote.ask.amount);
   } else {
     addLog("Unknown command: '%s'\n", command_line);
   }
@@ -311,10 +319,16 @@ void ConsoleView::addLog(const char* fmt, ...) {
 }
 
 void ConsoleView::addLogStd(const std::string& data) {
-  const boost::posix_time::ptime now =
-      boost::posix_time::second_clock::local_time();
-  auto hours = now.time_of_day().hours();
-  auto minutes = now.time_of_day().minutes();
+  const auto now = std::chrono::system_clock::now();
+  const auto now_time = std::chrono::system_clock::to_time_t(now);
+  std::tm local_time{};
+#if defined(_WIN32)
+  localtime_s(&local_time, &now_time);
+#else
+  localtime_r(&now_time, &local_time);
+#endif
+  auto hours = local_time.tm_hour;
+  auto minutes = local_time.tm_min;
 
   std::string log = "[";
   log += std::to_string(hours);

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "model/model.h"
+#include "service/TDAmeritrade/data/Quote.hpp"
 #include "service/TDAmeritrade/data/Watchlist.hpp"
 
 namespace premia {
