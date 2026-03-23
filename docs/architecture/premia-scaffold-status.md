@@ -56,6 +56,11 @@ This note captures the first implementation pass after the architecture review.
   watchlists when a valid `assets/tda.json` config is present.
 - `src/providers/tda/options_provider.cc` can now supply authenticated TDA
   option-chain snapshots.
+- `src/providers/schwab/account_detail_provider.cc` can now supply live Schwab
+  account balances and positions when a valid authenticated Schwab session
+  exists.
+- `src/providers/schwab/options_provider.cc` can now supply live Schwab option
+  chains when a valid authenticated Schwab session exists.
 - `src/providers/local/order_provider.cc` and `src/providers/tda/order_provider.cc`
   now back order preview and submission workflows through the shared contract
   surface.
@@ -83,6 +88,9 @@ This note captures the first implementation pass after the architecture review.
 - account detail and option-chain fallback views are now backed by provider
   adapters too, letting more of the desktop UI leave singleton-driven model
   flows behind.
+- the account surface and options surface now prefer live Schwab-backed data
+  before falling back to TDA or local fixtures when a valid Schwab session is
+  available.
 - account/options flows are no longer read-only at the API layer; order preview
   and submission routes now exist with safe local fallbacks and explicit live
   confirmation requirements for TDA.

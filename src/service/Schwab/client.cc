@@ -395,11 +395,11 @@ std::string Client::PostWithBasicAuth(const std::string& url,
 
 std::string Client::GetAccount(const std::string& account_hash) const {
   return SendAuthorizedGet(kTraderBaseUrl + "/accounts/" + account_hash +
-                           "?fields=positions,orders");
+                           "?fields=positions");
 }
 
 std::string Client::GetAllAccounts() const {
-  return SendAuthorizedGet(kTraderBaseUrl + "/accounts?fields=positions,orders");
+  return SendAuthorizedGet(kTraderBaseUrl + "/accounts?fields=positions");
 }
 
 // ---------------------------------------------------------------------------

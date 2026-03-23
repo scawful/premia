@@ -40,6 +40,7 @@ add_executable(
 add_executable(
   premia_provider_core_test
   providers/local_order_provider_test.cc
+  providers/schwab_guardrail_test.cc
   providers/tda_guardrail_test.cc
   core/order_service_test.cc
 )

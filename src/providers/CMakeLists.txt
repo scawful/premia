@@ -95,6 +95,25 @@ target_link_libraries(
 )
 
 add_library(
+  premia_provider_schwab_account_detail
+  schwab/account_detail_provider.cc
+)
+
+target_include_directories(
+  premia_provider_schwab_account_detail
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_schwab_account_detail PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_schwab_account_detail
+  PRIVATE
+  schwab
+)
+
+add_library(
   premia_provider_local_options
   local/options_provider.cc
 )
@@ -137,6 +156,25 @@ target_link_libraries(
   premia_provider_tda_options
   PRIVATE
   tdameritrade
+)
+
+add_library(
+  premia_provider_schwab_options
+  schwab/options_provider.cc
+)
+
+target_include_directories(
+  premia_provider_schwab_options
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_schwab_options PUBLIC cxx_std_17)
+
+target_link_libraries(
+  premia_provider_schwab_options
+  PRIVATE
+  schwab
 )
 
 add_library(

@@ -25,7 +25,9 @@
 #include "premia/providers/local/portfolio_provider.hpp"
 #include "premia/providers/local/watchlist_provider.hpp"
 #include "premia/providers/plaid/workflow_provider.hpp"
+#include "premia/providers/schwab/account_detail_provider.hpp"
 #include "premia/providers/schwab/market_data_provider.hpp"
+#include "premia/providers/schwab/options_provider.hpp"
 #include "premia/providers/schwab/workflow_provider.hpp"
 #include "premia/providers/tda/account_detail_provider.hpp"
 #include "premia/providers/tda/order_provider.hpp"
@@ -283,6 +285,28 @@ auto BuildChartFallback(const std::string& symbol, const std::string& range,
   return fallback;
 }
 
+auto MakePortfolioSummaryFromAccount(const AccountDetail& detail) -> PortfolioSummary {
+  return PortfolioSummary{detail.net_liquidation,
+                          {MakeMoney("0.00"), "0.00"},
+                          detail.cash,
+                          detail.buying_power,
+                          static_cast<int>(detail.positions.size())};
+}
+
+auto MakeHoldingsFromAccount(const AccountDetail& detail) -> std::vector<HoldingRow> {
+  std::vector<HoldingRow> holdings;
+  holdings.reserve(detail.positions.size());
+  for (const auto& position : detail.positions) {
+    holdings.push_back({"schwab:" + position.symbol,
+                        position.symbol,
+                        position.name,
+                        position.quantity,
+                        position.market_value,
+                        {position.day_profit_loss, position.day_profit_loss_percent}});
+  }
+  return holdings;
+}
+
 }  // namespace
 
 ConnectionService::ConnectionService() {
@@ -371,6 +395,12 @@ auto ConnectionService::MutableConnection(Provider provider) -> ConnectionSummar
 
 auto PortfolioAccountService::GetPortfolioSummary() const -> PortfolioSummary {
   try {
+    providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
+                                                      SchwabTokenPath());
+    return MakePortfolioSummaryFromAccount(provider.GetAccountDetail());
+  } catch (const std::exception&) {
+  }
+  try {
     providers::tda::PortfolioProvider provider(TdaConfigPath());
     return provider.GetPortfolioSummary();
   } catch (const std::exception&) {
@@ -381,6 +411,12 @@ auto PortfolioAccountService::GetPortfolioSummary() const -> PortfolioSummary {
 
 auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> {
   try {
+    providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
+                                                      SchwabTokenPath());
+    return MakeHoldingsFromAccount(provider.GetAccountDetail());
+  } catch (const std::exception&) {
+  }
+  try {
     providers::tda::PortfolioProvider provider(TdaConfigPath());
     return provider.GetTopHoldings();
   } catch (const std::exception&) {
@@ -390,6 +426,12 @@ auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> 
 }
 
 auto PortfolioAccountService::GetAccountDetail() const -> AccountDetail {
+  try {
+    providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
+                                                      SchwabTokenPath());
+    return provider.GetAccountDetail();
+  } catch (const std::exception&) {
+  }
   try {
     providers::tda::AccountDetailProvider provider(TdaConfigPath());
     return provider.GetAccountDetail();
@@ -448,6 +490,13 @@ auto MarketOptionsService::GetOptionChainSnapshot(
     const std::string& strategy, const std::string& range,
     const std::string& exp_month, const std::string& option_type) const
     -> OptionChainSnapshot {
+  try {
+    providers::schwab::OptionsProvider provider(SchwabConfigPath(),
+                                                SchwabTokenPath());
+    return provider.GetOptionChainSnapshot(symbol, strike_count, strategy, range,
+                                           exp_month, option_type);
+  } catch (const std::exception&) {
+  }
   try {
     providers::tda::OptionsProvider provider(TdaConfigPath());
     return provider.GetOptionChainSnapshot(symbol, strike_count, strategy, range,
