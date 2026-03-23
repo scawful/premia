@@ -1,12 +1,9 @@
 #include "premia/infrastructure/secrets/secret_store.hpp"
 
+#include <array>
+#include <cstdio>
 #include <cstdlib>
 #include <string>
-
-#if defined(__APPLE__)
-#include <CoreFoundation/CoreFoundation.h>
-#include <Security/Security.h>
-#endif
 
 namespace premia::infrastructure::secrets {
 
@@ -38,6 +35,54 @@ auto SecretAccount(ProviderKind provider, SecretKind kind) -> std::string {
   return ProviderName(provider) + "." + SecretName(kind);
 }
 
+auto ShellEscape(const std::string& value) -> std::string {
+  std::string escaped = "'";
+  for (const char ch : value) {
+    if (ch == '\'') {
+      escaped += "'\\''";
+    } else {
+      escaped.push_back(ch);
+    }
+  }
+  escaped += "'";
+  return escaped;
+}
+
+auto HexEncode(const std::string& value) -> std::string {
+  static constexpr char kHex[] = "0123456789abcdef";
+  std::string encoded;
+  encoded.reserve(value.size() * 2);
+  for (const unsigned char ch : value) {
+    encoded.push_back(kHex[(ch >> 4) & 0x0F]);
+    encoded.push_back(kHex[ch & 0x0F]);
+  }
+  return encoded;
+}
+
+auto RunCommandCapture(const std::string& command) -> std::optional<std::string> {
+  std::array<char, 256> buffer{};
+  std::string output;
+  FILE* pipe = popen(command.c_str(), "r");
+  if (pipe == nullptr) {
+    return std::nullopt;
+  }
+  while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe) != nullptr) {
+    output += buffer.data();
+  }
+  const auto status = pclose(pipe);
+  if (status != 0) {
+    return std::nullopt;
+  }
+  if (!output.empty() && output.back() == '\n') {
+    output.pop_back();
+  }
+  return output;
+}
+
+auto RunCommandStatus(const std::string& command) -> bool {
+  return std::system(command.c_str()) == 0;
+}
+
 }  // namespace
 
 auto KeychainEnabled() -> bool {
@@ -66,39 +111,10 @@ auto LoadSecret(ProviderKind provider, SecretKind kind)
 
   const auto service_name = std::string("com.scawful.premia");
   const auto account_name = SecretAccount(provider, kind);
-
-  auto service = CFStringCreateWithCString(nullptr, service_name.c_str(),
-                                           kCFStringEncodingUTF8);
-  auto account = CFStringCreateWithCString(nullptr, account_name.c_str(),
-                                           kCFStringEncodingUTF8);
-
-  const void* keys[] = {kSecClass, kSecAttrService, kSecAttrAccount,
-                        kSecReturnData, kSecMatchLimit};
-  const void* values[] = {kSecClassGenericPassword, service, account,
-                          kCFBooleanTrue, kSecMatchLimitOne};
-  auto query = CFDictionaryCreate(nullptr, keys, values, 5,
-                                  &kCFTypeDictionaryKeyCallBacks,
-                                  &kCFTypeDictionaryValueCallBacks);
-
-  CFTypeRef result = nullptr;
-  const auto status = SecItemCopyMatching(query, &result);
-
-  if (query != nullptr) CFRelease(query);
-  if (service != nullptr) CFRelease(service);
-  if (account != nullptr) CFRelease(account);
-
-  if (status != errSecSuccess || result == nullptr) {
-    if (result != nullptr) CFRelease(result);
-    return std::nullopt;
-  }
-
-  const auto data = static_cast<CFDataRef>(result);
-  const auto* bytes = CFDataGetBytePtr(data);
-  const auto length = CFDataGetLength(data);
-  std::string value(reinterpret_cast<const char*>(bytes),
-                    static_cast<std::size_t>(length));
-  CFRelease(result);
-  return value;
+  const auto command = std::string("/usr/bin/security find-generic-password -s ") +
+                       ShellEscape(service_name) + " -a " +
+                       ShellEscape(account_name) + " -w 2>/dev/null";
+  return RunCommandCapture(command);
 #endif
 }
 
@@ -116,36 +132,11 @@ auto SaveSecret(ProviderKind provider, SecretKind kind,
 
   const auto service_name = std::string("com.scawful.premia");
   const auto account_name = SecretAccount(provider, kind);
-
-  auto service = CFStringCreateWithCString(nullptr, service_name.c_str(),
-                                           kCFStringEncodingUTF8);
-  auto account = CFStringCreateWithCString(nullptr, account_name.c_str(),
-                                           kCFStringEncodingUTF8);
-  auto data = CFDataCreate(nullptr,
-                           reinterpret_cast<const UInt8*>(contents.data()),
-                           static_cast<CFIndex>(contents.size()));
-
-  const void* delete_keys[] = {kSecClass, kSecAttrService, kSecAttrAccount};
-  const void* delete_values[] = {kSecClassGenericPassword, service, account};
-  auto delete_query = CFDictionaryCreate(nullptr, delete_keys, delete_values, 3,
-                                         &kCFTypeDictionaryKeyCallBacks,
-                                         &kCFTypeDictionaryValueCallBacks);
-  SecItemDelete(delete_query);
-  if (delete_query != nullptr) CFRelease(delete_query);
-
-  const void* add_keys[] = {kSecClass, kSecAttrService, kSecAttrAccount,
-                            kSecValueData};
-  const void* add_values[] = {kSecClassGenericPassword, service, account, data};
-  auto add_query = CFDictionaryCreate(nullptr, add_keys, add_values, 4,
-                                      &kCFTypeDictionaryKeyCallBacks,
-                                      &kCFTypeDictionaryValueCallBacks);
-  const auto status = SecItemAdd(add_query, nullptr);
-
-  if (add_query != nullptr) CFRelease(add_query);
-  if (data != nullptr) CFRelease(data);
-  if (service != nullptr) CFRelease(service);
-  if (account != nullptr) CFRelease(account);
-  return status == errSecSuccess;
+  const auto command = std::string("/usr/bin/security add-generic-password -U -s ") +
+                       ShellEscape(service_name) + " -a " +
+                       ShellEscape(account_name) + " -X " +
+                       ShellEscape(HexEncode(contents)) + " >/dev/null 2>&1";
+  return RunCommandStatus(command);
 #endif
 }
 
@@ -161,22 +152,10 @@ auto DeleteSecret(ProviderKind provider, SecretKind kind) -> bool {
 
   const auto service_name = std::string("com.scawful.premia");
   const auto account_name = SecretAccount(provider, kind);
-
-  auto service = CFStringCreateWithCString(nullptr, service_name.c_str(),
-                                           kCFStringEncodingUTF8);
-  auto account = CFStringCreateWithCString(nullptr, account_name.c_str(),
-                                           kCFStringEncodingUTF8);
-  const void* keys[] = {kSecClass, kSecAttrService, kSecAttrAccount};
-  const void* values[] = {kSecClassGenericPassword, service, account};
-  auto query = CFDictionaryCreate(nullptr, keys, values, 3,
-                                  &kCFTypeDictionaryKeyCallBacks,
-                                  &kCFTypeDictionaryValueCallBacks);
-  const auto status = SecItemDelete(query);
-
-  if (query != nullptr) CFRelease(query);
-  if (service != nullptr) CFRelease(service);
-  if (account != nullptr) CFRelease(account);
-  return status == errSecSuccess || status == errSecItemNotFound;
+  const auto command = std::string("/usr/bin/security delete-generic-password -s ") +
+                       ShellEscape(service_name) + " -a " +
+                       ShellEscape(account_name) + " >/dev/null 2>&1";
+  return RunCommandStatus(command);
 #endif
 }
 

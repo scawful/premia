@@ -72,6 +72,9 @@ This note captures the first implementation pass after the architecture review.
 - `src/infrastructure/secrets/runtime_paths.cc` now provides runtime config/token
   path resolution, secure file writes, and migration helpers for provider
   secrets.
+- `src/infrastructure/secrets/secret_store.cc` now adds macOS Keychain-backed
+  secret persistence for provider config/token blobs, with CI/test opt-out via
+  `PREMIA_DISABLE_KEYCHAIN=1`.
 - watchlist summaries and watchlist-screen rows now come from a provider adapter
   backed by `assets/watchlists.json`, with TDA taking precedence when an
   authenticated watchlist provider is available.
@@ -221,7 +224,8 @@ This note captures the first implementation pass after the architecture review.
 - API and Swift integration tests now use `PREMIA_RUNTIME_DIR` to isolate live
   provider config/token state from repo fixtures.
 - `.github/workflows/ci.yml` now runs the C++ builds/tests, OpenAPI generation,
-  Swift package tests, and iOS Simulator host build on macOS CI.
+  Swift package tests, and iOS Simulator host build on macOS CI, with keychain
+  usage disabled and `PREMIA_RUNTIME_DIR` isolated for deterministic runs.
 
 ## Immediate next moves
 

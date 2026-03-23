@@ -8,6 +8,9 @@ on:
 jobs:
   build-test:
     runs-on: macos-14
+    env:
+      PREMIA_DISABLE_KEYCHAIN: 1
+      PREMIA_RUNTIME_DIR: ${{ github.workspace }}/.premia-runtime
 
     steps:
       - name: Checkout

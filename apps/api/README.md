@@ -65,8 +65,12 @@ Route behavior today:
 Credential and token storage:
 - live provider configs and tokens now default to runtime storage under
   `~/Library/Application Support/Premia/providers/` on macOS
+- on macOS, provider config/token blobs are also mirrored into Keychain when
+  keychain access is enabled
 - set `PREMIA_RUNTIME_DIR` to override that location for tests, CI, or isolated
   local runs
+- set `PREMIA_DISABLE_KEYCHAIN=1` to force pure runtime-file behavior in tests
+  or CI
 - checked-in `assets/*.json` files remain fallback fixtures and migration
   sources; they are no longer the preferred write target for live secrets
 
