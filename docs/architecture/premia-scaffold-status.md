@@ -173,11 +173,11 @@ This note captures the first implementation pass after the architecture review.
   the local generated-client dependency.
 - `npx --yes @openapitools/openapi-generator-cli generate ...` succeeds and emits
   the first generated Swift client package.
-- `swift build` in `apps/mobile-ios/` currently fails because the local machine
-  has conflicting `/usr/local/include` module maps shadowing Apple SDK modules.
-  That appears to be an environment issue, not a package-manifest issue.
-- `swift package dump-package` in `clients/swift/Generated/` fails for the same
-  environment reason after generation, not because generation itself failed.
+- `swift build` in `apps/mobile-ios/` now succeeds after moving the conflicting
+  SDK-shadow headers and modulemaps from `/usr/local/include` into
+  `~/.local/share/premia/swift-sdk-shadow-backup/`.
+- `swift package dump-package` in `clients/swift/Generated/` succeeds with the
+  Swift 6 generator output.
 
 ## Immediate next moves
 

@@ -23,9 +23,9 @@ Current status:
 - the generated client now also includes trading preview/submit/cancel/replace
   APIs, with the hand-written wrapper translating them into app-level order
   models.
-- Local Swift package compilation is currently blocked by conflicting
-  `/usr/local/include` module maps on this machine, the same environment issue
-  affecting the hand-written Swift scaffold.
+- Local Swift package compilation now succeeds after moving the conflicting
+  SDK-shadow headers and modulemaps from `/usr/local/include` into
+  `~/.local/share/premia/swift-sdk-shadow-backup/`.
 
 Suggested generation command:
 
