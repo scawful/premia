@@ -1,23 +1,15 @@
 #ifndef WatchlistView_hpp
 #define WatchlistView_hpp
 
-#include "model/core/watchlist_model.h"
-#include "core/TDA.hpp"
 #include "view/view.h"
 
 namespace premia {
 class WatchlistView : public View {
  private:
-  int currentService = 0;
   int watchlistIndex = 0;
-  bool serviceChanged = true;
-  bool isLoggedIn = false;
   EventMap events;
   Logger logger;
-  WatchlistModel model;
 
-  void DrawWatchlistMenu();
-  void DrawWatchlistTable();
   void DrawCoreWatchlistPreview();
 
  public:

@@ -5,7 +5,8 @@
 #include <vector>
 
 #include "model/model.h"
-#include "service/TDAmeritrade/client.h"
+#include "premia/core/application/screen_models.hpp"
+#include "service/TDAmeritrade/data/PricingStructures.hpp"
 
 namespace premia {
   
@@ -18,7 +19,8 @@ class ChartModel : public Model {
   auto getNumCandles() const { return (int)candles.size(); }
   auto getCandle(int i) { return candles.at(i); }
   auto getTickerSymbol() const { return tickerSymbol; }
-  tda::Quote& getQuote() { return quote; }
+  auto getLowBound() const -> double { return lowBound; }
+  auto getHighBound() const -> double { return highBound; }
 
   std::string getQuoteDetails();
   void fetchPriceHistory(const std::string& ticker, tda::PeriodType ptype,
@@ -31,11 +33,13 @@ class ChartModel : public Model {
   bool active = false;
   std::string tickerSymbol;
   SocketListener socketListener;
-  tda::Quote quote;
-  tda::PriceHistory priceHistory;
+  core::application::QuoteDetail quoteDetail;
+  core::application::ChartScreenData chartData;
   std::vector<tda::Candle> candles;
   std::vector<double> datesVec;
   std::vector<double> volumeVec;
+  double lowBound = 0.0;
+  double highBound = 0.0;
 };
 }  // namespace premia
 #endif

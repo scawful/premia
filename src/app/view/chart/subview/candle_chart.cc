@@ -143,11 +143,7 @@ void CandleChart::DrawCandleChart() {
 
       if (model->isActive()) {
         ImPlot::SetupAxesLimits(
-            0, 100,
-            boost::lexical_cast<double>(
-                model->getQuote().getQuoteVariable("52WkLow")),
-            boost::lexical_cast<double>(
-                model->getQuote().getQuoteVariable("52WkHigh")));
+            0, 100, model->getLowBound(), model->getHighBound());
         DrawCandles(0.25, model->getNumCandles(), bullCol, bearCol, tooltip);
       }
       ImPlot::EndPlot();

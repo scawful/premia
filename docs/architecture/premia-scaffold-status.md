@@ -61,6 +61,8 @@ This note captures the first implementation pass after the architecture review.
   surface.
 - those order providers now also support cancel and replace flows through the
   same provider-backed contract surface.
+- those order providers now also support open-order and order-history queries
+  through the same provider-backed contract surface.
 - `src/providers/schwab/market_data_provider.cc` now owns the Schwab-specific
   quote and chart parsing logic that had previously lived inside the shared core
   service.
@@ -130,6 +132,8 @@ This note captures the first implementation pass after the architecture review.
   methods, so trading flows can start from app-level Swift types too.
 - the mobile wrapper now also exposes typed cancel/replace order flows on top of
   the generated trading API.
+- the mobile wrapper now also exposes order-list/history loaders and a simple
+  SwiftUI `OrdersListView` for rendering provider-backed order records.
 
 ### Desktop migration start
 
@@ -153,6 +157,12 @@ This note captures the first implementation pass after the architecture review.
 - `src/app/view/options/option_chain.cc` now renders option rows and underlying
   details from normalized core snapshots instead of directly reading the old
   TDA-style raw option maps in the view layer.
+- `src/app/model/chart/chart_model.cc` and `src/app/view/watchlist/watchlist_view.cc`
+  now avoid direct TDA singleton usage on their active paths, further shifting
+  desktop behavior onto provider-backed core contracts.
+- the remaining direct `tda::TDA::getInstance()` usage in `src/app/` is now
+  isolated to the legacy login and console/socket paths, rather than the active
+  chart, watchlist, account, and options rendering flows.
 
 ## Validation status
 
