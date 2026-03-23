@@ -4,8 +4,6 @@ set(
   model/chart/chart_model.cc
   model/options/options_model.cc
   model/account/account_model.cc
-  model/console/console_model.cc
-  model/core/watchlist_model.cc
 )
 
 set(

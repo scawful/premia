@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include "app/core/TDA.hpp"
-
 namespace premiatests {
 namespace ServiceTestSuite {
 namespace TDATests {
