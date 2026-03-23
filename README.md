@@ -1,5 +1,7 @@
 # Premia
 
+[![Premia CI](https://github.com/scawful/premia/actions/workflows/ci.yml/badge.svg)](https://github.com/scawful/premia/actions/workflows/ci.yml)
+
 - Platform: Windows, macOS, GNU/Linux
 - Dependencies: Boost, SDL2, ImGui, ImPlot, libCURL, OpenSSL
 
@@ -41,6 +43,12 @@ API Key Instructions
 For TDAmeritrade users to link their account, the program starts with a login window that takes as input your consumer key and refresh token.
 
 Alternatively, you can create an apikey.txt and place it in the assets/ folder with your consumer key on the first line and the refresh token you generated on the second line for Premia to load those values for you. 
+
+CI and branch policy
+----------
+
+- GitHub Actions workflow: `.github/workflows/ci.yml`
+- Recommended branch protection: see `docs/branch-protection.md`
 
 Screenshots
 --------
