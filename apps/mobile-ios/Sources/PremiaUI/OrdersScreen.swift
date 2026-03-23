@@ -15,6 +15,10 @@ public struct OrdersScreen: View {
         AsyncStateView(isLoading: isLoading, error: error, retry: { Task { await load() } }) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    Text("Primary Brokerage · Charles Schwab")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+
                     Picker("Orders", selection: $selection) {
                         Text("Open").tag(0)
                         Text("History").tag(1)

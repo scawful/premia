@@ -13,8 +13,10 @@ void AccountView::DrawCoreAccountPreview() {
   const auto& portfolio = core_model.getPortfolioSummary();
 
   ImGui::Text("Core Account Preview");
+  ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
+                     "Primary Brokerage: Charles Schwab");
   ImGui::TextDisabled(
-      "This fallback view is driven by premia_core screen contracts.");
+      "This account pane is driven by provider-backed core contracts.");
   ImGui::Separator();
 
   ImGui::Text("Account ID: %s", account.account_id.c_str());
@@ -37,7 +39,12 @@ void AccountView::DrawCoreAccountPreview() {
     for (const auto& connection : core_model.getConnections()) {
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
-      ImGui::Text("%s", connection.display_name.c_str());
+      if (connection.provider == core::domain::Provider::kSchwab) {
+        ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f), "%s",
+                           connection.display_name.c_str());
+      } else {
+        ImGui::Text("%s", connection.display_name.c_str());
+      }
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s",
                   core::domain::ConnectionStatusToString(connection.status)

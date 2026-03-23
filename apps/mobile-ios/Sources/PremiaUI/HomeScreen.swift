@@ -14,6 +14,8 @@ public struct HomeScreen: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     if let snapshot {
+                        PrimaryBrokerBanner(connections: snapshot.connections)
+
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Portfolio")
                                 .font(.title2.weight(.bold))

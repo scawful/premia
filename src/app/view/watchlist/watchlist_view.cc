@@ -31,8 +31,10 @@ void WatchlistView::DrawCoreWatchlistPreview() {
   }
 
   ImGui::Text("Core Watchlist Preview");
+  ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
+                     "Primary Brokerage: Charles Schwab");
   ImGui::TextDisabled(
-      "This fallback table is driven by premia_core screen contracts.");
+      "This watchlist surface is driven by provider-backed core contracts.");
   ImGui::Separator();
 
   ImGui::Combo("##core_watchlists", &watchlistIndex, watchlist_names.data(),
@@ -70,9 +72,16 @@ void WatchlistView::DrawCoreWatchlistPreview() {
   ImGui::Separator();
   ImGui::Text("Connections");
   for (const auto& connection : service.GetConnections()) {
-    ImGui::BulletText("%s - %s", connection.display_name.c_str(),
-                      core::domain::ConnectionStatusToString(connection.status)
-                          .c_str());
+    if (connection.provider == core::domain::Provider::kSchwab) {
+      ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
+                         "%s - %s (Primary)", connection.display_name.c_str(),
+                         core::domain::ConnectionStatusToString(connection.status)
+                             .c_str());
+    } else {
+      ImGui::BulletText("%s - %s", connection.display_name.c_str(),
+                        core::domain::ConnectionStatusToString(connection.status)
+                            .c_str());
+    }
   }
 }
 

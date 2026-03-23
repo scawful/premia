@@ -91,6 +91,9 @@ This note captures the first implementation pass after the architecture review.
 - the account surface and options surface now prefer live Schwab-backed data
   before falling back to TDA or local fixtures when a valid Schwab session is
   available.
+- the active desktop and mobile UX now explicitly present Charles Schwab as the
+  primary brokerage across the provider-backed account, watchlist, chart, and
+  order surfaces.
 - account/options flows are no longer read-only at the API layer; order preview
   and submission routes now exist with safe local fallbacks and explicit live
   confirmation requirements for TDA.

@@ -14,15 +14,21 @@ public struct ChartScreen: View {
 
     public var body: some View {
         AsyncStateView(isLoading: isLoading, error: error, retry: { Task { await load() } }) {
-            List(snapshot?.candles ?? []) { candle in
-                VStack(alignment: .leading) {
-                    Text(candle.time)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text("O \(candle.open) H \(candle.high) L \(candle.low) C \(candle.close)")
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Primary Brokerage · Charles Schwab Market Data")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                List(snapshot?.candles ?? []) { candle in
+                    VStack(alignment: .leading) {
+                        Text(candle.time)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text("O \(candle.open) H \(candle.high) L \(candle.low) C \(candle.close)")
+                    }
                 }
+                .listStyle(.inset)
             }
-            .listStyle(.inset)
         }
         .navigationTitle("\(symbol) Chart")
         .task { await load() }

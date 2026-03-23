@@ -14,6 +14,10 @@ public struct AccountScreen: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     if let snapshot {
+                        Text("Primary Brokerage · Charles Schwab")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Account \(snapshot.accountID)")
                                 .font(.title2.weight(.bold))

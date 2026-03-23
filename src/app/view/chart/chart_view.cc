@@ -136,8 +136,10 @@ void ChartView::DrawCoreContractPreview() {
 
   ImGui::Separator();
   ImGui::Text("Core Contract Preview");
+  ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
+                     "Primary Brokerage: Charles Schwab");
   ImGui::TextDisabled(
-      "This block is driven by premia_core DTOs and services, not broker JSON.");
+      "This block is driven by provider-backed core DTOs and services.");
 
   if (ImGui::BeginTable("ChartContractPreview", 5,
                         ImGuiTableFlags_SizingStretchSame)) {

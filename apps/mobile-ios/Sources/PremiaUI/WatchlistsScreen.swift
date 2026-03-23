@@ -11,17 +11,24 @@ public struct WatchlistsScreen: View {
 
     public var body: some View {
         AsyncStateView(isLoading: isLoading, error: error, retry: { Task { await load() } }) {
-            List(watchlists) { watchlist in
-                NavigationLink(value: PremiaRoute.watchlist(id: watchlist.id)) {
-                    VStack(alignment: .leading) {
-                        Text(watchlist.name)
-                        Text("\(watchlist.instrumentCount) instruments")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Primary Brokerage · Charles Schwab")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                List(watchlists) { watchlist in
+                    NavigationLink(value: PremiaRoute.watchlist(id: watchlist.id)) {
+                        VStack(alignment: .leading) {
+                            Text(watchlist.name)
+                            Text("\(watchlist.instrumentCount) instruments")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
+                .listStyle(.inset)
             }
-            .listStyle(.inset)
+            .padding(.horizontal)
         }
         .navigationTitle("Watchlists")
         .task { await load() }

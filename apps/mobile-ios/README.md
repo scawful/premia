@@ -53,3 +53,5 @@ Current integration:
   `WatchlistDetailScreen`, `QuoteScreen`, `ChartScreen`, and `OrdersScreen`
   now provide a real tab-based SwiftUI navigation shell for the provider-backed
   app surfaces
+- the active mobile shell now presents Charles Schwab as the primary brokerage
+  across home, account, watchlists, quote/chart, and orders surfaces

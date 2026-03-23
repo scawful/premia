@@ -17,6 +17,10 @@ public struct QuoteScreen: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     if let snapshot {
+                        Text("Primary Brokerage · Charles Schwab Market Data")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+
                         Text(snapshot.instrument.name)
                             .font(.title2.weight(.bold))
                         Text("$\(snapshot.quote.lastPrice.amount)")

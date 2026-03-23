@@ -15,8 +15,8 @@
 namespace premia {
 
 void LoginView::DrawScreen() const {
-  static bool tdaAuth;
-  static bool schwabAuth;
+  static bool tdaAuth = false;
+  static bool schwabAuth = true;
   static std::string username;
   static std::string password;
   static std::string statusMessage;
@@ -37,6 +37,12 @@ void LoginView::DrawScreen() const {
 
     ImGui::EndTable();
   }
+
+  ImGui::Separator();
+  ImGui::Text("Primary Brokerage");
+  ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f), "Charles Schwab");
+  ImGui::TextDisabled(
+      "Use the Schwab workflow below. TDA is preserved only as a transitional path.");
 
   if (ImGui::Button("Login", ImVec2(ImGui::GetContentRegionAvail().x, 20.f))) {
     bool shouldEnterWorkspace = true;
@@ -70,9 +76,9 @@ void LoginView::DrawScreen() const {
     ImGui::TableNextColumn();
     ImGui::Text(ICON_MD_API);
     ImGui::TableNextColumn();
-    ImGui::Checkbox("TDA", &tdaAuth);
+    ImGui::Checkbox("TDA (Legacy)", &tdaAuth);
     ImGui::TableNextColumn();
-    ImGui::Checkbox("Schwab", &schwabAuth);
+    ImGui::Checkbox("Schwab (Primary)", &schwabAuth);
     ImGui::EndTable();
   }
   if (!statusMessage.empty()) {
