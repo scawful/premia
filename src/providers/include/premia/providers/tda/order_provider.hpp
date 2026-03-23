@@ -23,6 +23,10 @@ class OrderProvider : public core::ports::OrderProviderPort {
       -> core::application::OrderCancellationData override;
   auto ReplaceOrder(const core::application::OrderReplaceRequest& request)
       -> core::application::OrderReplacementData override;
+  auto GetOpenOrders(const std::string& account_id) const
+      -> std::vector<core::application::OrderRecordData> override;
+  auto GetOrderHistory(const std::string& account_id) const
+      -> std::vector<core::application::OrderRecordData> override;
 
  private:
   auto CurrentUtcTimestamp() const -> std::string;

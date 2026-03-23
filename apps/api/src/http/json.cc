@@ -451,6 +451,27 @@ auto SerializeOrderReplacementResponse(
                                     {"message", data.message}});
 }
 
+auto SerializeOrderRecordsResponse(
+    const std::vector<application::OrderRecordData>& data) -> std::string {
+  json::array records;
+  for (const auto& record : data) {
+    records.emplace_back(json::object{{"orderId", record.order_id},
+                                      {"accountId", record.account_id},
+                                      {"symbol", record.symbol},
+                                      {"assetType", record.asset_type},
+                                      {"instruction", record.instruction},
+                                      {"quantity", record.quantity},
+                                      {"orderType", record.order_type},
+                                      {"limitPrice", record.limit_price},
+                                      {"mode", record.mode},
+                                      {"status", record.status},
+                                      {"submittedAt", record.submitted_at},
+                                      {"updatedAt", record.updated_at},
+                                      {"message", record.message}});
+  }
+  return WriteEnvelope(json::object{{"orders", records}});
+}
+
 auto SerializeConnectionSummaryResponse(const application::ConnectionSummary& data)
     -> std::string {
   return WriteEnvelope(MakeConnectionSummary(data));

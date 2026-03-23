@@ -23,6 +23,8 @@ Current routes:
 - `GET /v1/screens/charts/{symbol}`
 - `GET /v1/screens/options/{symbol}`
 - `POST /v1/orders/preview`
+- `GET /v1/orders/open`
+- `GET /v1/orders/history`
 - `POST /v1/orders/submit`
 - `POST /v1/orders/{orderId}/cancel`
 - `POST /v1/orders/{orderId}/replace`
@@ -54,6 +56,9 @@ Route behavior today:
 - order cancel and replace requests follow the same safety model: simulated
   local behavior by default, live TDA behavior only when real credentials exist
   and live confirmation is explicit
+- open-order and order-history reads now flow through the same provider-backed
+  order service, using TDA when valid credentials exist and local fixtures
+  otherwise
 - watchlist mutation routes are backed by the local provider adapter and persist
   changes into `assets/watchlists.json`
 

@@ -116,6 +116,22 @@ struct OrderReplacementData {
   std::string message;
 };
 
+struct OrderRecordData {
+  std::string order_id;
+  std::string account_id;
+  std::string symbol;
+  std::string asset_type;
+  std::string instruction;
+  std::string quantity;
+  std::string order_type;
+  std::string limit_price;
+  std::string mode;
+  std::string status;
+  std::string submitted_at;
+  std::string updated_at;
+  std::string message;
+};
+
 }  // namespace premia::core::application
 
 #endif  // PREMIA_CORE_APPLICATION_WORKFLOW_MODELS_HPP

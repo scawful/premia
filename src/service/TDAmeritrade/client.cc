@@ -32,6 +32,20 @@ static auto string_replace(std::string &str, const std::string &from,
   return true;
 }
 
+static auto order_status_string(premia::tda::OrderStatus status) -> std::string {
+  switch (status) {
+    case premia::tda::ACCEPTED:
+      return "ACCEPTED";
+    case premia::tda::WORKING:
+      return "WORKING";
+    case premia::tda::REJECTED:
+      return "REJECTED";
+    case premia::tda::CANCELED:
+      return "CANCELED";
+  }
+  return "ACCEPTED";
+}
+
 namespace premia {
 
 static size_t json_write(const char *contents, size_t size, size_t nmemb,
@@ -503,7 +517,7 @@ std::string Client::get_orders_by_query(const std::string &account_id,
   string_replace(endpoint, "{maxResults}", std::to_string(maxResults));
   string_replace(endpoint, "{from}", std::to_string(fromEnteredTime));
   string_replace(endpoint, "{to}", std::to_string(toEnteredTime));
-  string_replace(endpoint, "{status}", "status");
+  string_replace(endpoint, "{status}", order_status_string(status));
   return send_authorized_request(endpoint);
 }
 

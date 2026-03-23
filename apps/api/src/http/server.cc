@@ -187,6 +187,24 @@ auto HandleGet(const std::string& raw_target)
                 .AccountDetails()
                 .GetAccountDetail()));
   }
+  if (path == "/v1/orders/open") {
+    const auto params = ParseQuery(query);
+    const auto account_id = params.count("accountId") ? params.at("accountId") : "";
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeOrderRecordsResponse(
+            core::application::CompositionRoot::Instance().Orders().GetOpenOrders(
+                account_id)));
+  }
+  if (path == "/v1/orders/history") {
+    const auto params = ParseQuery(query);
+    const auto account_id = params.count("accountId") ? params.at("accountId") : "";
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeOrderRecordsResponse(
+            core::application::CompositionRoot::Instance().Orders().GetOrderHistory(
+                account_id)));
+  }
   if (StartsWith(path, "/v1/screens/options/")) {
     const auto symbol = path.substr(std::string("/v1/screens/options/").size());
     const auto params = ParseQuery(query);

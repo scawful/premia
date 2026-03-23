@@ -445,6 +445,28 @@ auto OrderService::ReplaceOrder(const OrderReplaceRequest& request)
   return provider.ReplaceOrder(request);
 }
 
+auto OrderService::GetOpenOrders(const std::string& account_id) const
+    -> std::vector<OrderRecordData> {
+  try {
+    providers::tda::OrderProvider provider(kTDAConfigPath);
+    return provider.GetOpenOrders(account_id);
+  } catch (const std::exception&) {
+  }
+  providers::local::OrderProvider provider(kOrdersPath);
+  return provider.GetOpenOrders(account_id);
+}
+
+auto OrderService::GetOrderHistory(const std::string& account_id) const
+    -> std::vector<OrderRecordData> {
+  try {
+    providers::tda::OrderProvider provider(kTDAConfigPath);
+    return provider.GetOrderHistory(account_id);
+  } catch (const std::exception&) {
+  }
+  providers::local::OrderProvider provider(kOrdersPath);
+  return provider.GetOrderHistory(account_id);
+}
+
 WorkflowService::WorkflowService(ConnectionService& connection_service)
     : connection_service_(connection_service) {}
 

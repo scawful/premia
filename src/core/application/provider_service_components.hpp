@@ -62,6 +62,10 @@ class OrderService {
   auto SubmitOrder(const OrderIntentRequest& request) -> OrderSubmissionData;
   auto CancelOrder(const OrderCancelRequest& request) -> OrderCancellationData;
   auto ReplaceOrder(const OrderReplaceRequest& request) -> OrderReplacementData;
+  auto GetOpenOrders(const std::string& account_id) const
+      -> std::vector<OrderRecordData>;
+  auto GetOrderHistory(const std::string& account_id) const
+      -> std::vector<OrderRecordData>;
 };
 
 class WorkflowService {

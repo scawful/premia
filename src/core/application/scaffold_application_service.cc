@@ -143,6 +143,16 @@ auto ProviderBackedApplicationService::ReplaceOrder(
   return order_service_->ReplaceOrder(request);
 }
 
+auto ProviderBackedApplicationService::GetOpenOrders(
+    const std::string& account_id) const -> std::vector<OrderRecordData> {
+  return order_service_->GetOpenOrders(account_id);
+}
+
+auto ProviderBackedApplicationService::GetOrderHistory(
+    const std::string& account_id) const -> std::vector<OrderRecordData> {
+  return order_service_->GetOrderHistory(account_id);
+}
+
 auto ProviderBackedApplicationService::CreateLinkToken(
     const PlaidLinkTokenRequest& request) -> PlaidLinkTokenData {
   return workflow_service_->CreateLinkToken(request);

@@ -106,6 +106,10 @@ class OrderService {
       -> OrderCancellationData = 0;
   virtual auto ReplaceOrder(const OrderReplaceRequest& request)
       -> OrderReplacementData = 0;
+  virtual auto GetOpenOrders(const std::string& account_id) const
+      -> std::vector<OrderRecordData> = 0;
+  virtual auto GetOrderHistory(const std::string& account_id) const
+      -> std::vector<OrderRecordData> = 0;
 };
 
 }  // namespace premia::core::application

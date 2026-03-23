@@ -51,6 +51,29 @@ auto MultiplierForAssetType(const std::string& asset_type) -> double {
   return asset_type == "OPTION" ? 100.0 : 1.0;
 }
 
+auto ParseOrderRecord(const pt::ptree& order)
+    -> application::OrderRecordData {
+  application::OrderRecordData data;
+  data.order_id = order.get<std::string>("submissionId", "");
+  data.account_id = order.get<std::string>("accountId", "local_acc");
+  data.symbol = order.get<std::string>("symbol", "");
+  data.asset_type = order.get<std::string>("assetType", "EQUITY");
+  data.instruction = order.get<std::string>("instruction", "BUY");
+  data.quantity = order.get<std::string>("quantity", "0");
+  data.order_type = order.get<std::string>("orderType", "LIMIT");
+  data.limit_price = order.get<std::string>("limitPrice", "0.00");
+  data.mode = order.get<std::string>("mode", "simulated");
+  data.status = order.get<std::string>("status", "accepted");
+  data.submitted_at = order.get<std::string>("submittedAt", "");
+  data.updated_at = order.get<std::string>("cancelledAt", data.submitted_at);
+  data.message = order.get<std::string>("message", "");
+  return data;
+}
+
+auto IsOpenOrderStatus(const std::string& status) -> bool {
+  return status == "accepted" || status == "submitted" || status == "working";
+}
+
 }  // namespace
 
 OrderProvider::OrderProvider(std::string path) : path_(std::move(path)) {}
@@ -212,6 +235,49 @@ auto OrderProvider::ReplaceOrder(const application::OrderReplaceRequest& request
   data.submitted_at = submission.submitted_at;
   data.message = cancel.message + " Replacement accepted.";
   return data;
+}
+
+auto OrderProvider::GetOpenOrders(const std::string& account_id) const
+    -> std::vector<application::OrderRecordData> {
+  std::vector<application::OrderRecordData> orders_out;
+  std::ifstream input(path_);
+  if (!input.good()) {
+    return orders_out;
+  }
+
+  pt::ptree root;
+  pt::read_json(input, root);
+  if (auto child = root.get_child_optional("orders")) {
+    for (const auto& item : child.get()) {
+      const auto record = ParseOrderRecord(item.second);
+      if ((account_id.empty() || record.account_id == account_id) &&
+          IsOpenOrderStatus(record.status)) {
+        orders_out.push_back(record);
+      }
+    }
+  }
+  return orders_out;
+}
+
+auto OrderProvider::GetOrderHistory(const std::string& account_id) const
+    -> std::vector<application::OrderRecordData> {
+  std::vector<application::OrderRecordData> orders_out;
+  std::ifstream input(path_);
+  if (!input.good()) {
+    return orders_out;
+  }
+
+  pt::ptree root;
+  pt::read_json(input, root);
+  if (auto child = root.get_child_optional("orders")) {
+    for (const auto& item : child.get()) {
+      const auto record = ParseOrderRecord(item.second);
+      if (account_id.empty() || record.account_id == account_id) {
+        orders_out.push_back(record);
+      }
+    }
+  }
+  return orders_out;
 }
 
 auto OrderProvider::CurrentUtcTimestamp() const -> std::string {

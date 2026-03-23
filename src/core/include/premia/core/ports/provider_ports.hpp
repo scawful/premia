@@ -102,6 +102,10 @@ class OrderProviderPort {
   virtual auto ReplaceOrder(
       const premia::core::application::OrderReplaceRequest& request)
       -> premia::core::application::OrderReplacementData = 0;
+  virtual auto GetOpenOrders(const std::string& account_id) const
+      -> std::vector<premia::core::application::OrderRecordData> = 0;
+  virtual auto GetOrderHistory(const std::string& account_id) const
+      -> std::vector<premia::core::application::OrderRecordData> = 0;
 };
 
 }  // namespace premia::core::ports

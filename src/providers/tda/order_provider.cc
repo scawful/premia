@@ -53,6 +53,50 @@ auto ReadConfigTree(const std::string& path, pt::ptree& tree) -> bool {
   return true;
 }
 
+auto ParseOrderRecord(const pt::ptree& order)
+    -> application::OrderRecordData {
+  application::OrderRecordData data;
+  data.order_id = order.get<std::string>("orderId", order.get<std::string>("submissionId", ""));
+  data.account_id = order.get<std::string>("accountId", "");
+  data.asset_type = "EQUITY";
+  if (auto legs = order.get_child_optional("orderLegCollection")) {
+    const auto& first_leg = legs.get().front().second;
+    data.instruction = first_leg.get<std::string>("instruction", "BUY");
+    data.quantity = first_leg.get<std::string>("quantity", "0");
+    if (auto instrument = first_leg.get_child_optional("instrument")) {
+      data.symbol = instrument.get().get<std::string>("symbol", "");
+      data.asset_type = instrument.get().get<std::string>("assetType", "EQUITY");
+    }
+  }
+  data.order_type = order.get<std::string>("orderType", "LIMIT");
+  data.limit_price = order.get<std::string>("price", "0.00");
+  data.mode = "live";
+  data.status = order.get<std::string>("status", "UNKNOWN");
+  data.submitted_at = order.get<std::string>("enteredTime", "");
+  data.updated_at = order.get<std::string>("closeTime", data.submitted_at);
+  data.message = order.get<std::string>("statusDescription", "");
+  return data;
+}
+
+auto LoadOrdersForStatus(::premia::tda::Client& client, const std::string& account_id,
+                         premia::tda::OrderStatus status)
+    -> std::vector<application::OrderRecordData> {
+  std::vector<application::OrderRecordData> records;
+  const auto now = static_cast<double>(std::time(nullptr));
+  const auto response = client.get_orders_by_query(account_id, 50, 0, now, status);
+  if (response.empty()) {
+    return records;
+  }
+
+  std::istringstream ss(response);
+  pt::ptree root;
+  pt::read_json(ss, root);
+  for (const auto& item : root) {
+    records.push_back(ParseOrderRecord(item.second));
+  }
+  return records;
+}
+
 }  // namespace
 
 OrderProvider::OrderProvider(std::string config_path)
@@ -268,6 +312,48 @@ auto OrderProvider::ReplaceOrder(const application::OrderReplaceRequest& request
   data.status = "replaced";
   data.message = "Live order replacement submitted to TDA.";
   return data;
+}
+
+auto OrderProvider::GetOpenOrders(const std::string& account_id) const
+    -> std::vector<application::OrderRecordData> {
+  if (!HasUsableConfig()) {
+    throw std::runtime_error("tda order config unavailable");
+  }
+  pt::ptree tree;
+  ReadConfigTree(config_path_, tree);
+  ::premia::tda::Client client;
+  client.addAuth(tree.get<std::string>("consumer_key"),
+                 tree.get<std::string>("refresh_token"));
+  client.fetch_access_token();
+  const auto resolved_account = ResolveAccountId(client, account_id);
+
+  auto accepted = LoadOrdersForStatus(client, resolved_account, ::premia::tda::ACCEPTED);
+  auto working = LoadOrdersForStatus(client, resolved_account, ::premia::tda::WORKING);
+  accepted.insert(accepted.end(), working.begin(), working.end());
+  return accepted;
+}
+
+auto OrderProvider::GetOrderHistory(const std::string& account_id) const
+    -> std::vector<application::OrderRecordData> {
+  if (!HasUsableConfig()) {
+    throw std::runtime_error("tda order config unavailable");
+  }
+  pt::ptree tree;
+  ReadConfigTree(config_path_, tree);
+  ::premia::tda::Client client;
+  client.addAuth(tree.get<std::string>("consumer_key"),
+                 tree.get<std::string>("refresh_token"));
+  client.fetch_access_token();
+  const auto resolved_account = ResolveAccountId(client, account_id);
+
+  auto records = LoadOrdersForStatus(client, resolved_account, ::premia::tda::ACCEPTED);
+  auto working = LoadOrdersForStatus(client, resolved_account, ::premia::tda::WORKING);
+  auto cancelled = LoadOrdersForStatus(client, resolved_account, ::premia::tda::CANCELED);
+  auto rejected = LoadOrdersForStatus(client, resolved_account, ::premia::tda::REJECTED);
+  records.insert(records.end(), working.begin(), working.end());
+  records.insert(records.end(), cancelled.begin(), cancelled.end());
+  records.insert(records.end(), rejected.begin(), rejected.end());
+  return records;
 }
 
 auto OrderProvider::CurrentUtcTimestamp() const -> std::string {

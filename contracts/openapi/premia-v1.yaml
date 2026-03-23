@@ -289,6 +289,46 @@ paths:
                 $ref: '#/components/schemas/OrderPreviewResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
+  /v1/orders/open:
+    get:
+      tags: [Trading]
+      summary: List currently open orders.
+      operationId: getOpenOrders
+      parameters:
+        - name: accountId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Open orders response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecordsResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/orders/history:
+    get:
+      tags: [Trading]
+      summary: List historical orders.
+      operationId: getOrderHistory
+      parameters:
+        - name: accountId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order history response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecordsResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /v1/orders/submit:
     post:
       tags: [Trading]
@@ -1367,6 +1407,71 @@ components:
         meta:
           requestId: req_order_preview
           asOf: '2026-03-22T21:10:00Z'
+    OrderRecordData:
+      type: object
+      required: [orderId, accountId, symbol, assetType, instruction, quantity, orderType, limitPrice, mode, status, submittedAt, updatedAt, message]
+      properties:
+        orderId:
+          type: string
+        accountId:
+          type: string
+        symbol:
+          type: string
+        assetType:
+          type: string
+        instruction:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        orderType:
+          type: string
+        limitPrice:
+          $ref: '#/components/schemas/DecimalString'
+        mode:
+          type: string
+        status:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        message:
+          type: string
+    OrderRecordsResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [orders]
+          properties:
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderRecordData'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      example:
+        data:
+          orders:
+            - orderId: submission_100
+              accountId: local_acc
+              symbol: AAPL
+              assetType: EQUITY
+              instruction: BUY
+              quantity: '10'
+              orderType: LIMIT
+              limitPrice: '217.00'
+              mode: simulated
+              status: accepted
+              submittedAt: '2026-03-22T21:11:00Z'
+              updatedAt: '2026-03-22T21:11:00Z'
+              message: Preview only submission stored locally.
+        meta:
+          requestId: req_order_records
+          asOf: '2026-03-22T21:11:00Z'
     OrderSubmissionData:
       type: object
       required: [submissionId, accountId, symbol, assetType, instruction, quantity, orderType, limitPrice, mode, status, submittedAt, message]

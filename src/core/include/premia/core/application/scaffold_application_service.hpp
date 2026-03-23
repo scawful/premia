@@ -76,6 +76,10 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
       -> OrderCancellationData override;
   auto ReplaceOrder(const OrderReplaceRequest& request)
       -> OrderReplacementData override;
+  auto GetOpenOrders(const std::string& account_id) const
+      -> std::vector<OrderRecordData> override;
+  auto GetOrderHistory(const std::string& account_id) const
+      -> std::vector<OrderRecordData> override;
 
   auto CreateLinkToken(const PlaidLinkTokenRequest& request)
       -> PlaidLinkTokenData override;
