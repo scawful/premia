@@ -4,6 +4,7 @@
 #include <chrono>
 #include <ctime>
 #include <fstream>
+#include <functional>
 #include <iomanip>
 #include <map>
 #include <sstream>
@@ -14,6 +15,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "premia/infrastructure/secrets/runtime_paths.hpp"
 #include "Plaid/client.h"
 #include "Schwab/client.h"
 #include "premia/providers/local/account_detail_provider.hpp"
@@ -33,6 +35,7 @@
 namespace premia::core::application::detail {
 
 namespace domain = premia::core::domain;
+namespace secrets = premia::infrastructure::secrets;
 
 namespace {
 
@@ -100,9 +103,19 @@ auto HasFile(const std::string& path) -> bool {
   return file.good();
 }
 
-auto HasUsableSchwabConfig() -> bool {
+auto HasUsableTdaConfigAt(const std::string& path) -> bool {
   pt::ptree tree;
-  if (!ReadJsonTree(kSchwabConfigPath, tree)) {
+  if (!ReadJsonTree(path, tree)) {
+    return false;
+  }
+  const auto consumer_key = tree.get<std::string>("consumer_key", "");
+  const auto refresh_token = tree.get<std::string>("refresh_token", "");
+  return !IsPlaceholderValue(consumer_key) && !IsPlaceholderValue(refresh_token);
+}
+
+auto HasUsableSchwabConfigAt(const std::string& path) -> bool {
+  pt::ptree tree;
+  if (!ReadJsonTree(path, tree)) {
     return false;
   }
   const auto app_key = tree.get<std::string>("app_key", "");
@@ -110,9 +123,9 @@ auto HasUsableSchwabConfig() -> bool {
   return !IsPlaceholderValue(app_key) && !IsPlaceholderValue(app_secret);
 }
 
-auto HasUsablePlaidConfig() -> bool {
+auto HasUsablePlaidConfigAt(const std::string& path) -> bool {
   pt::ptree tree;
-  if (!ReadJsonTree(kPlaidConfigPath, tree)) {
+  if (!ReadJsonTree(path, tree)) {
     return false;
   }
   const auto client_id = tree.get<std::string>("client_id", "");
@@ -120,25 +133,83 @@ auto HasUsablePlaidConfig() -> bool {
   return !IsPlaceholderValue(client_id) && !IsPlaceholderValue(secret);
 }
 
+auto ResolveConfigPath(secrets::ProviderKind provider,
+                       const std::string& legacy_path,
+                       const std::function<bool(const std::string&)>& is_usable)
+    -> std::string {
+  const auto runtime_path = secrets::ProviderConfigPath(provider);
+  const auto runtime_path_string = runtime_path.string();
+  if (is_usable(runtime_path_string)) {
+    return runtime_path_string;
+  }
+  if (is_usable(legacy_path)) {
+    secrets::CopyFileToSecureStore(legacy_path, runtime_path);
+    return runtime_path_string;
+  }
+  if (secrets::FileExists(runtime_path)) {
+    return runtime_path_string;
+  }
+  return legacy_path;
+}
+
+auto ResolveTokenPath(secrets::ProviderKind provider,
+                      const std::string& legacy_path) -> std::string {
+  const auto runtime_path = secrets::ProviderTokenPath(provider);
+  if (secrets::FileExists(runtime_path)) {
+    return runtime_path.string();
+  }
+  if (secrets::FileExists(legacy_path)) {
+    secrets::CopyFileToSecureStore(legacy_path, runtime_path);
+    return runtime_path.string();
+  }
+  secrets::EnsureProviderDir(provider);
+  return runtime_path.string();
+}
+
+auto TdaConfigPath() -> std::string {
+  return ResolveConfigPath(secrets::ProviderKind::kTDA, kTDAConfigPath,
+                           HasUsableTdaConfigAt);
+}
+
+auto SchwabConfigPath() -> std::string {
+  return ResolveConfigPath(secrets::ProviderKind::kSchwab, kSchwabConfigPath,
+                           HasUsableSchwabConfigAt);
+}
+
+auto SchwabTokenPath() -> std::string {
+  return ResolveTokenPath(secrets::ProviderKind::kSchwab, kSchwabTokenPath);
+}
+
+auto PlaidConfigPath() -> std::string {
+  return ResolveConfigPath(secrets::ProviderKind::kPlaid, kPlaidConfigPath,
+                           HasUsablePlaidConfigAt);
+}
+
+auto PlaidTokenPath() -> std::string {
+  return ResolveTokenPath(secrets::ProviderKind::kPlaid, kPlaidTokenPath);
+}
+
 auto LoadSchwabClient(premia::schwab::Client& client) -> bool {
-  if (!HasUsableSchwabConfig()) {
+  const auto config_path = SchwabConfigPath();
+  if (!HasUsableSchwabConfigAt(config_path)) {
     return false;
   }
-  if (!client.LoadConfig(kSchwabConfigPath)) {
+  if (!client.LoadConfig(config_path)) {
     return false;
   }
-  client.LoadTokens(kSchwabTokenPath);
+  client.LoadTokens(SchwabTokenPath());
   return true;
 }
 
 auto LoadPlaidClient(premia::plaid::Client& client) -> bool {
-  if (!HasUsablePlaidConfig()) {
+  const auto config_path = PlaidConfigPath();
+  if (!HasUsablePlaidConfigAt(config_path)) {
     return false;
   }
-  if (!client.LoadConfig(kPlaidConfigPath)) {
+  if (!client.LoadConfig(config_path)) {
     return false;
   }
-  client.LoadTokens(kPlaidTokenPath);
+  client.LoadTokens(PlaidTokenPath());
   return true;
 }
 
@@ -212,7 +283,7 @@ auto ConnectionService::GetConnections() const -> std::vector<ConnectionSummary>
         } else if (client.HasValidRefreshToken()) {
           connection.status = ConnectionStatus::kDegraded;
           connection.reauth_required = false;
-        } else if (HasFile(kSchwabTokenPath)) {
+        } else if (HasFile(SchwabTokenPath())) {
           connection.status = ConnectionStatus::kReauthRequired;
           connection.reauth_required = true;
         } else {
@@ -265,7 +336,7 @@ auto ConnectionService::MutableConnection(Provider provider) -> ConnectionSummar
 
 auto PortfolioAccountService::GetPortfolioSummary() const -> PortfolioSummary {
   try {
-    providers::tda::PortfolioProvider provider(kTDAConfigPath);
+    providers::tda::PortfolioProvider provider(TdaConfigPath());
     return provider.GetPortfolioSummary();
   } catch (const std::exception&) {
   }
@@ -275,7 +346,7 @@ auto PortfolioAccountService::GetPortfolioSummary() const -> PortfolioSummary {
 
 auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> {
   try {
-    providers::tda::PortfolioProvider provider(kTDAConfigPath);
+    providers::tda::PortfolioProvider provider(TdaConfigPath());
     return provider.GetTopHoldings();
   } catch (const std::exception&) {
   }
@@ -285,7 +356,7 @@ auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> 
 
 auto PortfolioAccountService::GetAccountDetail() const -> AccountDetail {
   try {
-    providers::tda::AccountDetailProvider provider(kTDAConfigPath);
+    providers::tda::AccountDetailProvider provider(TdaConfigPath());
     return provider.GetAccountDetail();
   } catch (const std::exception&) {
   }
@@ -297,8 +368,8 @@ auto MarketOptionsService::GetQuoteDetail(const std::string& symbol) const
     -> QuoteDetail {
   const auto fallback = BuildQuoteFallback(symbol);
   try {
-    providers::schwab::MarketDataProvider provider(kSchwabConfigPath,
-                                                   kSchwabTokenPath);
+    providers::schwab::MarketDataProvider provider(SchwabConfigPath(),
+                                                   SchwabTokenPath());
     auto detail = provider.GetQuoteDetail(symbol);
     detail.position = fallback.position;
     detail.watchlist_membership = fallback.watchlist_membership;
@@ -321,8 +392,8 @@ auto MarketOptionsService::GetChartScreen(const std::string& symbol,
     -> ChartScreenData {
   const auto fallback = BuildChartFallback(symbol, range, interval, extended_hours);
   try {
-    providers::schwab::MarketDataProvider provider(kSchwabConfigPath,
-                                                   kSchwabTokenPath);
+    providers::schwab::MarketDataProvider provider(SchwabConfigPath(),
+                                                   SchwabTokenPath());
     auto chart = provider.GetChartScreen(symbol, fallback.range, fallback.interval,
                                          extended_hours);
     if (chart.instrument.name.empty()) {
@@ -343,7 +414,7 @@ auto MarketOptionsService::GetOptionChainSnapshot(
     const std::string& exp_month, const std::string& option_type) const
     -> OptionChainSnapshot {
   try {
-    providers::tda::OptionsProvider provider(kTDAConfigPath);
+    providers::tda::OptionsProvider provider(TdaConfigPath());
     return provider.GetOptionChainSnapshot(symbol, strike_count, strategy, range,
                                            exp_month, option_type);
   } catch (const std::exception&) {
@@ -355,7 +426,7 @@ auto MarketOptionsService::GetOptionChainSnapshot(
 
 auto WatchlistService::ListWatchlists() const -> std::vector<WatchlistSummary> {
   try {
-    providers::tda::WatchlistProvider provider(kTDAConfigPath);
+    providers::tda::WatchlistProvider provider(TdaConfigPath());
     return provider.ListWatchlists();
   } catch (const std::exception&) {
   }
@@ -366,7 +437,7 @@ auto WatchlistService::ListWatchlists() const -> std::vector<WatchlistSummary> {
 auto WatchlistService::GetWatchlistScreen(const std::string& watchlist_id) const
     -> WatchlistScreenData {
   try {
-    providers::tda::WatchlistProvider provider(kTDAConfigPath);
+    providers::tda::WatchlistProvider provider(TdaConfigPath());
     return provider.GetWatchlistScreen(watchlist_id);
   } catch (const std::exception&) {
   }
@@ -404,7 +475,7 @@ auto WatchlistService::RemoveWatchlistSymbol(const std::string& watchlist_id,
 auto OrderService::PreviewOrder(const OrderIntentRequest& request)
     -> OrderPreviewData {
   try {
-    providers::tda::OrderProvider provider(kTDAConfigPath);
+    providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.PreviewOrder(request);
   } catch (const std::exception&) {
   }
@@ -415,7 +486,7 @@ auto OrderService::PreviewOrder(const OrderIntentRequest& request)
 auto OrderService::SubmitOrder(const OrderIntentRequest& request)
     -> OrderSubmissionData {
   try {
-    providers::tda::OrderProvider provider(kTDAConfigPath);
+    providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.SubmitOrder(request);
   } catch (const std::exception&) {
   }
@@ -426,7 +497,7 @@ auto OrderService::SubmitOrder(const OrderIntentRequest& request)
 auto OrderService::CancelOrder(const OrderCancelRequest& request)
     -> OrderCancellationData {
   try {
-    providers::tda::OrderProvider provider(kTDAConfigPath);
+    providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.CancelOrder(request);
   } catch (const std::exception&) {
   }
@@ -437,7 +508,7 @@ auto OrderService::CancelOrder(const OrderCancelRequest& request)
 auto OrderService::ReplaceOrder(const OrderReplaceRequest& request)
     -> OrderReplacementData {
   try {
-    providers::tda::OrderProvider provider(kTDAConfigPath);
+    providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.ReplaceOrder(request);
   } catch (const std::exception&) {
   }
@@ -448,7 +519,7 @@ auto OrderService::ReplaceOrder(const OrderReplaceRequest& request)
 auto OrderService::GetOpenOrders(const std::string& account_id) const
     -> std::vector<OrderRecordData> {
   try {
-    providers::tda::OrderProvider provider(kTDAConfigPath);
+    providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.GetOpenOrders(account_id);
   } catch (const std::exception&) {
   }
@@ -459,7 +530,7 @@ auto OrderService::GetOpenOrders(const std::string& account_id) const
 auto OrderService::GetOrderHistory(const std::string& account_id) const
     -> std::vector<OrderRecordData> {
   try {
-    providers::tda::OrderProvider provider(kTDAConfigPath);
+    providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.GetOrderHistory(account_id);
   } catch (const std::exception&) {
   }
@@ -482,16 +553,16 @@ auto WorkflowService::StartSchwabOAuth(const SchwabOAuthStartRequest& request)
   schwab.reauth_required = false;
 
   const auto state = std::string("schwab_state_") + std::to_string(NextWorkflowId());
-  providers::schwab::WorkflowProvider provider(kSchwabConfigPath,
-                                               kSchwabTokenPath);
+  providers::schwab::WorkflowProvider provider(SchwabConfigPath(),
+                                               SchwabTokenPath());
   return provider.StartOAuth(request, state, CurrentUtcTimestamp());
 }
 
 auto WorkflowService::CompleteSchwabOAuth(
     const SchwabOAuthCompleteRequest& request) -> ConnectionSummary {
   auto& schwab = connection_service_.MutableConnection(Provider::kSchwab);
-  providers::schwab::WorkflowProvider provider(kSchwabConfigPath,
-                                               kSchwabTokenPath);
+  providers::schwab::WorkflowProvider provider(SchwabConfigPath(),
+                                               SchwabTokenPath());
   schwab = provider.CompleteOAuth(request, schwab, CurrentUtcTimestamp());
   return schwab;
 }
@@ -500,14 +571,14 @@ auto WorkflowService::CreatePlaidLinkToken(const PlaidLinkTokenRequest& request)
     -> PlaidLinkTokenData {
   auto& plaid = connection_service_.MutableConnection(Provider::kPlaid);
   plaid.status = ConnectionStatus::kConnecting;
-  providers::plaid::WorkflowProvider provider(kPlaidConfigPath, kPlaidTokenPath);
+  providers::plaid::WorkflowProvider provider(PlaidConfigPath(), PlaidTokenPath());
   return provider.CreateLinkToken(request, CurrentUtcTimestamp(), NextWorkflowId());
 }
 
 auto WorkflowService::CompletePlaidLink(
     const PlaidLinkCompleteRequest& request) -> ConnectionSummary {
   auto& plaid = connection_service_.MutableConnection(Provider::kPlaid);
-  providers::plaid::WorkflowProvider provider(kPlaidConfigPath, kPlaidTokenPath);
+  providers::plaid::WorkflowProvider provider(PlaidConfigPath(), PlaidTokenPath());
   plaid = provider.CompleteLink(request, plaid, CurrentUtcTimestamp());
   return plaid;
 }

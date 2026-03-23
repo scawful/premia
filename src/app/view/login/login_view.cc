@@ -43,7 +43,7 @@ void LoginView::DrawScreen() const {
 
     if (tdaAuth) {
       statusMessage =
-          "TDA now uses provider-backed config from assets/tda.json; no direct login call is needed.";
+          "TDA now uses provider-backed runtime config storage; no direct login call is needed.";
       if (logger) logger(std::string(statusMessage));
     }
     if (schwabAuth) {

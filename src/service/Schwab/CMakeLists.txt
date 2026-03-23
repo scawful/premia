@@ -12,6 +12,7 @@ target_include_directories(schwab
 
 target_link_libraries(schwab
   PRIVATE
+    premia_infrastructure
     ${BOOST_LIBRARIES}
     ${OPENSSL_LIBRARIES}
     curl

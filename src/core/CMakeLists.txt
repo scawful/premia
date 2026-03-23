@@ -16,6 +16,7 @@ target_compile_features(premia_core PUBLIC cxx_std_17)
 target_link_libraries(
   premia_core
   PUBLIC
+  premia_infrastructure
   premia_provider_local_account_detail
   premia_provider_local_options
   premia_provider_local_orders

@@ -103,10 +103,20 @@ void WriteWorkspaceAsset(const fs::path& workspace, const std::string& name,
   output << content;
 }
 
+void WriteRuntimeProviderFile(const fs::path& workspace, const std::string& provider,
+                              const std::string& name,
+                              const std::string& content) {
+  const auto dir = workspace / ".runtime" / "providers" / provider;
+  fs::create_directories(dir);
+  std::ofstream output(dir / name);
+  output << content;
+}
+
 auto MakeTempWorkspace(const std::string& name) -> fs::path {
   const auto path = fs::temp_directory_path() / name;
   fs::remove_all(path);
   fs::create_directories(path / "assets");
+  fs::create_directories(path / ".runtime");
 
   for (const auto* asset : {"account.json", "orders.json", "options.json",
                             "portfolio.json", "plaid.json", "schwab.json",
@@ -130,6 +140,8 @@ class PremiaApiProcess {
     ASSERT_GE(pid_, 0);
     if (pid_ == 0) {
       chdir(workspace_.c_str());
+      const auto runtime_dir = (workspace_ / ".runtime").string();
+      setenv("PREMIA_RUNTIME_DIR", runtime_dir.c_str(), 1);
       const auto port_string = std::to_string(port_);
       execl(PREMIA_API_BIN, PREMIA_API_BIN, "--host", kHost, "--port",
             port_string.c_str(), nullptr);
@@ -356,17 +368,17 @@ TEST_F(ApiIntegrationFixture, SeededProviderTokensDriveBootstrapStates) {
 #if defined(_WIN32)
   GTEST_SKIP() << "POSIX-only process launch helper";
 #endif
-  WriteWorkspaceAsset(
-      workspace_, "schwab.json",
+  WriteRuntimeProviderFile(
+      workspace_, "schwab", "config.json",
       R"({"app_key":"real-looking-key","app_secret":"real-looking-secret"})");
-  WriteWorkspaceAsset(
-      workspace_, "schwab_tokens.json",
+  WriteRuntimeProviderFile(
+      workspace_, "schwab", "tokens.json",
       R"({"refresh_token":"expired-refresh","refresh_token_expires_at":1})");
-  WriteWorkspaceAsset(
-      workspace_, "plaid.json",
+  WriteRuntimeProviderFile(
+      workspace_, "plaid", "config.json",
       R"({"client_id":"real-looking-client-id","secret":"real-looking-secret"})");
-  WriteWorkspaceAsset(
-      workspace_, "plaid_tokens.json",
+  WriteRuntimeProviderFile(
+      workspace_, "plaid", "tokens.json",
       R"({"access_token":"access-sandbox-demo"})");
 
   const auto bootstrap = HttpRequest("GET", Url("/v1/bootstrap"));

@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "premia/infrastructure/secrets/runtime_paths.hpp"
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -104,8 +106,12 @@ void Client::SaveTokens(const std::string& token_path) const {
   pt.put("refresh_token_expires_at", refresh_token_expires_at_);
 
   try {
-    std::ofstream file(token_path);
-    boost::property_tree::write_json(file, pt);
+    std::ostringstream buffer;
+    boost::property_tree::write_json(buffer, pt);
+    if (!premia::infrastructure::secrets::WriteSecureText(token_path,
+                                                          buffer.str())) {
+      std::cerr << "[Schwab] SaveTokens error: unable to write secure token file\n";
+    }
   } catch (const std::exception& e) {
     std::cerr << "[Schwab] SaveTokens error: " << e.what() << "\n";
   }

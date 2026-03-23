@@ -17,6 +17,7 @@ target_include_directories(plaid
 
 target_link_libraries(plaid
   PRIVATE
+    premia_infrastructure
     ${BOOST_LIBRARIES}
     ${OPENSSL_LIBRARIES}
     curl

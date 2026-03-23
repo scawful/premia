@@ -90,6 +90,10 @@ Each provider module:
 - `premia-infra-logging`
 - `premia-infra-time`
 
+Current implemented infrastructure:
+- `src/infrastructure/secrets/runtime_paths.cc` - runtime config/token path
+  resolution, secure file writes, and migration helpers for provider secrets
+
 ### App clients
 
 - `premia-api-http`

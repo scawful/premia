@@ -10,6 +10,7 @@ Makefile
 chart.csv
 apikey.txt
 assets/*tokens*.json
+.premia-runtime/
 .cache/
 apps/mobile-ios/.build/**
 apps/mobile-ios/.swiftpm/**

@@ -32,11 +32,11 @@ final class ConnectionWorkflowIntegrationTests: XCTestCase {
     }
 
     func testSeededBootstrapReflectsSchwabReauthAndPlaidConnected() async throws {
-        let server = try await PremiaAPITestServer.start(assetOverrides: [
-            "schwab.json": "{\n  \"app_key\": \"real-looking-key\",\n  \"app_secret\": \"real-looking-secret\"\n}\n",
-            "schwab_tokens.json": "{\n  \"refresh_token\": \"expired-refresh\",\n  \"refresh_token_expires_at\": 1\n}\n",
-            "plaid.json": "{\n  \"client_id\": \"real-looking-client-id\",\n  \"secret\": \"real-looking-secret\"\n}\n",
-            "plaid_tokens.json": "{\n  \"access_token\": \"access-sandbox-demo\"\n}\n"
+        let server = try await PremiaAPITestServer.start(runtimeOverrides: [
+            "providers/schwab/config.json": "{\n  \"app_key\": \"real-looking-key\",\n  \"app_secret\": \"real-looking-secret\"\n}\n",
+            "providers/schwab/tokens.json": "{\n  \"refresh_token\": \"expired-refresh\",\n  \"refresh_token_expires_at\": 1\n}\n",
+            "providers/plaid/config.json": "{\n  \"client_id\": \"real-looking-client-id\",\n  \"secret\": \"real-looking-secret\"\n}\n",
+            "providers/plaid/tokens.json": "{\n  \"access_token\": \"access-sandbox-demo\"\n}\n"
         ])
         defer { server.stop() }
 

@@ -8,6 +8,8 @@
 #include <sstream>
 #include <string>
 
+#include "premia/infrastructure/secrets/runtime_paths.hpp"
+
 namespace premia {
 namespace plaid {
 
@@ -69,8 +71,13 @@ bool Client::SaveConfig(const std::string& config_path) const {
   pt.put("env_url", env_url_);
 
   try {
-    std::ofstream file(config_path);
-    boost::property_tree::write_json(file, pt);
+    std::ostringstream buffer;
+    boost::property_tree::write_json(buffer, pt);
+    if (!premia::infrastructure::secrets::WriteSecureText(config_path,
+                                                          buffer.str())) {
+      std::cerr << "[Plaid] SaveConfig error: unable to write secure config file\n";
+      return false;
+    }
   } catch (const std::exception& e) {
     std::cerr << "[Plaid] SaveConfig error: " << e.what() << "\n";
     return false;
@@ -101,8 +108,12 @@ void Client::SaveTokens(const std::string& token_path) const {
   pt.put("item_id", item_id_);
 
   try {
-    std::ofstream file(token_path);
-    boost::property_tree::write_json(file, pt);
+    std::ostringstream buffer;
+    boost::property_tree::write_json(buffer, pt);
+    if (!premia::infrastructure::secrets::WriteSecureText(token_path,
+                                                          buffer.str())) {
+      std::cerr << "[Plaid] SaveTokens error: unable to write secure token file\n";
+    }
   } catch (const std::exception& e) {
     std::cerr << "[Plaid] SaveTokens error: " << e.what() << "\n";
   }
