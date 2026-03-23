@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(premia VERSION 0.40)
+project(premia VERSION 2.0.0)
 
 # C++ Standard ----------------------------------------------------------------
 set(CMAKE_CXX_STANDARD 17)
@@ -56,7 +56,18 @@ set(
   absl::flat_hash_map
 )
 
+# Version header --------------------------------------------------------------
+set(PREMIA_VERSION_MAJOR ${premia_VERSION_MAJOR})
+set(PREMIA_VERSION_MINOR ${premia_VERSION_MINOR})
+set(PREMIA_VERSION_PATCH ${premia_VERSION_PATCH})
+configure_file(
+    inc/premia_config.h.in
+    ${CMAKE_BINARY_DIR}/inc/premia_config.h
+)
+
 include_directories(include)
+include_directories(inc)
+include_directories(${CMAKE_BINARY_DIR}/inc)
 add_subdirectory(src)
 add_subdirectory(apps)
 add_subdirectory(test)

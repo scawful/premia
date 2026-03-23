@@ -1,30 +1,54 @@
 name = "premia"
-description = "Financial market analysis and trading platform (TDAmeritrade, InteractiveBrokers)"
-tags = ["tools", "finance", "trading", "c++", "imgui", "active"]
-platforms = ["mac", "linux", "windows"]
-stage = "active"
-public = true
+version = "2.0.0-dev"
+description = "Financial market data platform: API backend, iOS app, desktop client (Schwab, Plaid, IBKR, TDA)"
+aliases = ["premia-v2"]
+tags = ["tools", "finance", "trading", "cpp", "swift", "imgui", "rest-api", "ios", "active"]
+platforms = ["mac", "ios"]
+
+stage = "dev"
 is_product = false
 commercial_intent = "none"
+public = true
 
 # Technology stack
-languages = ["cpp", "c"]
+languages = ["cpp", "swift"]
 build_system = "cmake"
-requires_version = {cpp = "17", cmake = "3.20"}
+requires_version = {cpp = "17", cmake = "3.20", swift = "6.0"}
 
 [dependencies]
-# External system dependencies
-external = ["imgui", "curl", "openssl", "nlohmann-json"]
-
-# Build dependencies
+external = ["imgui", "curl", "openssl", "nlohmann-json", "crow", "jwt-cpp"]
 build = ["cmake", "ninja"]
-
-# Test dependencies
-test = []
+test = ["googletest"]
 
 [links]
 github = "https://github.com/scawful/premia"
 
 [build]
 system = "cmake"
-command = "cmake -B build && cmake --build build"
+command = "cmake -S . -B build-arch-next && cmake --build build-arch-next"
+targets = ["premia", "premia_api", "premia_core"]
+
+[test]
+command = "cmake --build build-arch-next --target premia_api && ctest --test-dir build-arch-next"
+
+[mobile]
+platform = "ios"
+path = "apps/mobile-ios/"
+command = "swift build"
+client = "clients/swift/Generated/"
+
+[api]
+contract = "contracts/openapi/premia-v1.yaml"
+server = "apps/api/"
+
+[providers]
+schwab = "src/providers/schwab/"
+plaid  = "src/providers/plaid/"
+ibkr   = "src/providers/ibkr/"
+tda    = "src/providers/tda/"
+local  = "src/providers/local/"
+
+[docs]
+architecture = "docs/architecture/"
+roadmap      = "ROADMAP.md"
+status       = "STATUS.md"
