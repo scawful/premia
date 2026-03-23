@@ -1,0 +1,59 @@
+name: Premia CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          brew install cmake ninja boost openssl curl sdl2 abseil xcodegen
+
+      - name: Configure CMake
+        run: cmake -S . -B build-next-providers -G Ninja
+
+      - name: Build desktop, API, and test binaries
+        run: |
+          cmake --build build-next-providers --target premia premia_api premia_provider_core_test premia_api_integration_test
+
+      - name: Run provider-backed C++ tests
+        run: ./build-next-providers/bin/premia_provider_core_test
+
+      - name: Run API integration tests
+        run: ./build-next-providers/bin/premia_api_integration_test
+
+      - name: Validate and regenerate OpenAPI client
+        run: |
+          npx --yes @openapitools/openapi-generator-cli validate -i contracts/openapi/premia-v1.yaml
+          rm -rf clients/swift/Generated
+          npx --yes @openapitools/openapi-generator-cli generate -i contracts/openapi/premia-v1.yaml -g swift6 -o clients/swift/Generated -c clients/swift/openapi-generator-config.yaml
+
+      - name: Validate generated Swift package
+        run: swift package dump-package --package-path clients/swift/Generated
+
+      - name: Run mobile Swift tests
+        env:
+          PREMIA_API_BIN: ${{ github.workspace }}/build-next-providers/bin/premia_api
+        run: |
+          swift build --package-path apps/mobile-ios
+          swift test --package-path apps/mobile-ios
+
+      - name: Generate iOS app host project
+        run: xcodegen generate --spec PremiaMobile/project.yml
+
+      - name: Build iOS app host
+        run: |
+          xcodebuild -project PremiaMobile/PremiaMobile.xcodeproj -scheme PremiaMobile -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build

@@ -69,6 +69,9 @@ This note captures the first implementation pass after the architecture review.
 - `src/providers/schwab/workflow_provider.cc` and
   `src/providers/plaid/workflow_provider.cc` now own the broker-specific
   workflow logic for Schwab OAuth and Plaid Link.
+- `src/infrastructure/secrets/runtime_paths.cc` now provides runtime config/token
+  path resolution, secure file writes, and migration helpers for provider
+  secrets.
 - watchlist summaries and watchlist-screen rows now come from a provider adapter
   backed by `assets/watchlists.json`, with TDA taking precedence when an
   authenticated watchlist provider is available.
@@ -215,6 +218,10 @@ This note captures the first implementation pass after the architecture review.
   workflow wrappers end to end.
 - those Swift integration tests now also cover seeded bootstrap state derivation
   for Schwab reauth-required and Plaid connected scenarios.
+- API and Swift integration tests now use `PREMIA_RUNTIME_DIR` to isolate live
+  provider config/token state from repo fixtures.
+- `.github/workflows/ci.yml` now runs the C++ builds/tests, OpenAPI generation,
+  Swift package tests, and iOS Simulator host build on macOS CI.
 
 ## Immediate next moves
 
