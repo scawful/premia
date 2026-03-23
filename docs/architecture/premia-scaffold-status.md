@@ -201,6 +201,9 @@ This note captures the first implementation pass after the architecture review.
 - `xcodebuild -project PremiaMobile/PremiaMobile.xcodeproj -scheme PremiaMobile -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build` succeeds.
 - `./build-next-providers/bin/premia_provider_core_test` passes provider-backed
   order fallback and guardrail tests.
+- `./build-next-providers/bin/premia_api_integration_test` now exercises the
+  provider-backed account, options, and trading/history HTTP routes through the
+  real `premia_api` binary against isolated fixture workspaces.
 - `swift test --package-path apps/mobile-ios` passes Swift model and SwiftUI
   smoke tests.
 

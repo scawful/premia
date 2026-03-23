@@ -44,6 +44,11 @@ add_executable(
   core/order_service_test.cc
 )
 
+add_executable(
+  premia_api_integration_test
+  api/api_integration_test.cc
+)
+
 target_include_directories(premia_test
   PUBLIC
   ../src
@@ -60,6 +65,15 @@ target_include_directories(premia_provider_core_test
   ../src/core/include
   ../src/providers/include
   ../src/core/application
+  ../src/service
+  ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+target_include_directories(premia_api_integration_test
+  PUBLIC
+  ../src
+  ../src/core/include
+  ../src/providers/include
   ../src/service
   ${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -94,11 +108,32 @@ target_link_libraries(
   gtest
 )
 
+target_link_libraries(
+  premia_api_integration_test
+  curl
+  ${BOOST_LIBRARIES}
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  gtest_main
+  gtest
+)
+
+target_compile_definitions(
+  premia_api_integration_test
+  PRIVATE
+  PREMIA_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+  PREMIA_API_BIN="$<TARGET_FILE:premia_api>"
+)
+
+add_dependencies(premia_api_integration_test premia_api)
+
 if(WIN32)
   target_link_libraries(premia_test ws2_32)
   target_link_libraries(premia_provider_core_test ws2_32)
+  target_link_libraries(premia_api_integration_test ws2_32)
 endif()
 
 include(GoogleTest)
 gtest_discover_tests(premia_test)
 gtest_discover_tests(premia_provider_core_test)
+gtest_discover_tests(premia_api_integration_test)
