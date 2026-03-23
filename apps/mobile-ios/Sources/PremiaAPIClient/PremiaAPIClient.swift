@@ -48,7 +48,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func loadBootstrap() async throws -> PremiaBootstrapSnapshot {
         let response = try await executeMapped {
-            try await BootstrapAPI.getBootstrap(apiConfiguration: apiConfiguration)
+            try await PremiaAPIClientGeneratedAPI.BootstrapAPI.getBootstrap(apiConfiguration: apiConfiguration)
         }
         let connections = response.data.connections.map(mapConnection)
         return PremiaBootstrapSnapshot(
@@ -62,7 +62,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func loadHome() async throws -> PremiaHomeSnapshot {
         let response = try await executeMapped {
-            try await HomeAPI.getHomeScreen(apiConfiguration: apiConfiguration)
+            try await PremiaAPIClientGeneratedAPI.HomeAPI.getHomeScreen(apiConfiguration: apiConfiguration)
         }
         return PremiaHomeSnapshot(
             connections: response.data.connections.map(mapConnection),
@@ -80,7 +80,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func loadAccount() async throws -> PremiaAccountDetailSnapshot {
         let response = try await executeMapped {
-            try await AccountAPI.getAccountScreen(apiConfiguration: apiConfiguration)
+            try await PremiaAPIClientGeneratedAPI.AccountAPI.getAccountScreen(apiConfiguration: apiConfiguration)
         }
         return PremiaAccountDetailSnapshot(
             accountID: response.data.accountId,
@@ -101,7 +101,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func loadQuote(symbol: String) async throws -> PremiaQuoteScreenSnapshot {
         let response = try await executeMapped {
-            try await QuotesAPI.getQuoteScreen(symbol: symbol, apiConfiguration: apiConfiguration)
+            try await PremiaAPIClientGeneratedAPI.QuotesAPI.getQuoteScreen(symbol: symbol, apiConfiguration: apiConfiguration)
         }
         return PremiaQuoteScreenSnapshot(
             instrument: mapInstrument(response.data.instrument),
@@ -120,7 +120,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
         extendedHours: Bool = false
     ) async throws -> PremiaChartSnapshot {
         let response = try await executeMapped {
-            try await ChartsAPI.getChartScreen(
+            try await PremiaAPIClientGeneratedAPI.ChartsAPI.getChartScreen(
                 symbol: symbol,
                 range: mapChartRange(range),
                 interval: mapChartInterval(interval),
@@ -136,7 +136,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             timezone: response.data.timezone,
             seriesType: response.data.series.type.rawValue,
             candles: response.data.series.bars.map(mapCandle),
-            change: response.data.stats.map { mapChange($0.change) },
+            change: response.data.stats?.change.map(mapChange),
             asOf: response.meta.asOf
         )
     }
@@ -151,7 +151,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
         optionType: String = "ALL"
     ) async throws -> PremiaOptionChainSnapshotModel {
         let response = try await executeMapped {
-            try await OptionsAPI.getOptionChainScreen(
+            try await PremiaAPIClientGeneratedAPI.OptionsAPI.getOptionChainScreen(
                 symbol: symbol,
                 strikeCount: strikeCount,
                 strategy: strategy,
@@ -194,7 +194,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func loadWatchlists() async throws -> [PremiaWatchlistSummaryModel] {
         let response = try await executeMapped {
-            try await WatchlistsAPI.listWatchlists(apiConfiguration: apiConfiguration)
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.listWatchlists(apiConfiguration: apiConfiguration)
         }
         return response.data.watchlists.map(mapWatchlist)
     }
@@ -202,7 +202,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func loadWatchlist(id: String) async throws -> PremiaWatchlistScreenSnapshot {
         let response = try await executeMapped {
-            try await WatchlistsAPI.getWatchlistScreen(
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.getWatchlistScreen(
                 watchlistId: id,
                 apiConfiguration: apiConfiguration
             )
@@ -225,7 +225,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             clientPlatform: clientPlatform
         )
         let response = try await executeMapped {
-            try await ConnectionsAPI.startSchwabOAuth(
+            try await PremiaAPIClientGeneratedAPI.ConnectionsAPI.startSchwabOAuth(
                 startSchwabOAuthRequest: request,
                 apiConfiguration: apiConfiguration
             )
@@ -247,7 +247,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             state: state
         )
         let response = try await executeMapped {
-            try await ConnectionsAPI.completeSchwabOAuth(
+            try await PremiaAPIClientGeneratedAPI.ConnectionsAPI.completeSchwabOAuth(
                 completeSchwabOAuthRequest: request,
                 apiConfiguration: apiConfiguration
             )
@@ -265,7 +265,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             redirectUri: redirectURI
         )
         let response = try await executeMapped {
-            try await ConnectionsAPI.createPlaidLinkToken(
+            try await PremiaAPIClientGeneratedAPI.ConnectionsAPI.createPlaidLinkToken(
                 createPlaidLinkTokenRequest: request,
                 apiConfiguration: apiConfiguration
             )
@@ -286,7 +286,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             institutionId: institutionID
         )
         let response = try await executeMapped {
-            try await ConnectionsAPI.completePlaidLink(
+            try await PremiaAPIClientGeneratedAPI.ConnectionsAPI.completePlaidLink(
                 completePlaidLinkRequest: request,
                 apiConfiguration: apiConfiguration
             )
@@ -297,7 +297,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func createWatchlist(name: String) async throws -> PremiaWatchlistSummaryModel {
         let response = try await executeMapped {
-            try await WatchlistsAPI.createWatchlist(
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.createWatchlist(
                 createWatchlistRequest: PremiaAPIClientGeneratedAPI.CreateWatchlistRequest(name: name),
                 apiConfiguration: apiConfiguration
             )
@@ -308,7 +308,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func renameWatchlist(id: String, name: String) async throws -> PremiaWatchlistSummaryModel {
         let response = try await executeMapped {
-            try await WatchlistsAPI.updateWatchlist(
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.updateWatchlist(
                 watchlistId: id,
                 updateWatchlistRequest: PremiaAPIClientGeneratedAPI.UpdateWatchlistRequest(name: name),
                 apiConfiguration: apiConfiguration
@@ -320,7 +320,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func addSymbol(_ symbol: String, toWatchlist id: String) async throws -> PremiaWatchlistSummaryModel {
         let response = try await executeMapped {
-            try await WatchlistsAPI.addWatchlistSymbol(
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.addWatchlistSymbol(
                 watchlistId: id,
                 addWatchlistSymbolRequest: PremiaAPIClientGeneratedAPI.AddWatchlistSymbolRequest(symbol: symbol),
                 apiConfiguration: apiConfiguration
@@ -332,7 +332,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func removeSymbol(_ symbol: String, fromWatchlist id: String) async throws -> PremiaWatchlistSummaryModel {
         let response = try await executeMapped {
-            try await WatchlistsAPI.deleteWatchlistSymbol(
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.deleteWatchlistSymbol(
                 watchlistId: id,
                 symbol: symbol,
                 apiConfiguration: apiConfiguration
@@ -344,7 +344,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func previewOrder(_ intent: PremiaOrderIntent) async throws -> PremiaOrderPreview {
         let response = try await executeMapped {
-            try await TradingAPI.previewOrder(
+            try await PremiaAPIClientGeneratedAPI.TradingAPI.previewOrder(
                 orderIntentRequest: mapOrderIntent(intent),
                 apiConfiguration: apiConfiguration
             )
@@ -355,7 +355,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func submitOrder(_ intent: PremiaOrderIntent) async throws -> PremiaOrderSubmission {
         let response = try await executeMapped {
-            try await TradingAPI.submitOrder(
+            try await PremiaAPIClientGeneratedAPI.TradingAPI.submitOrder(
                 orderIntentRequest: mapOrderIntent(intent),
                 apiConfiguration: apiConfiguration
             )
@@ -366,7 +366,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func cancelOrder(orderID: String, accountID: String? = nil, confirmLive: Bool = false) async throws -> PremiaOrderCancellation {
         let response = try await executeMapped {
-            try await TradingAPI.cancelOrder(
+            try await PremiaAPIClientGeneratedAPI.TradingAPI.cancelOrder(
                 orderId: orderID,
                 orderCancelRequest: PremiaAPIClientGeneratedAPI.OrderCancelRequest(
                     accountId: accountID,
@@ -381,7 +381,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, *)
     public func replaceOrder(_ replacement: PremiaOrderReplaceIntent) async throws -> PremiaOrderReplacement {
         let response = try await executeMapped {
-            try await TradingAPI.replaceOrder(
+            try await PremiaAPIClientGeneratedAPI.TradingAPI.replaceOrder(
                 orderId: replacement.orderID,
                 orderReplaceRequest: mapOrderReplaceIntent(replacement),
                 apiConfiguration: apiConfiguration
@@ -390,32 +390,6 @@ public final class PremiaAPIClient: @unchecked Sendable {
         return mapOrderReplacement(response.data, asOf: response.meta.asOf)
     }
 
-    @available(macOS 10.15, iOS 13.0, *)
-    public func cancelOrder(orderID: String, accountID: String? = nil, confirmLive: Bool = false) async throws -> PremiaOrderCancellation {
-        let response = try await executeMapped {
-            try await TradingAPI.cancelOrder(
-                orderId: orderID,
-                orderCancelRequest: PremiaAPIClientGeneratedAPI.OrderCancelRequest(
-                    accountId: accountID,
-                    confirmLive: confirmLive
-                ),
-                apiConfiguration: apiConfiguration
-            )
-        }
-        return mapOrderCancellation(response.data, asOf: response.meta.asOf)
-    }
-
-    @available(macOS 10.15, iOS 13.0, *)
-    public func replaceOrder(_ replacement: PremiaOrderReplaceIntent) async throws -> PremiaOrderReplacement {
-        let response = try await executeMapped {
-            try await TradingAPI.replaceOrder(
-                orderId: replacement.orderID,
-                orderReplaceRequest: mapOrderReplaceIntent(replacement),
-                apiConfiguration: apiConfiguration
-            )
-        }
-        return mapOrderReplacement(response.data, asOf: response.meta.asOf)
-    }
 
     @available(macOS 10.15, iOS 13.0, *)
     private func executeMapped<T>(_ operation: () async throws -> T) async throws -> T {
@@ -575,26 +549,10 @@ public final class PremiaAPIClient: @unchecked Sendable {
         return PremiaAPIClientGeneratedAPI.OrderReplaceRequest(
             accountId: intent.accountID,
             symbol: intent.symbol,
-            assetType: mapAssetType(intent.assetType),
-            instruction: mapInstruction(intent.instruction),
+            assetType: mapReplaceAssetType(intent.assetType),
+            instruction: mapReplaceInstruction(intent.instruction),
             quantity: intent.quantity,
-            orderType: mapOrderType(intent.orderType),
-            limitPrice: intent.limitPrice,
-            duration: intent.duration,
-            session: intent.session,
-            confirmLive: intent.confirmLive
-        )
-    }
-
-    private func mapOrderReplaceIntent(_ replacement: PremiaOrderReplaceIntent) -> PremiaAPIClientGeneratedAPI.OrderReplaceRequest {
-        let intent = replacement.replacement
-        return PremiaAPIClientGeneratedAPI.OrderReplaceRequest(
-            accountId: intent.accountID,
-            symbol: intent.symbol,
-            assetType: mapAssetType(intent.assetType),
-            instruction: mapInstruction(intent.instruction),
-            quantity: intent.quantity,
-            orderType: mapOrderType(intent.orderType),
+            orderType: mapReplaceOrderType(intent.orderType),
             limitPrice: intent.limitPrice,
             duration: intent.duration,
             session: intent.session,
@@ -669,37 +627,6 @@ public final class PremiaAPIClient: @unchecked Sendable {
         )
     }
 
-    private func mapOrderCancellation(_ cancellation: PremiaAPIClientGeneratedAPI.OrderCancellationData, asOf: Date?) -> PremiaOrderCancellation {
-        PremiaOrderCancellation(
-            orderID: cancellation.orderId,
-            accountID: cancellation.accountId,
-            mode: cancellation.mode,
-            status: cancellation.status,
-            cancelledAt: cancellation.cancelledAt,
-            message: cancellation.message,
-            asOf: asOf
-        )
-    }
-
-    private func mapOrderReplacement(_ replacement: PremiaAPIClientGeneratedAPI.OrderReplacementData, asOf: Date?) -> PremiaOrderReplacement {
-        PremiaOrderReplacement(
-            replacementID: replacement.replacementId,
-            replacedOrderID: replacement.replacedOrderId,
-            accountID: replacement.accountId,
-            symbol: replacement.symbol,
-            assetType: mapAssetTypeValue(replacement.assetType),
-            instruction: mapInstructionValue(replacement.instruction),
-            quantity: replacement.quantity,
-            orderType: mapOrderTypeValue(replacement.orderType),
-            limitPrice: replacement.limitPrice,
-            mode: replacement.mode,
-            status: replacement.status,
-            submittedAt: replacement.submittedAt,
-            message: replacement.message,
-            asOf: asOf
-        )
-    }
-
     private func mapPortfolio(_ portfolio: PremiaAPIClientGeneratedAPI.PortfolioSummary) -> PremiaPortfolioSummary {
         PremiaPortfolioSummary(
             totalValue: mapMoney(portfolio.totalValue),
@@ -713,11 +640,11 @@ public final class PremiaAPIClient: @unchecked Sendable {
     private func mapQuoteSnapshot(_ quote: PremiaAPIClientGeneratedAPI.QuoteSnapshot) -> PremiaQuoteSnapshotModel {
         PremiaQuoteSnapshotModel(
             lastPrice: mapMoney(quote.lastPrice),
-            bid: mapMoney(quote.bid),
-            ask: mapMoney(quote.ask),
-            open: mapMoney(quote.open),
-            high: mapMoney(quote.high),
-            low: mapMoney(quote.low),
+            bid: quote.bid.map(mapMoney) ?? PremiaMoney(amount: "0.00", currency: quote.lastPrice.currency),
+            ask: quote.ask.map(mapMoney) ?? PremiaMoney(amount: "0.00", currency: quote.lastPrice.currency),
+            open: quote._open.map(mapMoney) ?? PremiaMoney(amount: "0.00", currency: quote.lastPrice.currency),
+            high: quote.high.map(mapMoney) ?? PremiaMoney(amount: "0.00", currency: quote.lastPrice.currency),
+            low: quote.low.map(mapMoney) ?? PremiaMoney(amount: "0.00", currency: quote.lastPrice.currency),
             previousClose: mapMoney(quote.previousClose),
             volume: quote.volume,
             updatedAt: quote.updatedAt
@@ -726,8 +653,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     private func mapCandle(_ candle: PremiaAPIClientGeneratedAPI.Candle) -> PremiaCandle {
         PremiaCandle(
-            time: candle.time,
-            open: candle.open,
+            time: ISO8601DateFormatter().string(from: candle.time),
+            open: candle._open,
             high: candle.high,
             low: candle.low,
             close: candle.close,
@@ -897,11 +824,46 @@ public final class PremiaAPIClient: @unchecked Sendable {
         PremiaAssetType(rawValue: value) ?? .equity
     }
 
+    private func mapReplaceAssetType(_ assetType: PremiaAssetType) -> PremiaAPIClientGeneratedAPI.OrderReplaceRequest.AssetType {
+        switch assetType {
+        case .equity:
+            return .equity
+        case .option:
+            return .option
+        }
+    }
+
     private func mapInstructionValue(_ value: String) -> PremiaOrderInstruction {
         PremiaOrderInstruction(rawValue: value) ?? .buy
     }
 
+    private func mapReplaceInstruction(_ instruction: PremiaOrderInstruction) -> PremiaAPIClientGeneratedAPI.OrderReplaceRequest.Instruction {
+        switch instruction {
+        case .buy:
+            return .buy
+        case .sell:
+            return .sell
+        case .buyToOpen:
+            return .buyToOpen
+        case .sellToClose:
+            return .sellToClose
+        case .buyToClose:
+            return .buyToClose
+        case .sellToOpen:
+            return .sellToOpen
+        }
+    }
+
     private func mapOrderTypeValue(_ value: String) -> PremiaOrderType {
         PremiaOrderType(rawValue: value) ?? .limit
+    }
+
+    private func mapReplaceOrderType(_ orderType: PremiaOrderType) -> PremiaAPIClientGeneratedAPI.OrderReplaceRequest.OrderType {
+        switch orderType {
+        case .market:
+            return .market
+        case .limit:
+            return .limit
+        }
     }
 }

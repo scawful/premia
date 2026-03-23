@@ -73,6 +73,50 @@ public struct PremiaOptionContractPairRowModel: Codable, Sendable, Equatable, Id
     public let putTheta: String
     public let putVega: String
     public let putOpenInterest: String
+
+    public init(
+        id: String,
+        strike: String,
+        callBid: String,
+        callAsk: String,
+        callLast: String,
+        callChange: String,
+        callDelta: String,
+        callGamma: String,
+        callTheta: String,
+        callVega: String,
+        callOpenInterest: String,
+        putBid: String,
+        putAsk: String,
+        putLast: String,
+        putChange: String,
+        putDelta: String,
+        putGamma: String,
+        putTheta: String,
+        putVega: String,
+        putOpenInterest: String
+    ) {
+        self.id = id
+        self.strike = strike
+        self.callBid = callBid
+        self.callAsk = callAsk
+        self.callLast = callLast
+        self.callChange = callChange
+        self.callDelta = callDelta
+        self.callGamma = callGamma
+        self.callTheta = callTheta
+        self.callVega = callVega
+        self.callOpenInterest = callOpenInterest
+        self.putBid = putBid
+        self.putAsk = putAsk
+        self.putLast = putLast
+        self.putChange = putChange
+        self.putDelta = putDelta
+        self.putGamma = putGamma
+        self.putTheta = putTheta
+        self.putVega = putVega
+        self.putOpenInterest = putOpenInterest
+    }
 }
 
 public struct PremiaOptionExpirationSnapshotModel: Codable, Sendable, Equatable, Identifiable {
@@ -80,6 +124,13 @@ public struct PremiaOptionExpirationSnapshotModel: Codable, Sendable, Equatable,
     public let label: String
     public let gammaAtExpiry: String
     public let rows: [PremiaOptionContractPairRowModel]
+
+    public init(id: String, label: String, gammaAtExpiry: String, rows: [PremiaOptionContractPairRowModel]) {
+        self.id = id
+        self.label = label
+        self.gammaAtExpiry = gammaAtExpiry
+        self.rows = rows
+    }
 }
 
 public struct PremiaOptionChainSnapshotModel: Codable, Sendable, Equatable {
@@ -96,4 +147,20 @@ public struct PremiaOptionChainSnapshotModel: Codable, Sendable, Equatable {
     public let gammaExposure: String
     public let expirations: [PremiaOptionExpirationSnapshotModel]
     public let asOf: Date?
+
+    public init(symbol: String, description: String, bid: String, ask: String, openPrice: String, closePrice: String, highPrice: String, lowPrice: String, totalVolume: String, volatility: String, gammaExposure: String, expirations: [PremiaOptionExpirationSnapshotModel], asOf: Date?) {
+        self.symbol = symbol
+        self.description = description
+        self.bid = bid
+        self.ask = ask
+        self.openPrice = openPrice
+        self.closePrice = closePrice
+        self.highPrice = highPrice
+        self.lowPrice = lowPrice
+        self.totalVolume = totalVolume
+        self.volatility = volatility
+        self.gammaExposure = gammaExposure
+        self.expirations = expirations
+        self.asOf = asOf
+    }
 }
