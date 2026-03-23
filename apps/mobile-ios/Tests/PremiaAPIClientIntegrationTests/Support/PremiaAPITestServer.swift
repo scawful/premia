@@ -13,14 +13,14 @@ final class PremiaAPITestServer {
         self.process = process
     }
 
-    static func start() async throws -> PremiaAPITestServer {
+    static func start(assetOverrides: [String: String] = [:]) async throws -> PremiaAPITestServer {
         let repoRoot = repositoryRoot()
         let binary = resolveBinaryPath(repoRoot: repoRoot)
         guard FileManager.default.fileExists(atPath: binary.path) else {
             throw XCTSkip("premia_api binary not found at \(binary.path)")
         }
 
-        let workspaceURL = try makeWorkspace(repoRoot: repoRoot)
+        let workspaceURL = try makeWorkspace(repoRoot: repoRoot, assetOverrides: assetOverrides)
         let port = 8500 + Int.random(in: 0..<300)
         let baseURL = URL(string: "http://127.0.0.1:\(port)")!
 
@@ -70,13 +70,16 @@ final class PremiaAPITestServer {
         return repoRoot.appendingPathComponent("build-next-providers/bin/premia_api")
     }
 
-    private static func makeWorkspace(repoRoot: URL) throws -> URL {
+    private static func makeWorkspace(repoRoot: URL, assetOverrides: [String: String]) throws -> URL {
         let fm = FileManager.default
         let root = fm.temporaryDirectory.appendingPathComponent("premia-swift-integration-\(UUID().uuidString)")
         try fm.createDirectory(at: root.appendingPathComponent("assets"), withIntermediateDirectories: true)
         for asset in ["account.json", "orders.json", "options.json", "portfolio.json", "plaid.json", "schwab.json", "tda.json", "watchlists.json"] {
             try fm.copyItem(at: repoRoot.appendingPathComponent("assets/\(asset)"),
                             to: root.appendingPathComponent("assets/\(asset)"))
+        }
+        for (name, contents) in assetOverrides {
+            try contents.write(to: root.appendingPathComponent("assets/\(name)"), atomically: true, encoding: .utf8)
         }
         return root
     }

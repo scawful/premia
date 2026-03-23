@@ -213,6 +213,8 @@ This note captures the first implementation pass after the architecture review.
   `PremiaAPIClientIntegrationTests`, which launch the local `premia_api` binary
   and validate account, options, order lifecycle/history, and connection
   workflow wrappers end to end.
+- those Swift integration tests now also cover seeded bootstrap state derivation
+  for Schwab reauth-required and Plaid connected scenarios.
 
 ## Immediate next moves
 

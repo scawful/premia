@@ -78,14 +78,17 @@ auto MakeCapabilities(const std::map<std::string, bool>& capabilities)
 
 auto MakeConnectionSummary(const application::ConnectionSummary& summary)
     -> json::object {
-  return {
-      {"provider", domain::ProviderToString(summary.provider)},
-      {"status", domain::ConnectionStatusToString(summary.status)},
-      {"displayName", summary.display_name},
-      {"lastSyncAt", summary.last_sync_at},
-      {"reauthRequired", summary.reauth_required},
-      {"capabilities", MakeCapabilities(summary.capabilities)},
-  };
+  json::object object{{"provider", domain::ProviderToString(summary.provider)},
+                      {"status", domain::ConnectionStatusToString(summary.status)},
+                      {"displayName", summary.display_name},
+                      {"reauthRequired", summary.reauth_required},
+                      {"capabilities", MakeCapabilities(summary.capabilities)}};
+  if (summary.last_sync_at.empty()) {
+    object["lastSyncAt"] = nullptr;
+  } else {
+    object["lastSyncAt"] = summary.last_sync_at;
+  }
+  return object;
 }
 
 auto MakeConnectionSummaryArray(

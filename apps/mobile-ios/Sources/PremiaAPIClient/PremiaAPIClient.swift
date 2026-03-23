@@ -2,6 +2,35 @@ import Foundation
 import PremiaModels
 import PremiaAPIClientGenerated
 
+private struct BootstrapEnvelopeDTO: Decodable {
+    struct Meta: Decodable {
+        let requestId: String
+        let asOf: Date?
+    }
+
+    struct Payload: Decodable {
+        struct Session: Decodable {
+            let environment: String
+            let featureFlags: [String: Bool]
+        }
+
+        struct Connection: Decodable {
+            let provider: String
+            let status: String
+            let displayName: String
+            let lastSyncAt: Date?
+            let reauthRequired: Bool
+            let capabilities: [String: Bool]
+        }
+
+        let session: Session
+        let connections: [Connection]
+    }
+
+    let data: Payload
+    let meta: Meta
+}
+
 public struct PremiaAPIConfiguration: Sendable, Equatable {
     public let baseURL: URL
 
@@ -47,16 +76,20 @@ public final class PremiaAPIClient: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13.0, *)
     public func loadBootstrap() async throws -> PremiaBootstrapSnapshot {
-        let response = try await executeMapped {
-            try await PremiaAPIClientGeneratedAPI.BootstrapAPI.getBootstrap(apiConfiguration: apiConfiguration)
+        do {
+            let response = try await executeMapped {
+                try await PremiaAPIClientGeneratedAPI.BootstrapAPI.getBootstrap(apiConfiguration: apiConfiguration)
+            }
+            let connections = response.data.connections.map(mapConnection)
+            return PremiaBootstrapSnapshot(
+                environment: response.data.session.environment,
+                featureFlags: response.data.session.featureFlags,
+                connections: connections,
+                asOf: response.meta.asOf
+            )
+        } catch {
+            return try await loadBootstrapFallback()
         }
-        let connections = response.data.connections.map(mapConnection)
-        return PremiaBootstrapSnapshot(
-            environment: response.data.session.environment,
-            featureFlags: response.data.session.featureFlags,
-            connections: connections,
-            asOf: response.meta.asOf
-        )
     }
 
     @available(macOS 10.15, iOS 13.0, *)
@@ -422,6 +455,40 @@ public final class PremiaAPIClient: @unchecked Sendable {
         } catch {
             throw mapError(error)
         }
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    private func loadBootstrapFallback() async throws -> PremiaBootstrapSnapshot {
+        let (data, response) = try await URLSession.shared.data(from: bootstrapURL())
+        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+            throw PremiaAPIClientError(
+                code: "HTTP_\(http.statusCode)",
+                message: "Bootstrap request failed.",
+                statusCode: http.statusCode,
+                retryable: http.statusCode >= 500,
+                action: http.statusCode == 401 ? .reauth : .retry
+            )
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let envelope = try decoder.decode(BootstrapEnvelopeDTO.self, from: data)
+        return PremiaBootstrapSnapshot(
+            environment: envelope.data.session.environment,
+            featureFlags: envelope.data.session.featureFlags,
+            connections: envelope.data.connections.map { connection in
+                PremiaConnectionSummary(
+                    id: connection.provider,
+                    provider: PremiaProvider(rawValue: connection.provider) ?? .internal,
+                    status: PremiaConnectionStatus(rawValue: connection.status) ?? .notConnected,
+                    displayName: connection.displayName,
+                    lastSyncAt: connection.lastSyncAt,
+                    reauthRequired: connection.reauthRequired,
+                    capabilities: connection.capabilities
+                )
+            },
+            asOf: envelope.meta.asOf
+        )
     }
 
     private func mapError(_ error: Error) -> PremiaAPIClientError {
