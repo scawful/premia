@@ -52,6 +52,7 @@ struct WatchlistSummary {
   std::string id;
   std::string name;
   int instrument_count = 0;
+  bool is_archived = false;
 };
 
 struct WatchlistRow {
@@ -120,6 +121,13 @@ struct ChartSeries {
 
 struct ChartStats {
   AbsolutePercentChange change;
+};
+
+struct ChartAnnotation {
+  std::string id;
+  std::string label;
+  std::string price;
+  std::string kind;
 };
 
 struct MarketSummary {
@@ -227,6 +235,7 @@ struct ChartScreenData {
   std::string timezone;
   ChartSeries series;
   ChartStats stats;
+  std::vector<ChartAnnotation> annotations;
 };
 
 }  // namespace premia::core::application

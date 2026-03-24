@@ -9,6 +9,7 @@ public struct PremiaWatchlistRowModel: Codable, Sendable, Equatable, Identifiabl
     public let bid: PremiaMoney?
     public let ask: PremiaMoney?
     public let updatedAt: Date?
+    public let isPinned: Bool
 
     public init(
         id: String,
@@ -18,7 +19,8 @@ public struct PremiaWatchlistRowModel: Codable, Sendable, Equatable, Identifiabl
         dayChange: PremiaAbsolutePercentChange,
         bid: PremiaMoney?,
         ask: PremiaMoney?,
-        updatedAt: Date?
+        updatedAt: Date?,
+        isPinned: Bool
     ) {
         self.id = id
         self.symbol = symbol
@@ -28,6 +30,7 @@ public struct PremiaWatchlistRowModel: Codable, Sendable, Equatable, Identifiabl
         self.bid = bid
         self.ask = ask
         self.updatedAt = updatedAt
+        self.isPinned = isPinned
     }
 }
 

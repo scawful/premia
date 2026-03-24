@@ -71,6 +71,12 @@ class WatchlistService {
   auto MoveWatchlistSymbol(const std::string& watchlist_id,
                            const std::string& symbol,
                            const std::string& before_symbol) -> WatchlistSummary;
+  auto ArchiveWatchlist(const std::string& watchlist_id, bool archived)
+      -> WatchlistSummary;
+  auto DeleteWatchlist(const std::string& watchlist_id) -> WatchlistSummary;
+  auto MoveSymbolToWatchlist(const std::string& source_watchlist_id,
+                             const std::string& destination_watchlist_id,
+                             const std::string& symbol) -> WatchlistSummary;
 };
 
 class OrderService {

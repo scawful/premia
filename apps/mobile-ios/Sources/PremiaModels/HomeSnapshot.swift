@@ -22,11 +22,13 @@ public struct PremiaWatchlistSummaryModel: Codable, Sendable, Equatable, Identif
     public let id: String
     public let name: String
     public let instrumentCount: Int
+    public let isArchived: Bool
 
-    public init(id: String, name: String, instrumentCount: Int) {
+    public init(id: String, name: String, instrumentCount: Int, isArchived: Bool) {
         self.id = id
         self.name = name
         self.instrumentCount = instrumentCount
+        self.isArchived = isArchived
     }
 }
 

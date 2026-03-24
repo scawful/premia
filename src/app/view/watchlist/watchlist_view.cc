@@ -187,9 +187,17 @@ void WatchlistView::DrawWatchlistSummary(
 void WatchlistView::DrawCoreWatchlistPreview() {
   LoadState();
   auto& service = core::application::CompositionRoot::Instance().AppService();
-  const auto watchlists = service.ListWatchlists();
+  const auto all_watchlists = service.ListWatchlists();
+  std::vector<core::application::WatchlistSummary> watchlists;
+  for (const auto& watchlist : all_watchlists) {
+    if (!show_archived_ && watchlist.is_archived) {
+      continue;
+    }
+    watchlists.push_back(watchlist);
+  }
   if (watchlists.empty()) {
     ImGui::TextDisabled("No normalized watchlists available.");
+    ImGui::Checkbox("Show archived", &show_archived_);
     return;
   }
 
@@ -210,17 +218,31 @@ void WatchlistView::DrawCoreWatchlistPreview() {
       "This surface uses shared watchlist contracts and currently falls back to local or transitional sources.");
   ImGui::Separator();
 
+  ImGui::Checkbox("Show archived", &show_archived_);
+  ImGui::SameLine();
+  ImGui::TextDisabled("Archived watchlists stay available for later restore or delete.");
+
   ImGui::Combo("##core_watchlists", &watchlistIndex, watchlist_names.data(),
                static_cast<int>(watchlist_names.size()));
 
   const auto screen = service.GetWatchlistScreen(watchlists[watchlistIndex].id);
-  if (rename_watchlist_name_.empty()) {
+  if (rename_watchlist_name_.empty() || rename_watchlist_name_ == screen.watchlist.name) {
     rename_watchlist_name_ = screen.watchlist.name;
   }
   EnsureWatchlistOrdering(screen);
   const auto rows = BuildOrderedRows(screen);
 
-  if (ImGui::BeginTable("WatchlistMutationBar", 4,
+  std::vector<core::application::WatchlistSummary> transfer_targets;
+  for (const auto& watchlist : all_watchlists) {
+    if (watchlist.id != screen.watchlist.id && !watchlist.is_archived) {
+      transfer_targets.push_back(watchlist);
+    }
+  }
+  if (destination_watchlist_index_ >= static_cast<int>(transfer_targets.size())) {
+    destination_watchlist_index_ = 0;
+  }
+
+  if (ImGui::BeginTable("WatchlistMutationBar", 5,
                         ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
     ImGui::TableNextColumn();
     ImGui::InputTextWithHint("##newWatchlistName", "New watchlist name",
@@ -281,6 +303,57 @@ void WatchlistView::DrawCoreWatchlistPreview() {
         selected_symbol_.clear();
       } catch (const std::exception& ex) {
         status_message_ = std::string("Watchlist remove failed: ") + ex.what();
+      }
+    }
+
+    ImGui::TableNextColumn();
+    if (!transfer_targets.empty()) {
+      std::vector<const char*> target_labels;
+      target_labels.reserve(transfer_targets.size());
+      for (const auto& target : transfer_targets) {
+        target_labels.push_back(target.name.c_str());
+      }
+      ImGui::Combo("##moveWatchlistTarget", &destination_watchlist_index_,
+                   target_labels.data(), static_cast<int>(target_labels.size()));
+      if (ImGui::Button("Move Selected To", ImVec2(-FLT_MIN, 0.0f)) &&
+          !selected_symbol_.empty()) {
+        try {
+          service.MoveSymbolToWatchlist(screen.watchlist.id,
+                                        transfer_targets[destination_watchlist_index_].id,
+                                        selected_symbol_);
+          status_message_ = "Moved " + selected_symbol_ + " to " +
+                            transfer_targets[destination_watchlist_index_].name + ".";
+          selected_symbol_.clear();
+        } catch (const std::exception& ex) {
+          status_message_ = std::string("Watchlist move failed: ") + ex.what();
+        }
+      }
+    } else {
+      ImGui::TextDisabled("No transfer targets");
+    }
+
+    ImGui::TableNextColumn();
+    const auto archive_label = screen.watchlist.is_archived ? "Restore Watchlist"
+                                                            : "Archive Watchlist";
+    if (ImGui::Button(archive_label, ImVec2(-FLT_MIN, 0.0f))) {
+      try {
+        const auto summary =
+            service.ArchiveWatchlist(screen.watchlist.id, !screen.watchlist.is_archived);
+        status_message_ = std::string(summary.is_archived ? "Archived " : "Restored ") +
+                          summary.name + ".";
+      } catch (const std::exception& ex) {
+        status_message_ = std::string("Watchlist archive failed: ") + ex.what();
+      }
+    }
+    if (screen.watchlist.is_archived &&
+        ImGui::Button("Delete Archived", ImVec2(-FLT_MIN, 0.0f))) {
+      try {
+        const auto summary = service.DeleteWatchlist(screen.watchlist.id);
+        status_message_ = "Deleted archived watchlist " + summary.name + ".";
+        watchlistIndex = 0;
+        selected_symbol_.clear();
+      } catch (const std::exception& ex) {
+        status_message_ = std::string("Watchlist delete failed: ") + ex.what();
       }
     }
     ImGui::EndTable();

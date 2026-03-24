@@ -170,6 +170,25 @@ auto ProviderBackedApplicationService::MoveWatchlistSymbol(
                                                  before_symbol);
 }
 
+auto ProviderBackedApplicationService::ArchiveWatchlist(
+    const std::string& watchlist_id, bool archived) -> WatchlistSummary {
+  return watchlist_service_->ArchiveWatchlist(watchlist_id, archived);
+}
+
+auto ProviderBackedApplicationService::DeleteWatchlist(
+    const std::string& watchlist_id) -> WatchlistSummary {
+  return watchlist_service_->DeleteWatchlist(watchlist_id);
+}
+
+auto ProviderBackedApplicationService::MoveSymbolToWatchlist(
+    const std::string& source_watchlist_id,
+    const std::string& destination_watchlist_id,
+    const std::string& symbol) -> WatchlistSummary {
+  return watchlist_service_->MoveSymbolToWatchlist(source_watchlist_id,
+                                                   destination_watchlist_id,
+                                                   symbol);
+}
+
 auto ProviderBackedApplicationService::PreviewOrder(
     const OrderIntentRequest& request) -> OrderPreviewData {
   return order_service_->PreviewOrder(request);

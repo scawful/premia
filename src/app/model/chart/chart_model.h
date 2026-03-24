@@ -10,12 +10,7 @@
 
 namespace premia {
 
-struct ChartOverlayMarker {
-  std::string id;
-  std::string label;
-  double price = 0.0;
-  std::string kind;
-};
+using ChartOverlayMarker = core::application::ChartAnnotation;
   
 class ChartModel : public Model {
  public:

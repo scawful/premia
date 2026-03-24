@@ -31,6 +31,7 @@ auto BuildSummary(const application::WatchlistScreenData& screen)
   summary.id = screen.watchlist.id;
   summary.name = screen.watchlist.name;
   summary.instrument_count = static_cast<int>(screen.rows.size());
+  summary.is_archived = screen.watchlist.is_archived;
   return summary;
 }
 
@@ -125,6 +126,7 @@ auto WatchlistProvider::CreateWatchlist(const std::string& name)
   screen.watchlist.id = MakeSlug(name);
   screen.watchlist.name = name.empty() ? "Watchlist" : name;
   screen.watchlist.instrument_count = 0;
+  screen.watchlist.is_archived = false;
   screens.push_back(screen);
 
   const auto summaries = BuildSummaryList(screens);
@@ -270,12 +272,95 @@ auto WatchlistProvider::MoveWatchlistSymbol(const std::string& watchlist_id,
   return BuildSummary(*screen_it);
 }
 
+auto WatchlistProvider::ArchiveWatchlist(const std::string& watchlist_id,
+                                         bool archived)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  const auto screen_it = FindScreen(screens, watchlist_id);
+  if (screen_it == screens.end()) {
+    throw std::runtime_error("watchlist not found");
+  }
+
+  screen_it->watchlist.is_archived = archived;
+  const auto summaries = BuildSummaryList(screens);
+  for (auto& item : screens) {
+    item.available_watchlists = summaries;
+  }
+  SaveData(screens);
+  return BuildSummary(*screen_it);
+}
+
+auto WatchlistProvider::DeleteWatchlist(const std::string& watchlist_id)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  const auto screen_it = FindScreen(screens, watchlist_id);
+  if (screen_it == screens.end()) {
+    throw std::runtime_error("watchlist not found");
+  }
+
+  const auto summary = BuildSummary(*screen_it);
+  screens.erase(screen_it);
+  const auto summaries = BuildSummaryList(screens);
+  for (auto& item : screens) {
+    item.available_watchlists = summaries;
+  }
+  SaveData(screens);
+  return summary;
+}
+
+auto WatchlistProvider::MoveSymbolToWatchlist(
+    const std::string& source_watchlist_id,
+    const std::string& destination_watchlist_id,
+    const std::string& symbol) -> application::WatchlistSummary {
+  auto screens = LoadData();
+  const auto source_it = FindScreen(screens, source_watchlist_id);
+  const auto destination_it = FindScreen(screens, destination_watchlist_id);
+  if (source_it == screens.end() || destination_it == screens.end()) {
+    throw std::runtime_error("watchlist not found");
+  }
+  if (destination_it->watchlist.is_archived) {
+    throw std::runtime_error("cannot move a symbol into an archived watchlist");
+  }
+
+  const auto row_it = std::find_if(source_it->rows.begin(), source_it->rows.end(),
+                                   [&symbol](const application::WatchlistRow& row) {
+                                     return row.symbol == symbol;
+                                   });
+  if (row_it == source_it->rows.end()) {
+    throw std::runtime_error("watchlist symbol not found");
+  }
+
+  auto moved_row = *row_it;
+  source_it->rows.erase(row_it);
+  moved_row.id = destination_watchlist_id + ":" + moved_row.symbol;
+  moved_row.is_pinned = false;
+
+  const auto dest_exists = std::find_if(destination_it->rows.begin(),
+                                        destination_it->rows.end(),
+                                        [&symbol](const application::WatchlistRow& row) {
+                                          return row.symbol == symbol;
+                                        });
+  if (dest_exists == destination_it->rows.end()) {
+    destination_it->rows.push_back(moved_row);
+  }
+
+  source_it->watchlist.instrument_count = static_cast<int>(source_it->rows.size());
+  destination_it->watchlist.instrument_count =
+      static_cast<int>(destination_it->rows.size());
+  const auto summaries = BuildSummaryList(screens);
+  for (auto& item : screens) {
+    item.available_watchlists = summaries;
+  }
+  SaveData(screens);
+  return BuildSummary(*destination_it);
+}
+
 auto WatchlistProvider::BuildFallbackData() const
     -> std::vector<application::WatchlistScreenData> {
   std::vector<application::WatchlistScreenData> screens;
 
   application::WatchlistScreenData core;
-  core.watchlist = {"core", "Core", 3};
+  core.watchlist = {"core", "Core", 3, false};
   core.rows = {
       {"row_aapl", "AAPL", "Apple Inc.", MakeMoney("217.00"),
        MakeChange("1.30", "0.60"), MakeMoney("216.95"),
@@ -290,7 +375,7 @@ auto WatchlistProvider::BuildFallbackData() const
   screens.push_back(core);
 
   application::WatchlistScreenData earnings;
-  earnings.watchlist = {"earnings", "Earnings", 2};
+  earnings.watchlist = {"earnings", "Earnings", 2, false};
   earnings.rows = {
       {"row_nvda", "NVDA", "NVIDIA Corp.", MakeMoney("915.20"),
        MakeChange("12.40", "1.37"), MakeMoney("915.10"),
@@ -330,6 +415,7 @@ auto WatchlistProvider::LoadData() const
       const auto& tree = watchlist_node.second;
       screen.watchlist.id = tree.get<std::string>("id", "watchlist");
       screen.watchlist.name = tree.get<std::string>("name", "Watchlist");
+      screen.watchlist.is_archived = tree.get<bool>("isArchived", false);
       screen.rows.clear();
 
       for (const auto& row_node : tree.get_child("rows")) {
@@ -377,6 +463,7 @@ auto WatchlistProvider::SaveData(
     pt::ptree watchlist;
     watchlist.put("id", screen.watchlist.id);
     watchlist.put("name", screen.watchlist.name);
+    watchlist.put("isArchived", screen.watchlist.is_archived);
 
     pt::ptree rows;
     for (const auto& row : screen.rows) {

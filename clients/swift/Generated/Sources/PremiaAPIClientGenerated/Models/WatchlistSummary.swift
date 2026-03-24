@@ -18,17 +18,20 @@ public struct WatchlistSummary: Sendable, Codable, Hashable {
     public var id: String
     public var name: String
     public var instrumentCount: Int
+    public var isArchived: Bool
 
-    public init(id: String, name: String, instrumentCount: Int) {
+    public init(id: String, name: String, instrumentCount: Int, isArchived: Bool) {
         self.id = id
         self.name = name
         self.instrumentCount = instrumentCount
+        self.isArchived = isArchived
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case id
         case name
         case instrumentCount
+        case isArchived
     }
 
     // Encodable protocol methods
@@ -38,6 +41,7 @@ public struct WatchlistSummary: Sendable, Codable, Hashable {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(instrumentCount, forKey: .instrumentCount)
+        try container.encode(isArchived, forKey: .isArchived)
     }
 }
 

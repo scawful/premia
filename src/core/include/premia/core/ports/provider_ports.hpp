@@ -91,6 +91,14 @@ class WatchlistMutationProviderPort {
                                    const std::string& symbol,
                                    const std::string& before_symbol)
       -> WatchlistSummary = 0;
+  virtual auto ArchiveWatchlist(const std::string& watchlist_id, bool archived)
+      -> WatchlistSummary = 0;
+  virtual auto DeleteWatchlist(const std::string& watchlist_id)
+      -> WatchlistSummary = 0;
+  virtual auto MoveSymbolToWatchlist(const std::string& source_watchlist_id,
+                                     const std::string& destination_watchlist_id,
+                                     const std::string& symbol)
+      -> WatchlistSummary = 0;
 };
 
 class OrderProviderPort {

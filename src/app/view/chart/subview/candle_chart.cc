@@ -13,6 +13,19 @@
 #include "view/chart/chart.h"
 
 namespace premia {
+
+namespace {
+
+auto ParseMarkerPrice(const std::string& value) -> double {
+  try {
+    return std::stod(value);
+  } catch (...) {
+    return 0.0;
+  }
+}
+
+}  // namespace
+
 /**
  * @brief double array binary search
  * @author @scawful
@@ -109,11 +122,15 @@ void CandleChart::DrawOverlayMarkers() {
   const float left = ImPlot::GetPlotPos().x;
   const float right = left + ImPlot::GetPlotSize().x;
   const auto latest_close = model->getCandle(model->getNumCandles() - 1).close;
+  double entry_price = 0.0;
+  double stop_price = 0.0;
+  double target_price = 0.0;
 
   ImPlot::PushPlotClipRect();
   for (const auto& marker : markers) {
+    const auto marker_price = ParseMarkerPrice(marker.price);
     const auto point = ImPlot::PlotToPixels(model->getDate(model->getNumCandles() - 1),
-                                            marker.price);
+                                            marker_price);
     ImU32 color = IM_COL32(198, 176, 72, 210);
     if (marker.kind == "avg_cost") {
       color = IM_COL32(90, 180, 255, 210);
@@ -123,22 +140,51 @@ void CandleChart::DrawOverlayMarkers() {
       const auto zone_bottom = std::max(point.y, latest_point.y);
       draw_list->AddRectFilled(
           ImVec2(left, zone_top), ImVec2(right, zone_bottom),
-          latest_close >= marker.price ? IM_COL32(60, 170, 110, 28)
+          latest_close >= marker_price ? IM_COL32(60, 170, 110, 28)
                                        : IM_COL32(180, 70, 80, 28));
     } else if (marker.kind == "order") {
       color = IM_COL32(102, 214, 140, 210);
     } else if (marker.kind == "fill") {
       color = IM_COL32(255, 162, 66, 220);
+    } else if (marker.kind == "entry") {
+      color = IM_COL32(204, 214, 88, 220);
+      entry_price = marker_price;
+    } else if (marker.kind == "stop") {
+      color = IM_COL32(214, 84, 88, 220);
+      stop_price = marker_price;
+    } else if (marker.kind == "target") {
+      color = IM_COL32(90, 206, 132, 220);
+      target_price = marker_price;
     }
     draw_list->AddLine(ImVec2(left, point.y), ImVec2(right, point.y), color, 1.25f);
     draw_list->AddText(ImVec2(left + 8.0f, point.y - 14.0f), color,
                        (marker.label + " @ $" +
                         [&marker]() {
                           std::ostringstream oss;
-                          oss << std::fixed << std::setprecision(2) << marker.price;
+                          oss << std::fixed << std::setprecision(2)
+                              << ParseMarkerPrice(marker.price);
                           return oss.str();
                         }())
                            .c_str());
+  }
+
+  if (entry_price > 0.0 && stop_price > 0.0) {
+    const auto entry_point =
+        ImPlot::PlotToPixels(model->getDate(model->getNumCandles() - 1), entry_price);
+    const auto stop_point =
+        ImPlot::PlotToPixels(model->getDate(model->getNumCandles() - 1), stop_price);
+    draw_list->AddRectFilled(ImVec2(left, std::min(entry_point.y, stop_point.y)),
+                             ImVec2(right, std::max(entry_point.y, stop_point.y)),
+                             IM_COL32(214, 84, 88, 32));
+  }
+  if (entry_price > 0.0 && target_price > 0.0) {
+    const auto entry_point =
+        ImPlot::PlotToPixels(model->getDate(model->getNumCandles() - 1), entry_price);
+    const auto target_point =
+        ImPlot::PlotToPixels(model->getDate(model->getNumCandles() - 1), target_price);
+    draw_list->AddRectFilled(ImVec2(left, std::min(entry_point.y, target_point.y)),
+                             ImVec2(right, std::max(entry_point.y, target_point.y)),
+                             IM_COL32(90, 206, 132, 28));
   }
   ImPlot::PopPlotClipRect();
 }

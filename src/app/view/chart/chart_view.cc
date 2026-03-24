@@ -220,7 +220,7 @@ void ChartView::DrawChartPresets() {
 
 void ChartView::DrawOverlayControls() {
   LoadAnnotationState();
-  ImGui::BeginChild("ChartOverlayControls", ImVec2(0.0f, 108.0f), true);
+  ImGui::BeginChild("ChartOverlayControls", ImVec2(0.0f, 156.0f), true);
   ImGui::Text("Annotations and Trade Anchors");
   ImGui::TextDisabled(
       "Open orders and average-cost anchors are added automatically for the active account; custom notes stay local to this desktop session.");
@@ -234,8 +234,9 @@ void ChartView::DrawOverlayControls() {
   if (ImGui::Button("Add Marker") && !annotation_label_.empty() &&
       !annotation_price_.empty()) {
     auto& annotations = manual_annotations_[AnnotationStorageKey()];
-    annotations.push_back({tickerSymbol + ":note:" + annotation_label_, annotation_label_,
-                           ParsePrice(annotation_price_), "annotation"});
+    annotations.push_back(ChartOverlayMarker{tickerSymbol + ":note:" + annotation_label_,
+                                             annotation_label_, annotation_price_,
+                                             "annotation"});
     annotation_label_.clear();
     annotation_price_.clear();
     PersistAnnotationState();
@@ -244,6 +245,51 @@ void ChartView::DrawOverlayControls() {
   ImGui::SameLine();
   if (ImGui::Button("Clear Markers")) {
     manual_annotations_.erase(AnnotationStorageKey());
+    PersistAnnotationState();
+    RefreshOverlayMarkers();
+  }
+
+  ImGui::Separator();
+  ImGui::InputTextWithHint("##tradeEntryPrice", "Entry", &trade_entry_price_,
+                           ImGuiInputTextFlags_CharsDecimal);
+  ImGui::SameLine();
+  ImGui::InputTextWithHint("##tradeStopPrice", "Stop", &trade_stop_price_,
+                           ImGuiInputTextFlags_CharsDecimal);
+  ImGui::SameLine();
+  ImGui::InputTextWithHint("##tradeTargetPrice", "Target", &trade_target_price_,
+                           ImGuiInputTextFlags_CharsDecimal);
+  if (ImGui::Button("Set Risk Box") && !trade_entry_price_.empty()) {
+    auto& annotations = manual_annotations_[AnnotationStorageKey()];
+    annotations.erase(std::remove_if(annotations.begin(), annotations.end(),
+                                     [](const ChartOverlayMarker& marker) {
+                                       return marker.kind == "entry" ||
+                                              marker.kind == "stop" ||
+                                              marker.kind == "target";
+                                     }),
+                      annotations.end());
+    annotations.push_back(
+        ChartOverlayMarker{tickerSymbol + ":entry", "Entry", trade_entry_price_, "entry"});
+    if (!trade_stop_price_.empty()) {
+      annotations.push_back(
+          ChartOverlayMarker{tickerSymbol + ":stop", "Stop", trade_stop_price_, "stop"});
+    }
+    if (!trade_target_price_.empty()) {
+      annotations.push_back(ChartOverlayMarker{tickerSymbol + ":target", "Target",
+                                               trade_target_price_, "target"});
+    }
+    PersistAnnotationState();
+    RefreshOverlayMarkers();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Clear Risk Box")) {
+    auto& annotations = manual_annotations_[AnnotationStorageKey()];
+    annotations.erase(std::remove_if(annotations.begin(), annotations.end(),
+                                     [](const ChartOverlayMarker& marker) {
+                                       return marker.kind == "entry" ||
+                                              marker.kind == "stop" ||
+                                              marker.kind == "target";
+                                     }),
+                      annotations.end());
     PersistAnnotationState();
     RefreshOverlayMarkers();
   }
@@ -432,26 +478,27 @@ void ChartView::RefreshOverlayMarkers() {
       if (position.symbol != tickerSymbol) {
         continue;
       }
-      markers.push_back({tickerSymbol + ":avg-cost", "Avg Cost",
-                         ParsePrice(position.average_price.amount), "avg_cost"});
+      markers.push_back(ChartOverlayMarker{tickerSymbol + ":avg-cost", "Avg Cost",
+                                           position.average_price.amount,
+                                           "avg_cost"});
     }
     for (const auto& order : root.Orders().GetOpenOrders(account.account_id)) {
       if (order.symbol != tickerSymbol || order.limit_price.empty() ||
           order.limit_price == "0.00") {
         continue;
       }
-      markers.push_back({tickerSymbol + ":order:" + order.order_id,
-                         order.instruction + " " + order.quantity,
-                         ParsePrice(order.limit_price), "order"});
+      markers.push_back(ChartOverlayMarker{tickerSymbol + ":order:" + order.order_id,
+                                           order.instruction + " " + order.quantity,
+                                           order.limit_price, "order"});
     }
     for (const auto& order : root.Orders().GetOrderHistory(account.account_id)) {
       if (order.symbol != tickerSymbol || order.limit_price.empty() ||
           order.limit_price == "0.00" || !LooksFilledStatus(order.status)) {
         continue;
       }
-      markers.push_back({tickerSymbol + ":fill:" + order.order_id,
-                         "Fill " + order.instruction + " " + order.quantity,
-                         ParsePrice(order.limit_price), "fill"});
+      markers.push_back(ChartOverlayMarker{tickerSymbol + ":fill:" + order.order_id,
+                                           "Fill " + order.instruction + " " + order.quantity,
+                                           order.limit_price, "fill"});
     }
   } catch (const std::exception&) {
   }
@@ -482,10 +529,10 @@ void ChartView::LoadAnnotationState() {
         std::vector<ChartOverlayMarker> markers;
         for (const auto& marker_node : entry.second) {
           const auto& marker = marker_node.second;
-          markers.push_back({marker.get<std::string>("id", ""),
-                             marker.get<std::string>("label", ""),
-                             marker.get<double>("price", 0.0),
-                             marker.get<std::string>("kind", "annotation")});
+          markers.push_back(ChartOverlayMarker{marker.get<std::string>("id", ""),
+                                               marker.get<std::string>("label", ""),
+                                               marker.get<std::string>("price", "0.00"),
+                                               marker.get<std::string>("kind", "annotation")});
         }
         manual_annotations_[entry.first] = markers;
       }
@@ -501,9 +548,6 @@ void ChartView::PersistAnnotationState() const {
   for (const auto& [key, markers] : manual_annotations_) {
     pt::ptree marker_tree;
     for (const auto& marker : markers) {
-      if (marker.kind != "annotation") {
-        continue;
-      }
       pt::ptree marker_node;
       marker_node.put("id", marker.id);
       marker_node.put("label", marker.label);

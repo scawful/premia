@@ -169,6 +169,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             timezone: response.data.timezone,
             seriesType: response.data.series.type.rawValue,
             candles: response.data.series.bars.map(mapCandle),
+            annotations: response.data.annotations.map(mapChartAnnotation),
             change: response.data.stats?.change.map(mapChange),
             asOf: response.meta.asOf
         )
@@ -601,7 +602,8 @@ public final class PremiaAPIClient: @unchecked Sendable {
         PremiaWatchlistSummaryModel(
             id: watchlist.id,
             name: watchlist.name,
-            instrumentCount: watchlist.instrumentCount
+            instrumentCount: watchlist.instrumentCount,
+            isArchived: watchlist.isArchived
         )
     }
 
@@ -614,7 +616,17 @@ public final class PremiaAPIClient: @unchecked Sendable {
             dayChange: mapChange(row.dayChange),
             bid: row.bid.map(mapMoney),
             ask: row.ask.map(mapMoney),
-            updatedAt: row.updatedAt
+            updatedAt: row.updatedAt,
+            isPinned: row.isPinned
+        )
+    }
+
+    private func mapChartAnnotation(_ annotation: PremiaAPIClientGeneratedAPI.ChartAnnotation) -> PremiaChartAnnotation {
+        PremiaChartAnnotation(
+            id: annotation.id,
+            label: annotation.label,
+            price: annotation.price,
+            kind: annotation.kind
         )
     }
 

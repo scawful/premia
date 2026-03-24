@@ -16,13 +16,20 @@ public struct WatchlistsScreen: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
-                List(watchlists) { watchlist in
-                    NavigationLink(value: PremiaRoute.watchlist(id: watchlist.id)) {
-                        VStack(alignment: .leading) {
-                            Text(watchlist.name)
-                            Text("\(watchlist.instrumentCount) instruments")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                List {
+                    if !activeWatchlists.isEmpty {
+                        Section("Active") {
+                            ForEach(activeWatchlists) { watchlist in
+                                watchlistRow(watchlist)
+                            }
+                        }
+                    }
+
+                    if !archivedWatchlists.isEmpty {
+                        Section("Archived") {
+                            ForEach(archivedWatchlists) { watchlist in
+                                watchlistRow(watchlist)
+                            }
                         }
                     }
                 }
@@ -46,5 +53,33 @@ public struct WatchlistsScreen: View {
             error = PremiaAPIClientError(code: "WATCHLISTS_LOAD_FAILED", message: caughtError.localizedDescription)
         }
         isLoading = false
+    }
+
+    private var activeWatchlists: [PremiaWatchlistSummaryModel] {
+        watchlists.filter { !$0.isArchived }
+    }
+
+    private var archivedWatchlists: [PremiaWatchlistSummaryModel] {
+        watchlists.filter(\.isArchived)
+    }
+
+    private func watchlistRow(_ watchlist: PremiaWatchlistSummaryModel) -> some View {
+        NavigationLink(value: PremiaRoute.watchlist(id: watchlist.id)) {
+            VStack(alignment: .leading) {
+                HStack {
+                    Text(watchlist.name)
+                    if watchlist.isArchived {
+                        Text("Archived")
+                            .font(.caption2.weight(.semibold))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.15), in: Capsule())
+                    }
+                }
+                Text("\(watchlist.instrumentCount) instruments")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 }

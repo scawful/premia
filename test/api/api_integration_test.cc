@@ -315,6 +315,67 @@ TEST_F(ApiIntegrationFixture, WatchlistPinAndMoveRoutesPersistRowState) {
   EXPECT_TRUE(it->second.get<bool>("isPinned"));
 }
 
+TEST_F(ApiIntegrationFixture, WatchlistArchiveDeleteAndTransferRoutesWork) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  const auto source = HttpRequest("POST", Url("/v1/watchlists"),
+                                  R"({"name":"Source List"})");
+  const auto destination = HttpRequest("POST", Url("/v1/watchlists"),
+                                       R"({"name":"Destination List"})");
+  ASSERT_EQ(source.status_code, 201);
+  ASSERT_EQ(destination.status_code, 201);
+  const auto source_id = ParseJson(source.body).get<std::string>("data.id");
+  const auto destination_id =
+      ParseJson(destination.body).get<std::string>("data.id");
+
+  ASSERT_EQ(HttpRequest("POST", Url("/v1/watchlists/" + source_id + "/symbols"),
+                        R"({"symbol":"NVDA"})")
+                .status_code,
+            200);
+  ASSERT_EQ(HttpRequest("POST", Url("/v1/watchlists/" + source_id + "/transfer"),
+                        std::string("{\"symbol\":\"NVDA\",\"destinationWatchlistId\":\"") +
+                            destination_id + "\"}")
+                .status_code,
+            200);
+
+  const auto destination_screen =
+      HttpRequest("GET", Url("/v1/screens/watchlists/" + destination_id));
+  ASSERT_EQ(destination_screen.status_code, 200);
+  const auto destination_tree = ParseJson(destination_screen.body);
+  ASSERT_FALSE(destination_tree.get_child("data.rows").empty());
+  EXPECT_EQ(destination_tree.get_child("data.rows").front().second.get<std::string>("symbol"),
+            "NVDA");
+
+  ASSERT_EQ(HttpRequest("PATCH", Url("/v1/watchlists/" + destination_id + "/archive"),
+                        R"({"archived":true})")
+                .status_code,
+            200);
+  const auto watchlists = HttpRequest("GET", Url("/v1/watchlists"));
+  ASSERT_EQ(watchlists.status_code, 200);
+  bool found_archived = false;
+  for (const auto& item : ParseJson(watchlists.body).get_child("data.watchlists")) {
+    if (item.second.get<std::string>("id") == destination_id) {
+      found_archived = item.second.get<bool>("isArchived");
+    }
+  }
+  EXPECT_TRUE(found_archived);
+
+  ASSERT_EQ(HttpRequest("DELETE", Url("/v1/watchlists/" + destination_id)).status_code,
+            200);
+}
+
+TEST_F(ApiIntegrationFixture, ChartScreenSerializesAnnotations) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  const auto response =
+      HttpRequest("GET", Url("/v1/screens/charts/AAPL?range=1M&interval=1D"));
+  ASSERT_EQ(response.status_code, 200);
+  const auto tree = ParseJson(response.body);
+  EXPECT_FALSE(tree.get_child("data.annotations").empty());
+}
+
 TEST_F(ApiIntegrationFixture, OrderLifecyclePersistsAcrossOpenAndHistoryRoutes) {
 #if defined(_WIN32)
   GTEST_SKIP() << "POSIX-only process launch helper";

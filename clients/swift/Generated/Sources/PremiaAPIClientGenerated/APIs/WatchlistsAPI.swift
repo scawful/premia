@@ -57,6 +57,50 @@ open class WatchlistsAPI {
     }
 
     /**
+     Archive or restore a watchlist.
+     
+     - parameter watchlistId: (path)  
+     - parameter archiveWatchlistRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: WatchlistResponse
+     */
+    open class func archiveWatchlist(watchlistId: String, archiveWatchlistRequest: ArchiveWatchlistRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await archiveWatchlistWithRequestBuilder(watchlistId: watchlistId, archiveWatchlistRequest: archiveWatchlistRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Archive or restore a watchlist.
+     - PATCH /v1/watchlists/{watchlistId}/archive
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter watchlistId: (path)  
+     - parameter archiveWatchlistRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<WatchlistResponse> 
+     */
+    open class func archiveWatchlistWithRequestBuilder(watchlistId: String, archiveWatchlistRequest: ArchiveWatchlistRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
+        var localVariablePath = "/v1/watchlists/{watchlistId}/archive"
+        let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
+        let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: archiveWatchlistRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "PATCH", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
      Create a watchlist.
      
      - parameter createWatchlistRequest: (body)  
@@ -93,6 +137,48 @@ open class WatchlistsAPI {
         let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
         return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
+     Delete a watchlist.
+     
+     - parameter watchlistId: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: WatchlistResponse
+     */
+    open class func deleteWatchlist(watchlistId: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await deleteWatchlistWithRequestBuilder(watchlistId: watchlistId, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Delete a watchlist.
+     - DELETE /v1/watchlists/{watchlistId}
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter watchlistId: (path)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<WatchlistResponse> 
+     */
+    open class func deleteWatchlistWithRequestBuilder(watchlistId: String, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
+        var localVariablePath = "/v1/watchlists/{watchlistId}"
+        let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
+        let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            :
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "DELETE", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**
@@ -219,6 +305,143 @@ open class WatchlistsAPI {
         let localVariableRequestBuilder: RequestBuilder<WatchlistsResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
         return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
+     Reorder a symbol within a watchlist.
+     
+     - parameter watchlistId: (path)  
+     - parameter moveWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: WatchlistResponse
+     */
+    open class func moveWatchlistSymbol(watchlistId: String, moveWatchlistSymbolRequest: MoveWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await moveWatchlistSymbolWithRequestBuilder(watchlistId: watchlistId, moveWatchlistSymbolRequest: moveWatchlistSymbolRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Reorder a symbol within a watchlist.
+     - POST /v1/watchlists/{watchlistId}/move
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter watchlistId: (path)  
+     - parameter moveWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<WatchlistResponse> 
+     */
+    open class func moveWatchlistSymbolWithRequestBuilder(watchlistId: String, moveWatchlistSymbolRequest: MoveWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
+        var localVariablePath = "/v1/watchlists/{watchlistId}/move"
+        let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
+        let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: moveWatchlistSymbolRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
+     Pin or unpin a symbol in a watchlist.
+     
+     - parameter watchlistId: (path)  
+     - parameter symbol: (path)  
+     - parameter pinWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: WatchlistResponse
+     */
+    open class func pinWatchlistSymbol(watchlistId: String, symbol: String, pinWatchlistSymbolRequest: PinWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await pinWatchlistSymbolWithRequestBuilder(watchlistId: watchlistId, symbol: symbol, pinWatchlistSymbolRequest: pinWatchlistSymbolRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Pin or unpin a symbol in a watchlist.
+     - PATCH /v1/watchlists/{watchlistId}/symbols/{symbol}
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter watchlistId: (path)  
+     - parameter symbol: (path)  
+     - parameter pinWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<WatchlistResponse> 
+     */
+    open class func pinWatchlistSymbolWithRequestBuilder(watchlistId: String, symbol: String, pinWatchlistSymbolRequest: PinWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
+        var localVariablePath = "/v1/watchlists/{watchlistId}/symbols/{symbol}"
+        let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
+        let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
+        let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
+        let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: pinWatchlistSymbolRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "PATCH", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
+     Move a symbol into another watchlist.
+     
+     - parameter watchlistId: (path)  
+     - parameter transferWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: WatchlistResponse
+     */
+    open class func transferWatchlistSymbol(watchlistId: String, transferWatchlistSymbolRequest: TransferWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> WatchlistResponse {
+        return try await transferWatchlistSymbolWithRequestBuilder(watchlistId: watchlistId, transferWatchlistSymbolRequest: transferWatchlistSymbolRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Move a symbol into another watchlist.
+     - POST /v1/watchlists/{watchlistId}/transfer
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter watchlistId: (path)  
+     - parameter transferWatchlistSymbolRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<WatchlistResponse> 
+     */
+    open class func transferWatchlistSymbolWithRequestBuilder(watchlistId: String, transferWatchlistSymbolRequest: TransferWatchlistSymbolRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<WatchlistResponse> {
+        var localVariablePath = "/v1/watchlists/{watchlistId}/transfer"
+        let watchlistIdPreEscape = "\(APIHelper.mapValueToPathItem(watchlistId))"
+        let watchlistIdPostEscape = watchlistIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{watchlistId}", with: watchlistIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: transferWatchlistSymbolRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<WatchlistResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**

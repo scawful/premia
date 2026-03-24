@@ -30,6 +30,14 @@ class WatchlistProvider : public core::ports::WatchlistProviderPort,
                            const std::string& symbol,
                            const std::string& before_symbol)
       -> core::application::WatchlistSummary override;
+  auto ArchiveWatchlist(const std::string& watchlist_id, bool archived)
+      -> core::application::WatchlistSummary override;
+  auto DeleteWatchlist(const std::string& watchlist_id)
+      -> core::application::WatchlistSummary override;
+  auto MoveSymbolToWatchlist(const std::string& source_watchlist_id,
+                             const std::string& destination_watchlist_id,
+                             const std::string& symbol)
+      -> core::application::WatchlistSummary override;
 
  private:
   auto BuildFallbackData() const -> std::vector<core::application::WatchlistScreenData>;

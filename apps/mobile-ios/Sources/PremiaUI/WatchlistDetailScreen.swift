@@ -18,19 +18,40 @@ public struct WatchlistDetailScreen: View {
                 NavigationLink(value: PremiaRoute.quote(symbol: row.symbol)) {
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(row.symbol)
+                            HStack {
+                                Text(row.symbol)
+                                if row.isPinned {
+                                    Image(systemName: "pin.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(.yellow)
+                                }
+                            }
                             Text(row.name)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text("$\(row.lastPrice.amount)")
+                        VStack(alignment: .trailing) {
+                            Text("$\(row.lastPrice.amount)")
+                            Text("\(row.dayChange.absolute.amount) (\(row.dayChange.percent)%)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
             .listStyle(.inset)
         }
         .navigationTitle(snapshot?.watchlist.name ?? watchlistID)
+        .toolbar {
+            if snapshot?.watchlist.isArchived == true {
+                ToolbarItem(placement: .automatic) {
+                    Text("Archived")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
         .task { await load() }
     }
 

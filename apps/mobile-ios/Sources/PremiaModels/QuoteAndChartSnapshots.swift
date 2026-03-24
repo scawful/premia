@@ -47,18 +47,34 @@ public struct PremiaChartSnapshot: Codable, Sendable, Equatable {
     public let timezone: String
     public let seriesType: String
     public let candles: [PremiaCandle]
+    public let annotations: [PremiaChartAnnotation]
     public let change: PremiaAbsolutePercentChange?
     public let asOf: Date?
 
-    public init(instrument: PremiaInstrument, range: String, interval: String, timezone: String, seriesType: String, candles: [PremiaCandle], change: PremiaAbsolutePercentChange?, asOf: Date?) {
+    public init(instrument: PremiaInstrument, range: String, interval: String, timezone: String, seriesType: String, candles: [PremiaCandle], annotations: [PremiaChartAnnotation], change: PremiaAbsolutePercentChange?, asOf: Date?) {
         self.instrument = instrument
         self.range = range
         self.interval = interval
         self.timezone = timezone
         self.seriesType = seriesType
         self.candles = candles
+        self.annotations = annotations
         self.change = change
         self.asOf = asOf
+    }
+}
+
+public struct PremiaChartAnnotation: Codable, Sendable, Equatable, Identifiable {
+    public let id: String
+    public let label: String
+    public let price: String
+    public let kind: String
+
+    public init(id: String, label: String, price: String, kind: String) {
+        self.id = id
+        self.label = label
+        self.price = price
+        self.kind = kind
     }
 }
 

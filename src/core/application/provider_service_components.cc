@@ -311,6 +311,96 @@ auto MakePortfolioSummaryFromAccount(const AccountDetail& detail) -> PortfolioSu
                           static_cast<int>(detail.positions.size())};
 }
 
+auto ParsePriceString(const std::string& value) -> double {
+  try {
+    return std::stod(value);
+  } catch (...) {
+    return 0.0;
+  }
+}
+
+auto LooksFilledStatus(std::string status) -> bool {
+  std::transform(status.begin(), status.end(), status.begin(),
+                 [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+  return status.find("fill") != std::string::npos ||
+         status.find("execut") != std::string::npos ||
+         status.find("complete") != std::string::npos;
+}
+
+auto ChartAnnotationStatePath() -> std::string {
+  return (infrastructure::secrets::RuntimeRoot() / "chart_annotations.json").string();
+}
+
+auto LoadPersistedChartAnnotations(const std::string& account_id,
+                                   const std::string& symbol)
+    -> std::vector<ChartAnnotation> {
+  std::ifstream input(ChartAnnotationStatePath());
+  if (!input.good()) {
+    return {};
+  }
+
+  std::vector<ChartAnnotation> annotations;
+  try {
+    pt::ptree tree;
+    pt::read_json(input, tree);
+    const auto key = (account_id.empty() ? std::string("default") : account_id) +
+                     "|" + symbol;
+    if (auto items = tree.get_child_optional("annotations." + key)) {
+      for (const auto& item : *items) {
+        annotations.push_back(ChartAnnotation{item.second.get<std::string>("id", ""),
+                                             item.second.get<std::string>("label", ""),
+                                             item.second.get<std::string>("price", "0.00"),
+                                             item.second.get<std::string>("kind", "annotation")});
+      }
+    }
+  } catch (const std::exception&) {
+  }
+  return annotations;
+}
+
+auto BuildChartAnnotations(const std::string& symbol)
+    -> std::vector<ChartAnnotation> {
+  std::vector<ChartAnnotation> annotations;
+  try {
+    PortfolioAccountService portfolio_service;
+    const auto account = portfolio_service.GetAccountDetail();
+    annotations = LoadPersistedChartAnnotations(account.account_id, symbol);
+    for (const auto& position : account.positions) {
+      if (position.symbol != symbol) {
+        continue;
+      }
+      annotations.push_back(ChartAnnotation{symbol + ":avg-cost", "Avg Cost",
+                                            position.average_price.amount,
+                                            "avg_cost"});
+    }
+
+    OrderService order_service;
+    for (const auto& order : order_service.GetOpenOrders(account.account_id)) {
+      if (order.symbol != symbol || order.limit_price.empty() ||
+          ParsePriceString(order.limit_price) <= 0.0) {
+        continue;
+      }
+      annotations.push_back(ChartAnnotation{symbol + ":order:" + order.order_id,
+                                            order.instruction + " " + order.quantity,
+                                            order.limit_price,
+                                            "order"});
+    }
+    for (const auto& order : order_service.GetOrderHistory(account.account_id)) {
+      if (order.symbol != symbol || order.limit_price.empty() ||
+          ParsePriceString(order.limit_price) <= 0.0 ||
+          !LooksFilledStatus(order.status)) {
+        continue;
+      }
+      annotations.push_back(ChartAnnotation{symbol + ":fill:" + order.order_id,
+                                            "Fill " + order.instruction + " " + order.quantity,
+                                            order.limit_price,
+                                            "fill"});
+    }
+  } catch (const std::exception&) {
+  }
+  return annotations;
+}
+
 auto MakeBrokerageAccountSummary(const AccountDetail& detail, Provider provider,
                                  const std::string& display_name)
     -> BrokerageAccountSummary {
@@ -605,11 +695,16 @@ auto MarketOptionsService::GetChartScreen(const std::string& symbol,
       chart.instrument.name = fallback.instrument.name;
     }
     if (chart.series.bars.empty()) {
-      return fallback;
+      auto fallback_chart = fallback;
+      fallback_chart.annotations = BuildChartAnnotations(symbol);
+      return fallback_chart;
     }
+    chart.annotations = BuildChartAnnotations(symbol);
     return chart;
   } catch (const std::exception&) {
-    return fallback;
+    auto fallback_chart = fallback;
+    fallback_chart.annotations = BuildChartAnnotations(symbol);
+    return fallback_chart;
   }
 }
 
@@ -697,6 +792,27 @@ auto WatchlistService::MoveWatchlistSymbol(const std::string& watchlist_id,
     -> WatchlistSummary {
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.MoveWatchlistSymbol(watchlist_id, symbol, before_symbol);
+}
+
+auto WatchlistService::ArchiveWatchlist(const std::string& watchlist_id,
+                                        bool archived) -> WatchlistSummary {
+  providers::local::WatchlistProvider provider(kWatchlistsPath);
+  return provider.ArchiveWatchlist(watchlist_id, archived);
+}
+
+auto WatchlistService::DeleteWatchlist(const std::string& watchlist_id)
+    -> WatchlistSummary {
+  providers::local::WatchlistProvider provider(kWatchlistsPath);
+  return provider.DeleteWatchlist(watchlist_id);
+}
+
+auto WatchlistService::MoveSymbolToWatchlist(
+    const std::string& source_watchlist_id,
+    const std::string& destination_watchlist_id,
+    const std::string& symbol) -> WatchlistSummary {
+  providers::local::WatchlistProvider provider(kWatchlistsPath);
+  return provider.MoveSymbolToWatchlist(source_watchlist_id,
+                                        destination_watchlist_id, symbol);
 }
 
 auto OrderService::PreviewOrder(const OrderIntentRequest& request)

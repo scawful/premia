@@ -57,6 +57,9 @@ class ChartView : public View {
   std::string active_account_id_;
   std::string annotation_label_;
   std::string annotation_price_;
+  std::string trade_entry_price_;
+  std::string trade_stop_price_;
+  std::string trade_target_price_;
   std::string currentChart;
   std::function<void(const std::string&)> symbol_change_handler_;
   std::unordered_map<std::string, std::vector<ChartOverlayMarker>> manual_annotations_;

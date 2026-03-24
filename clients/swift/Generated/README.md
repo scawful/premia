@@ -51,10 +51,15 @@ Class | Method | HTTP request | Description
 *TradingAPI* | [**replaceOrder**](docs/TradingAPI.md#replaceorder) | **POST** /v1/orders/{orderId}/replace | Replace an existing order.
 *TradingAPI* | [**submitOrder**](docs/TradingAPI.md#submitorder) | **POST** /v1/orders/submit | Submit an equity or option order.
 *WatchlistsAPI* | [**addWatchlistSymbol**](docs/WatchlistsAPI.md#addwatchlistsymbol) | **POST** /v1/watchlists/{watchlistId}/symbols | Add a symbol to a watchlist.
+*WatchlistsAPI* | [**archiveWatchlist**](docs/WatchlistsAPI.md#archivewatchlist) | **PATCH** /v1/watchlists/{watchlistId}/archive | Archive or restore a watchlist.
 *WatchlistsAPI* | [**createWatchlist**](docs/WatchlistsAPI.md#createwatchlist) | **POST** /v1/watchlists | Create a watchlist.
+*WatchlistsAPI* | [**deleteWatchlist**](docs/WatchlistsAPI.md#deletewatchlist) | **DELETE** /v1/watchlists/{watchlistId} | Delete a watchlist.
 *WatchlistsAPI* | [**deleteWatchlistSymbol**](docs/WatchlistsAPI.md#deletewatchlistsymbol) | **DELETE** /v1/watchlists/{watchlistId}/symbols/{symbol} | Remove a symbol from a watchlist.
 *WatchlistsAPI* | [**getWatchlistScreen**](docs/WatchlistsAPI.md#getwatchlistscreen) | **GET** /v1/screens/watchlists/{watchlistId} | Load a watchlist screen.
 *WatchlistsAPI* | [**listWatchlists**](docs/WatchlistsAPI.md#listwatchlists) | **GET** /v1/watchlists | List watchlists.
+*WatchlistsAPI* | [**moveWatchlistSymbol**](docs/WatchlistsAPI.md#movewatchlistsymbol) | **POST** /v1/watchlists/{watchlistId}/move | Reorder a symbol within a watchlist.
+*WatchlistsAPI* | [**pinWatchlistSymbol**](docs/WatchlistsAPI.md#pinwatchlistsymbol) | **PATCH** /v1/watchlists/{watchlistId}/symbols/{symbol} | Pin or unpin a symbol in a watchlist.
+*WatchlistsAPI* | [**transferWatchlistSymbol**](docs/WatchlistsAPI.md#transferwatchlistsymbol) | **POST** /v1/watchlists/{watchlistId}/transfer | Move a symbol into another watchlist.
 *WatchlistsAPI* | [**updateWatchlist**](docs/WatchlistsAPI.md#updatewatchlist) | **PATCH** /v1/watchlists/{watchlistId} | Update a watchlist.
 
 
@@ -65,10 +70,12 @@ Class | Method | HTTP request | Description
  - [AccountPositionRow](docs/AccountPositionRow.md)
  - [AccountScreenResponse](docs/AccountScreenResponse.md)
  - [AddWatchlistSymbolRequest](docs/AddWatchlistSymbolRequest.md)
+ - [ArchiveWatchlistRequest](docs/ArchiveWatchlistRequest.md)
  - [BootstrapData](docs/BootstrapData.md)
  - [BootstrapDataSession](docs/BootstrapDataSession.md)
  - [BootstrapResponse](docs/BootstrapResponse.md)
  - [Candle](docs/Candle.md)
+ - [ChartAnnotation](docs/ChartAnnotation.md)
  - [ChartScreenData](docs/ChartScreenData.md)
  - [ChartScreenResponse](docs/ChartScreenResponse.md)
  - [ChartSeries](docs/ChartSeries.md)
@@ -90,6 +97,7 @@ Class | Method | HTTP request | Description
  - [Meta](docs/Meta.md)
  - [ModelErrorResponse](docs/ModelErrorResponse.md)
  - [Money](docs/Money.md)
+ - [MoveWatchlistSymbolRequest](docs/MoveWatchlistSymbolRequest.md)
  - [OptionChainResponse](docs/OptionChainResponse.md)
  - [OptionChainSnapshot](docs/OptionChainSnapshot.md)
  - [OptionContractPairRow](docs/OptionContractPairRow.md)
@@ -108,6 +116,7 @@ Class | Method | HTTP request | Description
  - [OrderReplacementResponse](docs/OrderReplacementResponse.md)
  - [OrderSubmissionData](docs/OrderSubmissionData.md)
  - [OrderSubmissionResponse](docs/OrderSubmissionResponse.md)
+ - [PinWatchlistSymbolRequest](docs/PinWatchlistSymbolRequest.md)
  - [PlaidLinkTokenData](docs/PlaidLinkTokenData.md)
  - [PlaidLinkTokenResponse](docs/PlaidLinkTokenResponse.md)
  - [PortfolioSummary](docs/PortfolioSummary.md)
@@ -119,6 +128,7 @@ Class | Method | HTTP request | Description
  - [SchwabOAuthStartData](docs/SchwabOAuthStartData.md)
  - [SchwabOAuthStartResponse](docs/SchwabOAuthStartResponse.md)
  - [StartSchwabOAuthRequest](docs/StartSchwabOAuthRequest.md)
+ - [TransferWatchlistSymbolRequest](docs/TransferWatchlistSymbolRequest.md)
  - [UpdateWatchlistRequest](docs/UpdateWatchlistRequest.md)
  - [WatchlistMembership](docs/WatchlistMembership.md)
  - [WatchlistResponse](docs/WatchlistResponse.md)

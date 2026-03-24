@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **timezone** | **String** |  | 
 **series** | [**ChartSeries**](ChartSeries.md) |  | 
 **stats** | [**ChartStats**](ChartStats.md) |  | [optional] 
+**annotations** | [ChartAnnotation] |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

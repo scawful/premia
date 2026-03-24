@@ -106,6 +106,7 @@ auto MakeWatchlistSummary(const application::WatchlistSummary& watchlist)
       {"id", watchlist.id},
       {"name", watchlist.name},
       {"instrumentCount", watchlist.instrument_count},
+      {"isArchived", watchlist.is_archived},
   };
 }
 
@@ -162,6 +163,18 @@ auto MakeWatchlistRowArray(const std::vector<application::WatchlistRow>& rows)
                                     {"ask", MakeMoney(row.ask)},
                                     {"updatedAt", row.updated_at},
                                     {"isPinned", row.is_pinned}});
+  }
+  return array;
+}
+
+auto MakeChartAnnotationArray(
+    const std::vector<application::ChartAnnotation>& annotations) -> json::array {
+  json::array array;
+  for (const auto& annotation : annotations) {
+    array.emplace_back(json::object{{"id", annotation.id},
+                                    {"label", annotation.label},
+                                    {"price", annotation.price},
+                                    {"kind", annotation.kind}});
   }
   return array;
 }
@@ -394,6 +407,8 @@ auto SerializeChartScreenResponse(const application::ChartScreenData& data)
                                     {"interval", data.interval},
                                     {"timezone", data.timezone},
                                     {"series", MakeChartSeries(data.series)},
+                                    {"annotations",
+                                     MakeChartAnnotationArray(data.annotations)},
                                     {"stats",
                                      json::object{{"change",
                                                    MakeAbsolutePercentChange(

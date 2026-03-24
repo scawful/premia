@@ -140,6 +140,21 @@ paths:
                 $ref: '#/components/schemas/WatchlistResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
+    delete:
+      tags: [Watchlists]
+      summary: Delete a watchlist.
+      operationId: deleteWatchlist
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+      responses:
+        '200':
+          description: Watchlist deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /v1/watchlists/{watchlistId}/symbols:
     post:
       tags: [Watchlists]
@@ -163,6 +178,28 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
   /v1/watchlists/{watchlistId}/symbols/{symbol}:
+    patch:
+      tags: [Watchlists]
+      summary: Pin or unpin a symbol in a watchlist.
+      operationId: pinWatchlistSymbol
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+        - $ref: '#/components/parameters/Symbol'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PinWatchlistSymbolRequest'
+      responses:
+        '200':
+          description: Watchlist updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
     delete:
       tags: [Watchlists]
       summary: Remove a symbol from a watchlist.
@@ -173,6 +210,72 @@ paths:
       responses:
         '200':
           description: Watchlist updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/watchlists/{watchlistId}/move:
+    post:
+      tags: [Watchlists]
+      summary: Reorder a symbol within a watchlist.
+      operationId: moveWatchlistSymbol
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveWatchlistSymbolRequest'
+      responses:
+        '200':
+          description: Watchlist updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/watchlists/{watchlistId}/archive:
+    patch:
+      tags: [Watchlists]
+      summary: Archive or restore a watchlist.
+      operationId: archiveWatchlist
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveWatchlistRequest'
+      responses:
+        '200':
+          description: Watchlist updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/watchlists/{watchlistId}/transfer:
+    post:
+      tags: [Watchlists]
+      summary: Move a symbol into another watchlist.
+      operationId: transferWatchlistSymbol
+      parameters:
+        - $ref: '#/components/parameters/WatchlistId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferWatchlistSymbolRequest'
+      responses:
+        '200':
+          description: Destination watchlist updated.
           content:
             application/json:
               schema:
@@ -650,7 +753,7 @@ components:
           $ref: '#/components/schemas/AbsolutePercentChange'
     WatchlistSummary:
       type: object
-      required: [id, name, instrumentCount]
+      required: [id, name, instrumentCount, isArchived]
       properties:
         id:
           type: string
@@ -659,9 +762,11 @@ components:
         instrumentCount:
           type: integer
           minimum: 0
+        isArchived:
+          type: boolean
     WatchlistRow:
       type: object
-      required: [id, symbol, name, lastPrice, dayChange, updatedAt]
+      required: [id, symbol, name, lastPrice, dayChange, updatedAt, isPinned]
       properties:
         id:
           type: string
@@ -680,6 +785,8 @@ components:
         updatedAt:
           type: string
           format: date-time
+        isPinned:
+          type: boolean
     Instrument:
       type: object
       required: [symbol, name, assetType]
@@ -783,6 +890,18 @@ components:
       properties:
         change:
           $ref: '#/components/schemas/AbsolutePercentChange'
+    ChartAnnotation:
+      type: object
+      required: [id, label, price, kind]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        price:
+          type: string
+        kind:
+          type: string
     BootstrapData:
       type: object
       required: [session, connections]
@@ -1134,7 +1253,7 @@ components:
           asOf: '2026-03-22T18:44:58Z'
     ChartScreenData:
       type: object
-      required: [instrument, range, interval, timezone, series]
+      required: [instrument, range, interval, timezone, series, annotations]
       properties:
         instrument:
           $ref: '#/components/schemas/Instrument'
@@ -1148,6 +1267,10 @@ components:
           $ref: '#/components/schemas/ChartSeries'
         stats:
           $ref: '#/components/schemas/ChartStats'
+        annotations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartAnnotation'
     ChartScreenResponse:
       type: object
       required: [data, meta]
@@ -1181,6 +1304,11 @@ components:
                 amount: '8.20'
                 currency: USD
               percent: '3.93'
+          annotations:
+            - id: AAPL:avg-cost
+              label: Avg Cost
+              price: '200.50'
+              kind: avg_cost
         meta:
           requestId: req_4
           asOf: '2026-03-22T18:44:58Z'
@@ -1760,4 +1888,32 @@ components:
       required: [symbol]
       properties:
         symbol:
+          type: string
+    PinWatchlistSymbolRequest:
+      type: object
+      required: [pinned]
+      properties:
+        pinned:
+          type: boolean
+    MoveWatchlistSymbolRequest:
+      type: object
+      required: [symbol, beforeSymbol]
+      properties:
+        symbol:
+          type: string
+        beforeSymbol:
+          type: string
+    ArchiveWatchlistRequest:
+      type: object
+      required: [archived]
+      properties:
+        archived:
+          type: boolean
+    TransferWatchlistSymbolRequest:
+      type: object
+      required: [symbol, destinationWatchlistId]
+      properties:
+        symbol:
+          type: string
+        destinationWatchlistId:
           type: string

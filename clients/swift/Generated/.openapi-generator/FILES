@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 .swiftformat
 Cartfile
 Package.swift
@@ -32,10 +31,12 @@ Sources/PremiaAPIClientGenerated/Models/AccountDetail.swift
 Sources/PremiaAPIClientGenerated/Models/AccountPositionRow.swift
 Sources/PremiaAPIClientGenerated/Models/AccountScreenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/AddWatchlistSymbolRequest.swift
+Sources/PremiaAPIClientGenerated/Models/ArchiveWatchlistRequest.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapData.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapDataSession.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapResponse.swift
 Sources/PremiaAPIClientGenerated/Models/Candle.swift
+Sources/PremiaAPIClientGenerated/Models/ChartAnnotation.swift
 Sources/PremiaAPIClientGenerated/Models/ChartScreenData.swift
 Sources/PremiaAPIClientGenerated/Models/ChartScreenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/ChartSeries.swift
@@ -57,6 +58,7 @@ Sources/PremiaAPIClientGenerated/Models/Instrument.swift
 Sources/PremiaAPIClientGenerated/Models/Meta.swift
 Sources/PremiaAPIClientGenerated/Models/ModelErrorResponse.swift
 Sources/PremiaAPIClientGenerated/Models/Money.swift
+Sources/PremiaAPIClientGenerated/Models/MoveWatchlistSymbolRequest.swift
 Sources/PremiaAPIClientGenerated/Models/OptionChainResponse.swift
 Sources/PremiaAPIClientGenerated/Models/OptionChainSnapshot.swift
 Sources/PremiaAPIClientGenerated/Models/OptionContractPairRow.swift
@@ -75,6 +77,7 @@ Sources/PremiaAPIClientGenerated/Models/OrderReplacementData.swift
 Sources/PremiaAPIClientGenerated/Models/OrderReplacementResponse.swift
 Sources/PremiaAPIClientGenerated/Models/OrderSubmissionData.swift
 Sources/PremiaAPIClientGenerated/Models/OrderSubmissionResponse.swift
+Sources/PremiaAPIClientGenerated/Models/PinWatchlistSymbolRequest.swift
 Sources/PremiaAPIClientGenerated/Models/PlaidLinkTokenData.swift
 Sources/PremiaAPIClientGenerated/Models/PlaidLinkTokenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/PortfolioSummary.swift
@@ -86,6 +89,7 @@ Sources/PremiaAPIClientGenerated/Models/QuoteSnapshot.swift
 Sources/PremiaAPIClientGenerated/Models/SchwabOAuthStartData.swift
 Sources/PremiaAPIClientGenerated/Models/SchwabOAuthStartResponse.swift
 Sources/PremiaAPIClientGenerated/Models/StartSchwabOAuthRequest.swift
+Sources/PremiaAPIClientGenerated/Models/TransferWatchlistSymbolRequest.swift
 Sources/PremiaAPIClientGenerated/Models/UpdateWatchlistRequest.swift
 Sources/PremiaAPIClientGenerated/Models/WatchlistMembership.swift
 Sources/PremiaAPIClientGenerated/Models/WatchlistResponse.swift
@@ -101,11 +105,13 @@ docs/AccountDetail.md
 docs/AccountPositionRow.md
 docs/AccountScreenResponse.md
 docs/AddWatchlistSymbolRequest.md
+docs/ArchiveWatchlistRequest.md
 docs/BootstrapAPI.md
 docs/BootstrapData.md
 docs/BootstrapDataSession.md
 docs/BootstrapResponse.md
 docs/Candle.md
+docs/ChartAnnotation.md
 docs/ChartScreenData.md
 docs/ChartScreenResponse.md
 docs/ChartSeries.md
@@ -130,6 +136,7 @@ docs/Instrument.md
 docs/Meta.md
 docs/ModelErrorResponse.md
 docs/Money.md
+docs/MoveWatchlistSymbolRequest.md
 docs/OptionChainResponse.md
 docs/OptionChainSnapshot.md
 docs/OptionContractPairRow.md
@@ -149,6 +156,7 @@ docs/OrderReplacementData.md
 docs/OrderReplacementResponse.md
 docs/OrderSubmissionData.md
 docs/OrderSubmissionResponse.md
+docs/PinWatchlistSymbolRequest.md
 docs/PlaidLinkTokenData.md
 docs/PlaidLinkTokenResponse.md
 docs/PortfolioSummary.md
@@ -163,6 +171,7 @@ docs/SchwabOAuthStartResponse.md
 docs/StartSchwabOAuthRequest.md
 docs/StreamingAPI.md
 docs/TradingAPI.md
+docs/TransferWatchlistSymbolRequest.md
 docs/UpdateWatchlistRequest.md
 docs/WatchlistMembership.md
 docs/WatchlistResponse.md

@@ -19,6 +19,26 @@ public struct ChartScreen: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
+                if let annotations = snapshot?.annotations, !annotations.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Chart Markers")
+                            .font(.headline)
+                        ForEach(annotations) { annotation in
+                            HStack {
+                                Text(annotation.label)
+                                Spacer()
+                                Text(annotation.kind.uppercased())
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                Text("$\(annotation.price)")
+                            }
+                            .font(.caption)
+                        }
+                    }
+                    .padding()
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+
                 List(snapshot?.candles ?? []) { candle in
                     VStack(alignment: .leading) {
                         Text(candle.time)

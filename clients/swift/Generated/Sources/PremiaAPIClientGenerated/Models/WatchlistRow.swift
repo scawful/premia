@@ -22,8 +22,9 @@ public struct WatchlistRow: Sendable, Codable, Hashable {
     public var bid: Money?
     public var ask: Money?
     public var updatedAt: Date
+    public var isPinned: Bool
 
-    public init(id: String, symbol: String, name: String, lastPrice: Money, dayChange: AbsolutePercentChange, bid: Money? = nil, ask: Money? = nil, updatedAt: Date) {
+    public init(id: String, symbol: String, name: String, lastPrice: Money, dayChange: AbsolutePercentChange, bid: Money? = nil, ask: Money? = nil, updatedAt: Date, isPinned: Bool) {
         self.id = id
         self.symbol = symbol
         self.name = name
@@ -32,6 +33,7 @@ public struct WatchlistRow: Sendable, Codable, Hashable {
         self.bid = bid
         self.ask = ask
         self.updatedAt = updatedAt
+        self.isPinned = isPinned
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -43,6 +45,7 @@ public struct WatchlistRow: Sendable, Codable, Hashable {
         case bid
         case ask
         case updatedAt
+        case isPinned
     }
 
     // Encodable protocol methods
@@ -57,6 +60,7 @@ public struct WatchlistRow: Sendable, Codable, Hashable {
         try container.encodeIfPresent(bid, forKey: .bid)
         try container.encodeIfPresent(ask, forKey: .ask)
         try container.encode(updatedAt, forKey: .updatedAt)
+        try container.encode(isPinned, forKey: .isPinned)
     }
 }
 

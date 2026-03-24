@@ -435,6 +435,30 @@ auto HandleMutation(const http::request<http::string_body>& request)
               segments[2], GetRequiredString(payload, "symbol"),
               GetRequiredString(payload, "beforeSymbol"))));
     }
+
+    if (segments.size() == 4 && segments[0] == "v1" && segments[1] == "watchlists" &&
+        segments[3] == "archive" && request.method() == http::verb::patch) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeWatchlistResponse(service.ArchiveWatchlist(
+              segments[2], GetOptionalBool(payload, "archived", true))));
+    }
+
+    if (segments.size() == 3 && segments[0] == "v1" && segments[1] == "watchlists" &&
+        request.method() == http::verb::delete_) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeWatchlistResponse(service.DeleteWatchlist(segments[2])));
+    }
+
+    if (segments.size() == 4 && segments[0] == "v1" && segments[1] == "watchlists" &&
+        segments[3] == "transfer" && request.method() == http::verb::post) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeWatchlistResponse(service.MoveSymbolToWatchlist(
+              segments[2], GetRequiredString(payload, "destinationWatchlistId"),
+              GetRequiredString(payload, "symbol"))));
+    }
   } catch (const std::exception& e) {
     return MakeJsonResponse(
         http::status::bad_request,

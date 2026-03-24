@@ -20,14 +20,16 @@ public struct ChartScreenData: Sendable, Codable, Hashable {
     public var timezone: String
     public var series: ChartSeries
     public var stats: ChartStats?
+    public var annotations: [ChartAnnotation]
 
-    public init(instrument: Instrument, range: String, interval: String, timezone: String, series: ChartSeries, stats: ChartStats? = nil) {
+    public init(instrument: Instrument, range: String, interval: String, timezone: String, series: ChartSeries, stats: ChartStats? = nil, annotations: [ChartAnnotation]) {
         self.instrument = instrument
         self.range = range
         self.interval = interval
         self.timezone = timezone
         self.series = series
         self.stats = stats
+        self.annotations = annotations
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -37,6 +39,7 @@ public struct ChartScreenData: Sendable, Codable, Hashable {
         case timezone
         case series
         case stats
+        case annotations
     }
 
     // Encodable protocol methods
@@ -49,6 +52,7 @@ public struct ChartScreenData: Sendable, Codable, Hashable {
         try container.encode(timezone, forKey: .timezone)
         try container.encode(series, forKey: .series)
         try container.encodeIfPresent(stats, forKey: .stats)
+        try container.encode(annotations, forKey: .annotations)
     }
 }
 
