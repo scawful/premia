@@ -12,6 +12,19 @@
 
 namespace premia {
 
+namespace {
+
+auto DayChangeColor(const std::string& amount) -> ImVec4 {
+  try {
+    return std::stod(amount) < 0.0 ? ImVec4(0.89f, 0.34f, 0.36f, 1.0f)
+                                    : ImVec4(0.24f, 0.78f, 0.55f, 1.0f);
+  } catch (...) {
+    return ImVec4(0.58f, 0.63f, 0.71f, 1.0f);
+  }
+}
+
+}  // namespace
+
 void WatchlistView::DrawCoreWatchlistPreview() {
   auto& service = core::application::CompositionRoot::Instance().AppService();
   const auto watchlists = service.ListWatchlists();
@@ -32,22 +45,23 @@ void WatchlistView::DrawCoreWatchlistPreview() {
 
   ImGui::Text("Core Watchlist Preview");
   ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
-                     "Primary Brokerage: Charles Schwab");
+                     "Normalized Watchlists");
   ImGui::TextDisabled(
-      "This watchlist surface is driven by provider-backed core contracts.");
+      "This surface uses shared watchlist contracts and currently falls back to local or transitional sources.");
   ImGui::Separator();
 
   ImGui::Combo("##core_watchlists", &watchlistIndex, watchlist_names.data(),
                static_cast<int>(watchlist_names.size()));
 
   const auto screen = service.GetWatchlistScreen(watchlists[watchlistIndex].id);
-  if (ImGui::BeginTable("CoreWatchlistTable", 5,
+  if (ImGui::BeginTable("CoreWatchlistTable", 6,
                         watchlistFlags | ImGuiTableFlags_Borders,
                         ImVec2(0, 0))) {
     ImGui::TableSetupScrollFreeze(0, 1);
     ImGui::TableSetupColumn("Symbol", ImGuiTableColumnFlags_WidthFixed);
     ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
     ImGui::TableSetupColumn("Last", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("Day", ImGuiTableColumnFlags_WidthFixed);
     ImGui::TableSetupColumn("Bid", ImGuiTableColumnFlags_WidthFixed);
     ImGui::TableSetupColumn("Ask", ImGuiTableColumnFlags_WidthFixed);
     ImGui::TableHeadersRow();
@@ -55,14 +69,25 @@ void WatchlistView::DrawCoreWatchlistPreview() {
     for (const auto& row : screen.rows) {
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
-      ImGui::Text("%s", row.symbol.c_str());
+      const bool is_selected = selected_symbol_ == row.symbol;
+      if (ImGui::Selectable(row.symbol.c_str(), is_selected,
+                            ImGuiSelectableFlags_SpanAllColumns)) {
+        selected_symbol_ = row.symbol;
+        if (symbol_selection_handler_) {
+          symbol_selection_handler_(row.symbol);
+        }
+      }
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s", row.name.c_str());
       ImGui::TableSetColumnIndex(2);
       ImGui::Text("$%s", row.last_price.amount.c_str());
       ImGui::TableSetColumnIndex(3);
-      ImGui::Text("$%s", row.bid.amount.c_str());
+      ImGui::TextColored(DayChangeColor(row.day_change.absolute.amount),
+                         "$%s (%s%%)", row.day_change.absolute.amount.c_str(),
+                         row.day_change.percent.c_str());
       ImGui::TableSetColumnIndex(4);
+      ImGui::Text("$%s", row.bid.amount.c_str());
+      ImGui::TableSetColumnIndex(5);
       ImGui::Text("$%s", row.ask.amount.c_str());
     }
 
@@ -73,11 +98,11 @@ void WatchlistView::DrawCoreWatchlistPreview() {
   ImGui::Text("Connections");
   for (const auto& connection : service.GetConnections()) {
     if (connection.provider == core::domain::Provider::kSchwab) {
-      ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
-                         "%s - %s (Primary)", connection.display_name.c_str(),
-                         core::domain::ConnectionStatusToString(connection.status)
-                             .c_str());
-    } else {
+        ImGui::TextColored(
+            ImVec4(0.40f, 0.72f, 0.96f, 1.0f), "%s - %s (Market Data)",
+            connection.display_name.c_str(),
+            core::domain::ConnectionStatusToString(connection.status).c_str());
+      } else {
       ImGui::BulletText("%s - %s", connection.display_name.c_str(),
                         core::domain::ConnectionStatusToString(connection.status)
                             .c_str());
@@ -94,6 +119,15 @@ void WatchlistView::addLogger(const Logger &newLogger) {
 void WatchlistView::addEvent(const std::string &key,
                              const EventHandler &event) {
   this->events[key] = event;
+}
+
+void WatchlistView::SetSelectedSymbol(const std::string& symbol) {
+  selected_symbol_ = symbol;
+}
+
+void WatchlistView::SetSymbolSelectionHandler(
+    const std::function<void(const std::string&)>& handler) {
+  symbol_selection_handler_ = handler;
 }
 
 void WatchlistView::Update() {

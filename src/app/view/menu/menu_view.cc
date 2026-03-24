@@ -12,13 +12,24 @@
 
 namespace premia {
 
+namespace {
+
+void DispatchEvent(const EventMap& events, const std::string& key) {
+  const auto event = events.find(key);
+  if (event != events.end()) {
+    event->second();
+  }
+}
+
+}  // namespace
+
 void MenuView::DrawFileMenu() {
   static bool show_console = false;
 
   if (show_console) {
     ImGui::SetNextWindowSize(ImVec2(500, 300), ImGuiCond_Appearing);
     ImGui::Begin("Console", &show_console, ImGuiWindowFlags_NoScrollbar);
-    events.at("consoleView")();
+    DispatchEvent(events, "consoleView");
     ImGui::End();
   }
 
@@ -40,7 +51,7 @@ void MenuView::DrawFileMenu() {
     }
 
     if (ImGui::MenuItem("Quit", "ESC")) {
-      events.at("quit")();
+      DispatchEvent(events, "quit");
     }
 
     ImGui::EndMenu();
@@ -49,14 +60,15 @@ void MenuView::DrawFileMenu() {
 
 void MenuView::DrawTradeMenu() {
   if (ImGui::BeginMenu(ICON_MD_SYNC_ALT)) {
-    ImGui::MenuItem("Place Order", "N/A");
-    ImGui::MenuItem("Replace Order", "N/A");
-    ImGui::MenuItem("Cancel Order", "N/A");
-    ImGui::Separator();
-    ImGui::MenuItem("Get Order", "N/A");
+    if (ImGui::MenuItem("Trade Desk")) {
+      DispatchEvent(events, "tradeDeskView");
+    }
+    if (ImGui::MenuItem("Account Snapshot")) {
+      DispatchEvent(events, "accountView");
+    }
     ImGui::Separator();
     if (ImGui::MenuItem("Option Chain")) {
-      events.at("optionChainView")();
+      DispatchEvent(events, "optionChainView");
     }
     ImGui::EndMenu();
   }
@@ -64,32 +76,17 @@ void MenuView::DrawTradeMenu() {
 
 void MenuView::DrawChartsMenu() {
   if (ImGui::BeginMenu(ICON_MD_ADD_CHART)) {
-    if (ImGui::MenuItem("Line Plot", ICON_MD_SHOW_CHART)) {
-      events.at("linePlotView")();
-    }
-    if (ImGui::MenuItem("Candlestick", ICON_MD_CANDLESTICK_CHART)) {
-      events.at("chartView")();
-    }
-    if (ImGui::MenuItem("Multi Plot", ICON_MD_STACKED_LINE_CHART)) {
-      events.at("chartView")();
-    }
-    if (ImGui::MenuItem("Advanced", ICON_MD_MULTILINE_CHART)) {
-      events.at("chartView")();
-    }
-    if (ImGui::MenuItem("Futures", ICON_MD_AUTO_GRAPH)) {
-      events.at("chartView")();
-    }
-    if (ImGui::MenuItem("Crypto", ICON_MD_CURRENCY_BITCOIN)) {
-      events.at("chartView")();
+    if (ImGui::MenuItem("Chart Desk", ICON_MD_CANDLESTICK_CHART)) {
+      DispatchEvent(events, "chartView");
     }
 
     ImGui::Separator();
-    if (ImGui::MenuItem("Movers Up", ICON_MD_TRENDING_UP)) {
-      events.at("moversUpView")();
+    if (ImGui::MenuItem("Line View", ICON_MD_SHOW_CHART)) {
+      DispatchEvent(events, "linePlotView");
     }
 
-    if (ImGui::MenuItem("Movers Down", ICON_MD_TRENDING_DOWN)) {
-      events.at("moversDownView")();
+    if (ImGui::MenuItem("Option Chain", ICON_MD_STACKED_LINE_CHART)) {
+      DispatchEvent(events, "optionChainView");
     }
 
     ImGui::EndMenu();
@@ -98,40 +95,13 @@ void MenuView::DrawChartsMenu() {
 
 void MenuView::DrawAnalyzeMenu() {
   if (ImGui::BeginMenu(ICON_MD_TOPIC)) {
-    if (ImGui::MenuItem("Risk Premia Hub")) events.at("goHome")();
+    if (ImGui::MenuItem("Overview")) DispatchEvent(events, "goHome");
+    if (ImGui::MenuItem("Watchlists")) DispatchEvent(events, "watchlistView");
+    if (ImGui::MenuItem("Account")) DispatchEvent(events, "accountView");
     ImGui::Separator();
-    ImGui::MenuItem("Fundamentals", "N/A");
-    ImGui::Separator();
-    ImGui::MenuItem("Insider Roster", "PRO");
-    ImGui::MenuItem("Insider Summary", "PRO");
-    ImGui::MenuItem("Insider Transactions", "PRO");
-    ImGui::MenuItem("Fund Ownership", "PRO");
-    ImGui::Separator();
-    ImGui::MenuItem("Retail Money Funds", "PRO");
-    ImGui::MenuItem("Institutional Money Funds", "PRO");
-    ImGui::MenuItem("Institutional Ownership", "PRO");
-    ImGui::Separator();
-    ImGui::MenuItem("Largest Trades", "PRO");
-    ImGui::MenuItem("Market Volume (U.S.)", "PRO");
-    ImGui::Separator();
-    ImGui::MenuItem("Daily Treasury Rates", "PRO");
-    ImGui::MenuItem("Federal Funds Rate", "PRO");
-    ImGui::MenuItem("Unemployment Rate", "PRO");
-    ImGui::MenuItem("US Recession Probabilities", "PRO");
-    ImGui::Separator();
-    ImGui::MenuItem("Consumer Price Index", "PRO");
-    ImGui::MenuItem("Industrial Production Index", "PRO");
+    ImGui::TextDisabled("Research surfaces beyond options are still product backlog work.");
     ImGui::Separator();
     ImGui::EndMenu();
-  }
-}
-
-void MenuView::DrawColumnOptions(int x) {
-  std::string column = "LeftCol";
-  if (x) column = "RightCol";
-
-  if (ImGui::MenuItem("Option Chain")) {
-    events.at("optionChain" + column)();
   }
 }
 
@@ -159,25 +129,16 @@ void MenuView::DrawViewMenu() {
   }
 
   if (ImGui::BeginMenu(ICON_MD_TUNE)) {
-    if (ImGui::BeginMenu("Left Column")) {
-      DrawColumnOptions(0);
-      ImGui::EndMenu();
-    }
-
-    if (ImGui::BeginMenu("Right Column")) {
-      DrawColumnOptions(1);
-      ImGui::EndMenu();
-    }
-
+    if (ImGui::MenuItem("Overview")) DispatchEvent(events, "goHome");
+    if (ImGui::MenuItem("Charts")) DispatchEvent(events, "chartView");
+    if (ImGui::MenuItem("Trade Desk")) DispatchEvent(events, "tradeDeskView");
+    if (ImGui::MenuItem("Account")) DispatchEvent(events, "accountView");
     ImGui::Separator();
 
     if (ImGui::BeginMenu("Appearance")) {
       if (ImGui::MenuItem("Fullscreen")) {
-        events.at("toggleFullscreenMode")();
+        DispatchEvent(events, "toggleFullscreenMode");
       }
-      ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Window Layout")) {
       ImGui::EndMenu();
     }
 
@@ -223,7 +184,7 @@ void MenuView::DrawScreen() {
     ImGui::Text("Premia Version 0.4");
     ImGui::Text("Written by: Justin Scofield (scawful)");
     ImGui::Text("Dependencies: Boost, SDL2, ImGui, ImPlot, Abseil");
-    ImGui::Text("Data provided by: TDAmeritrade, Schwab");
+    ImGui::Text("Data providers: Schwab, IBKR, Plaid, local preview");
 
     if (ImGui::Button("Close", ImVec2(120, 0))) {
       about = false;

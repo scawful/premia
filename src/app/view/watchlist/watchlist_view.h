@@ -7,6 +7,8 @@ namespace premia {
 class WatchlistView : public View {
  private:
   int watchlistIndex = 0;
+  std::string selected_symbol_;
+  std::function<void(const std::string&)> symbol_selection_handler_;
   EventMap events;
   Logger logger;
 
@@ -16,6 +18,9 @@ class WatchlistView : public View {
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string &, const EventHandler&) override;
+  void SetSelectedSymbol(const std::string& symbol);
+  void SetSymbolSelectionHandler(
+      const std::function<void(const std::string&)>& handler);
   void Update() override;
 
  private:

@@ -16,6 +16,9 @@ class ChartView : public View {
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string& key, const EventHandler& event) override;
+   void SetTickerSymbol(const std::string& symbol);
+   void SetSymbolChangeHandler(
+       const std::function<void(const std::string&)>& handler);
   void Update() override;
 
  private:
@@ -23,6 +26,7 @@ class ChartView : public View {
   void DrawChart();
   void DrawChartSettings();
   void DrawCoreContractPreview();
+  void FetchChartData();
   auto GetSelectedRangeLabel() const -> std::string;
   auto GetSelectedIntervalLabel() const -> std::string;
 
@@ -32,8 +36,10 @@ class ChartView : public View {
   int frequency_type = 1;
   int frequency_amount = 0;
   bool isInit = false;
-  std::string tickerSymbol;
+  bool pending_refresh_ = true;
+  std::string tickerSymbol = "AAPL";
   std::string currentChart;
+  std::function<void(const std::string&)> symbol_change_handler_;
 
   EventMap events;
   ChartMap charts;

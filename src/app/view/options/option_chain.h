@@ -24,7 +24,12 @@ class OptionChainView : public View {
     GEXEpochPair(double* epoch, double* gamma)
         : epochArray(epoch), gammaArray(gamma) {}
   };
-  std::string symbol;
+  std::string symbol = "SPY";
+  std::string strike_count_ = "8";
+  int current_strategy_ = 0;
+  int current_expiration_index_ = 0;
+  bool pending_refresh_ = true;
+  std::function<void(const std::string&)> symbol_change_handler_;
   EventMap events;
   Logger logger;
   OptionsModel model;
@@ -33,11 +38,15 @@ class OptionChainView : public View {
   void DrawChain();
   void DrawUnderlying();
   void DrawCoreOptionPreview();
+  void FetchOptionChain();
 
  public:
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string &key, const EventHandler& event) override;
+  void SetSymbol(const std::string& next_symbol);
+  void SetSymbolChangeHandler(
+      const std::function<void(const std::string&)>& handler);
   void Update() override;
 
  private:

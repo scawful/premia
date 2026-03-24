@@ -15,12 +15,54 @@
 #include "view/view.h"
 
 namespace premia {
-void OptionChainView::DrawSearch() {
-  static std::string ticker;
-  static std::string count;
-  static std::string strike;
-  static int current_strategy = 0;
 
+namespace {
+
+auto StrategyValue(int index) -> const char* {
+  switch (index) {
+    case 0:
+      return "SINGLE";
+    case 1:
+      return "ANALYTICAL";
+    case 2:
+      return "COVERED";
+    case 3:
+      return "VERTICAL";
+    case 4:
+      return "CALENDAR";
+    case 5:
+      return "STRANGLE";
+    case 6:
+      return "STRADDLE";
+    case 7:
+      return "BUTTERFLY";
+    case 8:
+      return "CONDOR";
+    case 9:
+      return "DIAGONAL";
+    case 10:
+      return "COLLAR";
+    case 11:
+      return "ROLL";
+    default:
+      return "SINGLE";
+  }
+}
+
+}  // namespace
+
+void OptionChainView::FetchOptionChain() {
+  if (symbol.empty() || strike_count_.empty()) {
+    return;
+  }
+  model.fetchOptionChain(symbol, strike_count_, StrategyValue(current_strategy_),
+                         "ALL", "ALL", "ALL");
+  model.calculateGammaExposure();
+  current_expiration_index_ = 0;
+  pending_refresh_ = false;
+}
+
+void OptionChainView::DrawSearch() {
   if (ImGui::BeginTable("SearchTable", 4, ImGuiTableFlags_SizingStretchProp,
                         ImVec2(ImGui::GetContentRegionAvail().x, 0.f))) {
     ImGui::TableSetupScrollFreeze(0, 1);
@@ -31,21 +73,28 @@ void OptionChainView::DrawSearch() {
 
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(50.f);
-    ImGui::InputText("##symbol", &ticker, ImGuiInputTextFlags_CharsUppercase);
+    ImGui::InputText("##symbol", &symbol, ImGuiInputTextFlags_CharsUppercase);
+    if (ImGui::IsItemDeactivatedAfterEdit() && !symbol.empty() &&
+        symbol_change_handler_) {
+      symbol_change_handler_(symbol);
+    }
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(50.f);
-    ImGui::InputText("##strikeCount", &count, ImGuiInputTextFlags_CharsDecimal);
+    ImGui::InputText("##strikeCount", &strike_count_,
+                     ImGuiInputTextFlags_CharsDecimal);
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(75.f);
-    ImGui::Combo("##strategy", &current_strategy,
+    ImGui::Combo("##strategy", &current_strategy_,
                  "SINGLE\0ANALYTICAL\0COVERED\0VERTICAL\0CALENDAR\0STRANGLE\0ST"
                  "RADDLE\0BUTTERFLY\0CONDOR\0DIAGONAL\0COLLAR\0ROLL\0");
     ImGui::TableNextColumn();
     if (ImGui::Button(ICON_MD_QUERY_STATS,
                       ImVec2(ImGui::GetContentRegionAvail().x, 0.f)) &&
-        !count.empty()) {
-      model.fetchOptionChain(ticker, count, "SINGLE", "ALL", "ALL", "ALL");
-      model.calculateGammaExposure();
+        !strike_count_.empty()) {
+      pending_refresh_ = true;
+      if (symbol_change_handler_) {
+        symbol_change_handler_(symbol);
+      }
     }
     ImGui::EndTable();
   }
@@ -61,24 +110,24 @@ void OptionChainView::DrawChain() {
       ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
       ImGuiTableFlags_Hideable | ImGuiTableFlags_SizingStretchProp;
 
-  static int current_item = 0;
   const auto& snapshot = model.getCoreSnapshot();
   if (snapshot.expirations.empty()) {
     ImGui::TextDisabled("No option-chain expirations available.");
     return;
   }
-  if (current_item >= static_cast<int>(snapshot.expirations.size())) {
-    current_item = 0;
+  if (current_expiration_index_ >= static_cast<int>(snapshot.expirations.size())) {
+    current_expiration_index_ = 0;
   }
 
-  ImGui::Text("Gamma at Expiry $%.0f", model.getGammaAtExpiry(current_item));
+  ImGui::Text("Gamma at Expiry $%.0f",
+              model.getGammaAtExpiry(current_expiration_index_));
   if (ImGui::BeginCombo("Expiration Date",
-                        snapshot.expirations[current_item].label.c_str(),
+                        snapshot.expirations[current_expiration_index_].label.c_str(),
                         ImGuiComboFlags_None)) {
     for (int n = 0; n < snapshot.expirations.size(); n++) {
-      const bool is_selected = (current_item == n);
+      const bool is_selected = (current_expiration_index_ == n);
       if (ImGui::Selectable(snapshot.expirations[n].label.c_str(), is_selected))
-        current_item = n;
+        current_expiration_index_ = n;
 
       // Set the initial focus when opening the combo (scrolling + keyboard
       // navigation focus)
@@ -113,10 +162,12 @@ void OptionChainView::DrawChain() {
     ImGui::TableHeadersRow();
 
     ImGuiListClipper clipper;
-    clipper.Begin(static_cast<int>(snapshot.expirations[current_item].rows.size()));
+    clipper.Begin(
+        static_cast<int>(snapshot.expirations[current_expiration_index_].rows.size()));
     while (clipper.Step()) {
       for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
-        const auto& option_row = snapshot.expirations[current_item].rows[row];
+        const auto& option_row =
+            snapshot.expirations[current_expiration_index_].rows[row];
         ImGui::TableNextRow();
         for (int column = 0; column < 19; column++) {
           ImGui::TableSetColumnIndex(column);
@@ -300,9 +351,11 @@ void OptionChainView::addEvent(const std::string& key,
 }
 
 void OptionChainView::Update() {
+  if (pending_refresh_) {
+    FetchOptionChain();
+  }
   if (ImGui::Button("Refresh Core Option Snapshot")) {
-    model.fetchOptionChain("SPY", "8", "SINGLE", "ALL", "ALL", "ALL");
-    model.calculateGammaExposure();
+    pending_refresh_ = true;
   }
 
   if (model.isActive()) {
@@ -324,9 +377,12 @@ void OptionChainView::Update() {
 
 void OptionChainView::DrawCoreOptionPreview() {
   const auto snapshot = core::application::CompositionRoot::Instance()
-                            .Options()
-                            .GetOptionChainSnapshot("SPY", "8", "SINGLE", "ALL",
-                                                    "ALL", "ALL");
+                             .Options()
+                             .GetOptionChainSnapshot(symbol.empty() ? "SPY" : symbol,
+                                                     strike_count_.empty() ? "8"
+                                                                           : strike_count_,
+                                                     StrategyValue(current_strategy_),
+                                                     "ALL", "ALL", "ALL");
 
   ImGui::Separator();
   ImGui::Text("Core Options Preview");
@@ -377,5 +433,18 @@ void OptionChainView::DrawCoreOptionPreview() {
       ImGui::EndTable();
     }
   }
+}
+
+void OptionChainView::SetSymbol(const std::string& next_symbol) {
+  if (next_symbol.empty() || symbol == next_symbol) {
+    return;
+  }
+  symbol = next_symbol;
+  pending_refresh_ = true;
+}
+
+void OptionChainView::SetSymbolChangeHandler(
+    const std::function<void(const std::string&)>& handler) {
+  symbol_change_handler_ = handler;
 }
 }  // namespace premia

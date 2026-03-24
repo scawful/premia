@@ -17,6 +17,18 @@ namespace premia {
 
 namespace {
 
+auto ResolveMarketDataSource(
+    const std::vector<core::application::ConnectionSummary>& connections)
+    -> std::string {
+  for (const auto& connection : connections) {
+    if (connection.provider == core::domain::Provider::kSchwab &&
+        connection.status == core::domain::ConnectionStatus::kConnected) {
+      return connection.display_name;
+    }
+  }
+  return "Local Preview";
+}
+
 auto PeriodTypeLabel(int period_type) -> const char* {
   switch (period_type) {
     case 0:
@@ -75,6 +87,16 @@ void ChartView::initChart() {
   isInit = true;
 }
 
+void ChartView::FetchChartData() {
+  if (tickerSymbol.empty()) {
+    return;
+  }
+  charts[currentChart]->fetchData(tickerSymbol, tda::PeriodType(period_type),
+                                  period_amount, tda::FrequencyType(frequency_type),
+                                  frequency_amount, true);
+  pending_refresh_ = false;
+}
+
 void ChartView::DrawChart() { charts.at(currentChart)->Update(); }
 
 void ChartView::DrawChartSettings() {
@@ -85,6 +107,12 @@ void ChartView::DrawChartSettings() {
     ImGui::SetNextItemWidth(50.f);
     ImGui::InputText("##chartEnterSymbol", &tickerSymbol,
                      ImGuiInputTextFlags_CharsUppercase);
+    if (ImGui::IsItemDeactivatedAfterEdit() && !tickerSymbol.empty()) {
+      pending_refresh_ = true;
+      if (symbol_change_handler_) {
+        symbol_change_handler_(tickerSymbol);
+      }
+    }
     ImGui::TableNextColumn();
     ImGui::Text("Period");
     ImGui::TableNextColumn();
@@ -109,9 +137,10 @@ void ChartView::DrawChartSettings() {
     ImGui::Combo("##amount", &frequency_amount, " 1\0 5\0 10\0 15\0 30\0");
     ImGui::TableNextColumn();
     if (ImGui::Button("Search") && !tickerSymbol.empty()) {
-      this->charts[currentChart]->fetchData(
-          tickerSymbol, tda::PeriodType(period_type), period_amount,
-          tda::FrequencyType(frequency_type), frequency_amount, true);
+      pending_refresh_ = true;
+      if (symbol_change_handler_) {
+        symbol_change_handler_(tickerSymbol);
+      }
     }
     ImGui::EndTable();
   }
@@ -130,6 +159,7 @@ auto ChartView::GetSelectedIntervalLabel() const -> std::string {
 void ChartView::DrawCoreContractPreview() {
   const std::string preview_symbol = tickerSymbol.empty() ? "AAPL" : tickerSymbol;
   auto& service = core::application::CompositionRoot::Instance().AppService();
+  const auto connections = service.GetConnections();
   const auto quote = service.GetQuoteDetail(preview_symbol);
   const auto chart = service.GetChartScreen(preview_symbol, GetSelectedRangeLabel(),
                                             GetSelectedIntervalLabel(), true);
@@ -137,9 +167,10 @@ void ChartView::DrawCoreContractPreview() {
   ImGui::Separator();
   ImGui::Text("Core Contract Preview");
   ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
-                     "Primary Brokerage: Charles Schwab");
+                     "Market Data Source: %s",
+                     ResolveMarketDataSource(connections).c_str());
   ImGui::TextDisabled(
-      "This block is driven by provider-backed core DTOs and services.");
+      "Charts prefer Schwab when connected and fall back to local preview data otherwise.");
 
   if (ImGui::BeginTable("ChartContractPreview", 5,
                         ImGuiTableFlags_SizingStretchSame)) {
@@ -182,17 +213,29 @@ void ChartView::addEvent(const std::string& key, const EventHandler& event) {
   this->events[key] = event;
 }
 
+void ChartView::SetTickerSymbol(const std::string& symbol) {
+  if (symbol.empty() || tickerSymbol == symbol) {
+    return;
+  }
+  tickerSymbol = symbol;
+  pending_refresh_ = true;
+}
+
+void ChartView::SetSymbolChangeHandler(
+    const std::function<void(const std::string&)>& handler) {
+  symbol_change_handler_ = handler;
+}
+
 void ChartView::Update() {
   if (!isInit) {
     initChart();
   }
-  if (!ImGui::Begin("Chart", nullptr)) {
-    return;
+  if (pending_refresh_) {
+    FetchChartData();
   }
   DrawChartSettings();
   DrawCoreContractPreview();
   DrawChart();
-  ImGui::End();
 }
 
 }  // namespace premia

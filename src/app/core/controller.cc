@@ -25,8 +25,8 @@
 
 namespace premia {
 
-constexpr size_t SCREEN_WIDTH = 1200;
-constexpr size_t SCREEN_HEIGHT = 800;
+constexpr size_t SCREEN_WIDTH = 1480;
+constexpr size_t SCREEN_HEIGHT = 920;
 
 namespace {
 
@@ -179,6 +179,10 @@ void Controller::onInput() {
       case SDL_KEYDOWN:
         break;
 
+      case SDL_QUIT:
+        active = false;
+        break;
+
       case SDL_KEYUP: {
         io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
         io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
@@ -247,7 +251,7 @@ absl::Status Controller::CreatePremiaWindow() {
         absl::StrFormat("SDL_Init: %s\n", SDL_GetError()));
   } else {
     window_ = std::unique_ptr<SDL_Window, sdl_deleter>(
-        SDL_CreateWindow("Premia",                 // window title
+        SDL_CreateWindow("Premia v2",              // window title
                          SDL_WINDOWPOS_UNDEFINED,  // initial x position
                          SDL_WINDOWPOS_UNDEFINED,  // initial y position
                          SCREEN_WIDTH,             // width, in pixels

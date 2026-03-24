@@ -4,6 +4,41 @@
 #include "premia/core/application/scaffold_application_service.hpp"
 
 namespace premia {
+
+namespace {
+
+auto ResolveAccountSource(
+    const std::vector<core::application::ConnectionSummary>& connections,
+    const std::string& account_id) -> std::string {
+  for (const auto& connection : connections) {
+    if (connection.provider == core::domain::Provider::kSchwab &&
+        connection.status == core::domain::ConnectionStatus::kConnected) {
+      return connection.display_name;
+    }
+  }
+  for (const auto& connection : connections) {
+    if (connection.provider == core::domain::Provider::kIBKR &&
+        connection.status == core::domain::ConnectionStatus::kConnected) {
+      return connection.display_name;
+    }
+  }
+  if (!account_id.empty() && account_id.rfind("U", 0) == 0) {
+    return "Interactive Brokers";
+  }
+  return "Local Preview";
+}
+
+auto ChangeColor(const std::string& amount) -> ImVec4 {
+  try {
+    return std::stod(amount) < 0.0 ? ImVec4(0.89f, 0.34f, 0.36f, 1.0f)
+                                    : ImVec4(0.24f, 0.78f, 0.55f, 1.0f);
+  } catch (...) {
+    return ImVec4(0.58f, 0.63f, 0.71f, 1.0f);
+  }
+}
+
+}  // namespace
+
 void AccountView::DrawCoreAccountPreview() {
   if (!core_model.hasData()) {
     core_model.refresh();
@@ -11,12 +46,14 @@ void AccountView::DrawCoreAccountPreview() {
 
   const auto& account = core_model.getAccountDetail();
   const auto& portfolio = core_model.getPortfolioSummary();
+  const auto& connections = core_model.getConnections();
 
   ImGui::Text("Core Account Preview");
   ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
-                     "Primary Brokerage: Charles Schwab");
+                     "Account Source: %s",
+                     ResolveAccountSource(connections, account.account_id).c_str());
   ImGui::TextDisabled(
-      "This account pane is driven by provider-backed core contracts.");
+      "This account pane is driven by provider-backed account contracts.");
   ImGui::Separator();
 
   ImGui::Text("Account ID: %s", account.account_id.c_str());
@@ -61,11 +98,13 @@ void AccountView::DrawCoreAccountPreview() {
 
   ImGui::Separator();
 
-  if (ImGui::BeginTable("CoreHoldings", 4,
+  if (ImGui::BeginTable("CoreHoldings", 6,
                         ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders |
                             ImGuiTableFlags_SizingStretchSame)) {
     ImGui::TableSetupColumn("Symbol");
     ImGui::TableSetupColumn("Name");
+    ImGui::TableSetupColumn("Quantity");
+    ImGui::TableSetupColumn("Avg Price");
     ImGui::TableSetupColumn("Market Value");
     ImGui::TableSetupColumn("Day Change");
     ImGui::TableHeadersRow();
@@ -77,10 +116,15 @@ void AccountView::DrawCoreAccountPreview() {
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s", holding.name.c_str());
       ImGui::TableSetColumnIndex(2);
-      ImGui::Text("$%s", holding.market_value.amount.c_str());
+      ImGui::Text("%s", holding.quantity.c_str());
       ImGui::TableSetColumnIndex(3);
-      ImGui::Text("$%s (%s%%)", holding.day_profit_loss.amount.c_str(),
-                  holding.day_profit_loss_percent.c_str());
+      ImGui::Text("$%s", holding.average_price.amount.c_str());
+      ImGui::TableSetColumnIndex(4);
+      ImGui::Text("$%s", holding.market_value.amount.c_str());
+      ImGui::TableSetColumnIndex(5);
+      ImGui::TextColored(ChangeColor(holding.day_profit_loss.amount), "$%s (%s%%)",
+                         holding.day_profit_loss.amount.c_str(),
+                         holding.day_profit_loss_percent.c_str());
     }
 
     ImGui::EndTable();

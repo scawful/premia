@@ -20,12 +20,11 @@ class MenuView : public View {
   void addEvent(const std::string&, const EventHandler&) override;
   void Update() override;
 
- private:
+  private:
   void DrawFileMenu();
   void DrawTradeMenu();
   void DrawChartsMenu();
   void DrawAnalyzeMenu();
-  void DrawColumnOptions(int x);
   void DrawViewMenu();
   void DrawHelpMenu();
   void DrawScreen();
