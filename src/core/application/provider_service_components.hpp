@@ -8,6 +8,10 @@
 
 namespace premia::core::application::detail {
 
+auto MakeHoldingsFromAccount(const AccountDetail& detail,
+                             premia::core::domain::Provider provider)
+    -> std::vector<HoldingRow>;
+
 class ConnectionService {
  public:
   ConnectionService();

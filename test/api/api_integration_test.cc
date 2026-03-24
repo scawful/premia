@@ -227,6 +227,31 @@ TEST_F(ApiIntegrationFixture, AccountScreenReturnsFallbackData) {
   EXPECT_FALSE(tree.get_child("data.positions").empty());
 }
 
+TEST_F(ApiIntegrationFixture, UnreachableIbkrShowsDegradedBootstrapAndFallbackScreens) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  WriteWorkspaceAsset(workspace_, "ibkr.json",
+                      R"({"host":"127.0.0.1","port":65535,"client_id":2901,"account_id":""})");
+
+  const auto bootstrap = HttpRequest("GET", Url("/v1/bootstrap"));
+  ASSERT_EQ(bootstrap.status_code, 200);
+  const auto bootstrap_tree = ParseJson(bootstrap.body);
+  EXPECT_EQ(FindConnectionStatus(bootstrap_tree, "ibkr"), "degraded");
+
+  const auto account = HttpRequest("GET", Url("/v1/screens/account"));
+  ASSERT_EQ(account.status_code, 200);
+  const auto account_tree = ParseJson(account.body);
+  EXPECT_EQ(account_tree.get<std::string>("data.accountId"), "local_acc");
+
+  const auto home = HttpRequest("GET", Url("/v1/screens/home"));
+  ASSERT_EQ(home.status_code, 200);
+  const auto home_tree = ParseJson(home.body);
+  EXPECT_EQ(home_tree.get<std::string>("data.portfolio.totalValue.amount"),
+            "128345.22");
+  EXPECT_EQ(home_tree.get<std::string>("data.topHoldings..id"), "holding_aapl");
+}
+
 TEST_F(ApiIntegrationFixture, OptionsScreenReturnsFallbackChain) {
 #if defined(_WIN32)
   GTEST_SKIP() << "POSIX-only process launch helper";

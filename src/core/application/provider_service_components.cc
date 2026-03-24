@@ -310,11 +310,15 @@ auto MakePortfolioSummaryFromAccount(const AccountDetail& detail) -> PortfolioSu
                           static_cast<int>(detail.positions.size())};
 }
 
-auto MakeHoldingsFromAccount(const AccountDetail& detail) -> std::vector<HoldingRow> {
+}  // namespace
+
+auto MakeHoldingsFromAccount(const AccountDetail& detail, Provider provider)
+    -> std::vector<HoldingRow> {
+  const auto provider_key = domain::ProviderToString(provider);
   std::vector<HoldingRow> holdings;
   holdings.reserve(detail.positions.size());
   for (const auto& position : detail.positions) {
-    holdings.push_back({"schwab:" + position.symbol,
+    holdings.push_back({provider_key + ":" + position.symbol,
                         position.symbol,
                         position.name,
                         position.quantity,
@@ -323,8 +327,6 @@ auto MakeHoldingsFromAccount(const AccountDetail& detail) -> std::vector<Holding
   }
   return holdings;
 }
-
-}  // namespace
 
 ConnectionService::ConnectionService() {
   connections_ = {
@@ -452,12 +454,12 @@ auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> 
   try {
     providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
                                                       SchwabTokenPath());
-    return MakeHoldingsFromAccount(provider.GetAccountDetail());
+    return MakeHoldingsFromAccount(provider.GetAccountDetail(), Provider::kSchwab);
   } catch (const std::exception&) {
   }
   try {
     providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
-    return MakeHoldingsFromAccount(provider.GetAccountDetail());
+    return MakeHoldingsFromAccount(provider.GetAccountDetail(), Provider::kIBKR);
   } catch (const std::exception&) {
   }
   try {

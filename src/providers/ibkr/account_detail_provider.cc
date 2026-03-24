@@ -6,6 +6,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <stdexcept>
@@ -90,14 +91,30 @@ class SnapshotClient : public DefaultEWrapper {
       throw std::runtime_error(error_text_);
     }
 
-    client_.reqManagedAccts();
-    WaitFor([this]() { return managed_accounts_ready_ || fatal_error_; }, 5);
+    WaitFor([this]() {
+      return next_valid_id_ready_ || managed_accounts_ready_ || fatal_error_;
+    }, 5);
+    if (fatal_error_) {
+      throw std::runtime_error(error_text_);
+    }
+    if (!next_valid_id_ready_ && !managed_accounts_ready_) {
+      client_.eDisconnect();
+      throw std::runtime_error(
+          "ibkr handshake timed out; accept or authorize the API session in "
+          "TWS/IB Gateway");
+    }
+    if (!managed_accounts_ready_) {
+      client_.reqManagedAccts();
+      WaitFor([this]() { return managed_accounts_ready_ || fatal_error_; }, 5);
+    }
     if (fatal_error_) {
       throw std::runtime_error(error_text_);
     }
 
     if (managed_accounts_.empty()) {
-      throw std::runtime_error("ibkr returned no managed accounts");
+      throw std::runtime_error(
+          "ibkr connected but returned no managed accounts; confirm the API "
+          "session is accepted in TWS/IB Gateway");
     }
 
     target_account_ = config.account_id.empty() ? managed_accounts_.front() : config.account_id;
@@ -108,6 +125,7 @@ class SnapshotClient : public DefaultEWrapper {
     WaitFor([this]() { return account_summary_done_ && account_download_done_; }, 8);
     client_.cancelAccountSummary(kSummaryRequestId);
     client_.reqAccountUpdates(false, target_account_);
+    disconnecting_ = true;
     client_.eDisconnect();
 
     if (fatal_error_) {
@@ -133,8 +151,12 @@ class SnapshotClient : public DefaultEWrapper {
   }
 
   void error(int id, int errorCode, const std::string& errorString) override {
+    (void)id;
     if (errorCode == 2104 || errorCode == 2106 || errorCode == 2158 ||
         errorCode == 2108 || errorCode == 2107) {
+      return;
+    }
+    if (disconnecting_ && errorCode == 509) {
       return;
     }
     fatal_error_ = true;
@@ -152,6 +174,11 @@ class SnapshotClient : public DefaultEWrapper {
       }
     }
     managed_accounts_ready_ = true;
+  }
+
+  void nextValidId(OrderId orderId) override {
+    next_valid_id_ = orderId;
+    next_valid_id_ready_ = true;
   }
 
   void accountSummary(int reqId, const std::string& account,
@@ -229,11 +256,14 @@ class SnapshotClient : public DefaultEWrapper {
   EClientSocket client_;
   std::unique_ptr<EReader> reader_;
   bool managed_accounts_ready_ = false;
+  bool next_valid_id_ready_ = false;
   bool account_summary_done_ = false;
   bool account_download_done_ = false;
+  bool disconnecting_ = false;
   bool fatal_error_ = false;
   std::string error_text_;
   std::string target_account_;
+  std::optional<OrderId> next_valid_id_;
   std::vector<std::string> managed_accounts_;
   std::map<std::string, std::string> summary_;
   std::vector<application::AccountPositionRow> positions_;

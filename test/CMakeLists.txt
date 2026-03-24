@@ -39,6 +39,7 @@ add_executable(
 
 add_executable(
   premia_provider_core_test
+  core/portfolio_account_service_test.cc
   providers/ibkr_guardrail_test.cc
   providers/local_order_provider_test.cc
   providers/schwab_guardrail_test.cc
