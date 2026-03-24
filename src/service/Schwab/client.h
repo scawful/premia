@@ -62,6 +62,30 @@ class Client {
   // Trader v1 endpoints (https://api.schwabapi.com/trader/v1)
   std::string GetAccount(const std::string& account_hash) const;
   std::string GetAllAccounts() const;
+  std::string PreviewOrder(const std::string& account_hash,
+                           const std::string& order_payload,
+                           long* status_code = nullptr) const;
+  bool PlaceOrder(const std::string& account_hash,
+                  const std::string& order_payload,
+                  std::string* order_location = nullptr,
+                  long* status_code = nullptr) const;
+  std::string GetOrdersForAccount(const std::string& account_hash,
+                                  const std::string& from_entered_time,
+                                  const std::string& to_entered_time,
+                                  int max_results,
+                                  const std::string& status = "",
+                                  long* status_code = nullptr) const;
+  std::string GetOrder(const std::string& account_hash,
+                       const std::string& order_id,
+                       long* status_code = nullptr) const;
+  bool CancelOrder(const std::string& account_hash,
+                   const std::string& order_id,
+                   long* status_code = nullptr) const;
+  bool ReplaceOrder(const std::string& account_hash,
+                    const std::string& order_id,
+                    const std::string& order_payload,
+                    std::string* order_location = nullptr,
+                    long* status_code = nullptr) const;
 
   // MarketData v1 endpoints (https://api.schwabapi.com/marketdata/v1)
   std::string GetQuote(const std::string& symbol) const;
@@ -93,6 +117,15 @@ class Client {
   std::vector<AccountHash> account_hashes_;
 
   // HTTP helpers
+  struct AuthorizedResponse {
+    long status_code = 0;
+    std::string body;
+    std::string location;
+  };
+
+  auto SendAuthorizedRequest(const std::string& method, const std::string& url,
+                             const std::string* body = nullptr) const
+      -> AuthorizedResponse;
   std::string SendAuthorizedGet(const std::string& url) const;
   std::string PostWithBasicAuth(const std::string& url,
                                 const std::string& body) const;

@@ -196,6 +196,12 @@ void Workspace::WireEvents() {
     workspace_message_ =
         "Linked symbol from watchlists into charts, options, and trade.";
   });
+  account_view_.SetSymbolSelectionHandler([this](const std::string& symbol) {
+    SelectSymbol(symbol);
+    active_surface_ = Surface::kTrade;
+    workspace_message_ =
+        "Linked account holding into charts, options, and the trade desk.";
+  });
   chart_view_.SetSymbolChangeHandler([this](const std::string& symbol) {
     SelectSymbol(symbol);
     workspace_message_ = "Linked chart symbol into options and trade.";
@@ -204,6 +210,13 @@ void Workspace::WireEvents() {
     SelectSymbol(symbol);
     workspace_message_ = "Linked options symbol into charts and trade.";
   });
+  option_chain_view_.SetStrikeSelectionHandler(
+      [this](const std::string& symbol, const std::string& strike) {
+        SelectSymbol(symbol);
+        selected_option_strike_ = strike;
+        active_surface_ = Surface::kTrade;
+        workspace_message_ = "Linked option strike into the trade desk for review.";
+      });
 
   events_wired_ = true;
 }
@@ -215,8 +228,10 @@ void Workspace::SelectSymbol(const std::string& symbol) {
   if (ticket_symbol_ != symbol) {
     ticket_limit_price_.clear();
     latest_preview_.reset();
+    selected_option_strike_.clear();
   }
   ticket_symbol_ = symbol;
+  account_view_.SetSelectedSymbol(symbol);
   watchlist_view_.SetSelectedSymbol(symbol);
   chart_view_.SetTickerSymbol(symbol);
   option_chain_view_.SetSymbol(symbol);
@@ -275,6 +290,9 @@ auto Workspace::BuildOrderIntent() const -> core::application::OrderIntentReques
   request.limit_price = ticket_order_type_ == 0 ? ticket_limit_price_ : "";
   request.duration = "DAY";
   request.session = "NORMAL";
+  request.confirm_live = live_trade_enabled_ &&
+                         IsProviderConnected(Provider::kSchwab) &&
+                         request.asset_type == "EQUITY";
   return request;
 }
 
@@ -520,7 +538,7 @@ void Workspace::DrawOverview() {
     }
     ImGui::Separator();
     ImGui::TextWrapped(
-        "Market data and options currently prefer Schwab when connected. Account snapshots can fall through to IBKR, and trading remains a simulated desktop flow until provider order routing is wired.");
+        "Market data and options currently prefer Schwab when connected. Account snapshots can fall through to IBKR, and desktop trading now runs in preview mode by default with an explicit live Schwab gate.");
     ImGui::EndChild();
     ImGui::EndTable();
   }
@@ -538,6 +556,9 @@ void Workspace::DrawLinkedSymbolCard() {
                 FormatMoney(trade_quote_->quote.ask).c_str());
   } else {
     ImGui::TextDisabled("Quote unavailable.");
+  }
+  if (!selected_option_strike_.empty()) {
+    ImGui::TextDisabled("Selected strike: %s", selected_option_strike_.c_str());
   }
   if (ImGui::Button("Chart", ImVec2(100.0f, 0.0f))) {
     active_surface_ = Surface::kChart;
@@ -559,8 +580,9 @@ void Workspace::DrawTradingStatusCard() {
   ImGui::Text("Account Source: %s", ActiveAccountSource().c_str());
   ImGui::Text("Quote Source: %s", ActiveMarketDataSource().c_str());
   ImGui::TextWrapped("Route Target: %s", PreferredTradingVenue().c_str());
+  ImGui::TextDisabled("Live routing armed: %s", live_trade_enabled_ ? "yes" : "no");
   ImGui::TextColored(AccentColor(),
-                     "Execution remains simulated in the desktop app.");
+                     "Preview is the default path; live Schwab submit requires the explicit checkbox.");
   ImGui::EndChild();
 }
 
@@ -603,7 +625,7 @@ void Workspace::DrawOrdersTable(
 void Workspace::DrawQuickTradeTicket(bool expanded) {
   ImGui::Text(expanded ? "Trade Ticket" : "Quick Ticket");
   ImGui::TextDisabled(
-      "Schwab is the preferred quote and route target when connected, but desktop execution stays in simulation until broker order adapters land.");
+      "Schwab is the preferred quote and route target when connected, but live submission stays gated behind an explicit desktop checkbox.");
   ImGui::Text("Routing: %s", PreferredTradingVenue().c_str());
   ImGui::Text("Quote Source: %s", ActiveMarketDataSource().c_str());
   ImGui::Separator();
@@ -616,6 +638,13 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
   ImGui::Combo("Side", &ticket_instruction_, "BUY\0SELL\0");
   ImGui::Combo("Order Type", &ticket_order_type_, "LIMIT\0MARKET\0");
   ImGui::Combo("Asset Type", &ticket_asset_type_, "EQUITY\0OPTION\0");
+  if (IsProviderConnected(Provider::kSchwab)) {
+    ImGui::Checkbox("Enable live Schwab submit", &live_trade_enabled_);
+    if (ticket_asset_type_ != 0) {
+      ImGui::TextDisabled(
+          "Live option routing stays disabled until contract-symbol normalization is wired.");
+    }
+  }
 
   if (ticket_order_type_ == 0) {
     ImGui::InputText("Limit Price", &ticket_limit_price_,
@@ -641,15 +670,21 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
                         trade_quote_->quote.updated_at.empty()
                             ? "-"
                             : trade_quote_->quote.updated_at.c_str());
+    if (!selected_option_strike_.empty()) {
+      ImGui::TextDisabled("Selected strike: %s", selected_option_strike_.c_str());
+    }
     ImGui::EndChild();
   }
 
   const char* preview_label = IsProviderConnected(Provider::kSchwab)
                                   ? "Preview Schwab Ticket"
                                   : "Preview Ticket";
-  const char* submit_label = IsProviderConnected(Provider::kSchwab)
-                                 ? "Stage Schwab Order"
-                                 : "Submit Simulated";
+  const char* submit_label = live_trade_enabled_ &&
+                                     IsProviderConnected(Provider::kSchwab)
+                                 ? "Submit Live to Schwab"
+                                 : (IsProviderConnected(Provider::kSchwab)
+                                        ? "Stage Schwab Order"
+                                        : "Submit Simulated");
 
   if (ImGui::Button(preview_label, ImVec2(-FLT_MIN / 2.0f, 0.0f))) {
     try {
@@ -659,7 +694,7 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
               BuildOrderIntent());
       latest_submission_.reset();
       workspace_message_ = IsProviderConnected(Provider::kSchwab)
-                               ? "Built a Schwab-first trade preview using live quote data; execution remains simulated."
+                               ? "Built a Schwab-first trade preview using live quote data."
                                : "Generated a simulated desktop order preview.";
     } catch (const std::exception& ex) {
       workspace_message_ = std::string("Order preview failed: ") + ex.what();
@@ -677,7 +712,9 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
       latest_preview_.reset();
       RefreshWorkspaceData();
       workspace_message_ = IsProviderConnected(Provider::kSchwab)
-                               ? "Stored a Schwab-routed desktop ticket in simulated mode."
+                               ? (live_trade_enabled_
+                                      ? "Submitted a live-gated Schwab order from the desktop trade desk."
+                                      : "Stored a Schwab-routed desktop ticket in staged mode.")
                                : latest_submission_->message;
     } catch (const std::exception& ex) {
       workspace_message_ = std::string("Order submission failed: ") + ex.what();
@@ -708,7 +745,7 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
 void Workspace::DrawTradeDesk() {
   ImGui::Text("Trade Desk");
   ImGui::TextDisabled(
-      "This desk keeps a Schwab-first trading workflow visible today while remaining explicit that execution is still simulated.");
+      "This desk keeps a Schwab-first trading workflow visible today while defaulting to preview mode until you arm live Schwab submission.");
   ImGui::Separator();
 
   if (ImGui::BeginTable("TradeDeskLayout", 2,
@@ -793,7 +830,7 @@ void Workspace::DrawRightRail() {
   } else {
     ImGui::Text("Trade Notes");
     ImGui::TextWrapped(
-        "When Schwab order routing lands, this rail can graduate into live trade confirmations and replace/cancel workflows. Until then it stays explicit about simulated mode.");
+        "Live Schwab order routing is available behind an explicit checkbox, while IBKR remains account-only and options still need contract-symbol normalization for safe live routing.");
   }
 
   ImGui::Separator();

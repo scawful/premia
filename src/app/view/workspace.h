@@ -80,11 +80,13 @@ class Workspace {
   std::optional<core::application::OrderSubmissionData> latest_submission_;
 
   std::string ticket_symbol_ = "AAPL";
+  std::string selected_option_strike_;
   std::string ticket_quantity_ = "1";
   std::string ticket_limit_price_;
   int ticket_instruction_ = 0;
   int ticket_order_type_ = 0;
   int ticket_asset_type_ = 0;
+  bool live_trade_enabled_ = false;
 };
 
 }  // namespace premia

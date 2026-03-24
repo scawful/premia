@@ -29,6 +29,7 @@ target_link_libraries(
   premia_provider_tda_watchlists
   premia_provider_schwab_account_detail
   premia_provider_schwab_market_data
+  premia_provider_schwab_orders
   premia_provider_schwab_options
   premia_provider_schwab_workflows
   premia_provider_ibkr_account_detail

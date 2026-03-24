@@ -112,7 +112,14 @@ void AccountView::DrawCoreAccountPreview() {
     for (const auto& holding : account.positions) {
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
-      ImGui::Text("%s", holding.symbol.c_str());
+      const bool is_selected = selected_symbol_ == holding.symbol;
+      if (ImGui::Selectable(holding.symbol.c_str(), is_selected,
+                            ImGuiSelectableFlags_SpanAllColumns)) {
+        selected_symbol_ = holding.symbol;
+        if (symbol_selection_handler_) {
+          symbol_selection_handler_(holding.symbol);
+        }
+      }
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s", holding.name.c_str());
       ImGui::TableSetColumnIndex(2);
@@ -139,6 +146,15 @@ void AccountView::addLogger(const Logger &newLogger) {
 
 void AccountView::addEvent(const std::string &key, const EventHandler &event) {
   this->events[key] = event;
+}
+
+void AccountView::SetSelectedSymbol(const std::string& symbol) {
+  selected_symbol_ = symbol;
+}
+
+void AccountView::SetSymbolSelectionHandler(
+    const std::function<void(const std::string&)>& handler) {
+  symbol_selection_handler_ = handler;
 }
 
 void AccountView::Update() {

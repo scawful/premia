@@ -28,6 +28,7 @@
 #include "premia/providers/ibkr/account_detail_provider.hpp"
 #include "premia/providers/schwab/account_detail_provider.hpp"
 #include "premia/providers/schwab/market_data_provider.hpp"
+#include "premia/providers/schwab/order_provider.hpp"
 #include "premia/providers/schwab/options_provider.hpp"
 #include "premia/providers/schwab/workflow_provider.hpp"
 #include "premia/providers/tda/account_detail_provider.hpp"
@@ -610,6 +611,11 @@ auto WatchlistService::RemoveWatchlistSymbol(const std::string& watchlist_id,
 auto OrderService::PreviewOrder(const OrderIntentRequest& request)
     -> OrderPreviewData {
   try {
+    providers::schwab::OrderProvider provider(SchwabConfigPath(), SchwabTokenPath());
+    return provider.PreviewOrder(request);
+  } catch (const std::exception&) {
+  }
+  try {
     providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.PreviewOrder(request);
   } catch (const std::exception&) {
@@ -620,6 +626,11 @@ auto OrderService::PreviewOrder(const OrderIntentRequest& request)
 
 auto OrderService::SubmitOrder(const OrderIntentRequest& request)
     -> OrderSubmissionData {
+  try {
+    providers::schwab::OrderProvider provider(SchwabConfigPath(), SchwabTokenPath());
+    return provider.SubmitOrder(request);
+  } catch (const std::exception&) {
+  }
   try {
     providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.SubmitOrder(request);
@@ -632,6 +643,11 @@ auto OrderService::SubmitOrder(const OrderIntentRequest& request)
 auto OrderService::CancelOrder(const OrderCancelRequest& request)
     -> OrderCancellationData {
   try {
+    providers::schwab::OrderProvider provider(SchwabConfigPath(), SchwabTokenPath());
+    return provider.CancelOrder(request);
+  } catch (const std::exception&) {
+  }
+  try {
     providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.CancelOrder(request);
   } catch (const std::exception&) {
@@ -642,6 +658,11 @@ auto OrderService::CancelOrder(const OrderCancelRequest& request)
 
 auto OrderService::ReplaceOrder(const OrderReplaceRequest& request)
     -> OrderReplacementData {
+  try {
+    providers::schwab::OrderProvider provider(SchwabConfigPath(), SchwabTokenPath());
+    return provider.ReplaceOrder(request);
+  } catch (const std::exception&) {
+  }
   try {
     providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.ReplaceOrder(request);
@@ -654,6 +675,11 @@ auto OrderService::ReplaceOrder(const OrderReplaceRequest& request)
 auto OrderService::GetOpenOrders(const std::string& account_id) const
     -> std::vector<OrderRecordData> {
   try {
+    providers::schwab::OrderProvider provider(SchwabConfigPath(), SchwabTokenPath());
+    return provider.GetOpenOrders(account_id);
+  } catch (const std::exception&) {
+  }
+  try {
     providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.GetOpenOrders(account_id);
   } catch (const std::exception&) {
@@ -664,6 +690,11 @@ auto OrderService::GetOpenOrders(const std::string& account_id) const
 
 auto OrderService::GetOrderHistory(const std::string& account_id) const
     -> std::vector<OrderRecordData> {
+  try {
+    providers::schwab::OrderProvider provider(SchwabConfigPath(), SchwabTokenPath());
+    return provider.GetOrderHistory(account_id);
+  } catch (const std::exception&) {
+  }
   try {
     providers::tda::OrderProvider provider(TdaConfigPath());
     return provider.GetOrderHistory(account_id);

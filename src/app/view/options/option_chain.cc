@@ -200,7 +200,11 @@ void OptionChainView::DrawChain() {
               ImGui::Text("%s", option_row.call_open_interest.c_str());
               break;
             case 9:
-              ImGui::Selectable(option_row.strike.c_str(), &select_options[row]);
+              if (ImGui::Selectable(option_row.strike.c_str(), &select_options[row])) {
+                if (strike_selection_handler_) {
+                  strike_selection_handler_(symbol, option_row.strike);
+                }
+              }
               break;
             case 10:
               ImGui::Text("%s", option_row.put_bid.c_str());
@@ -446,5 +450,10 @@ void OptionChainView::SetSymbol(const std::string& next_symbol) {
 void OptionChainView::SetSymbolChangeHandler(
     const std::function<void(const std::string&)>& handler) {
   symbol_change_handler_ = handler;
+}
+
+void OptionChainView::SetStrikeSelectionHandler(
+    const std::function<void(const std::string&, const std::string&)>& handler) {
+  strike_selection_handler_ = handler;
 }
 }  // namespace premia

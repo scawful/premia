@@ -4,6 +4,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <chrono>
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -46,6 +47,48 @@ static size_t curl_write(const char* ptr, size_t size, size_t nmemb,
     return 0;
   }
   return total;
+}
+
+static size_t curl_header(const char* ptr, size_t size, size_t nmemb,
+                          std::string* out) {
+  size_t total = size * nmemb;
+  if (out != nullptr) {
+    out->append(ptr, total);
+  }
+  return total;
+}
+
+auto HeaderValue(const std::string& headers, const std::string& name)
+    -> std::string {
+  std::istringstream stream(headers);
+  std::string line;
+  const std::string needle = name + ":";
+  while (std::getline(stream, line)) {
+    if (line.size() < needle.size()) {
+      continue;
+    }
+    bool matches = true;
+    for (size_t index = 0; index < needle.size(); ++index) {
+      if (std::tolower(static_cast<unsigned char>(line[index])) !=
+          std::tolower(static_cast<unsigned char>(needle[index]))) {
+        matches = false;
+        break;
+      }
+    }
+    if (!matches) {
+      continue;
+    }
+    auto value = line.substr(needle.size());
+    while (!value.empty() && (value.front() == ' ' || value.front() == '\t')) {
+      value.erase(value.begin());
+    }
+    while (!value.empty() &&
+           (value.back() == '\r' || value.back() == '\n' || value.back() == ' ')) {
+      value.pop_back();
+    }
+    return value;
+  }
+  return "";
 }
 
 // ---------------------------------------------------------------------------
@@ -335,27 +378,58 @@ const std::vector<AccountHash>& Client::GetAllAccountHashes() const {
 // Internal HTTP helpers
 // ---------------------------------------------------------------------------
 
-std::string Client::SendAuthorizedGet(const std::string& url) const {
+auto Client::SendAuthorizedRequest(const std::string& method,
+                                   const std::string& url,
+                                   const std::string* body) const
+    -> AuthorizedResponse {
   CURL* curl = curl_easy_init();
-  if (!curl) return "";
+  if (!curl) return {};
 
-  std::string response;
+  AuthorizedResponse response;
+  std::string response_headers;
   std::string auth_header = "Authorization: Bearer " + access_token_;
 
   struct curl_slist* headers = nullptr;
   headers = curl_slist_append(headers, auth_header.c_str());
+  headers = curl_slist_append(headers, "Accept: application/json");
+  if (body != nullptr) {
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+  }
 
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response.body);
+  curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, curl_header);
+  curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_headers);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
   curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
-  curl_easy_perform(curl);
+  if (method == "POST") {
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+  } else if (method != "GET") {
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
+  }
+
+  if (body != nullptr) {
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body->c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE,
+                     static_cast<long>(body->size()));
+  }
+
+  CURLcode code = curl_easy_perform(curl);
+  if (code == CURLE_OK) {
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.status_code);
+  }
+  response.location = HeaderValue(response_headers, "Location");
+
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
   return response;
+}
+
+std::string Client::SendAuthorizedGet(const std::string& url) const {
+  return SendAuthorizedRequest("GET", url).body;
 }
 
 // POST to Schwab token endpoint using HTTP Basic Auth (app_key:app_secret).
@@ -400,6 +474,96 @@ std::string Client::GetAccount(const std::string& account_hash) const {
 
 std::string Client::GetAllAccounts() const {
   return SendAuthorizedGet(kTraderBaseUrl + "/accounts?fields=positions");
+}
+
+std::string Client::PreviewOrder(const std::string& account_hash,
+                                 const std::string& order_payload,
+                                 long* status_code) const {
+  const auto response = SendAuthorizedRequest(
+      "POST", kTraderBaseUrl + "/accounts/" + account_hash + "/previewOrder",
+      &order_payload);
+  if (status_code != nullptr) {
+    *status_code = response.status_code;
+  }
+  return response.body;
+}
+
+bool Client::PlaceOrder(const std::string& account_hash,
+                        const std::string& order_payload,
+                        std::string* order_location,
+                        long* status_code) const {
+  const auto response = SendAuthorizedRequest(
+      "POST", kTraderBaseUrl + "/accounts/" + account_hash + "/orders",
+      &order_payload);
+  if (status_code != nullptr) {
+    *status_code = response.status_code;
+  }
+  if (order_location != nullptr) {
+    *order_location = response.location;
+  }
+  return response.status_code >= 200 && response.status_code < 300;
+}
+
+std::string Client::GetOrdersForAccount(const std::string& account_hash,
+                                        const std::string& from_entered_time,
+                                        const std::string& to_entered_time,
+                                        int max_results,
+                                        const std::string& status,
+                                        long* status_code) const {
+  std::string url = kTraderBaseUrl + "/accounts/" + account_hash +
+                    "/orders?maxResults=" + std::to_string(max_results) +
+                    "&fromEnteredTime=" + from_entered_time +
+                    "&toEnteredTime=" + to_entered_time;
+  if (!status.empty()) {
+    url += "&status=" + status;
+  }
+  const auto response = SendAuthorizedRequest("GET", url);
+  if (status_code != nullptr) {
+    *status_code = response.status_code;
+  }
+  return response.body;
+}
+
+std::string Client::GetOrder(const std::string& account_hash,
+                             const std::string& order_id,
+                             long* status_code) const {
+  const auto response = SendAuthorizedRequest(
+      "GET", kTraderBaseUrl + "/accounts/" + account_hash + "/orders/" +
+                 order_id);
+  if (status_code != nullptr) {
+    *status_code = response.status_code;
+  }
+  return response.body;
+}
+
+bool Client::CancelOrder(const std::string& account_hash,
+                         const std::string& order_id,
+                         long* status_code) const {
+  const auto response = SendAuthorizedRequest(
+      "DELETE", kTraderBaseUrl + "/accounts/" + account_hash + "/orders/" +
+                    order_id);
+  if (status_code != nullptr) {
+    *status_code = response.status_code;
+  }
+  return response.status_code >= 200 && response.status_code < 300;
+}
+
+bool Client::ReplaceOrder(const std::string& account_hash,
+                          const std::string& order_id,
+                          const std::string& order_payload,
+                          std::string* order_location,
+                          long* status_code) const {
+  const auto response = SendAuthorizedRequest(
+      "PUT", kTraderBaseUrl + "/accounts/" + account_hash + "/orders/" +
+                 order_id,
+      &order_payload);
+  if (status_code != nullptr) {
+    *status_code = response.status_code;
+  }
+  if (order_location != nullptr) {
+    *order_location = response.location;
+  }
+  return response.status_code >= 200 && response.status_code < 300;
 }
 
 // ---------------------------------------------------------------------------
