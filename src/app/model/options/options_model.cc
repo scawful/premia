@@ -213,6 +213,7 @@ void OptionsModel::loadFromCoreSnapshot(
       tda::StrikePriceMap call_strike;
       call_strike.strikePrice = row.strike;
       call_strike.raw_option = makeRawOptionMap({
+          {"symbol", row.call_symbol},
           {"strikePrice", row.strike},
           {"bid", row.call_bid},
           {"ask", row.call_ask},
@@ -230,6 +231,7 @@ void OptionsModel::loadFromCoreSnapshot(
       tda::StrikePriceMap put_strike;
       put_strike.strikePrice = row.strike;
       put_strike.raw_option = makeRawOptionMap({
+          {"symbol", row.put_symbol},
           {"strikePrice", row.strike},
           {"bid", row.put_bid},
           {"ask", row.put_ask},

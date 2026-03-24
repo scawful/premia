@@ -34,13 +34,32 @@ auto ProviderBackedApplicationService::GetBootstrapData() const -> BootstrapData
 }
 
 auto ProviderBackedApplicationService::GetHomeScreenData() const -> HomeScreenData {
+  return GetHomeScreenDataForAccount("");
+}
+
+auto ProviderBackedApplicationService::GetHomeScreenDataForAccount(
+    const std::string& account_id) const -> HomeScreenData {
   HomeScreenData data;
   data.connections = connection_service_->GetConnections();
-  data.portfolio = portfolio_service_->GetPortfolioSummary();
-  data.top_holdings = portfolio_service_->GetTopHoldings();
+  data.brokerage_accounts = portfolio_service_->ListBrokerageAccounts();
+  data.active_account_id = account_id;
+  data.portfolio = portfolio_service_->GetPortfolioSummaryForAccount(account_id);
+  data.top_holdings = portfolio_service_->GetTopHoldingsForAccount(account_id);
   data.watchlists = watchlist_service_->ListWatchlists();
   data.market = MarketSummary{"open", "2026-03-22T20:00:00Z"};
+  if (data.active_account_id.empty()) {
+    if (!data.brokerage_accounts.empty()) {
+      data.active_account_id = data.brokerage_accounts.front().account_id;
+    } else {
+      data.active_account_id = GetAccountDetailForAccount("").account_id;
+    }
+  }
   return data;
+}
+
+auto ProviderBackedApplicationService::ListBrokerageAccounts() const
+    -> std::vector<BrokerageAccountSummary> {
+  return portfolio_service_->ListBrokerageAccounts();
 }
 
 auto ProviderBackedApplicationService::GetConnections() const
@@ -58,13 +77,28 @@ auto ProviderBackedApplicationService::GetPortfolioSummary() const
   return portfolio_service_->GetPortfolioSummary();
 }
 
+auto ProviderBackedApplicationService::GetPortfolioSummaryForAccount(
+    const std::string& account_id) const -> PortfolioSummary {
+  return portfolio_service_->GetPortfolioSummaryForAccount(account_id);
+}
+
 auto ProviderBackedApplicationService::GetTopHoldings() const
     -> std::vector<HoldingRow> {
   return portfolio_service_->GetTopHoldings();
 }
 
+auto ProviderBackedApplicationService::GetTopHoldingsForAccount(
+    const std::string& account_id) const -> std::vector<HoldingRow> {
+  return portfolio_service_->GetTopHoldingsForAccount(account_id);
+}
+
 auto ProviderBackedApplicationService::GetAccountDetail() const -> AccountDetail {
   return portfolio_service_->GetAccountDetail();
+}
+
+auto ProviderBackedApplicationService::GetAccountDetailForAccount(
+    const std::string& account_id) const -> AccountDetail {
+  return portfolio_service_->GetAccountDetailForAccount(account_id);
 }
 
 auto ProviderBackedApplicationService::GetQuoteDetail(const std::string& symbol) const

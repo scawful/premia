@@ -36,6 +36,11 @@ class Workspace {
   void RefreshWorkspaceData();
   void RefreshTradeQuote();
   void SelectSymbol(const std::string& symbol);
+  void SelectOptionContract(const std::string& symbol,
+                            const std::string& contract_symbol,
+                            const std::string& strike,
+                            bool is_call);
+  void SelectOrder(const core::application::OrderRecordData& order);
   void DrawHeader();
   void DrawSidebar();
   void DrawMainSurface();
@@ -49,7 +54,8 @@ class Workspace {
   void DrawOrdersTable(
       const char* id,
       const std::vector<core::application::OrderRecordData>& orders,
-      int max_rows) const;
+      int max_rows,
+      bool selectable = false);
 
   auto BuildOrderIntent() const -> core::application::OrderIntentRequest;
   auto ActiveAccountSource() const -> std::string;
@@ -63,6 +69,8 @@ class Workspace {
   bool events_wired_ = false;
   std::string workspace_message_;
   std::string last_refresh_at_;
+  std::string active_account_id_;
+  std::string selected_order_id_;
 
   MenuView menu_view_;
   ConsoleView console_view_;
@@ -73,6 +81,7 @@ class Workspace {
 
   core::application::HomeScreenData home_data_;
   core::application::AccountDetail account_detail_;
+  std::vector<core::application::BrokerageAccountSummary> brokerage_accounts_;
   std::vector<core::application::OrderRecordData> open_orders_;
   std::vector<core::application::OrderRecordData> order_history_;
   std::optional<core::application::QuoteDetail> trade_quote_;
@@ -81,11 +90,13 @@ class Workspace {
 
   std::string ticket_symbol_ = "AAPL";
   std::string selected_option_strike_;
+  std::string selected_option_contract_symbol_;
   std::string ticket_quantity_ = "1";
   std::string ticket_limit_price_;
   int ticket_instruction_ = 0;
   int ticket_order_type_ = 0;
   int ticket_asset_type_ = 0;
+  bool selected_option_is_call_ = true;
   bool live_trade_enabled_ = false;
 };
 

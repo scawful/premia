@@ -173,7 +173,16 @@ void OptionChainView::DrawChain() {
           ImGui::TableSetColumnIndex(column);
           switch (column) {
             case 0:
-              ImGui::Text("%s", option_row.call_bid.c_str());
+              if (!option_row.call_symbol.empty() &&
+                  ImGui::Selectable((option_row.call_bid + "##call_" + option_row.id).c_str(),
+                                    false, ImGuiSelectableFlags_SpanAllColumns)) {
+                if (strike_selection_handler_) {
+                  strike_selection_handler_(symbol, option_row.call_symbol,
+                                            option_row.strike, true);
+                }
+              } else {
+                ImGui::Text("%s", option_row.call_bid.c_str());
+              }
               break;
             case 1:
               ImGui::Text("%s", option_row.call_ask.c_str());
@@ -202,12 +211,21 @@ void OptionChainView::DrawChain() {
             case 9:
               if (ImGui::Selectable(option_row.strike.c_str(), &select_options[row])) {
                 if (strike_selection_handler_) {
-                  strike_selection_handler_(symbol, option_row.strike);
+                  strike_selection_handler_(symbol, "", option_row.strike, true);
                 }
               }
               break;
             case 10:
-              ImGui::Text("%s", option_row.put_bid.c_str());
+              if (!option_row.put_symbol.empty() &&
+                  ImGui::Selectable((option_row.put_bid + "##put_" + option_row.id).c_str(),
+                                    false, ImGuiSelectableFlags_SpanAllColumns)) {
+                if (strike_selection_handler_) {
+                  strike_selection_handler_(symbol, option_row.put_symbol,
+                                            option_row.strike, false);
+                }
+              } else {
+                ImGui::Text("%s", option_row.put_bid.c_str());
+              }
               break;
             case 11:
               ImGui::Text("%s", option_row.put_ask.c_str());
@@ -453,7 +471,8 @@ void OptionChainView::SetSymbolChangeHandler(
 }
 
 void OptionChainView::SetStrikeSelectionHandler(
-    const std::function<void(const std::string&, const std::string&)>& handler) {
+    const std::function<void(const std::string&, const std::string&,
+                             const std::string&, bool)>& handler) {
   strike_selection_handler_ = handler;
 }
 }  // namespace premia

@@ -26,9 +26,16 @@ class ConnectionService {
 
 class PortfolioAccountService {
  public:
+  auto ListBrokerageAccounts() const -> std::vector<BrokerageAccountSummary>;
   auto GetPortfolioSummary() const -> PortfolioSummary;
+  auto GetPortfolioSummaryForAccount(const std::string& account_id) const
+      -> PortfolioSummary;
   auto GetTopHoldings() const -> std::vector<HoldingRow>;
+  auto GetTopHoldingsForAccount(const std::string& account_id) const
+      -> std::vector<HoldingRow>;
   auto GetAccountDetail() const -> AccountDetail;
+  auto GetAccountDetailForAccount(const std::string& account_id) const
+      -> AccountDetail;
 };
 
 class MarketOptionsService {

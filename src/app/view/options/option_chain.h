@@ -30,7 +30,8 @@ class OptionChainView : public View {
   int current_expiration_index_ = 0;
   bool pending_refresh_ = true;
   std::function<void(const std::string&)> symbol_change_handler_;
-  std::function<void(const std::string&, const std::string&)> strike_selection_handler_;
+  std::function<void(const std::string&, const std::string&, const std::string&, bool)>
+      strike_selection_handler_;
   EventMap events;
   Logger logger;
   OptionsModel model;
@@ -49,7 +50,8 @@ class OptionChainView : public View {
   void SetSymbolChangeHandler(
       const std::function<void(const std::string&)>& handler);
   void SetStrikeSelectionHandler(
-      const std::function<void(const std::string&, const std::string&)>& handler);
+      const std::function<void(const std::string&, const std::string&,
+                               const std::string&, bool)>& handler);
   void Update() override;
 
  private:

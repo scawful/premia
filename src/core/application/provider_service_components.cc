@@ -311,6 +311,18 @@ auto MakePortfolioSummaryFromAccount(const AccountDetail& detail) -> PortfolioSu
                           static_cast<int>(detail.positions.size())};
 }
 
+auto MakeBrokerageAccountSummary(const AccountDetail& detail, Provider provider,
+                                 const std::string& display_name)
+    -> BrokerageAccountSummary {
+  BrokerageAccountSummary summary;
+  summary.provider = provider;
+  summary.account_id = detail.account_id;
+  summary.display_name = display_name;
+  summary.total_value = detail.net_liquidation;
+  summary.holdings_count = static_cast<int>(detail.positions.size());
+  return summary;
+}
+
 }  // namespace
 
 auto MakeHoldingsFromAccount(const AccountDetail& detail, Provider provider)
@@ -431,15 +443,59 @@ auto ConnectionService::MutableConnection(Provider provider) -> ConnectionSummar
 }
 
 auto PortfolioAccountService::GetPortfolioSummary() const -> PortfolioSummary {
+  return GetPortfolioSummaryForAccount("");
+}
+
+auto PortfolioAccountService::ListBrokerageAccounts() const
+    -> std::vector<BrokerageAccountSummary> {
   try {
     providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
                                                       SchwabTokenPath());
-    return MakePortfolioSummaryFromAccount(provider.GetAccountDetail());
+    auto accounts = provider.ListBrokerageAccounts();
+    if (!accounts.empty()) {
+      return accounts;
+    }
+  } catch (const std::exception&) {
+  }
+
+  try {
+    providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
+    const auto detail = provider.GetAccountDetail();
+    return {MakeBrokerageAccountSummary(detail, Provider::kIBKR,
+                                        "Interactive Brokers")};
+  } catch (const std::exception&) {
+  }
+
+  try {
+    providers::tda::AccountDetailProvider provider(TdaConfigPath());
+    const auto detail = provider.GetAccountDetail();
+    return {MakeBrokerageAccountSummary(detail, Provider::kTDA,
+                                        "TDAmeritrade")};
+  } catch (const std::exception&) {
+  }
+
+  providers::local::AccountDetailProvider provider(kAccountPath);
+  const auto detail = provider.GetAccountDetail();
+  return {MakeBrokerageAccountSummary(detail, Provider::kInternal,
+                                      "Local Preview")};
+}
+
+auto PortfolioAccountService::GetPortfolioSummaryForAccount(
+    const std::string& account_id) const -> PortfolioSummary {
+  try {
+    providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
+                                                      SchwabTokenPath());
+    return MakePortfolioSummaryFromAccount(
+        account_id.empty() ? provider.GetAccountDetail()
+                           : provider.GetAccountDetailForAccount(account_id));
   } catch (const std::exception&) {
   }
   try {
     providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
-    return MakePortfolioSummaryFromAccount(provider.GetAccountDetail());
+    const auto detail = provider.GetAccountDetail();
+    if (account_id.empty() || detail.account_id == account_id) {
+      return MakePortfolioSummaryFromAccount(detail);
+    }
   } catch (const std::exception&) {
   }
   try {
@@ -452,15 +508,26 @@ auto PortfolioAccountService::GetPortfolioSummary() const -> PortfolioSummary {
 }
 
 auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> {
+  return GetTopHoldingsForAccount("");
+}
+
+auto PortfolioAccountService::GetTopHoldingsForAccount(
+    const std::string& account_id) const -> std::vector<HoldingRow> {
   try {
     providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
                                                       SchwabTokenPath());
-    return MakeHoldingsFromAccount(provider.GetAccountDetail(), Provider::kSchwab);
+    return MakeHoldingsFromAccount(
+        account_id.empty() ? provider.GetAccountDetail()
+                           : provider.GetAccountDetailForAccount(account_id),
+        Provider::kSchwab);
   } catch (const std::exception&) {
   }
   try {
     providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
-    return MakeHoldingsFromAccount(provider.GetAccountDetail(), Provider::kIBKR);
+    const auto detail = provider.GetAccountDetail();
+    if (account_id.empty() || detail.account_id == account_id) {
+      return MakeHoldingsFromAccount(detail, Provider::kIBKR);
+    }
   } catch (const std::exception&) {
   }
   try {
@@ -473,15 +540,24 @@ auto PortfolioAccountService::GetTopHoldings() const -> std::vector<HoldingRow> 
 }
 
 auto PortfolioAccountService::GetAccountDetail() const -> AccountDetail {
+  return GetAccountDetailForAccount("");
+}
+
+auto PortfolioAccountService::GetAccountDetailForAccount(
+    const std::string& account_id) const -> AccountDetail {
   try {
     providers::schwab::AccountDetailProvider provider(SchwabConfigPath(),
                                                       SchwabTokenPath());
-    return provider.GetAccountDetail();
+    return account_id.empty() ? provider.GetAccountDetail()
+                              : provider.GetAccountDetailForAccount(account_id);
   } catch (const std::exception&) {
   }
   try {
     providers::ibkr::AccountDetailProvider provider(IbkrConfigPath());
-    return provider.GetAccountDetail();
+    const auto detail = provider.GetAccountDetail();
+    if (account_id.empty() || detail.account_id == account_id) {
+      return detail;
+    }
   } catch (const std::exception&) {
   }
   try {

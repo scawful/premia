@@ -29,8 +29,8 @@ auto BuildFallback() -> application::OptionChainSnapshot {
   snapshot.expirations = {{"2026-04-17:26",
                            "2026-04-17:26",
                            "34200.00",
-                           {{"520c", "520", "7.80", "7.90", "7.85", "0.42", "0.52", "0.03", "-0.08", "0.12", "845", "8.10", "8.20", "8.15", "0.36", "-0.48", "0.03", "-0.08", "0.11", "902"},
-                            {"525c", "525", "5.20", "5.30", "5.25", "0.28", "0.41", "0.02", "-0.07", "0.10", "774", "10.60", "10.75", "10.68", "0.31", "-0.59", "0.02", "-0.07", "0.10", "811"}}}};
+                           {{"520c", "520", "SPY_041726C520", "7.80", "7.90", "7.85", "0.42", "0.52", "0.03", "-0.08", "0.12", "845", "SPY_041726P520", "8.10", "8.20", "8.15", "0.36", "-0.48", "0.03", "-0.08", "0.11", "902"},
+                            {"525c", "525", "SPY_041726C525", "5.20", "5.30", "5.25", "0.28", "0.41", "0.02", "-0.07", "0.10", "774", "SPY_041726P525", "10.60", "10.75", "10.68", "0.31", "-0.59", "0.02", "-0.07", "0.10", "811"}}}};
   return snapshot;
 }
 
@@ -86,6 +86,7 @@ auto OptionsProvider::GetOptionChainSnapshot(const std::string& symbol,
         expiration.rows.push_back(
             {row.get<std::string>("id", "row"),
              row.get<std::string>("strike", "0"),
+             row.get<std::string>("callSymbol", ""),
              row.get<std::string>("callBid", "0.00"),
              row.get<std::string>("callAsk", "0.00"),
              row.get<std::string>("callLast", "0.00"),
@@ -95,6 +96,7 @@ auto OptionsProvider::GetOptionChainSnapshot(const std::string& symbol,
              row.get<std::string>("callTheta", "0.00"),
              row.get<std::string>("callVega", "0.00"),
              row.get<std::string>("callOpenInterest", "0"),
+             row.get<std::string>("putSymbol", ""),
              row.get<std::string>("putBid", "0.00"),
              row.get<std::string>("putAsk", "0.00"),
              row.get<std::string>("putLast", "0.00"),

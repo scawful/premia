@@ -31,6 +31,14 @@ struct PortfolioSummary {
   int holdings_count = 0;
 };
 
+struct BrokerageAccountSummary {
+  Provider provider = Provider::kInternal;
+  std::string account_id;
+  std::string display_name;
+  Money total_value;
+  int holdings_count = 0;
+};
+
 struct HoldingRow {
   std::string id;
   std::string symbol;
@@ -126,6 +134,8 @@ struct BootstrapData {
 
 struct HomeScreenData {
   std::vector<ConnectionSummary> connections;
+  std::vector<BrokerageAccountSummary> brokerage_accounts;
+  std::string active_account_id;
   PortfolioSummary portfolio;
   std::vector<HoldingRow> top_holdings;
   std::vector<WatchlistSummary> watchlists;
@@ -165,6 +175,7 @@ struct AccountDetail {
 struct OptionContractPairRow {
   std::string id;
   std::string strike;
+  std::string call_symbol;
   std::string call_bid;
   std::string call_ask;
   std::string call_last;
@@ -174,6 +185,7 @@ struct OptionContractPairRow {
   std::string call_theta;
   std::string call_vega;
   std::string call_open_interest;
+  std::string put_symbol;
   std::string put_bid;
   std::string put_ask;
   std::string put_last;

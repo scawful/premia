@@ -211,11 +211,17 @@ void Workspace::WireEvents() {
     workspace_message_ = "Linked options symbol into charts and trade.";
   });
   option_chain_view_.SetStrikeSelectionHandler(
-      [this](const std::string& symbol, const std::string& strike) {
-        SelectSymbol(symbol);
-        selected_option_strike_ = strike;
-        active_surface_ = Surface::kTrade;
-        workspace_message_ = "Linked option strike into the trade desk for review.";
+      [this](const std::string& symbol, const std::string& contract_symbol,
+             const std::string& strike, bool is_call) {
+        if (contract_symbol.empty()) {
+          SelectSymbol(symbol);
+          selected_option_strike_ = strike;
+          active_surface_ = Surface::kTrade;
+          workspace_message_ =
+              "Linked option strike into the trade desk for review.";
+          return;
+        }
+        SelectOptionContract(symbol, contract_symbol, strike, is_call);
       });
 
   events_wired_ = true;
@@ -229,6 +235,7 @@ void Workspace::SelectSymbol(const std::string& symbol) {
     ticket_limit_price_.clear();
     latest_preview_.reset();
     selected_option_strike_.clear();
+    selected_option_contract_symbol_.clear();
   }
   ticket_symbol_ = symbol;
   account_view_.SetSelectedSymbol(symbol);
@@ -236,6 +243,43 @@ void Workspace::SelectSymbol(const std::string& symbol) {
   chart_view_.SetTickerSymbol(symbol);
   option_chain_view_.SetSymbol(symbol);
   RefreshTradeQuote();
+}
+
+void Workspace::SelectOptionContract(const std::string& symbol,
+                                     const std::string& contract_symbol,
+                                     const std::string& strike,
+                                     bool is_call) {
+  SelectSymbol(symbol);
+  selected_option_strike_ = strike;
+  selected_option_contract_symbol_ = contract_symbol;
+  selected_option_is_call_ = is_call;
+  ticket_asset_type_ = 1;
+  ticket_instruction_ = 0;
+  ticket_quantity_ = "1";
+  active_surface_ = Surface::kTrade;
+  workspace_message_ = std::string("Loaded ") +
+                       (is_call ? "call" : "put") +
+                       " contract into the trade desk.";
+}
+
+void Workspace::SelectOrder(const core::application::OrderRecordData& order) {
+  selected_order_id_ = order.order_id;
+  ticket_quantity_ = order.quantity;
+  ticket_limit_price_ = order.limit_price;
+  ticket_order_type_ = order.order_type == "MARKET" ? 1 : 0;
+  ticket_asset_type_ = order.asset_type == "OPTION" ? 1 : 0;
+  if (ticket_asset_type_ == 1) {
+    selected_option_contract_symbol_ = order.symbol;
+  }
+  ticket_instruction_ = (order.instruction == "SELL" ||
+                         order.instruction == "SELL_TO_CLOSE")
+                            ? 1
+                            : 0;
+  SelectSymbol(ticket_asset_type_ == 1 ? ticket_symbol_ : order.symbol);
+  if (ticket_asset_type_ == 1) {
+    selected_option_contract_symbol_ = order.symbol;
+  }
+  workspace_message_ = "Loaded the selected order into the trade ticket.";
 }
 
 void Workspace::RefreshTradeQuote() {
@@ -256,10 +300,24 @@ void Workspace::RefreshTradeQuote() {
 void Workspace::RefreshWorkspaceData() {
   try {
     auto& root = core::application::CompositionRoot::Instance();
-    home_data_ = root.AppService().GetHomeScreenData();
-    account_detail_ = root.AccountDetails().GetAccountDetail();
-    open_orders_ = root.Orders().GetOpenOrders(account_detail_.account_id);
-    order_history_ = root.Orders().GetOrderHistory(account_detail_.account_id);
+    brokerage_accounts_ = root.AppService().ListBrokerageAccounts();
+    if (!active_account_id_.empty()) {
+      const auto account_it = std::find_if(
+          brokerage_accounts_.begin(), brokerage_accounts_.end(),
+          [this](const core::application::BrokerageAccountSummary& account) {
+            return account.account_id == active_account_id_;
+          });
+      if (account_it == brokerage_accounts_.end()) {
+        active_account_id_.clear();
+      }
+    }
+    home_data_ = root.AppService().GetHomeScreenDataForAccount(active_account_id_);
+    account_detail_ = root.AppService().GetAccountDetailForAccount(active_account_id_);
+    if (active_account_id_.empty()) {
+      active_account_id_ = account_detail_.account_id;
+    }
+    open_orders_ = root.Orders().GetOpenOrders(active_account_id_);
+    order_history_ = root.Orders().GetOrderHistory(active_account_id_);
     if (!home_data_.top_holdings.empty()) {
       ticket_symbol_ = home_data_.top_holdings.front().symbol;
     } else if (!account_detail_.positions.empty()) {
@@ -280,11 +338,19 @@ void Workspace::RefreshWorkspaceData() {
 
 auto Workspace::BuildOrderIntent() const -> core::application::OrderIntentRequest {
   core::application::OrderIntentRequest request;
-  request.account_id = account_detail_.account_id.empty() ? "local_acc"
-                                                           : account_detail_.account_id;
-  request.symbol = ticket_symbol_.empty() ? "AAPL" : ticket_symbol_;
+  request.account_id = active_account_id_.empty() ? (account_detail_.account_id.empty()
+                                                         ? "local_acc"
+                                                         : account_detail_.account_id)
+                                                  : active_account_id_;
   request.asset_type = ticket_asset_type_ == 0 ? "EQUITY" : "OPTION";
-  request.instruction = ticket_instruction_ == 0 ? "BUY" : "SELL";
+  request.symbol = request.asset_type == "OPTION" &&
+                           !selected_option_contract_symbol_.empty()
+                       ? selected_option_contract_symbol_
+                       : (ticket_symbol_.empty() ? "AAPL" : ticket_symbol_);
+  request.instruction = request.asset_type == "OPTION"
+                            ? (ticket_instruction_ == 0 ? "BUY_TO_OPEN"
+                                                        : "SELL_TO_CLOSE")
+                            : (ticket_instruction_ == 0 ? "BUY" : "SELL");
   request.quantity = ticket_quantity_.empty() ? "1" : ticket_quantity_;
   request.order_type = ticket_order_type_ == 0 ? "LIMIT" : "MARKET";
   request.limit_price = ticket_order_type_ == 0 ? ticket_limit_price_ : "";
@@ -292,11 +358,17 @@ auto Workspace::BuildOrderIntent() const -> core::application::OrderIntentReques
   request.session = "NORMAL";
   request.confirm_live = live_trade_enabled_ &&
                          IsProviderConnected(Provider::kSchwab) &&
-                         request.asset_type == "EQUITY";
+                         (request.asset_type == "EQUITY" ||
+                          !selected_option_contract_symbol_.empty());
   return request;
 }
 
 auto Workspace::ActiveAccountSource() const -> std::string {
+  for (const auto& account : brokerage_accounts_) {
+    if (!active_account_id_.empty() && account.account_id == active_account_id_) {
+      return account.display_name;
+    }
+  }
   for (const auto& connection : home_data_.connections) {
     if (connection.provider == Provider::kSchwab &&
         connection.status == ConnectionStatus::kConnected) {
@@ -363,6 +435,24 @@ void Workspace::DrawHeader() {
     RefreshWorkspaceData();
   }
   ImGui::SameLine();
+  if (!brokerage_accounts_.empty()) {
+    std::vector<const char*> account_names;
+    int active_index = 0;
+    account_names.reserve(brokerage_accounts_.size());
+    for (int index = 0; index < static_cast<int>(brokerage_accounts_.size()); ++index) {
+      account_names.push_back(brokerage_accounts_[index].display_name.c_str());
+      if (brokerage_accounts_[index].account_id == active_account_id_) {
+        active_index = index;
+      }
+    }
+    ImGui::SetNextItemWidth(220.0f);
+    if (ImGui::Combo("##activeAccount", &active_index, account_names.data(),
+                     static_cast<int>(account_names.size()))) {
+      active_account_id_ = brokerage_accounts_[active_index].account_id;
+      RefreshWorkspaceData();
+    }
+    ImGui::SameLine();
+  }
   ImGui::TextDisabled("Last refresh: %s", last_refresh_at_.empty() ? "not yet"
                                                                     : last_refresh_at_.c_str());
 
@@ -381,6 +471,10 @@ void Workspace::DrawSidebar() {
   ImGui::TextDisabled("Account ID: %s",
                       account_detail_.account_id.empty() ? "-"
                                                          : account_detail_.account_id.c_str());
+  if (brokerage_accounts_.size() > 1) {
+    ImGui::TextDisabled("Linked Schwab accounts: %d",
+                        static_cast<int>(brokerage_accounts_.size()));
+  }
   ImGui::Separator();
 
   struct NavItem {
@@ -588,7 +682,7 @@ void Workspace::DrawTradingStatusCard() {
 
 void Workspace::DrawOrdersTable(
     const char* id, const std::vector<core::application::OrderRecordData>& orders,
-    int max_rows) const {
+    int max_rows, bool selectable) {
   if (orders.empty()) {
     ImGui::TextDisabled("No orders available.");
     return;
@@ -608,7 +702,15 @@ void Workspace::DrawOrdersTable(
       const auto& order = orders[index];
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
-      ImGui::Text("%s", order.symbol.c_str());
+      if (selectable) {
+        const bool is_selected = selected_order_id_ == order.order_id;
+        if (ImGui::Selectable(order.symbol.c_str(), is_selected,
+                              ImGuiSelectableFlags_SpanAllColumns)) {
+          SelectOrder(order);
+        }
+      } else {
+        ImGui::Text("%s", order.symbol.c_str());
+      }
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s", order.instruction.c_str());
       ImGui::TableSetColumnIndex(2);
@@ -640,9 +742,9 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
   ImGui::Combo("Asset Type", &ticket_asset_type_, "EQUITY\0OPTION\0");
   if (IsProviderConnected(Provider::kSchwab)) {
     ImGui::Checkbox("Enable live Schwab submit", &live_trade_enabled_);
-    if (ticket_asset_type_ != 0) {
+    if (ticket_asset_type_ != 0 && selected_option_contract_symbol_.empty()) {
       ImGui::TextDisabled(
-          "Live option routing stays disabled until contract-symbol normalization is wired.");
+          "Select a call or put contract from the option chain before arming live option routing.");
     }
   }
 
@@ -673,6 +775,9 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
     if (!selected_option_strike_.empty()) {
       ImGui::TextDisabled("Selected strike: %s", selected_option_strike_.c_str());
     }
+    if (!selected_option_contract_symbol_.empty()) {
+      ImGui::TextDisabled("Contract: %s", selected_option_contract_symbol_.c_str());
+    }
     ImGui::EndChild();
   }
 
@@ -687,6 +792,11 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
                                         : "Submit Simulated");
 
   if (ImGui::Button(preview_label, ImVec2(-FLT_MIN / 2.0f, 0.0f))) {
+    if (ticket_asset_type_ == 1 && selected_option_contract_symbol_.empty()) {
+      workspace_message_ =
+          "Select a specific call or put contract from the option chain before previewing an option order.";
+      return;
+    }
     try {
       RefreshTradeQuote();
       latest_preview_ =
@@ -704,6 +814,11 @@ void Workspace::DrawQuickTradeTicket(bool expanded) {
     ImGui::SameLine();
   }
   if (ImGui::Button(submit_label, ImVec2(expanded ? -FLT_MIN : -FLT_MIN, 0.0f))) {
+    if (ticket_asset_type_ == 1 && selected_option_contract_symbol_.empty()) {
+      workspace_message_ =
+          "Select a specific call or put contract from the option chain before submitting an option order.";
+      return;
+    }
     try {
       RefreshTradeQuote();
       latest_submission_ =
@@ -760,7 +875,34 @@ void Workspace::DrawTradeDesk() {
     ImGui::TableNextColumn();
     ImGui::BeginChild("TradeDeskOrdersPanel", ImVec2(0.0f, 0.0f), true);
     ImGui::Text("Open Orders");
-    DrawOrdersTable("TradeDeskOpenOrders", open_orders_, 8);
+    DrawOrdersTable("TradeDeskOpenOrders", open_orders_, 8, true);
+    if (!selected_order_id_.empty()) {
+      ImGui::Separator();
+      ImGui::TextDisabled("Selected order: %s", selected_order_id_.c_str());
+      if (ImGui::Button("Cancel Selected Order", ImVec2(-FLT_MIN, 0.0f))) {
+        try {
+          const auto result = core::application::CompositionRoot::Instance().Orders().
+              CancelOrder({active_account_id_.empty() ? account_detail_.account_id
+                                                      : active_account_id_,
+                           selected_order_id_,
+                           live_trade_enabled_ && IsProviderConnected(Provider::kSchwab)});
+          RefreshWorkspaceData();
+          workspace_message_ = result.message;
+        } catch (const std::exception& ex) {
+          workspace_message_ = std::string("Order cancellation failed: ") + ex.what();
+        }
+      }
+      if (ImGui::Button("Replace Selected With Ticket", ImVec2(-FLT_MIN, 0.0f))) {
+        try {
+          const auto result = core::application::CompositionRoot::Instance().Orders().
+              ReplaceOrder({selected_order_id_, BuildOrderIntent()});
+          RefreshWorkspaceData();
+          workspace_message_ = result.message;
+        } catch (const std::exception& ex) {
+          workspace_message_ = std::string("Order replace failed: ") + ex.what();
+        }
+      }
+    }
     ImGui::Separator();
     ImGui::Text("Order History");
     DrawOrdersTable("TradeDeskOrderHistory", order_history_, 10);

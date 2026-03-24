@@ -133,6 +133,21 @@ auto MakeHoldingArray(const std::vector<application::HoldingRow>& holdings)
   return array;
 }
 
+auto MakeBrokerageAccountArray(
+    const std::vector<application::BrokerageAccountSummary>& accounts)
+    -> json::array {
+  json::array array;
+  for (const auto& account : accounts) {
+    array.emplace_back(json::object{{"provider",
+                                     domain::ProviderToString(account.provider)},
+                                    {"accountId", account.account_id},
+                                    {"displayName", account.display_name},
+                                    {"totalValue", MakeMoney(account.total_value)},
+                                    {"holdingsCount", account.holdings_count}});
+  }
+  return array;
+}
+
 auto MakeWatchlistRowArray(const std::vector<application::WatchlistRow>& rows)
     -> json::array {
   json::array array;
@@ -241,6 +256,7 @@ auto MakeOptionExpirationArray(
     for (const auto& row : expiration.rows) {
       rows.emplace_back(json::object{{"id", row.id},
                                      {"strike", row.strike},
+                                     {"callSymbol", row.call_symbol},
                                      {"callBid", row.call_bid},
                                      {"callAsk", row.call_ask},
                                      {"callLast", row.call_last},
@@ -250,6 +266,7 @@ auto MakeOptionExpirationArray(
                                      {"callTheta", row.call_theta},
                                      {"callVega", row.call_vega},
                                      {"callOpenInterest", row.call_open_interest},
+                                     {"putSymbol", row.put_symbol},
                                      {"putBid", row.put_bid},
                                      {"putAsk", row.put_ask},
                                      {"putLast", row.put_last},
@@ -294,6 +311,10 @@ auto SerializeHomeScreenResponse(const application::HomeScreenData& data)
     -> std::string {
   return WriteEnvelope(json::object{{"connections",
                                      MakeConnectionSummaryArray(data.connections)},
+                                    {"brokerageAccounts",
+                                     MakeBrokerageAccountArray(
+                                         data.brokerage_accounts)},
+                                    {"activeAccountId", data.active_account_id},
                                     {"portfolio",
                                      json::object{{"totalValue",
                                                    MakeMoney(data.portfolio.total_value)},

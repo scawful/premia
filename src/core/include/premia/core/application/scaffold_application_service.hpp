@@ -36,6 +36,15 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
 
   auto GetBootstrapData() const -> BootstrapData;
   auto GetHomeScreenData() const -> HomeScreenData;
+  auto GetHomeScreenDataForAccount(const std::string& account_id) const
+      -> HomeScreenData;
+  auto ListBrokerageAccounts() const -> std::vector<BrokerageAccountSummary>;
+  auto GetPortfolioSummaryForAccount(const std::string& account_id) const
+      -> PortfolioSummary;
+  auto GetTopHoldingsForAccount(const std::string& account_id) const
+      -> std::vector<HoldingRow>;
+  auto GetAccountDetailForAccount(const std::string& account_id) const
+      -> AccountDetail;
 
   auto GetConnections() const -> std::vector<ConnectionSummary> override;
   auto GetConnection(const std::string& provider_key) const

@@ -12,6 +12,10 @@ class AccountDetailProvider : public core::ports::AccountDetailProviderPort {
   AccountDetailProvider(std::string config_path, std::string token_path);
 
   auto GetAccountDetail() const -> core::application::AccountDetail override;
+  auto GetAccountDetailForAccount(const std::string& account_id) const
+      -> core::application::AccountDetail;
+  auto ListBrokerageAccounts() const
+      -> std::vector<core::application::BrokerageAccountSummary>;
 
  private:
   std::string config_path_;

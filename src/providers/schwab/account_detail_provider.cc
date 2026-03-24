@@ -20,6 +20,10 @@ namespace pt = boost::property_tree;
 
 namespace {
 
+struct AccountSnapshot {
+  application::AccountDetail detail;
+};
+
 auto MakeMoney(const std::string& amount) -> domain::Money {
   return domain::Money{amount.empty() ? "0.00" : amount, "USD"};
 }
@@ -148,6 +152,43 @@ auto PickBestAccountResponse(const std::vector<std::string>& responses) -> std::
   return best_response;
 }
 
+auto BuildAccountDisplayName(const std::string& account_id) -> std::string {
+  if (account_id.size() > 4) {
+    return "Charles Schwab (..." + account_id.substr(account_id.size() - 4) + ")";
+  }
+  return "Charles Schwab";
+}
+
+auto MakeBrokerageAccountSummary(const application::AccountDetail& detail)
+    -> application::BrokerageAccountSummary {
+  application::BrokerageAccountSummary summary;
+  summary.provider = domain::Provider::kSchwab;
+  summary.account_id = detail.account_id;
+  summary.display_name = BuildAccountDisplayName(detail.account_id);
+  summary.total_value = detail.net_liquidation;
+  summary.holdings_count = static_cast<int>(detail.positions.size());
+  return summary;
+}
+
+auto FetchAccountSnapshots(::premia::schwab::Client& client)
+    -> std::vector<AccountSnapshot> {
+  if (!client.GetAccountNumbers()) {
+    throw std::runtime_error("schwab account bootstrap unavailable");
+  }
+
+  std::vector<AccountSnapshot> snapshots;
+  for (const auto& account : client.GetAllAccountHashes()) {
+    const auto response = client.GetAccount(account.hash_value);
+    if (!response.empty()) {
+      snapshots.push_back({ParseAccount(response)});
+    }
+  }
+  if (snapshots.empty()) {
+    throw std::runtime_error("no usable schwab account responses");
+  }
+  return snapshots;
+}
+
 }  // namespace
 
 AccountDetailProvider::AccountDetailProvider(std::string config_path,
@@ -159,18 +200,52 @@ auto AccountDetailProvider::GetAccountDetail() const -> application::AccountDeta
   if (!LoadAuthorizedClient(client, config_path_, token_path_)) {
     throw std::runtime_error("schwab client unavailable");
   }
-  if (!client.GetAccountNumbers()) {
-    throw std::runtime_error("schwab account bootstrap unavailable");
-  }
 
-  std::vector<std::string> responses;
-  for (const auto& account : client.GetAllAccountHashes()) {
-    const auto response = client.GetAccount(account.hash_value);
-    if (!response.empty()) {
-      responses.push_back(response);
+  auto snapshots = FetchAccountSnapshots(client);
+  double best_score = -std::numeric_limits<double>::infinity();
+  application::AccountDetail best_detail;
+  for (const auto& snapshot : snapshots) {
+    const auto score = std::stod(snapshot.detail.net_liquidation.amount) +
+                       (snapshot.detail.positions.empty() ? 0.0 : 1000000.0);
+    if (score > best_score) {
+      best_score = score;
+      best_detail = snapshot.detail;
     }
   }
-  return ParseAccount(PickBestAccountResponse(responses));
+  return best_detail;
+}
+
+auto AccountDetailProvider::GetAccountDetailForAccount(
+    const std::string& account_id) const -> application::AccountDetail {
+  if (account_id.empty()) {
+    return GetAccountDetail();
+  }
+
+  ::premia::schwab::Client client;
+  if (!LoadAuthorizedClient(client, config_path_, token_path_)) {
+    throw std::runtime_error("schwab client unavailable");
+  }
+
+  for (const auto& snapshot : FetchAccountSnapshots(client)) {
+    if (snapshot.detail.account_id == account_id) {
+      return snapshot.detail;
+    }
+  }
+  throw std::runtime_error("schwab account was not found");
+}
+
+auto AccountDetailProvider::ListBrokerageAccounts() const
+    -> std::vector<application::BrokerageAccountSummary> {
+  ::premia::schwab::Client client;
+  if (!LoadAuthorizedClient(client, config_path_, token_path_)) {
+    throw std::runtime_error("schwab client unavailable");
+  }
+
+  std::vector<application::BrokerageAccountSummary> accounts;
+  for (const auto& snapshot : FetchAccountSnapshots(client)) {
+    accounts.push_back(MakeBrokerageAccountSummary(snapshot.detail));
+  }
+  return accounts;
 }
 
 }  // namespace premia::providers::schwab
