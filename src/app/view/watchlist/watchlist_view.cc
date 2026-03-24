@@ -74,6 +74,13 @@ auto SpreadText(const premia::core::application::WatchlistRow& row) -> std::stri
   }
 }
 
+auto MatchesAnySymbol(const std::vector<core::application::WatchlistRow>& rows,
+                      const std::string& symbol) -> bool {
+  return std::any_of(rows.begin(), rows.end(), [&symbol](const auto& row) {
+    return row.symbol == symbol;
+  });
+}
+
 }  // namespace
 
 void WatchlistView::LoadState() {
@@ -184,6 +191,79 @@ void WatchlistView::DrawWatchlistSummary(
   }
 }
 
+void WatchlistView::DrawComparePanel(
+    const core::application::WatchlistScreenData& primary,
+    const core::application::WatchlistScreenData& secondary,
+    const std::vector<core::application::WatchlistRow>& primary_rows,
+    const std::vector<core::application::WatchlistRow>& secondary_rows) {
+  int overlap_count = 0;
+  for (const auto& row : primary_rows) {
+    if (MatchesAnySymbol(secondary_rows, row.symbol)) {
+      ++overlap_count;
+    }
+  }
+
+  ImGui::BeginChild("WatchlistComparePanel", ImVec2(0.0f, 300.0f), true);
+  ImGui::Text("Watchlist Compare");
+  ImGui::TextDisabled("Primary: %s | Secondary: %s | Overlap: %d",
+                      primary.watchlist.name.c_str(), secondary.watchlist.name.c_str(),
+                      overlap_count);
+
+  if (ImGui::BeginTable("WatchlistCompareTables", 2,
+                        ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
+    const auto draw_side = [&](const char* id,
+                               const core::application::WatchlistScreenData& screen_data,
+                               const std::vector<core::application::WatchlistRow>& rows,
+                               bool highlight_overlap) {
+      ImGui::BeginChild(id, ImVec2(0.0f, 240.0f), true);
+      ImGui::Text("%s", screen_data.watchlist.name.c_str());
+      ImGui::Separator();
+      if (ImGui::BeginTable((std::string(id) + "Table").c_str(), 4,
+                            ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders |
+                                ImGuiTableFlags_SizingStretchSame)) {
+        ImGui::TableSetupColumn("Symbol");
+        ImGui::TableSetupColumn("Last");
+        ImGui::TableSetupColumn("Day");
+        ImGui::TableSetupColumn("Flag");
+        ImGui::TableHeadersRow();
+        for (const auto& row : rows) {
+          if (!MatchesFilter(row, filter_text_, movement_filter_)) {
+            continue;
+          }
+          const bool overlap = highlight_overlap && MatchesAnySymbol(
+              highlight_overlap ? secondary_rows : primary_rows, row.symbol);
+          ImGui::TableNextRow();
+          ImGui::TableSetColumnIndex(0);
+          ImGui::Text("%s", row.symbol.c_str());
+          ImGui::TableSetColumnIndex(1);
+          ImGui::Text("$%s", row.last_price.amount.c_str());
+          ImGui::TableSetColumnIndex(2);
+          ImGui::TextColored(DayChangeColor(row.day_change.absolute.amount),
+                             "%s%%", row.day_change.percent.c_str());
+          ImGui::TableSetColumnIndex(3);
+          if (row.is_pinned) {
+            ImGui::TextColored(ImVec4(0.92f, 0.78f, 0.36f, 1.0f), "Pinned");
+          } else if (overlap) {
+            ImGui::TextColored(ImVec4(0.40f, 0.72f, 0.96f, 1.0f), "Overlap");
+          } else {
+            ImGui::TextDisabled("-");
+          }
+        }
+        ImGui::EndTable();
+      }
+      ImGui::EndChild();
+    };
+
+    ImGui::TableNextColumn();
+    draw_side("PrimaryCompareSide", primary, primary_rows, true);
+    ImGui::TableNextColumn();
+    draw_side("SecondaryCompareSide", secondary, secondary_rows, true);
+    ImGui::EndTable();
+  }
+
+  ImGui::EndChild();
+}
+
 void WatchlistView::DrawCoreWatchlistPreview() {
   LoadState();
   auto& service = core::application::CompositionRoot::Instance().AppService();
@@ -231,6 +311,16 @@ void WatchlistView::DrawCoreWatchlistPreview() {
   }
   EnsureWatchlistOrdering(screen);
   const auto rows = BuildOrderedRows(screen);
+
+  std::vector<core::application::WatchlistSummary> compare_targets;
+  for (const auto& watchlist : watchlists) {
+    if (watchlist.id != screen.watchlist.id) {
+      compare_targets.push_back(watchlist);
+    }
+  }
+  if (compare_watchlist_index_ >= static_cast<int>(compare_targets.size())) {
+    compare_watchlist_index_ = 0;
+  }
 
   std::vector<core::application::WatchlistSummary> transfer_targets;
   for (const auto& watchlist : all_watchlists) {
@@ -361,6 +451,26 @@ void WatchlistView::DrawCoreWatchlistPreview() {
 
   if (!status_message_.empty()) {
     ImGui::TextDisabled("%s", status_message_.c_str());
+  }
+
+  if (!compare_targets.empty()) {
+    ImGui::Checkbox("Compare Watchlists", &compare_mode_);
+    if (compare_mode_) {
+      ImGui::SameLine();
+      std::vector<const char*> compare_names;
+      compare_names.reserve(compare_targets.size());
+      for (const auto& watchlist : compare_targets) {
+        compare_names.push_back(watchlist.name.c_str());
+      }
+      ImGui::SetNextItemWidth(220.0f);
+      ImGui::Combo("##compareWatchlist", &compare_watchlist_index_,
+                   compare_names.data(), static_cast<int>(compare_names.size()));
+      const auto secondary =
+          service.GetWatchlistScreen(compare_targets[compare_watchlist_index_].id);
+      const auto secondary_rows = BuildOrderedRows(secondary);
+      DrawComparePanel(screen, secondary, rows, secondary_rows);
+      ImGui::Spacing();
+    }
   }
 
   DrawWatchlistSummary(screen);

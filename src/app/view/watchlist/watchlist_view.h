@@ -21,6 +21,8 @@ class WatchlistView : public View {
   std::string status_message_;
   bool show_archived_ = false;
   int destination_watchlist_index_ = 0;
+  bool compare_mode_ = false;
+  int compare_watchlist_index_ = 0;
   int movement_filter_ = 0;
   bool state_loaded_ = false;
   std::unordered_map<std::string, std::vector<std::string>> pinned_symbols_by_watchlist_;
@@ -31,6 +33,10 @@ class WatchlistView : public View {
 
   void DrawCoreWatchlistPreview();
   void DrawWatchlistSummary(const core::application::WatchlistScreenData& screen);
+  void DrawComparePanel(const core::application::WatchlistScreenData& primary,
+                        const core::application::WatchlistScreenData& secondary,
+                        const std::vector<core::application::WatchlistRow>& primary_rows,
+                        const std::vector<core::application::WatchlistRow>& secondary_rows);
   void LoadState();
   void PersistState() const;
   void EnsureWatchlistOrdering(const core::application::WatchlistScreenData& screen);

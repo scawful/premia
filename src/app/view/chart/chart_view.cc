@@ -296,6 +296,57 @@ void ChartView::DrawOverlayControls() {
 
   const auto marker_count = static_cast<int>(model->getOverlayMarkers().size());
   ImGui::TextDisabled("Visible markers for %s: %d", tickerSymbol.c_str(), marker_count);
+  if (!order_edit_message_.empty()) {
+    ImGui::TextDisabled("%s", order_edit_message_.c_str());
+  }
+
+  if (!editable_orders_.empty()) {
+    std::vector<const char*> order_labels;
+    order_labels.reserve(editable_orders_.size());
+    for (const auto& order : editable_orders_) {
+      order_labels.push_back(order.order_id.c_str());
+    }
+    if (selected_editable_order_index_ >= static_cast<int>(editable_orders_.size())) {
+      selected_editable_order_index_ = 0;
+    }
+    const auto& selected_order = editable_orders_[selected_editable_order_index_];
+    if (editable_order_id_ != selected_order.order_id) {
+      editable_order_id_ = selected_order.order_id;
+      editable_order_price_ = static_cast<float>(ParsePrice(selected_order.limit_price));
+    }
+    ImGui::Separator();
+    ImGui::Text("Chart-Side Order Editing");
+    ImGui::Combo("Open Order", &selected_editable_order_index_, order_labels.data(),
+                 static_cast<int>(order_labels.size()));
+    ImGui::DragFloat("Replacement Price", &editable_order_price_, 0.05f, 0.0f, 0.0f,
+                     "$%.2f");
+    ImGui::Checkbox("Enable live replace", &live_chart_replace_enabled_);
+    if (ImGui::Button("Apply Replace From Chart")) {
+      try {
+        core::application::OrderIntentRequest replacement;
+        replacement.account_id = selected_order.account_id;
+        replacement.symbol = selected_order.symbol;
+        replacement.asset_type = selected_order.asset_type;
+        replacement.instruction = selected_order.instruction;
+        replacement.quantity = selected_order.quantity;
+        replacement.order_type = selected_order.order_type;
+        replacement.limit_price = [&]() {
+          std::ostringstream oss;
+          oss << std::fixed << std::setprecision(2) << editable_order_price_;
+          return oss.str();
+        }();
+        replacement.duration = "DAY";
+        replacement.session = "NORMAL";
+        replacement.confirm_live = live_chart_replace_enabled_;
+        const auto result = core::application::CompositionRoot::Instance().Orders().
+            ReplaceOrder({selected_order.order_id, replacement});
+        order_edit_message_ = result.message;
+        RefreshOverlayMarkers();
+      } catch (const std::exception& ex) {
+        order_edit_message_ = std::string("Chart replace failed: ") + ex.what();
+      }
+    }
+  }
   ImGui::EndChild();
 }
 
@@ -466,6 +517,7 @@ void ChartView::DrawStatsStrip(const core::application::QuoteDetail& quote,
 void ChartView::RefreshOverlayMarkers() {
   LoadAnnotationState();
   std::vector<ChartOverlayMarker> markers;
+  editable_orders_.clear();
   const auto manual_it = manual_annotations_.find(AnnotationStorageKey());
   if (manual_it != manual_annotations_.end()) {
     markers.insert(markers.end(), manual_it->second.begin(), manual_it->second.end());
@@ -487,6 +539,7 @@ void ChartView::RefreshOverlayMarkers() {
           order.limit_price == "0.00") {
         continue;
       }
+      editable_orders_.push_back(order);
       markers.push_back(ChartOverlayMarker{tickerSymbol + ":order:" + order.order_id,
                                            order.instruction + " " + order.quantity,
                                            order.limit_price, "order"});
@@ -501,6 +554,28 @@ void ChartView::RefreshOverlayMarkers() {
                                            order.limit_price, "fill"});
     }
   } catch (const std::exception&) {
+  }
+
+  if (!editable_orders_.empty()) {
+    if (selected_editable_order_index_ >= static_cast<int>(editable_orders_.size())) {
+      selected_editable_order_index_ = 0;
+    }
+    const auto& selected_order = editable_orders_[selected_editable_order_index_];
+    if (editable_order_id_ != selected_order.order_id) {
+      editable_order_id_ = selected_order.order_id;
+      editable_order_price_ = static_cast<float>(ParsePrice(selected_order.limit_price));
+    }
+    std::ostringstream price_stream;
+    price_stream << std::fixed << std::setprecision(2) << editable_order_price_;
+    if (std::abs(ParsePrice(selected_order.limit_price) - editable_order_price_) > 0.009f) {
+      markers.push_back(ChartOverlayMarker{tickerSymbol + ":edit-preview",
+                                           "Replace Preview",
+                                           price_stream.str(),
+                                           "edit_preview"});
+    }
+  } else {
+    editable_order_id_.clear();
+    editable_order_price_ = 0.0f;
   }
 
   model->setOverlayMarkers(std::move(markers));
