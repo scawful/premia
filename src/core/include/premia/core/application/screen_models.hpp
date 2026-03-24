@@ -63,6 +63,7 @@ struct WatchlistRow {
   Money bid;
   Money ask;
   std::string updated_at;
+  bool is_pinned = false;
 };
 
 struct Instrument {

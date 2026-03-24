@@ -74,7 +74,17 @@ auto MakePlaceholderRow(const std::string& watchlist_id,
           MakeChange("0.00", "0.00"),
           MakeMoney("0.00"),
           MakeMoney("0.00"),
-          ""};
+          "",
+          false};
+}
+
+auto FindScreen(std::vector<application::WatchlistScreenData>& screens,
+                const std::string& watchlist_id)
+    -> std::vector<application::WatchlistScreenData>::iterator {
+  return std::find_if(screens.begin(), screens.end(),
+                      [&watchlist_id](const application::WatchlistScreenData& screen) {
+                        return screen.watchlist.id == watchlist_id;
+                      });
 }
 
 }  // namespace
@@ -147,23 +157,22 @@ auto WatchlistProvider::AddWatchlistSymbol(const std::string& watchlist_id,
                                            const std::string& symbol)
     -> application::WatchlistSummary {
   auto screens = LoadData();
-  for (auto& screen : screens) {
-    if (screen.watchlist.id == watchlist_id) {
-      const auto exists = std::find_if(screen.rows.begin(), screen.rows.end(),
-                                       [&symbol](const application::WatchlistRow& row) {
-                                         return row.symbol == symbol;
-                                       });
-      if (exists == screen.rows.end()) {
-        screen.rows.push_back(MakePlaceholderRow(watchlist_id, symbol));
-      }
-      screen.watchlist.instrument_count = static_cast<int>(screen.rows.size());
-      const auto summaries = BuildSummaryList(screens);
-      for (auto& item : screens) {
-        item.available_watchlists = summaries;
-      }
-      SaveData(screens);
-      return BuildSummary(screen);
+  const auto screen_it = FindScreen(screens, watchlist_id);
+  if (screen_it != screens.end()) {
+    const auto exists = std::find_if(screen_it->rows.begin(), screen_it->rows.end(),
+                                     [&symbol](const application::WatchlistRow& row) {
+                                       return row.symbol == symbol;
+                                     });
+    if (exists == screen_it->rows.end()) {
+      screen_it->rows.push_back(MakePlaceholderRow(watchlist_id, symbol));
     }
+    screen_it->watchlist.instrument_count = static_cast<int>(screen_it->rows.size());
+    const auto summaries = BuildSummaryList(screens);
+    for (auto& item : screens) {
+      item.available_watchlists = summaries;
+    }
+    SaveData(screens);
+    return BuildSummary(*screen_it);
   }
   throw std::runtime_error("watchlist not found");
 }
@@ -172,24 +181,93 @@ auto WatchlistProvider::RemoveWatchlistSymbol(const std::string& watchlist_id,
                                               const std::string& symbol)
     -> application::WatchlistSummary {
   auto screens = LoadData();
-  for (auto& screen : screens) {
-    if (screen.watchlist.id == watchlist_id) {
-      screen.rows.erase(
-          std::remove_if(screen.rows.begin(), screen.rows.end(),
-                         [&symbol](const application::WatchlistRow& row) {
-                           return row.symbol == symbol;
-                         }),
-          screen.rows.end());
-      screen.watchlist.instrument_count = static_cast<int>(screen.rows.size());
-      const auto summaries = BuildSummaryList(screens);
-      for (auto& item : screens) {
-        item.available_watchlists = summaries;
-      }
-      SaveData(screens);
-      return BuildSummary(screen);
+  const auto screen_it = FindScreen(screens, watchlist_id);
+  if (screen_it != screens.end()) {
+    screen_it->rows.erase(
+        std::remove_if(screen_it->rows.begin(), screen_it->rows.end(),
+                       [&symbol](const application::WatchlistRow& row) {
+                         return row.symbol == symbol;
+                       }),
+        screen_it->rows.end());
+    screen_it->watchlist.instrument_count = static_cast<int>(screen_it->rows.size());
+    const auto summaries = BuildSummaryList(screens);
+    for (auto& item : screens) {
+      item.available_watchlists = summaries;
     }
+    SaveData(screens);
+    return BuildSummary(*screen_it);
   }
   throw std::runtime_error("watchlist not found");
+}
+
+auto WatchlistProvider::PinWatchlistSymbol(const std::string& watchlist_id,
+                                           const std::string& symbol,
+                                           bool pinned)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  const auto screen_it = FindScreen(screens, watchlist_id);
+  if (screen_it == screens.end()) {
+    throw std::runtime_error("watchlist not found");
+  }
+
+  const auto row_it = std::find_if(screen_it->rows.begin(), screen_it->rows.end(),
+                                   [&symbol](const application::WatchlistRow& row) {
+                                     return row.symbol == symbol;
+                                   });
+  if (row_it == screen_it->rows.end()) {
+    throw std::runtime_error("watchlist symbol not found");
+  }
+
+  auto row = *row_it;
+  row.is_pinned = pinned;
+  screen_it->rows.erase(row_it);
+  if (pinned) {
+    const auto insert_it = std::find_if(screen_it->rows.begin(), screen_it->rows.end(),
+                                        [](const application::WatchlistRow& item) {
+                                          return !item.is_pinned;
+                                        });
+    screen_it->rows.insert(insert_it, row);
+  } else {
+    screen_it->rows.push_back(row);
+  }
+
+  SaveData(screens);
+  return BuildSummary(*screen_it);
+}
+
+auto WatchlistProvider::MoveWatchlistSymbol(const std::string& watchlist_id,
+                                            const std::string& symbol,
+                                            const std::string& before_symbol)
+    -> application::WatchlistSummary {
+  auto screens = LoadData();
+  const auto screen_it = FindScreen(screens, watchlist_id);
+  if (screen_it == screens.end()) {
+    throw std::runtime_error("watchlist not found");
+  }
+
+  auto& rows = screen_it->rows;
+  const auto from = std::find_if(rows.begin(), rows.end(),
+                                 [&symbol](const application::WatchlistRow& row) {
+                                   return row.symbol == symbol;
+                                 });
+  const auto to = std::find_if(rows.begin(), rows.end(),
+                               [&before_symbol](const application::WatchlistRow& row) {
+                                 return row.symbol == before_symbol;
+                               });
+  if (from == rows.end() || to == rows.end()) {
+    throw std::runtime_error("watchlist symbol not found");
+  }
+
+  auto row = *from;
+  rows.erase(from);
+  const auto insert_it = std::find_if(rows.begin(), rows.end(),
+                                      [&before_symbol](const application::WatchlistRow& item) {
+                                        return item.symbol == before_symbol;
+                                      });
+  rows.insert(insert_it, row);
+
+  SaveData(screens);
+  return BuildSummary(*screen_it);
 }
 
 auto WatchlistProvider::BuildFallbackData() const
@@ -201,13 +279,13 @@ auto WatchlistProvider::BuildFallbackData() const
   core.rows = {
       {"row_aapl", "AAPL", "Apple Inc.", MakeMoney("217.00"),
        MakeChange("1.30", "0.60"), MakeMoney("216.95"),
-       MakeMoney("217.02"), "2026-03-22T18:44:58Z"},
+       MakeMoney("217.02"), "2026-03-22T18:44:58Z", true},
       {"row_msft", "MSFT", "Microsoft Corp.", MakeMoney("420.10"),
        MakeChange("2.15", "0.51"), MakeMoney("420.00"),
-       MakeMoney("420.15"), "2026-03-22T18:44:59Z"},
+       MakeMoney("420.15"), "2026-03-22T18:44:59Z", false},
       {"row_spy", "SPY", "SPDR S&P 500 ETF", MakeMoney("519.50"),
        MakeChange("3.70", "0.72"), MakeMoney("519.45"),
-       MakeMoney("519.54"), "2026-03-22T18:45:00Z"},
+       MakeMoney("519.54"), "2026-03-22T18:45:00Z", false},
   };
   screens.push_back(core);
 
@@ -216,10 +294,10 @@ auto WatchlistProvider::BuildFallbackData() const
   earnings.rows = {
       {"row_nvda", "NVDA", "NVIDIA Corp.", MakeMoney("915.20"),
        MakeChange("12.40", "1.37"), MakeMoney("915.10"),
-       MakeMoney("915.30"), "2026-03-22T18:45:00Z"},
+       MakeMoney("915.30"), "2026-03-22T18:45:00Z", false},
       {"row_amzn", "AMZN", "Amazon.com Inc.", MakeMoney("204.80"),
        MakeChange("1.12", "0.55"), MakeMoney("204.75"),
-       MakeMoney("204.84"), "2026-03-22T18:44:55Z"},
+       MakeMoney("204.84"), "2026-03-22T18:44:55Z", false},
   };
   screens.push_back(earnings);
 
@@ -265,7 +343,8 @@ auto WatchlistProvider::LoadData() const
                         row_tree.get<std::string>("dayChangePercent", "0.00")),
              MakeMoney(row_tree.get<std::string>("bid", "0.00")),
              MakeMoney(row_tree.get<std::string>("ask", "0.00")),
-             row_tree.get<std::string>("updatedAt", "")});
+             row_tree.get<std::string>("updatedAt", ""),
+             row_tree.get<bool>("isPinned", false)});
       }
 
       screen.watchlist.instrument_count = static_cast<int>(screen.rows.size());
@@ -311,6 +390,7 @@ auto WatchlistProvider::SaveData(
       row_tree.put("dayChangeAbsolute", row.day_change.absolute.amount);
       row_tree.put("dayChangePercent", row.day_change.percent);
       row_tree.put("updatedAt", row.updated_at);
+      row_tree.put("isPinned", row.is_pinned);
       rows.push_back({"", row_tree});
     }
 

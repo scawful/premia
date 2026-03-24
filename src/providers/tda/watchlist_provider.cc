@@ -127,7 +127,8 @@ auto WatchlistProvider::LoadScreens() const
              MakeChange(quote.getQuoteVariable("netChange"), "0.00"),
              MakeMoney(quote.getQuoteVariable("bidPrice")),
              MakeMoney(quote.getQuoteVariable("askPrice")),
-             quote.getQuoteVariable("quoteTime")});
+             quote.getQuoteVariable("quoteTime"),
+             false});
       }
 
       screen.watchlist.instrument_count = static_cast<int>(screen.rows.size());

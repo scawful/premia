@@ -160,7 +160,8 @@ auto MakeWatchlistRowArray(const std::vector<application::WatchlistRow>& rows)
                                      MakeAbsolutePercentChange(row.day_change)},
                                     {"bid", MakeMoney(row.bid)},
                                     {"ask", MakeMoney(row.ask)},
-                                    {"updatedAt", row.updated_at}});
+                                    {"updatedAt", row.updated_at},
+                                    {"isPinned", row.is_pinned}});
   }
   return array;
 }

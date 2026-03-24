@@ -108,6 +108,7 @@ void CandleChart::DrawOverlayMarkers() {
   auto* draw_list = ImPlot::GetPlotDrawList();
   const float left = ImPlot::GetPlotPos().x;
   const float right = left + ImPlot::GetPlotSize().x;
+  const auto latest_close = model->getCandle(model->getNumCandles() - 1).close;
 
   ImPlot::PushPlotClipRect();
   for (const auto& marker : markers) {
@@ -116,8 +117,18 @@ void CandleChart::DrawOverlayMarkers() {
     ImU32 color = IM_COL32(198, 176, 72, 210);
     if (marker.kind == "avg_cost") {
       color = IM_COL32(90, 180, 255, 210);
+      const auto latest_point =
+          ImPlot::PlotToPixels(model->getDate(model->getNumCandles() - 1), latest_close);
+      const auto zone_top = std::min(point.y, latest_point.y);
+      const auto zone_bottom = std::max(point.y, latest_point.y);
+      draw_list->AddRectFilled(
+          ImVec2(left, zone_top), ImVec2(right, zone_bottom),
+          latest_close >= marker.price ? IM_COL32(60, 170, 110, 28)
+                                       : IM_COL32(180, 70, 80, 28));
     } else if (marker.kind == "order") {
       color = IM_COL32(102, 214, 140, 210);
+    } else if (marker.kind == "fill") {
+      color = IM_COL32(255, 162, 66, 220);
     }
     draw_list->AddLine(ImVec2(left, point.y), ImVec2(right, point.y), color, 1.25f);
     draw_list->AddText(ImVec2(left + 8.0f, point.y - 14.0f), color,

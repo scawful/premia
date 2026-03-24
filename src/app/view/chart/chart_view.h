@@ -38,7 +38,10 @@ class ChartView : public View {
                       const core::application::ChartScreenData& chart);
   void FetchChartData();
   void ApplyPreset(const std::string& preset_id);
+  void LoadAnnotationState();
+  void PersistAnnotationState() const;
   void RefreshOverlayMarkers();
+  auto AnnotationStorageKey() const -> std::string;
   auto GetSelectedRangeLabel() const -> std::string;
   auto GetSelectedIntervalLabel() const -> std::string;
 
@@ -57,6 +60,7 @@ class ChartView : public View {
   std::string currentChart;
   std::function<void(const std::string&)> symbol_change_handler_;
   std::unordered_map<std::string, std::vector<ChartOverlayMarker>> manual_annotations_;
+  bool annotation_state_loaded_ = false;
 
   EventMap events;
   ChartMap charts;

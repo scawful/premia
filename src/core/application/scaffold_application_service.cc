@@ -157,6 +157,19 @@ auto ProviderBackedApplicationService::RemoveWatchlistSymbol(
   return watchlist_service_->RemoveWatchlistSymbol(watchlist_id, symbol);
 }
 
+auto ProviderBackedApplicationService::PinWatchlistSymbol(
+    const std::string& watchlist_id, const std::string& symbol, bool pinned)
+    -> WatchlistSummary {
+  return watchlist_service_->PinWatchlistSymbol(watchlist_id, symbol, pinned);
+}
+
+auto ProviderBackedApplicationService::MoveWatchlistSymbol(
+    const std::string& watchlist_id, const std::string& symbol,
+    const std::string& before_symbol) -> WatchlistSummary {
+  return watchlist_service_->MoveWatchlistSymbol(watchlist_id, symbol,
+                                                 before_symbol);
+}
+
 auto ProviderBackedApplicationService::PreviewOrder(
     const OrderIntentRequest& request) -> OrderPreviewData {
   return order_service_->PreviewOrder(request);

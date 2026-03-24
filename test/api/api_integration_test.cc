@@ -53,9 +53,17 @@ auto HttpRequest(const std::string& method, const std::string& url,
   struct curl_slist* headers = nullptr;
   if (method == "POST") {
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
+  } else if (method != "GET") {
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
+  }
+  if (!payload.empty()) {
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, payload.size());
+  }
+  if (!payload.empty() || method == "POST" || method == "PATCH") {
     headers = curl_slist_append(headers, "Content-Type: application/json");
+  }
+  if (headers != nullptr) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   }
 
@@ -263,6 +271,48 @@ TEST_F(ApiIntegrationFixture, OptionsScreenReturnsFallbackChain) {
   EXPECT_EQ(tree.get<std::string>("data.symbol"), "SPY");
   EXPECT_EQ(tree.get<std::string>("data.description"), "SPDR S&P 500 ETF");
   EXPECT_FALSE(tree.get_child("data.expirations").empty());
+}
+
+TEST_F(ApiIntegrationFixture, WatchlistPinAndMoveRoutesPersistRowState) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  const auto created = HttpRequest("POST", Url("/v1/watchlists"),
+                                   R"({"name":"Pinned Flow"})");
+  ASSERT_EQ(created.status_code, 201);
+  const auto created_tree = ParseJson(created.body);
+  const auto watchlist_id = created_tree.get<std::string>("data.id");
+
+  ASSERT_EQ(HttpRequest("POST", Url("/v1/watchlists/" + watchlist_id + "/symbols"),
+                        R"({"symbol":"AAPL"})")
+                .status_code,
+            200);
+  ASSERT_EQ(HttpRequest("POST", Url("/v1/watchlists/" + watchlist_id + "/symbols"),
+                        R"({"symbol":"MSFT"})")
+                .status_code,
+            200);
+  ASSERT_EQ(HttpRequest("PATCH",
+                        Url("/v1/watchlists/" + watchlist_id + "/symbols/AAPL"),
+                        R"({"pinned":true})")
+                .status_code,
+            200);
+  ASSERT_EQ(HttpRequest("POST", Url("/v1/watchlists/" + watchlist_id + "/move"),
+                        R"({"symbol":"MSFT","beforeSymbol":"AAPL"})")
+                .status_code,
+            200);
+
+  const auto screen =
+      HttpRequest("GET", Url("/v1/screens/watchlists/" + watchlist_id));
+  ASSERT_EQ(screen.status_code, 200);
+  const auto tree = ParseJson(screen.body);
+  const auto& rows = tree.get_child("data.rows");
+  ASSERT_EQ(std::distance(rows.begin(), rows.end()), 2);
+  auto it = rows.begin();
+  EXPECT_EQ(it->second.get<std::string>("symbol"), "MSFT");
+  EXPECT_FALSE(it->second.get<bool>("isPinned"));
+  ++it;
+  EXPECT_EQ(it->second.get<std::string>("symbol"), "AAPL");
+  EXPECT_TRUE(it->second.get<bool>("isPinned"));
 }
 
 TEST_F(ApiIntegrationFixture, OrderLifecyclePersistsAcrossOpenAndHistoryRoutes) {

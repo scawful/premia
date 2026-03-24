@@ -6,16 +6,10 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cstdlib>
-#include <filesystem>
-#include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include "premia/core/application/composition_root.hpp"
 #include "view/core/IconsMaterialDesign.h"
@@ -23,8 +17,6 @@
 namespace premia {
 
 namespace {
-
-namespace pt = boost::property_tree;
 
 auto DayChangeColor(const std::string& amount) -> ImVec4 {
   try {
@@ -82,199 +74,46 @@ auto SpreadText(const premia::core::application::WatchlistRow& row) -> std::stri
   }
 }
 
-auto WatchlistStatePath() -> std::filesystem::path {
-  std::filesystem::path path;
-  if (const char* override_path = std::getenv("PREMIA_RUNTIME_DIR");
-      override_path != nullptr && override_path[0] != '\0') {
-    path = std::filesystem::path(override_path);
-#if defined(__APPLE__)
-  } else if (const char* home = std::getenv("HOME"); home != nullptr && home[0] != '\0') {
-    path = std::filesystem::path(home) / "Library/Application Support/Premia";
-#elif defined(_WIN32)
-  } else if (const char* appdata = std::getenv("APPDATA");
-             appdata != nullptr && appdata[0] != '\0') {
-    path = std::filesystem::path(appdata) / "Premia";
-#else
-  } else if (const char* xdg = std::getenv("XDG_STATE_HOME");
-             xdg != nullptr && xdg[0] != '\0') {
-    path = std::filesystem::path(xdg) / "premia";
-  } else if (const char* home = std::getenv("HOME"); home != nullptr && home[0] != '\0') {
-    path = std::filesystem::path(home) / ".local/state/premia";
-#endif
-  } else {
-    path = std::filesystem::current_path() / ".premia-runtime";
-  }
-  std::error_code ec;
-  std::filesystem::create_directories(path, ec);
-  return path / "watchlist_state.json";
-}
-
-auto ContainsSymbol(const std::vector<std::string>& symbols, const std::string& symbol)
-    -> bool {
-  return std::find(symbols.begin(), symbols.end(), symbol) != symbols.end();
-}
-
 }  // namespace
 
 void WatchlistView::LoadState() {
-  if (state_loaded_) {
-    return;
-  }
-  const auto state_path = WatchlistStatePath();
-  if (!std::filesystem::exists(state_path)) {
-    state_loaded_ = true;
-    return;
-  }
-
-  try {
-    pt::ptree tree;
-    std::ifstream input(state_path);
-    if (!input.good()) {
-      state_loaded_ = true;
-      return;
-    }
-    pt::read_json(input, tree);
-    if (auto pinned = tree.get_child_optional("pinned")) {
-      for (const auto& entry : *pinned) {
-        std::vector<std::string> symbols;
-        for (const auto& symbol : entry.second) {
-          symbols.push_back(symbol.second.get_value<std::string>());
-        }
-        pinned_symbols_by_watchlist_[entry.first] = symbols;
-      }
-    }
-    if (auto ordered = tree.get_child_optional("ordered")) {
-      for (const auto& entry : *ordered) {
-        std::vector<std::string> symbols;
-        for (const auto& symbol : entry.second) {
-          symbols.push_back(symbol.second.get_value<std::string>());
-        }
-        ordered_symbols_by_watchlist_[entry.first] = symbols;
-      }
-    }
-  } catch (const std::exception&) {
-  }
   state_loaded_ = true;
 }
 
-void WatchlistView::PersistState() const {
-  pt::ptree tree;
-  pt::ptree pinned_tree;
-  for (const auto& [watchlist_id, symbols] : pinned_symbols_by_watchlist_) {
-    pt::ptree symbol_tree;
-    for (const auto& symbol : symbols) {
-      pt::ptree value;
-      value.put("", symbol);
-      symbol_tree.push_back(std::make_pair("", value));
-    }
-    pinned_tree.add_child(watchlist_id, symbol_tree);
-  }
-  tree.add_child("pinned", pinned_tree);
-
-  pt::ptree ordered_tree;
-  for (const auto& [watchlist_id, symbols] : ordered_symbols_by_watchlist_) {
-    pt::ptree symbol_tree;
-    for (const auto& symbol : symbols) {
-      pt::ptree value;
-      value.put("", symbol);
-      symbol_tree.push_back(std::make_pair("", value));
-    }
-    ordered_tree.add_child(watchlist_id, symbol_tree);
-  }
-  tree.add_child("ordered", ordered_tree);
-
-  std::ofstream output(WatchlistStatePath());
-  pt::write_json(output, tree);
-}
+void WatchlistView::PersistState() const {}
 
 void WatchlistView::EnsureWatchlistOrdering(
-    const core::application::WatchlistScreenData& screen) {
-  auto& ordered = ordered_symbols_by_watchlist_[screen.watchlist.id];
-  auto& pinned = pinned_symbols_by_watchlist_[screen.watchlist.id];
-
-  for (const auto& row : screen.rows) {
-    if (!ContainsSymbol(ordered, row.symbol)) {
-      ordered.push_back(row.symbol);
-    }
-  }
-  ordered.erase(std::remove_if(ordered.begin(), ordered.end(),
-                               [&screen](const std::string& symbol) {
-                                 return std::none_of(screen.rows.begin(), screen.rows.end(),
-                                                     [&symbol](const auto& row) {
-                                                       return row.symbol == symbol;
-                                                     });
-                               }),
-                ordered.end());
-
-  pinned.erase(std::remove_if(pinned.begin(), pinned.end(),
-                              [&screen](const std::string& symbol) {
-                                return std::none_of(screen.rows.begin(), screen.rows.end(),
-                                                    [&symbol](const auto& row) {
-                                                      return row.symbol == symbol;
-                                                    });
-                              }),
-               pinned.end());
-}
+    const core::application::WatchlistScreenData&) {}
 
 auto WatchlistView::BuildOrderedRows(
     const core::application::WatchlistScreenData& screen) const
     -> std::vector<core::application::WatchlistRow> {
-  std::vector<core::application::WatchlistRow> rows = screen.rows;
-  const auto order_it = ordered_symbols_by_watchlist_.find(screen.watchlist.id);
-  const auto pin_it = pinned_symbols_by_watchlist_.find(screen.watchlist.id);
-
-  auto order_index = [&](const std::string& symbol) {
-    if (order_it == ordered_symbols_by_watchlist_.end()) {
-      return rows.size();
-    }
-    const auto& ordered = order_it->second;
-    const auto it = std::find(ordered.begin(), ordered.end(), symbol);
-    return it == ordered.end() ? ordered.size()
-                               : static_cast<size_t>(std::distance(ordered.begin(), it));
-  };
-  auto pin_index = [&](const std::string& symbol) {
-    if (pin_it == pinned_symbols_by_watchlist_.end()) {
-      return rows.size();
-    }
-    const auto& pinned = pin_it->second;
-    const auto it = std::find(pinned.begin(), pinned.end(), symbol);
-    return it == pinned.end() ? pinned.size()
-                              : static_cast<size_t>(std::distance(pinned.begin(), it));
-  };
-
-  std::stable_sort(rows.begin(), rows.end(), [&](const auto& lhs, const auto& rhs) {
-    const bool lhs_pinned = IsPinned(screen.watchlist.id, lhs.symbol);
-    const bool rhs_pinned = IsPinned(screen.watchlist.id, rhs.symbol);
-    if (lhs_pinned != rhs_pinned) {
-      return lhs_pinned > rhs_pinned;
-    }
-    if (lhs_pinned && rhs_pinned) {
-      return pin_index(lhs.symbol) < pin_index(rhs.symbol);
-    }
-    return order_index(lhs.symbol) < order_index(rhs.symbol);
-  });
-  return rows;
+  return screen.rows;
 }
 
 auto WatchlistView::IsPinned(const std::string& watchlist_id,
                              const std::string& symbol) const -> bool {
-  const auto it = pinned_symbols_by_watchlist_.find(watchlist_id);
-  if (it == pinned_symbols_by_watchlist_.end()) {
-    return false;
-  }
-  return ContainsSymbol(it->second, symbol);
+  const auto screen = core::application::CompositionRoot::Instance()
+                          .AppService()
+                          .GetWatchlistScreen(watchlist_id);
+  const auto it = std::find_if(screen.rows.begin(), screen.rows.end(),
+                               [&symbol](const core::application::WatchlistRow& row) {
+                                 return row.symbol == symbol;
+                               });
+  return it != screen.rows.end() && it->is_pinned;
 }
 
 void WatchlistView::TogglePinned(const std::string& watchlist_id,
                                  const std::string& symbol) {
-  auto& pinned = pinned_symbols_by_watchlist_[watchlist_id];
-  const auto it = std::find(pinned.begin(), pinned.end(), symbol);
-  if (it == pinned.end()) {
-    pinned.insert(pinned.begin(), symbol);
-  } else {
-    pinned.erase(it);
-  }
-  PersistState();
+  auto& service = core::application::CompositionRoot::Instance().AppService();
+  const auto screen = service.GetWatchlistScreen(watchlist_id);
+  const auto it = std::find_if(screen.rows.begin(), screen.rows.end(),
+                               [&symbol](const core::application::WatchlistRow& row) {
+                                 return row.symbol == symbol;
+                               });
+  const bool next_state = it == screen.rows.end() ? true : !it->is_pinned;
+  service.PinWatchlistSymbol(watchlist_id, symbol, next_state);
+  status_message_ = std::string(next_state ? "Pinned " : "Unpinned ") + symbol + ".";
 }
 
 void WatchlistView::MoveSymbolBefore(const std::string& watchlist_id,
@@ -283,29 +122,10 @@ void WatchlistView::MoveSymbolBefore(const std::string& watchlist_id,
   if (symbol == before_symbol) {
     return;
   }
-  auto& ordered = ordered_symbols_by_watchlist_[watchlist_id];
-  const auto from = std::find(ordered.begin(), ordered.end(), symbol);
-  const auto to = std::find(ordered.begin(), ordered.end(), before_symbol);
-  if (from == ordered.end() || to == ordered.end()) {
-    return;
-  }
-
-  const auto value = *from;
-  ordered.erase(from);
-  const auto insert_at = std::find(ordered.begin(), ordered.end(), before_symbol);
-  ordered.insert(insert_at, value);
-
-  auto& pinned = pinned_symbols_by_watchlist_[watchlist_id];
-  const auto pinned_from = std::find(pinned.begin(), pinned.end(), symbol);
-  const auto pinned_to = std::find(pinned.begin(), pinned.end(), before_symbol);
-  if (pinned_from != pinned.end() && pinned_to != pinned.end()) {
-    const auto pinned_value = *pinned_from;
-    pinned.erase(pinned_from);
-    const auto pinned_insert = std::find(pinned.begin(), pinned.end(), before_symbol);
-    pinned.insert(pinned_insert, pinned_value);
-  }
-
-  PersistState();
+  core::application::CompositionRoot::Instance()
+      .AppService()
+      .MoveWatchlistSymbol(watchlist_id, symbol, before_symbol);
+  status_message_ = "Moved " + symbol + " within the current watchlist.";
 }
 
 void WatchlistView::DrawWatchlistSummary(
@@ -501,7 +321,7 @@ void WatchlistView::DrawCoreWatchlistPreview() {
       }
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
-      const auto pin_label = IsPinned(screen.watchlist.id, row.symbol) ? "*" : ".";
+      const auto pin_label = row.is_pinned ? "*" : ".";
       if (ImGui::SmallButton((std::string(pin_label) + "##pin_" + row.symbol).c_str())) {
         TogglePinned(screen.watchlist.id, row.symbol);
       }

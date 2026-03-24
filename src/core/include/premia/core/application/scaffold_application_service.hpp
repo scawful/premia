@@ -76,6 +76,12 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
                           const std::string& symbol) -> WatchlistSummary override;
   auto RemoveWatchlistSymbol(const std::string& watchlist_id,
                              const std::string& symbol) -> WatchlistSummary override;
+  auto PinWatchlistSymbol(const std::string& watchlist_id,
+                          const std::string& symbol,
+                          bool pinned) -> WatchlistSummary override;
+  auto MoveWatchlistSymbol(const std::string& watchlist_id,
+                           const std::string& symbol,
+                           const std::string& before_symbol) -> WatchlistSummary override;
 
   auto PreviewOrder(const OrderIntentRequest& request)
       -> OrderPreviewData override;

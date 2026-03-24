@@ -5,9 +5,15 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
 #include <algorithm>
+#include <cstdlib>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <sstream>
 #include <string>
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "metatypes.h"
 #include "premia/core/application/composition_root.hpp"
@@ -18,6 +24,8 @@
 namespace premia {
 
 namespace {
+
+namespace pt = boost::property_tree;
 
 auto ResolveMarketDataSource(
     const std::vector<core::application::ConnectionSummary>& connections)
@@ -88,6 +96,41 @@ auto ParsePrice(const std::string& value) -> double {
   }
 }
 
+auto LooksFilledStatus(std::string status) -> bool {
+  std::transform(status.begin(), status.end(), status.begin(),
+                 [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+  return status.find("fill") != std::string::npos ||
+         status.find("execut") != std::string::npos ||
+         status.find("complete") != std::string::npos;
+}
+
+auto ChartAnnotationStatePath() -> std::filesystem::path {
+  std::filesystem::path path;
+  if (const char* override_path = std::getenv("PREMIA_RUNTIME_DIR");
+      override_path != nullptr && override_path[0] != '\0') {
+    path = std::filesystem::path(override_path);
+#if defined(__APPLE__)
+  } else if (const char* home = std::getenv("HOME"); home != nullptr && home[0] != '\0') {
+    path = std::filesystem::path(home) / "Library/Application Support/Premia";
+#elif defined(_WIN32)
+  } else if (const char* appdata = std::getenv("APPDATA");
+             appdata != nullptr && appdata[0] != '\0') {
+    path = std::filesystem::path(appdata) / "Premia";
+#else
+  } else if (const char* xdg = std::getenv("XDG_STATE_HOME");
+             xdg != nullptr && xdg[0] != '\0') {
+    path = std::filesystem::path(xdg) / "premia";
+  } else if (const char* home = std::getenv("HOME"); home != nullptr && home[0] != '\0') {
+    path = std::filesystem::path(home) / ".local/state/premia";
+#endif
+  } else {
+    path = std::filesystem::current_path() / ".premia-runtime";
+  }
+  std::error_code ec;
+  std::filesystem::create_directories(path, ec);
+  return path / "chart_annotations.json";
+}
+
 void DrawChartMetricCard(const char* id, const char* label,
                          const std::string& value, const ImVec4& color,
                          const std::string& note) {
@@ -113,6 +156,7 @@ void ChartView::FetchChartData() {
   if (tickerSymbol.empty()) {
     return;
   }
+  LoadAnnotationState();
   charts[currentChart]->fetchData(tickerSymbol, tda::PeriodType(period_type),
                                   period_amount, tda::FrequencyType(frequency_type),
                                   frequency_amount, true);
@@ -175,6 +219,7 @@ void ChartView::DrawChartPresets() {
 }
 
 void ChartView::DrawOverlayControls() {
+  LoadAnnotationState();
   ImGui::BeginChild("ChartOverlayControls", ImVec2(0.0f, 108.0f), true);
   ImGui::Text("Annotations and Trade Anchors");
   ImGui::TextDisabled(
@@ -188,16 +233,18 @@ void ChartView::DrawOverlayControls() {
   ImGui::SameLine();
   if (ImGui::Button("Add Marker") && !annotation_label_.empty() &&
       !annotation_price_.empty()) {
-    auto& annotations = manual_annotations_[tickerSymbol];
+    auto& annotations = manual_annotations_[AnnotationStorageKey()];
     annotations.push_back({tickerSymbol + ":note:" + annotation_label_, annotation_label_,
                            ParsePrice(annotation_price_), "annotation"});
     annotation_label_.clear();
     annotation_price_.clear();
+    PersistAnnotationState();
     RefreshOverlayMarkers();
   }
   ImGui::SameLine();
   if (ImGui::Button("Clear Markers")) {
-    manual_annotations_.erase(tickerSymbol);
+    manual_annotations_.erase(AnnotationStorageKey());
+    PersistAnnotationState();
     RefreshOverlayMarkers();
   }
 
@@ -371,8 +418,9 @@ void ChartView::DrawStatsStrip(const core::application::QuoteDetail& quote,
 }
 
 void ChartView::RefreshOverlayMarkers() {
+  LoadAnnotationState();
   std::vector<ChartOverlayMarker> markers;
-  const auto manual_it = manual_annotations_.find(tickerSymbol);
+  const auto manual_it = manual_annotations_.find(AnnotationStorageKey());
   if (manual_it != manual_annotations_.end()) {
     markers.insert(markers.end(), manual_it->second.begin(), manual_it->second.end());
   }
@@ -396,10 +444,84 @@ void ChartView::RefreshOverlayMarkers() {
                          order.instruction + " " + order.quantity,
                          ParsePrice(order.limit_price), "order"});
     }
+    for (const auto& order : root.Orders().GetOrderHistory(account.account_id)) {
+      if (order.symbol != tickerSymbol || order.limit_price.empty() ||
+          order.limit_price == "0.00" || !LooksFilledStatus(order.status)) {
+        continue;
+      }
+      markers.push_back({tickerSymbol + ":fill:" + order.order_id,
+                         "Fill " + order.instruction + " " + order.quantity,
+                         ParsePrice(order.limit_price), "fill"});
+    }
   } catch (const std::exception&) {
   }
 
   model->setOverlayMarkers(std::move(markers));
+}
+
+void ChartView::LoadAnnotationState() {
+  if (annotation_state_loaded_) {
+    return;
+  }
+  const auto path = ChartAnnotationStatePath();
+  if (!std::filesystem::exists(path)) {
+    annotation_state_loaded_ = true;
+    return;
+  }
+
+  try {
+    pt::ptree tree;
+    std::ifstream input(path.string());
+    if (!input.good()) {
+      annotation_state_loaded_ = true;
+      return;
+    }
+    pt::read_json(input, tree);
+    if (auto annotations = tree.get_child_optional("annotations")) {
+      for (const auto& entry : *annotations) {
+        std::vector<ChartOverlayMarker> markers;
+        for (const auto& marker_node : entry.second) {
+          const auto& marker = marker_node.second;
+          markers.push_back({marker.get<std::string>("id", ""),
+                             marker.get<std::string>("label", ""),
+                             marker.get<double>("price", 0.0),
+                             marker.get<std::string>("kind", "annotation")});
+        }
+        manual_annotations_[entry.first] = markers;
+      }
+    }
+  } catch (const std::exception&) {
+  }
+  annotation_state_loaded_ = true;
+}
+
+void ChartView::PersistAnnotationState() const {
+  pt::ptree tree;
+  pt::ptree annotations_tree;
+  for (const auto& [key, markers] : manual_annotations_) {
+    pt::ptree marker_tree;
+    for (const auto& marker : markers) {
+      if (marker.kind != "annotation") {
+        continue;
+      }
+      pt::ptree marker_node;
+      marker_node.put("id", marker.id);
+      marker_node.put("label", marker.label);
+      marker_node.put("price", marker.price);
+      marker_node.put("kind", marker.kind);
+      marker_tree.push_back({"", marker_node});
+    }
+    annotations_tree.add_child(key, marker_tree);
+  }
+  tree.add_child("annotations", annotations_tree);
+
+  std::ofstream output(ChartAnnotationStatePath().string());
+  pt::write_json(output, tree);
+}
+
+auto ChartView::AnnotationStorageKey() const -> std::string {
+  const auto account_key = active_account_id_.empty() ? "default" : active_account_id_;
+  return account_key + "|" + tickerSymbol;
 }
 
 std::string ChartView::getName() { return "Chart"; }
@@ -428,6 +550,7 @@ void ChartView::SetActiveAccountId(const std::string& account_id) {
     return;
   }
   active_account_id_ = account_id;
+  LoadAnnotationState();
   RefreshOverlayMarkers();
 }
 

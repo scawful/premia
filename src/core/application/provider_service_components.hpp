@@ -65,6 +65,12 @@ class WatchlistService {
                           const std::string& symbol) -> WatchlistSummary;
   auto RemoveWatchlistSymbol(const std::string& watchlist_id,
                              const std::string& symbol) -> WatchlistSummary;
+  auto PinWatchlistSymbol(const std::string& watchlist_id,
+                          const std::string& symbol,
+                          bool pinned) -> WatchlistSummary;
+  auto MoveWatchlistSymbol(const std::string& watchlist_id,
+                           const std::string& symbol,
+                           const std::string& before_symbol) -> WatchlistSummary;
 };
 
 class OrderService {

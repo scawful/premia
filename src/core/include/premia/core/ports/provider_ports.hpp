@@ -84,6 +84,13 @@ class WatchlistMutationProviderPort {
                                   const std::string& symbol) -> WatchlistSummary = 0;
   virtual auto RemoveWatchlistSymbol(const std::string& watchlist_id,
                                      const std::string& symbol) -> WatchlistSummary = 0;
+  virtual auto PinWatchlistSymbol(const std::string& watchlist_id,
+                                  const std::string& symbol,
+                                  bool pinned) -> WatchlistSummary = 0;
+  virtual auto MoveWatchlistSymbol(const std::string& watchlist_id,
+                                   const std::string& symbol,
+                                   const std::string& before_symbol)
+      -> WatchlistSummary = 0;
 };
 
 class OrderProviderPort {

@@ -684,6 +684,21 @@ auto WatchlistService::RemoveWatchlistSymbol(const std::string& watchlist_id,
   return provider.RemoveWatchlistSymbol(watchlist_id, symbol);
 }
 
+auto WatchlistService::PinWatchlistSymbol(const std::string& watchlist_id,
+                                          const std::string& symbol,
+                                          bool pinned) -> WatchlistSummary {
+  providers::local::WatchlistProvider provider(kWatchlistsPath);
+  return provider.PinWatchlistSymbol(watchlist_id, symbol, pinned);
+}
+
+auto WatchlistService::MoveWatchlistSymbol(const std::string& watchlist_id,
+                                           const std::string& symbol,
+                                           const std::string& before_symbol)
+    -> WatchlistSummary {
+  providers::local::WatchlistProvider provider(kWatchlistsPath);
+  return provider.MoveWatchlistSymbol(watchlist_id, symbol, before_symbol);
+}
+
 auto OrderService::PreviewOrder(const OrderIntentRequest& request)
     -> OrderPreviewData {
   try {
