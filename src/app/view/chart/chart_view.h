@@ -1,8 +1,10 @@
 #ifndef ChartView_hpp
 #define ChartView_hpp
 
+#include <functional>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "metatypes.h"
 #include "view/chart/subview/candle_chart.h"
@@ -25,8 +27,12 @@ class ChartView : public View {
   void initChart();
   void DrawChart();
   void DrawChartSettings();
+  void DrawChartPresets();
   void DrawCoreContractPreview();
+  void DrawStatsStrip(const core::application::QuoteDetail& quote,
+                      const core::application::ChartScreenData& chart);
   void FetchChartData();
+  void ApplyPreset(const std::string& preset_id);
   auto GetSelectedRangeLabel() const -> std::string;
   auto GetSelectedIntervalLabel() const -> std::string;
 
@@ -37,6 +43,7 @@ class ChartView : public View {
   int frequency_amount = 0;
   bool isInit = false;
   bool pending_refresh_ = true;
+  std::string active_preset_ = "1Y";
   std::string tickerSymbol = "AAPL";
   std::string currentChart;
   std::function<void(const std::string&)> symbol_change_handler_;

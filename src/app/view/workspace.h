@@ -47,6 +47,9 @@ class Workspace {
   void DrawRightRail();
   void DrawOverview();
   void DrawTradeDesk();
+  void DrawBrokerageAccountsPanel();
+  void DrawQuickActionsPanel();
+  void DrawSelectedOrderCard();
   void DrawLinkedSymbolCard();
   void DrawTradingStatusCard();
   void DrawCompactAccountCard();

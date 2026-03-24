@@ -78,6 +78,18 @@ auto FrequencyAmountValue(int frequency_amount) -> const char* {
   return kValues[frequency_amount];
 }
 
+void DrawChartMetricCard(const char* id, const char* label,
+                         const std::string& value, const ImVec4& color,
+                         const std::string& note) {
+  ImGui::BeginChild(id, ImVec2(0.0f, 84.0f), true);
+  ImGui::TextDisabled("%s", label);
+  ImGui::PushStyleColor(ImGuiCol_Text, color);
+  ImGui::Text("%s", value.c_str());
+  ImGui::PopStyleColor();
+  ImGui::TextDisabled("%s", note.c_str());
+  ImGui::EndChild();
+}
+
 }  // namespace
 
 void ChartView::initChart() {
@@ -97,7 +109,59 @@ void ChartView::FetchChartData() {
   pending_refresh_ = false;
 }
 
+void ChartView::ApplyPreset(const std::string& preset_id) {
+  active_preset_ = preset_id;
+  if (preset_id == "1D") {
+    period_type = 0;
+    period_amount = 0;
+    frequency_type = 0;
+    frequency_amount = 0;
+  } else if (preset_id == "1W") {
+    period_type = 0;
+    period_amount = 4;
+    frequency_type = 0;
+    frequency_amount = 1;
+  } else if (preset_id == "1M") {
+    period_type = 1;
+    period_amount = 0;
+    frequency_type = 1;
+    frequency_amount = 0;
+  } else if (preset_id == "3M") {
+    period_type = 1;
+    period_amount = 2;
+    frequency_type = 1;
+    frequency_amount = 0;
+  } else if (preset_id == "1Y") {
+    period_type = 2;
+    period_amount = 0;
+    frequency_type = 1;
+    frequency_amount = 0;
+  }
+  pending_refresh_ = true;
+}
+
 void ChartView::DrawChart() { charts.at(currentChart)->Update(); }
+
+void ChartView::DrawChartPresets() {
+  const char* presets[] = {"1D", "1W", "1M", "3M", "1Y"};
+  ImGui::TextDisabled("Presets");
+  for (int index = 0; index < 5; ++index) {
+    if (index > 0) {
+      ImGui::SameLine();
+    }
+    if (active_preset_ == presets[index]) {
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.24f, 0.33f, 0.43f, 1.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                           ImVec4(0.29f, 0.40f, 0.52f, 1.0f));
+    }
+    if (ImGui::Button(presets[index], ImVec2(52.0f, 0.0f))) {
+      ApplyPreset(presets[index]);
+    }
+    if (active_preset_ == presets[index]) {
+      ImGui::PopStyleColor(2);
+    }
+  }
+}
 
 void ChartView::DrawChartSettings() {
   if (ImGui::BeginTable("Chart Settings", 13, ImGuiTableFlags_SizingFixedFit)) {
@@ -117,24 +181,37 @@ void ChartView::DrawChartSettings() {
     ImGui::Text("Period");
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(55.f);
-    ImGui::Combo("##Period", &period_type, "Day\0Month\0Year\0YTD\0");
+    if (ImGui::Combo("##Period", &period_type, "Day\0Month\0Year\0YTD\0")) {
+      active_preset_ = "Custom";
+      pending_refresh_ = true;
+    }
     ImGui::TableNextColumn();
     ImGui::Text("Type");
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(50.f);
-    ImGui::Combo("##type", &period_amount,
-                 " 1\0 2\0 3\0 4\0 5\0 6\0 10\0 15\0 20\0");
+    if (ImGui::Combo("##type", &period_amount,
+                     " 1\0 2\0 3\0 4\0 5\0 6\0 10\0 15\0 20\0")) {
+      active_preset_ = "Custom";
+      pending_refresh_ = true;
+    }
     ImGui::TableNextColumn();
     ImGui::Text("Frequency");
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(75.f);
-    ImGui::Combo("##frequency", &frequency_type,
-                 "Minute\0Daily\0Weekly\0Monthly\0");
+    if (ImGui::Combo("##frequency", &frequency_type,
+                     "Minute\0Daily\0Weekly\0Monthly\0")) {
+      active_preset_ = "Custom";
+      pending_refresh_ = true;
+    }
     ImGui::TableNextColumn();
     ImGui::Text("Amount");
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(50.f);
-    ImGui::Combo("##amount", &frequency_amount, " 1\0 5\0 10\0 15\0 30\0");
+    if (ImGui::Combo("##amount", &frequency_amount,
+                     " 1\0 5\0 10\0 15\0 30\0")) {
+      active_preset_ = "Custom";
+      pending_refresh_ = true;
+    }
     ImGui::TableNextColumn();
     if (ImGui::Button("Search") && !tickerSymbol.empty()) {
       pending_refresh_ = true;
@@ -144,6 +221,8 @@ void ChartView::DrawChartSettings() {
     }
     ImGui::EndTable();
   }
+
+  DrawChartPresets();
 }
 
 auto ChartView::GetSelectedRangeLabel() const -> std::string {
@@ -171,6 +250,8 @@ void ChartView::DrawCoreContractPreview() {
                      ResolveMarketDataSource(connections).c_str());
   ImGui::TextDisabled(
       "Charts prefer Schwab when connected and fall back to local preview data otherwise.");
+
+  DrawStatsStrip(quote, chart);
 
   if (ImGui::BeginTable("ChartContractPreview", 5,
                         ImGuiTableFlags_SizingStretchSame)) {
@@ -203,6 +284,46 @@ void ChartView::DrawCoreContractPreview() {
   ImGui::Text("Series Type: %s | Bars: %d | Exchange: %s", chart.series.type.c_str(),
               static_cast<int>(chart.series.bars.size()),
               quote.instrument.primary_exchange.c_str());
+}
+
+void ChartView::DrawStatsStrip(const core::application::QuoteDetail& quote,
+                               const core::application::ChartScreenData& chart) {
+  const auto is_down = [&chart]() {
+    try {
+      return std::stod(chart.stats.change.absolute.amount) < 0.0;
+    } catch (...) {
+      return false;
+    }
+  }();
+  const auto change_color =
+      is_down ? ImVec4(0.89f, 0.34f, 0.36f, 1.0f) : ImVec4(0.24f, 0.78f, 0.55f, 1.0f);
+
+  if (ImGui::BeginTable("ChartStatsStrip", 4,
+                        ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
+    ImGui::TableNextColumn();
+    DrawChartMetricCard("ChartLastCard", "Last",
+                        "$" + quote.quote.last_price.amount,
+                        ImVec4(0.83f, 0.69f, 0.28f, 1.0f),
+                        quote.instrument.symbol + " - " + quote.instrument.name);
+    ImGui::TableNextColumn();
+    DrawChartMetricCard("ChartChangeCard", "Session Change",
+                        "$" + chart.stats.change.absolute.amount + " (" +
+                            chart.stats.change.percent + "%)",
+                        change_color,
+                        "Current selected range");
+    ImGui::TableNextColumn();
+    DrawChartMetricCard("ChartBidAskCard", "Bid / Ask",
+                        "$" + quote.quote.bid.amount + " / $" + quote.quote.ask.amount,
+                        ImVec4(0.40f, 0.72f, 0.96f, 1.0f),
+                        quote.instrument.primary_exchange);
+    ImGui::TableNextColumn();
+    DrawChartMetricCard("ChartRangeCard", "Open / High / Low",
+                        "$" + quote.quote.open.amount + " / $" +
+                            quote.quote.high.amount + " / $" + quote.quote.low.amount,
+                        ImVec4(0.58f, 0.63f, 0.71f, 1.0f),
+                        "Volume " + quote.quote.volume);
+    ImGui::EndTable();
+  }
 }
 
 std::string ChartView::getName() { return "Chart"; }

@@ -106,6 +106,53 @@ auto ChangeColor(const std::string& amount) -> ImVec4 {
   return ParseSignedAmount(amount) < 0.0 ? NegativeColor() : PositiveColor();
 }
 
+auto AccountSuffix(const std::string& account_id) -> std::string {
+  if (account_id.size() <= 4) {
+    return account_id;
+  }
+  return account_id.substr(account_id.size() - 4);
+}
+
+void ApplyWorkspaceTheme() {
+  auto& style = ImGui::GetStyle();
+  style.WindowRounding = 14.0f;
+  style.ChildRounding = 12.0f;
+  style.FrameRounding = 10.0f;
+  style.PopupRounding = 10.0f;
+  style.ScrollbarRounding = 12.0f;
+  style.GrabRounding = 10.0f;
+  style.TabRounding = 10.0f;
+  style.FrameBorderSize = 1.0f;
+  style.ChildBorderSize = 1.0f;
+  style.WindowPadding = ImVec2(16.0f, 14.0f);
+  style.FramePadding = ImVec2(10.0f, 7.0f);
+  style.ItemSpacing = ImVec2(10.0f, 8.0f);
+  style.ItemInnerSpacing = ImVec2(8.0f, 6.0f);
+
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(0.08f, 0.10f, 0.13f, 1.0f);
+  style.Colors[ImGuiCol_ChildBg] = ImVec4(0.11f, 0.13f, 0.17f, 1.0f);
+  style.Colors[ImGuiCol_PopupBg] = ImVec4(0.12f, 0.14f, 0.18f, 0.98f);
+  style.Colors[ImGuiCol_Border] = ImVec4(0.22f, 0.26f, 0.33f, 0.95f);
+  style.Colors[ImGuiCol_FrameBg] = ImVec4(0.15f, 0.18f, 0.22f, 1.0f);
+  style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.20f, 0.24f, 0.30f, 1.0f);
+  style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.23f, 0.28f, 0.35f, 1.0f);
+  style.Colors[ImGuiCol_Button] = ImVec4(0.18f, 0.24f, 0.31f, 1.0f);
+  style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.24f, 0.33f, 0.43f, 1.0f);
+  style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.29f, 0.40f, 0.52f, 1.0f);
+  style.Colors[ImGuiCol_Header] = ImVec4(0.18f, 0.24f, 0.31f, 0.95f);
+  style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.27f, 0.37f, 0.48f, 1.0f);
+  style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.31f, 0.43f, 0.56f, 1.0f);
+  style.Colors[ImGuiCol_TableHeaderBg] = ImVec4(0.14f, 0.17f, 0.22f, 1.0f);
+  style.Colors[ImGuiCol_TableBorderStrong] = ImVec4(0.24f, 0.28f, 0.35f, 1.0f);
+  style.Colors[ImGuiCol_TableBorderLight] = ImVec4(0.18f, 0.21f, 0.27f, 1.0f);
+  style.Colors[ImGuiCol_Tab] = ImVec4(0.16f, 0.20f, 0.27f, 1.0f);
+  style.Colors[ImGuiCol_TabHovered] = ImVec4(0.24f, 0.33f, 0.43f, 1.0f);
+  style.Colors[ImGuiCol_TabActive] = ImVec4(0.27f, 0.37f, 0.48f, 1.0f);
+  style.Colors[ImGuiCol_CheckMark] = AccentColor();
+  style.Colors[ImGuiCol_SliderGrab] = AccentColor();
+  style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.92f, 0.78f, 0.36f, 1.0f);
+}
+
 void DrawMetricCard(const char* id, const std::string& label,
                     const std::string& value, const std::string& note,
                     const ImVec4& value_color) {
@@ -399,7 +446,7 @@ auto Workspace::ActiveMarketDataSource() const -> std::string {
 
 auto Workspace::PreferredTradingVenue() const -> std::string {
   if (IsProviderConnected(Provider::kSchwab)) {
-    return "Charles Schwab desk (live quotes, simulated execution)";
+    return "Charles Schwab desk (live quotes, preview-first execution)";
   }
   if (IsProviderConnected(Provider::kIBKR)) {
     return "Interactive Brokers account desk (simulation only)";
@@ -551,6 +598,11 @@ void Workspace::DrawOverview() {
   ImGui::TextDisabled("Current account source: %s", ActiveAccountSource().c_str());
   ImGui::Separator();
 
+  if (!brokerage_accounts_.empty()) {
+    DrawBrokerageAccountsPanel();
+    ImGui::Spacing();
+  }
+
   if (ImGui::BeginTable("OverviewMetrics", 4,
                         ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
     ImGui::TableNextColumn();
@@ -633,9 +685,82 @@ void Workspace::DrawOverview() {
     ImGui::Separator();
     ImGui::TextWrapped(
         "Market data and options currently prefer Schwab when connected. Account snapshots can fall through to IBKR, and desktop trading now runs in preview mode by default with an explicit live Schwab gate.");
+    ImGui::Spacing();
+    DrawQuickActionsPanel();
     ImGui::EndChild();
     ImGui::EndTable();
   }
+}
+
+void Workspace::DrawBrokerageAccountsPanel() {
+  ImGui::BeginChild("BrokerageAccountsPanel", ImVec2(0.0f, 148.0f), true);
+  ImGui::Text("Linked Brokerage Accounts");
+  ImGui::TextDisabled(
+      "Switching accounts keeps the same desktop workspace while updating portfolio, holdings, and order state.");
+  ImGui::Separator();
+
+  const int column_count = std::min<int>(3, std::max<int>(1, brokerage_accounts_.size()));
+  if (ImGui::BeginTable("BrokerageAccountsTable", column_count,
+                        ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
+    int column_index = 0;
+    for (const auto& account : brokerage_accounts_) {
+      if (column_index == 0) {
+        ImGui::TableNextRow();
+      }
+      ImGui::TableSetColumnIndex(column_index);
+      ImGui::BeginChild(("AccountCard" + account.account_id).c_str(),
+                        ImVec2(0.0f, 96.0f), true);
+      const bool is_active = account.account_id == active_account_id_;
+      ImGui::TextColored(ProviderColor(account.provider), "%s",
+                         account.display_name.c_str());
+      ImGui::TextDisabled("Account ending %s", AccountSuffix(account.account_id).c_str());
+      ImGui::Text("Value: %s", FormatMoney(account.total_value).c_str());
+      ImGui::TextDisabled("Holdings: %d", account.holdings_count);
+      if (is_active) {
+        ImGui::TextColored(PositiveColor(), "Active workspace account");
+      } else if (ImGui::Button(("Switch##" + account.account_id).c_str(),
+                               ImVec2(-FLT_MIN, 0.0f))) {
+        active_account_id_ = account.account_id;
+        RefreshWorkspaceData();
+      }
+      ImGui::EndChild();
+      column_index = (column_index + 1) % column_count;
+    }
+    ImGui::EndTable();
+  }
+
+  ImGui::EndChild();
+}
+
+void Workspace::DrawQuickActionsPanel() {
+  ImGui::BeginChild("QuickActionsPanel", ImVec2(0.0f, 134.0f), true);
+  ImGui::Text("Quick Actions");
+  ImGui::TextDisabled("Jump straight into the next likely workflow.");
+  if (ImGui::Button("Refresh All", ImVec2(120.0f, 0.0f))) {
+    RefreshWorkspaceData();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Trade Desk", ImVec2(120.0f, 0.0f))) {
+    active_surface_ = Surface::kTrade;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Account", ImVec2(120.0f, 0.0f))) {
+    active_surface_ = Surface::kAccount;
+  }
+  if (ImGui::Button("Charts", ImVec2(120.0f, 0.0f))) {
+    active_surface_ = Surface::kChart;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Options", ImVec2(120.0f, 0.0f))) {
+    active_surface_ = Surface::kOptions;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Watchlists", ImVec2(120.0f, 0.0f))) {
+    active_surface_ = Surface::kWatchlists;
+  }
+  ImGui::TextWrapped("Focused symbol `%s` stays linked across chart, options, and ticket surfaces.",
+                     ticket_symbol_.c_str());
+  ImGui::EndChild();
 }
 
 void Workspace::DrawLinkedSymbolCard() {
@@ -653,6 +778,10 @@ void Workspace::DrawLinkedSymbolCard() {
   }
   if (!selected_option_strike_.empty()) {
     ImGui::TextDisabled("Selected strike: %s", selected_option_strike_.c_str());
+  }
+  if (!selected_option_contract_symbol_.empty()) {
+    ImGui::TextDisabled("Contract: %s", selected_option_contract_symbol_.c_str());
+    ImGui::TextDisabled("Leg: %s", selected_option_is_call_ ? "Call" : "Put");
   }
   if (ImGui::Button("Chart", ImVec2(100.0f, 0.0f))) {
     active_surface_ = Surface::kChart;
@@ -677,6 +806,42 @@ void Workspace::DrawTradingStatusCard() {
   ImGui::TextDisabled("Live routing armed: %s", live_trade_enabled_ ? "yes" : "no");
   ImGui::TextColored(AccentColor(),
                      "Preview is the default path; live Schwab submit requires the explicit checkbox.");
+  ImGui::EndChild();
+}
+
+void Workspace::DrawSelectedOrderCard() {
+  ImGui::BeginChild("SelectedOrderCard", ImVec2(0.0f, 138.0f), true);
+  ImGui::Text("Selected Order");
+
+  auto find_order = [this]() -> const core::application::OrderRecordData* {
+    auto in_open = std::find_if(open_orders_.begin(), open_orders_.end(),
+                                [this](const core::application::OrderRecordData& order) {
+                                  return order.order_id == selected_order_id_;
+                                });
+    if (in_open != open_orders_.end()) {
+      return &(*in_open);
+    }
+    auto in_history = std::find_if(order_history_.begin(), order_history_.end(),
+                                   [this](const core::application::OrderRecordData& order) {
+                                     return order.order_id == selected_order_id_;
+                                   });
+    return in_history == order_history_.end() ? nullptr : &(*in_history);
+  };
+
+  const auto* order = find_order();
+  if (order == nullptr) {
+    ImGui::TextDisabled("Pick an open order to load it into the ticket and manage it.");
+    ImGui::EndChild();
+    return;
+  }
+
+  ImGui::Text("%s", order->symbol.c_str());
+  ImGui::TextDisabled("Order ID: %s", order->order_id.c_str());
+  ImGui::Text("%s %s %s", order->instruction.c_str(), order->quantity.c_str(),
+              order->asset_type.c_str());
+  ImGui::Text("Type: %s | Status: %s", order->order_type.c_str(),
+              order->status.c_str());
+  ImGui::TextDisabled("Mode: %s", order->mode.c_str());
   ImGui::EndChild();
 }
 
@@ -874,6 +1039,8 @@ void Workspace::DrawTradeDesk() {
 
     ImGui::TableNextColumn();
     ImGui::BeginChild("TradeDeskOrdersPanel", ImVec2(0.0f, 0.0f), true);
+    DrawSelectedOrderCard();
+    ImGui::Spacing();
     ImGui::Text("Open Orders");
     DrawOrdersTable("TradeDeskOpenOrders", open_orders_, 8, true);
     if (!selected_order_id_.empty()) {
@@ -982,6 +1149,7 @@ void Workspace::DrawRightRail() {
 }
 
 void Workspace::Update() {
+  ApplyWorkspaceTheme();
   NewMasterFrame();
   WireEvents();
   if (!data_loaded_) {
