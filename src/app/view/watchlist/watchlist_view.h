@@ -15,6 +15,10 @@ class WatchlistView : public View {
   int watchlistIndex = 0;
   std::string selected_symbol_;
   std::string filter_text_;
+  std::string new_watchlist_name_;
+  std::string rename_watchlist_name_;
+  std::string new_symbol_input_;
+  std::string status_message_;
   int movement_filter_ = 0;
   bool state_loaded_ = false;
   std::unordered_map<std::string, std::vector<std::string>> pinned_symbols_by_watchlist_;

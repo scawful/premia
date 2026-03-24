@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
 #include <sstream>
 
 #include <imgui/imgui.h>
@@ -92,6 +93,43 @@ void CandleChart::DrawReadoutCard() {
     ImGui::EndTable();
   }
   ImGui::EndChild();
+}
+
+void CandleChart::DrawOverlayMarkers() {
+  if (model == nullptr || !model->isActive()) {
+    return;
+  }
+
+  const auto& markers = model->getOverlayMarkers();
+  if (markers.empty()) {
+    return;
+  }
+
+  auto* draw_list = ImPlot::GetPlotDrawList();
+  const float left = ImPlot::GetPlotPos().x;
+  const float right = left + ImPlot::GetPlotSize().x;
+
+  ImPlot::PushPlotClipRect();
+  for (const auto& marker : markers) {
+    const auto point = ImPlot::PlotToPixels(model->getDate(model->getNumCandles() - 1),
+                                            marker.price);
+    ImU32 color = IM_COL32(198, 176, 72, 210);
+    if (marker.kind == "avg_cost") {
+      color = IM_COL32(90, 180, 255, 210);
+    } else if (marker.kind == "order") {
+      color = IM_COL32(102, 214, 140, 210);
+    }
+    draw_list->AddLine(ImVec2(left, point.y), ImVec2(right, point.y), color, 1.25f);
+    draw_list->AddText(ImVec2(left + 8.0f, point.y - 14.0f), color,
+                       (marker.label + " @ $" +
+                        [&marker]() {
+                          std::ostringstream oss;
+                          oss << std::fixed << std::setprecision(2) << marker.price;
+                          return oss.str();
+                        }())
+                           .c_str());
+  }
+  ImPlot::PopPlotClipRect();
 }
 
 /**
@@ -224,6 +262,7 @@ void CandleChart::DrawCandleChart() {
         ImPlot::SetupAxesLimits(
             0, 100, model->getLowBound(), model->getHighBound());
         DrawCandles(0.25, model->getNumCandles(), bullCol, bearCol, tooltip);
+        DrawOverlayMarkers();
       }
       ImPlot::EndPlot();
     }

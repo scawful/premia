@@ -26,6 +26,7 @@ class CandleChart : public Chart {
   int binary_search(const std::vector<double>& arr, int l, int r, double x);
   int nearest_index(const std::vector<double>& arr, double x);
   void DrawReadoutCard();
+  void DrawOverlayMarkers();
   void DrawCandles(float width_percent, int count, ImVec4 bullCol,
                    ImVec4 bearCol, bool tooltip);
   void DrawCandleChart();

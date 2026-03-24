@@ -210,6 +210,50 @@ void AccountView::DrawCoreAccountPreview() {
     ImGui::EndChild();
   }
 
+  ImGui::Spacing();
+
+  if (ImGui::BeginTable("AccountDrilldowns", 2,
+                        ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
+    std::vector<core::application::AccountPositionRow> ranked_by_pnl = account.positions;
+    std::sort(ranked_by_pnl.begin(), ranked_by_pnl.end(),
+              [](const auto& lhs, const auto& rhs) {
+                return ParseAmount(lhs.day_profit_loss.amount) >
+                       ParseAmount(rhs.day_profit_loss.amount);
+              });
+
+    ImGui::TableNextColumn();
+    ImGui::BeginChild("TopGainersCard", ImVec2(0.0f, 170.0f), true);
+    ImGui::Text("Top Gainers");
+    ImGui::TextDisabled("Best intraday movers in the active account.");
+    for (size_t index = 0; index < std::min<size_t>(3, ranked_by_pnl.size()); ++index) {
+      const auto& holding = ranked_by_pnl[index];
+      ImGui::Text("%s", holding.symbol.c_str());
+      ImGui::SameLine();
+      ImGui::TextColored(ImVec4(0.24f, 0.78f, 0.55f, 1.0f), "$%s (%s%%)",
+                         holding.day_profit_loss.amount.c_str(),
+                         holding.day_profit_loss_percent.c_str());
+      ImGui::TextDisabled("%s", holding.name.c_str());
+    }
+    ImGui::EndChild();
+
+    ImGui::TableNextColumn();
+    ImGui::BeginChild("TopLaggardsCard", ImVec2(0.0f, 170.0f), true);
+    ImGui::Text("Top Laggards");
+    ImGui::TextDisabled("Weakest intraday movers in the active account.");
+    std::reverse(ranked_by_pnl.begin(), ranked_by_pnl.end());
+    for (size_t index = 0; index < std::min<size_t>(3, ranked_by_pnl.size()); ++index) {
+      const auto& holding = ranked_by_pnl[index];
+      ImGui::Text("%s", holding.symbol.c_str());
+      ImGui::SameLine();
+      ImGui::TextColored(ImVec4(0.89f, 0.34f, 0.36f, 1.0f), "$%s (%s%%)",
+                         holding.day_profit_loss.amount.c_str(),
+                         holding.day_profit_loss_percent.c_str());
+      ImGui::TextDisabled("%s", holding.name.c_str());
+    }
+    ImGui::EndChild();
+    ImGui::EndTable();
+  }
+
   ImGui::Separator();
 
   if (ImGui::BeginTable("CoreConnections", 3,

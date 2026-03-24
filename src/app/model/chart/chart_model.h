@@ -9,6 +9,13 @@
 #include "service/TDAmeritrade/data/PricingStructures.hpp"
 
 namespace premia {
+
+struct ChartOverlayMarker {
+  std::string id;
+  std::string label;
+  double price = 0.0;
+  std::string kind;
+};
   
 class ChartModel : public Model {
  public:
@@ -21,6 +28,12 @@ class ChartModel : public Model {
   auto getTickerSymbol() const { return tickerSymbol; }
   auto getLowBound() const -> double { return lowBound; }
   auto getHighBound() const -> double { return highBound; }
+  auto getOverlayMarkers() const -> const std::vector<ChartOverlayMarker>& {
+    return overlay_markers;
+  }
+  void setOverlayMarkers(std::vector<ChartOverlayMarker> markers) {
+    overlay_markers = std::move(markers);
+  }
 
   std::string getQuoteDetails();
   void fetchPriceHistory(const std::string& ticker, tda::PeriodType ptype,
@@ -38,6 +51,7 @@ class ChartModel : public Model {
   std::vector<tda::Candle> candles;
   std::vector<double> datesVec;
   std::vector<double> volumeVec;
+  std::vector<ChartOverlayMarker> overlay_markers;
   double lowBound = 0.0;
   double highBound = 0.0;
 };

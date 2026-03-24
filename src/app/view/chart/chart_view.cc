@@ -4,7 +4,9 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
+#include <algorithm>
 #include <memory>
+#include <sstream>
 #include <string>
 
 #include "metatypes.h"
@@ -78,6 +80,14 @@ auto FrequencyAmountValue(int frequency_amount) -> const char* {
   return kValues[frequency_amount];
 }
 
+auto ParsePrice(const std::string& value) -> double {
+  try {
+    return std::stod(value);
+  } catch (...) {
+    return 0.0;
+  }
+}
+
 void DrawChartMetricCard(const char* id, const char* label,
                          const std::string& value, const ImVec4& color,
                          const std::string& note) {
@@ -106,6 +116,7 @@ void ChartView::FetchChartData() {
   charts[currentChart]->fetchData(tickerSymbol, tda::PeriodType(period_type),
                                   period_amount, tda::FrequencyType(frequency_type),
                                   frequency_amount, true);
+  RefreshOverlayMarkers();
   pending_refresh_ = false;
 }
 
@@ -161,6 +172,38 @@ void ChartView::DrawChartPresets() {
       ImGui::PopStyleColor(2);
     }
   }
+}
+
+void ChartView::DrawOverlayControls() {
+  ImGui::BeginChild("ChartOverlayControls", ImVec2(0.0f, 108.0f), true);
+  ImGui::Text("Annotations and Trade Anchors");
+  ImGui::TextDisabled(
+      "Open orders and average-cost anchors are added automatically for the active account; custom notes stay local to this desktop session.");
+  ImGui::InputTextWithHint("##annotationLabel", "Annotation label",
+                           &annotation_label_);
+  ImGui::SameLine();
+  ImGui::SetNextItemWidth(110.0f);
+  ImGui::InputTextWithHint("##annotationPrice", "Price", &annotation_price_,
+                           ImGuiInputTextFlags_CharsDecimal);
+  ImGui::SameLine();
+  if (ImGui::Button("Add Marker") && !annotation_label_.empty() &&
+      !annotation_price_.empty()) {
+    auto& annotations = manual_annotations_[tickerSymbol];
+    annotations.push_back({tickerSymbol + ":note:" + annotation_label_, annotation_label_,
+                           ParsePrice(annotation_price_), "annotation"});
+    annotation_label_.clear();
+    annotation_price_.clear();
+    RefreshOverlayMarkers();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Clear Markers")) {
+    manual_annotations_.erase(tickerSymbol);
+    RefreshOverlayMarkers();
+  }
+
+  const auto marker_count = static_cast<int>(model->getOverlayMarkers().size());
+  ImGui::TextDisabled("Visible markers for %s: %d", tickerSymbol.c_str(), marker_count);
+  ImGui::EndChild();
 }
 
 void ChartView::DrawChartSettings() {
@@ -223,6 +266,7 @@ void ChartView::DrawChartSettings() {
   }
 
   DrawChartPresets();
+  DrawOverlayControls();
 }
 
 auto ChartView::GetSelectedRangeLabel() const -> std::string {
@@ -326,6 +370,38 @@ void ChartView::DrawStatsStrip(const core::application::QuoteDetail& quote,
   }
 }
 
+void ChartView::RefreshOverlayMarkers() {
+  std::vector<ChartOverlayMarker> markers;
+  const auto manual_it = manual_annotations_.find(tickerSymbol);
+  if (manual_it != manual_annotations_.end()) {
+    markers.insert(markers.end(), manual_it->second.begin(), manual_it->second.end());
+  }
+
+  try {
+    auto& root = core::application::CompositionRoot::Instance();
+    const auto account = root.AppService().GetAccountDetailForAccount(active_account_id_);
+    for (const auto& position : account.positions) {
+      if (position.symbol != tickerSymbol) {
+        continue;
+      }
+      markers.push_back({tickerSymbol + ":avg-cost", "Avg Cost",
+                         ParsePrice(position.average_price.amount), "avg_cost"});
+    }
+    for (const auto& order : root.Orders().GetOpenOrders(account.account_id)) {
+      if (order.symbol != tickerSymbol || order.limit_price.empty() ||
+          order.limit_price == "0.00") {
+        continue;
+      }
+      markers.push_back({tickerSymbol + ":order:" + order.order_id,
+                         order.instruction + " " + order.quantity,
+                         ParsePrice(order.limit_price), "order"});
+    }
+  } catch (const std::exception&) {
+  }
+
+  model->setOverlayMarkers(std::move(markers));
+}
+
 std::string ChartView::getName() { return "Chart"; }
 
 void ChartView::addLogger(const Logger& newLogger) { this->logger = newLogger; }
@@ -345,6 +421,14 @@ void ChartView::SetTickerSymbol(const std::string& symbol) {
 void ChartView::SetSymbolChangeHandler(
     const std::function<void(const std::string&)>& handler) {
   symbol_change_handler_ = handler;
+}
+
+void ChartView::SetActiveAccountId(const std::string& account_id) {
+  if (active_account_id_ == account_id) {
+    return;
+  }
+  active_account_id_ = account_id;
+  RefreshOverlayMarkers();
 }
 
 void ChartView::SetActivePresetId(const std::string& preset_id) {
@@ -369,6 +453,8 @@ void ChartView::Update() {
   }
   if (pending_refresh_) {
     FetchChartData();
+  } else {
+    RefreshOverlayMarkers();
   }
   DrawChartSettings();
   DrawCoreContractPreview();

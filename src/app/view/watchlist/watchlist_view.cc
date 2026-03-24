@@ -394,8 +394,82 @@ void WatchlistView::DrawCoreWatchlistPreview() {
                static_cast<int>(watchlist_names.size()));
 
   const auto screen = service.GetWatchlistScreen(watchlists[watchlistIndex].id);
+  if (rename_watchlist_name_.empty()) {
+    rename_watchlist_name_ = screen.watchlist.name;
+  }
   EnsureWatchlistOrdering(screen);
   const auto rows = BuildOrderedRows(screen);
+
+  if (ImGui::BeginTable("WatchlistMutationBar", 4,
+                        ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
+    ImGui::TableNextColumn();
+    ImGui::InputTextWithHint("##newWatchlistName", "New watchlist name",
+                             &new_watchlist_name_);
+    if (ImGui::Button("Create Watchlist", ImVec2(-FLT_MIN, 0.0f)) &&
+        !new_watchlist_name_.empty()) {
+      try {
+        const auto summary = service.CreateWatchlist(new_watchlist_name_);
+        new_watchlist_name_.clear();
+        status_message_ = "Created watchlist " + summary.name + ".";
+        const auto refreshed = service.ListWatchlists();
+        for (int index = 0; index < static_cast<int>(refreshed.size()); ++index) {
+          if (refreshed[index].id == summary.id) {
+            watchlistIndex = index;
+            break;
+          }
+        }
+      } catch (const std::exception& ex) {
+        status_message_ = std::string("Watchlist create failed: ") + ex.what();
+      }
+    }
+
+    ImGui::TableNextColumn();
+    ImGui::InputTextWithHint("##renameWatchlistName", "Rename current watchlist",
+                             &rename_watchlist_name_);
+    if (ImGui::Button("Rename", ImVec2(-FLT_MIN, 0.0f)) &&
+        !rename_watchlist_name_.empty()) {
+      try {
+        const auto summary =
+            service.RenameWatchlist(screen.watchlist.id, rename_watchlist_name_);
+        status_message_ = "Renamed watchlist to " + summary.name + ".";
+      } catch (const std::exception& ex) {
+        status_message_ = std::string("Watchlist rename failed: ") + ex.what();
+      }
+    }
+
+    ImGui::TableNextColumn();
+    ImGui::InputTextWithHint("##newSymbolInput", "Add symbol to current watchlist",
+                             &new_symbol_input_, ImGuiInputTextFlags_CharsUppercase);
+    if (ImGui::Button("Add Symbol", ImVec2(-FLT_MIN, 0.0f)) && !new_symbol_input_.empty()) {
+      try {
+        service.AddWatchlistSymbol(screen.watchlist.id, new_symbol_input_);
+        status_message_ = "Added " + new_symbol_input_ + " to " +
+                          screen.watchlist.name + ".";
+        new_symbol_input_.clear();
+      } catch (const std::exception& ex) {
+        status_message_ = std::string("Watchlist add failed: ") + ex.what();
+      }
+    }
+
+    ImGui::TableNextColumn();
+    if (ImGui::Button("Remove Selected", ImVec2(-FLT_MIN, 0.0f)) &&
+        !selected_symbol_.empty()) {
+      try {
+        service.RemoveWatchlistSymbol(screen.watchlist.id, selected_symbol_);
+        status_message_ = "Removed " + selected_symbol_ + " from " +
+                          screen.watchlist.name + ".";
+        selected_symbol_.clear();
+      } catch (const std::exception& ex) {
+        status_message_ = std::string("Watchlist remove failed: ") + ex.what();
+      }
+    }
+    ImGui::EndTable();
+  }
+
+  if (!status_message_.empty()) {
+    ImGui::TextDisabled("%s", status_message_.c_str());
+  }
+
   DrawWatchlistSummary(screen);
   ImGui::Spacing();
 

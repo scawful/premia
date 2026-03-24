@@ -523,6 +523,7 @@ void Workspace::RefreshWorkspaceData() {
       active_account_id_ = account_detail_.account_id;
     }
     account_view_.SetActiveAccountId(active_account_id_);
+    chart_view_.SetActiveAccountId(active_account_id_);
     open_orders_ = root.Orders().GetOpenOrders(active_account_id_);
     order_history_ = root.Orders().GetOrderHistory(active_account_id_);
     if (ticket_symbol_.empty()) {
@@ -1064,6 +1065,10 @@ void Workspace::DrawBrokerageAccountsPanel() {
   ImGui::Separator();
 
   const int column_count = std::min<int>(3, std::max<int>(1, brokerage_accounts_.size()));
+  double max_value = 0.0;
+  for (const auto& account : brokerage_accounts_) {
+    max_value = std::max(max_value, ParseSignedAmount(account.total_value.amount));
+  }
   if (ImGui::BeginTable("BrokerageAccountsTable", column_count,
                         ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
     int column_index = 0;
@@ -1079,6 +1084,12 @@ void Workspace::DrawBrokerageAccountsPanel() {
                          account.display_name.c_str());
       ImGui::TextDisabled("Account ending %s", AccountSuffix(account.account_id).c_str());
       ImGui::Text("Value: %s", FormatMoney(account.total_value).c_str());
+      const float ratio = max_value <= 0.0 ? 0.0f
+                                           : static_cast<float>(
+                                                 ParseSignedAmount(account.total_value.amount) /
+                                                 max_value);
+      ImGui::ProgressBar(ratio, ImVec2(-FLT_MIN, 0.0f),
+                         (std::to_string(account.holdings_count) + " holdings").c_str());
       ImGui::TextDisabled("Holdings: %d", account.holdings_count);
       if (is_active) {
         ImGui::TextColored(PositiveColor(), "Active workspace account");

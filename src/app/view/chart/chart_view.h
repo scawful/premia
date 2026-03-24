@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "metatypes.h"
 #include "view/chart/subview/candle_chart.h"
@@ -21,6 +22,7 @@ class ChartView : public View {
   void SetTickerSymbol(const std::string& symbol);
   void SetSymbolChangeHandler(
       const std::function<void(const std::string&)>& handler);
+  void SetActiveAccountId(const std::string& account_id);
   void SetActivePresetId(const std::string& preset_id);
   auto GetActivePresetId() const -> const std::string&;
   void Update() override;
@@ -31,10 +33,12 @@ class ChartView : public View {
   void DrawChartSettings();
   void DrawChartPresets();
   void DrawCoreContractPreview();
+  void DrawOverlayControls();
   void DrawStatsStrip(const core::application::QuoteDetail& quote,
                       const core::application::ChartScreenData& chart);
   void FetchChartData();
   void ApplyPreset(const std::string& preset_id);
+  void RefreshOverlayMarkers();
   auto GetSelectedRangeLabel() const -> std::string;
   auto GetSelectedIntervalLabel() const -> std::string;
 
@@ -47,8 +51,12 @@ class ChartView : public View {
   bool pending_refresh_ = true;
   std::string active_preset_ = "1Y";
   std::string tickerSymbol = "AAPL";
+  std::string active_account_id_;
+  std::string annotation_label_;
+  std::string annotation_price_;
   std::string currentChart;
   std::function<void(const std::string&)> symbol_change_handler_;
+  std::unordered_map<std::string, std::vector<ChartOverlayMarker>> manual_annotations_;
 
   EventMap events;
   ChartMap charts;
