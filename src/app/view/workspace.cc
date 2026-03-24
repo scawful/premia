@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -251,6 +252,26 @@ Workspace::Workspace() {
   LoadWorkspaceState();
 }
 
+void Workspace::ApplyLayoutPreset(const std::string& preset_id) {
+  layout_preset_ = preset_id.empty() ? "Balanced" : preset_id;
+  if (layout_preset_ == "Focus") {
+    sidebar_width_ = 236.0f;
+    right_rail_width_ = 300.0f;
+  } else if (layout_preset_ == "Research") {
+    sidebar_width_ = 332.0f;
+    right_rail_width_ = 420.0f;
+  } else if (layout_preset_ == "Balanced") {
+    sidebar_width_ = 280.0f;
+    right_rail_width_ = 360.0f;
+  } else if (layout_preset_ == "Custom") {
+    return;
+  } else {
+    layout_preset_ = "Balanced";
+    sidebar_width_ = 280.0f;
+    right_rail_width_ = 360.0f;
+  }
+}
+
 void Workspace::LoadWorkspaceState() {
   const auto state_path = WorkspaceStatePath();
   if (!std::filesystem::exists(state_path)) {
@@ -288,15 +309,25 @@ void Workspace::LoadWorkspaceState() {
 
     const auto preset = tree.get<std::string>("chartPreset", "1Y");
     chart_view_.SetActivePresetId(preset);
+    const auto layout_preset = tree.get<std::string>("layoutPreset", "Balanced");
+    ApplyLayoutPreset(layout_preset);
+    sidebar_width_ = tree.get<float>("sidebarWidth", sidebar_width_);
+    right_rail_width_ = tree.get<float>("rightRailWidth", right_rail_width_);
     persisted_surface_key_ = surface_key;
     persisted_account_id_ = active_account_id_;
     persisted_symbol_ = ticket_symbol_;
     persisted_chart_preset_ = chart_view_.GetActivePresetId();
+    persisted_layout_preset_ = layout_preset_;
+    persisted_sidebar_width_ = sidebar_width_;
+    persisted_right_rail_width_ = right_rail_width_;
   } catch (const std::exception&) {
     persisted_surface_key_ = CurrentSurfaceKey();
     persisted_account_id_ = active_account_id_;
     persisted_symbol_ = ticket_symbol_;
     persisted_chart_preset_ = chart_view_.GetActivePresetId();
+    persisted_layout_preset_ = layout_preset_;
+    persisted_sidebar_width_ = sidebar_width_;
+    persisted_right_rail_width_ = right_rail_width_;
   }
 
   workspace_state_loaded_ = true;
@@ -314,7 +345,10 @@ void Workspace::PersistWorkspaceStateIfNeeded() {
       surface_key == persisted_surface_key_ &&
       active_account_id_ == persisted_account_id_ &&
       ticket_symbol_ == persisted_symbol_ &&
-      chart_preset == persisted_chart_preset_) {
+      chart_preset == persisted_chart_preset_ &&
+      layout_preset_ == persisted_layout_preset_ &&
+      std::abs(sidebar_width_ - persisted_sidebar_width_) < 0.5f &&
+      std::abs(right_rail_width_ - persisted_right_rail_width_) < 0.5f) {
     return;
   }
 
@@ -323,6 +357,9 @@ void Workspace::PersistWorkspaceStateIfNeeded() {
   tree.put("focusedSymbol", ticket_symbol_);
   tree.put("activeSurface", surface_key);
   tree.put("chartPreset", chart_preset);
+  tree.put("layoutPreset", layout_preset_);
+  tree.put("sidebarWidth", sidebar_width_);
+  tree.put("rightRailWidth", right_rail_width_);
   std::ofstream output(state_path);
   pt::write_json(output, tree);
 
@@ -330,6 +367,9 @@ void Workspace::PersistWorkspaceStateIfNeeded() {
   persisted_account_id_ = active_account_id_;
   persisted_symbol_ = ticket_symbol_;
   persisted_chart_preset_ = chart_preset;
+  persisted_layout_preset_ = layout_preset_;
+  persisted_sidebar_width_ = sidebar_width_;
+  persisted_right_rail_width_ = right_rail_width_;
 }
 
 void Workspace::WireEvents() {
@@ -482,6 +522,7 @@ void Workspace::RefreshWorkspaceData() {
     if (active_account_id_.empty()) {
       active_account_id_ = account_detail_.account_id;
     }
+    account_view_.SetActiveAccountId(active_account_id_);
     open_orders_ = root.Orders().GetOpenOrders(active_account_id_);
     order_history_ = root.Orders().GetOrderHistory(active_account_id_);
     if (ticket_symbol_.empty()) {
@@ -546,6 +587,141 @@ auto Workspace::CurrentSurfaceKey() const -> std::string {
       return "account";
   }
   return "overview";
+}
+
+auto Workspace::ActiveSurfaceIndex() const -> int {
+  switch (active_surface_) {
+    case Surface::kOverview:
+      return 0;
+    case Surface::kWatchlists:
+      return 1;
+    case Surface::kChart:
+      return 2;
+    case Surface::kOptions:
+      return 3;
+    case Surface::kTrade:
+      return 4;
+    case Surface::kAccount:
+      return 5;
+  }
+  return 0;
+}
+
+void Workspace::OpenCommandPalette() {
+  command_symbol_ = ticket_symbol_;
+  command_surface_index_ = ActiveSurfaceIndex();
+  command_account_index_ = 0;
+  for (int index = 0; index < static_cast<int>(brokerage_accounts_.size()); ++index) {
+    if (brokerage_accounts_[index].account_id == active_account_id_) {
+      command_account_index_ = index;
+      break;
+    }
+  }
+  command_layout_index_ = layout_preset_ == "Focus"
+                              ? 0
+                              : (layout_preset_ == "Balanced"
+                                     ? 1
+                                     : (layout_preset_ == "Research" ? 2 : 3));
+  command_palette_open_ = true;
+}
+
+void Workspace::HandleKeyboardShortcuts() {
+  auto& io = ImGui::GetIO();
+  if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_K, false)) {
+    OpenCommandPalette();
+  }
+  if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_R, false)) {
+    RefreshWorkspaceData();
+  }
+  if (!io.KeyCtrl || io.WantTextInput) {
+    return;
+  }
+
+  if (ImGui::IsKeyPressed(ImGuiKey_1, false)) {
+    active_surface_ = Surface::kOverview;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_2, false)) {
+    active_surface_ = Surface::kWatchlists;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_3, false)) {
+    active_surface_ = Surface::kChart;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_4, false)) {
+    active_surface_ = Surface::kOptions;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_5, false)) {
+    active_surface_ = Surface::kTrade;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_6, false)) {
+    active_surface_ = Surface::kAccount;
+  }
+}
+
+void Workspace::DrawCommandPalette() {
+  if (command_palette_open_) {
+    ImGui::OpenPopup("Command Palette");
+    command_palette_open_ = false;
+  }
+
+  const ImVec2 display = ImGui::GetIO().DisplaySize;
+  ImGui::SetNextWindowSize(ImVec2(540.0f, 0.0f), ImGuiCond_Appearing);
+  ImGui::SetNextWindowPos(ImVec2(display.x * 0.5f, display.y * 0.18f),
+                          ImGuiCond_Appearing, ImVec2(0.5f, 0.0f));
+
+  if (!ImGui::BeginPopupModal("Command Palette", nullptr,
+                              ImGuiWindowFlags_AlwaysAutoResize)) {
+    return;
+  }
+
+  static const char* kSurfaceLabels[] = {"Overview",  "Watchlists", "Charts",
+                                         "Options",   "Trade Desk", "Account"};
+  static const char* kLayoutLabels[] = {"Focus", "Balanced", "Research",
+                                        "Custom"};
+
+  ImGui::TextDisabled("Ctrl+1..6 switches surfaces. Ctrl+R refreshes. Ctrl+K reopens this palette.");
+  ImGui::Separator();
+  ImGui::InputTextWithHint("##commandSymbol", "Focused symbol (e.g. AAPL)",
+                           &command_symbol_, ImGuiInputTextFlags_CharsUppercase);
+  ImGui::Combo("Surface", &command_surface_index_, kSurfaceLabels,
+               IM_ARRAYSIZE(kSurfaceLabels));
+
+  if (!brokerage_accounts_.empty()) {
+    std::vector<const char*> account_names;
+    account_names.reserve(brokerage_accounts_.size());
+    for (const auto& account : brokerage_accounts_) {
+      account_names.push_back(account.display_name.c_str());
+    }
+    ImGui::Combo("Account", &command_account_index_, account_names.data(),
+                 static_cast<int>(account_names.size()));
+  }
+
+  ImGui::Combo("Layout", &command_layout_index_, kLayoutLabels,
+               IM_ARRAYSIZE(kLayoutLabels));
+
+  if (ImGui::Button("Apply", ImVec2(140.0f, 0.0f))) {
+    const std::string requested_account_id =
+        brokerage_accounts_.empty()
+            ? std::string()
+            : brokerage_accounts_[std::clamp(command_account_index_, 0,
+                                             static_cast<int>(brokerage_accounts_.size()) - 1)]
+                  .account_id;
+    if (!requested_account_id.empty() && requested_account_id != active_account_id_) {
+      active_account_id_ = requested_account_id;
+      RefreshWorkspaceData();
+    }
+
+    if (command_layout_index_ >= 0 && command_layout_index_ < 4) {
+      ApplyLayoutPreset(kLayoutLabels[command_layout_index_]);
+    }
+
+    if (!command_symbol_.empty()) {
+      SelectSymbol(command_symbol_);
+    }
+    active_surface_ = static_cast<Surface>(std::clamp(command_surface_index_, 0, 5));
+    workspace_message_ = "Applied command palette changes.";
+    ImGui::CloseCurrentPopup();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Cancel", ImVec2(140.0f, 0.0f))) {
+    ImGui::CloseCurrentPopup();
+  }
+
+  ImGui::EndPopup();
 }
 
 auto Workspace::ActiveAccountSource() const -> std::string {
@@ -696,6 +872,8 @@ void Workspace::DrawSidebar() {
     active_surface_ = Surface::kTrade;
   }
 
+  ImGui::Separator();
+  DrawLayoutPanel();
   ImGui::Separator();
   ImGui::Text("Connections");
   for (const auto& connection : home_data_.connections) {
@@ -898,6 +1076,33 @@ void Workspace::DrawQuickActionsPanel() {
   }
   ImGui::TextWrapped("Focused symbol `%s` stays linked across chart, options, and ticket surfaces.",
                      ticket_symbol_.c_str());
+  ImGui::EndChild();
+}
+
+void Workspace::DrawLayoutPanel() {
+  ImGui::BeginChild("LayoutPanel", ImVec2(0.0f, 180.0f), true);
+  ImGui::Text("Layout");
+  ImGui::TextDisabled("Tune panel widths and save them into the desktop workspace state.");
+  if (ImGui::Button("Focus", ImVec2(78.0f, 0.0f))) {
+    ApplyLayoutPreset("Focus");
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Balanced", ImVec2(88.0f, 0.0f))) {
+    ApplyLayoutPreset("Balanced");
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Research", ImVec2(86.0f, 0.0f))) {
+    ApplyLayoutPreset("Research");
+  }
+  ImGui::TextDisabled("Preset: %s", layout_preset_.c_str());
+  if (ImGui::SliderFloat("Sidebar Width", &sidebar_width_, 220.0f, 360.0f, "%.0f px")) {
+    layout_preset_ = "Custom";
+  }
+  if (ImGui::SliderFloat("Right Rail", &right_rail_width_, 280.0f, 460.0f,
+                         "%.0f px")) {
+    layout_preset_ = "Custom";
+  }
+  ImGui::TextDisabled("Shortcuts: Ctrl+1..6 views, Ctrl+R refresh, Ctrl+K command palette");
   ImGui::EndChild();
 }
 
@@ -1296,16 +1501,18 @@ void Workspace::Update() {
   }
 
   menu_view_.Update();
+  HandleKeyboardShortcuts();
   DrawHeader();
+  DrawCommandPalette();
 
   if (ImGui::BeginTable("WorkspaceLayout", 3,
                         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV,
                         ImVec2(0.0f, 0.0f))) {
     ImGui::TableSetupColumn("Sidebar", ImGuiTableColumnFlags_WidthFixed,
-                            kSidebarWidth);
+                            sidebar_width_);
     ImGui::TableSetupColumn("Main", ImGuiTableColumnFlags_WidthStretch);
     ImGui::TableSetupColumn("RightRail", ImGuiTableColumnFlags_WidthFixed,
-                            kRightRailWidth);
+                            right_rail_width_);
     ImGui::TableNextRow();
 
     ImGui::TableSetColumnIndex(0);

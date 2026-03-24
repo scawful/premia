@@ -6,19 +6,21 @@
 
 namespace premia {
 class AccountView : public View {
- public:
+  public:
    std::string getName() override;
-   void addLogger(const Logger &logger) override;
-   void addEvent(const std::string &key, const EventHandler &event) override;
-   void SetSelectedSymbol(const std::string& symbol);
-   void SetSymbolSelectionHandler(
-       const std::function<void(const std::string&)>& handler);
+    void addLogger(const Logger &logger) override;
+    void addEvent(const std::string &key, const EventHandler &event) override;
+    void SetActiveAccountId(const std::string& account_id);
+    void SetSelectedSymbol(const std::string& symbol);
+    void SetSymbolSelectionHandler(
+        const std::function<void(const std::string&)>& handler);
    void Update() override;
 
   private:
    bool isInit = false;
+   std::string active_account_id_;
    std::string selected_symbol_;
-   std::function<void(const std::string&)> symbol_selection_handler_;
+    std::function<void(const std::string&)> symbol_selection_handler_;
    EventMap events;
    Logger logger;
    AccountModel core_model;

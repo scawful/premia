@@ -6,11 +6,21 @@ namespace premia {
 
 void AccountModel::addLogger(const Logger& new_logger) { logger = new_logger; }
 
+void AccountModel::setActiveAccountId(const std::string& account_id) {
+  if (active_account_id_ == account_id) {
+    return;
+  }
+  active_account_id_ = account_id;
+  loaded = false;
+}
+
 void AccountModel::refresh() {
   auto& composition_root = core::application::CompositionRoot::Instance();
-  portfolio_summary = composition_root.Portfolio().GetPortfolioSummary();
-  account_detail = composition_root.AccountDetails().GetAccountDetail();
-  connections = composition_root.BrokerConnections().GetConnections();
+  portfolio_summary =
+      composition_root.AppService().GetPortfolioSummaryForAccount(active_account_id_);
+  account_detail =
+      composition_root.AppService().GetAccountDetailForAccount(active_account_id_);
+  connections = composition_root.AppService().GetConnections();
   loaded = true;
 }
 

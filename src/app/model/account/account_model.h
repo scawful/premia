@@ -1,6 +1,7 @@
 #ifndef AccountModel_hpp
 #define AccountModel_hpp
 
+#include <string>
 #include <vector>
 
 #include "model/model.h"
@@ -12,12 +13,14 @@ class AccountModel : public Model {
  private:
   Logger logger;
   bool loaded = false;
+  std::string active_account_id_;
   core::application::PortfolioSummary portfolio_summary;
   core::application::AccountDetail account_detail;
   std::vector<core::application::ConnectionSummary> connections;
 
-  public:
+   public:
   void addLogger(const Logger& logger);
+  void setActiveAccountId(const std::string& account_id);
   void refresh();
   bool hasData() const;
   const core::application::PortfolioSummary& getPortfolioSummary() const;

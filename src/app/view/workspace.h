@@ -37,6 +37,10 @@ class Workspace {
   void PersistWorkspaceStateIfNeeded();
   void RefreshWorkspaceData();
   void RefreshTradeQuote();
+  void HandleKeyboardShortcuts();
+  void OpenCommandPalette();
+  void DrawCommandPalette();
+  void ApplyLayoutPreset(const std::string& preset_id);
   void SelectSymbol(const std::string& symbol);
   void SelectOptionContract(const std::string& symbol,
                             const std::string& contract_symbol,
@@ -52,6 +56,7 @@ class Workspace {
   void DrawBrokerageAccountsPanel();
   void DrawQuickActionsPanel();
   void DrawSelectedOrderCard();
+  void DrawLayoutPanel();
   void DrawLinkedSymbolCard();
   void DrawTradingStatusCard();
   void DrawCompactAccountCard();
@@ -64,6 +69,7 @@ class Workspace {
 
   auto BuildOrderIntent() const -> core::application::OrderIntentRequest;
   auto CurrentSurfaceKey() const -> std::string;
+  auto ActiveSurfaceIndex() const -> int;
   auto ActiveAccountSource() const -> std::string;
   auto ActiveMarketDataSource() const -> std::string;
   auto PreferredTradingVenue() const -> std::string;
@@ -81,7 +87,15 @@ class Workspace {
   std::string persisted_account_id_;
   std::string persisted_symbol_;
   std::string persisted_chart_preset_;
+  std::string persisted_layout_preset_;
+  float persisted_sidebar_width_ = 280.0f;
+  float persisted_right_rail_width_ = 360.0f;
   bool workspace_state_loaded_ = false;
+  bool command_palette_open_ = false;
+  std::string command_symbol_;
+  int command_surface_index_ = 0;
+  int command_account_index_ = 0;
+  int command_layout_index_ = 0;
 
   MenuView menu_view_;
   ConsoleView console_view_;
@@ -104,11 +118,14 @@ class Workspace {
   std::string selected_option_contract_symbol_;
   std::string ticket_quantity_ = "1";
   std::string ticket_limit_price_;
+  std::string layout_preset_ = "Balanced";
   int ticket_instruction_ = 0;
   int ticket_order_type_ = 0;
   int ticket_asset_type_ = 0;
   bool selected_option_is_call_ = true;
   bool live_trade_enabled_ = false;
+  float sidebar_width_ = 280.0f;
+  float right_rail_width_ = 360.0f;
 };
 
 }  // namespace premia
