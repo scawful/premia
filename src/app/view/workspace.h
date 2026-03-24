@@ -40,6 +40,7 @@ class Workspace {
   void HandleKeyboardShortcuts();
   void OpenCommandPalette();
   void DrawCommandPalette();
+  void DrawShortcutHelpOverlay();
   void ApplyLayoutPreset(const std::string& preset_id);
   void SelectSymbol(const std::string& symbol);
   void SelectOptionContract(const std::string& symbol,
@@ -92,6 +93,7 @@ class Workspace {
   float persisted_right_rail_width_ = 360.0f;
   bool workspace_state_loaded_ = false;
   bool command_palette_open_ = false;
+  bool shortcut_help_open_ = false;
   std::string command_symbol_;
   int command_surface_index_ = 0;
   int command_account_index_ = 0;

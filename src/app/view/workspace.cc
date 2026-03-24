@@ -630,6 +630,9 @@ void Workspace::HandleKeyboardShortcuts() {
   if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_K, false)) {
     OpenCommandPalette();
   }
+  if (ImGui::IsKeyPressed(ImGuiKey_F1, false)) {
+    shortcut_help_open_ = true;
+  }
   if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_R, false)) {
     RefreshWorkspaceData();
   }
@@ -724,6 +727,43 @@ void Workspace::DrawCommandPalette() {
   ImGui::EndPopup();
 }
 
+void Workspace::DrawShortcutHelpOverlay() {
+  if (shortcut_help_open_) {
+    ImGui::OpenPopup("Desktop Shortcuts");
+    shortcut_help_open_ = false;
+  }
+
+  ImGui::SetNextWindowSize(ImVec2(560.0f, 0.0f), ImGuiCond_Appearing);
+  if (!ImGui::BeginPopupModal("Desktop Shortcuts", nullptr,
+                              ImGuiWindowFlags_AlwaysAutoResize)) {
+    return;
+  }
+
+  ImGui::Text("Navigation");
+  ImGui::Separator();
+  ImGui::BulletText("Ctrl+1  Overview");
+  ImGui::BulletText("Ctrl+2  Watchlists");
+  ImGui::BulletText("Ctrl+3  Charts");
+  ImGui::BulletText("Ctrl+4  Options");
+  ImGui::BulletText("Ctrl+5  Trade Desk");
+  ImGui::BulletText("Ctrl+6  Account");
+  ImGui::BulletText("Ctrl+R  Refresh workspace");
+  ImGui::BulletText("Ctrl+K  Open command palette");
+  ImGui::BulletText("F1      Show this help");
+
+  ImGui::Spacing();
+  ImGui::Text("Tips");
+  ImGui::Separator();
+  ImGui::BulletText("Drag the divider bars between columns to resize the layout");
+  ImGui::BulletText("Use layout presets in the sidebar to snap back to a known layout");
+  ImGui::BulletText("Selecting holdings, watchlist rows, or option contracts keeps the symbol linked across the workspace");
+
+  if (ImGui::Button("Close", ImVec2(140.0f, 0.0f))) {
+    ImGui::CloseCurrentPopup();
+  }
+  ImGui::EndPopup();
+}
+
 auto Workspace::ActiveAccountSource() const -> std::string {
   for (const auto& account : brokerage_accounts_) {
     if (!active_account_id_.empty() && account.account_id == active_account_id_) {
@@ -794,6 +834,14 @@ void Workspace::DrawHeader() {
 
   if (ImGui::Button("Refresh Workspace", ImVec2(170.0f, 0.0f))) {
     RefreshWorkspaceData();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Palette", ImVec2(96.0f, 0.0f))) {
+    OpenCommandPalette();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Shortcuts", ImVec2(110.0f, 0.0f))) {
+    shortcut_help_open_ = true;
   }
   ImGui::SameLine();
   if (!brokerage_accounts_.empty()) {
@@ -1504,28 +1552,85 @@ void Workspace::Update() {
   HandleKeyboardShortcuts();
   DrawHeader();
   DrawCommandPalette();
+  DrawShortcutHelpOverlay();
 
-  if (ImGui::BeginTable("WorkspaceLayout", 3,
-                        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV,
-                        ImVec2(0.0f, 0.0f))) {
-    ImGui::TableSetupColumn("Sidebar", ImGuiTableColumnFlags_WidthFixed,
-                            sidebar_width_);
-    ImGui::TableSetupColumn("Main", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn("RightRail", ImGuiTableColumnFlags_WidthFixed,
-                            right_rail_width_);
-    ImGui::TableNextRow();
+  constexpr float splitter_width = 8.0f;
+  constexpr float min_sidebar_width = 220.0f;
+  constexpr float min_main_width = 480.0f;
+  constexpr float min_right_width = 280.0f;
 
-    ImGui::TableSetColumnIndex(0);
-    DrawSidebar();
-
-    ImGui::TableSetColumnIndex(1);
-    DrawMainSurface();
-
-    ImGui::TableSetColumnIndex(2);
-    DrawRightRail();
-
-    ImGui::EndTable();
+  const ImVec2 layout_origin = ImGui::GetCursorScreenPos();
+  const ImVec2 layout_size = ImGui::GetContentRegionAvail();
+  const float max_side_total =
+      std::max(min_sidebar_width + min_right_width,
+               layout_size.x - min_main_width - splitter_width * 2.0f);
+  if (sidebar_width_ + right_rail_width_ > max_side_total) {
+    float overflow = sidebar_width_ + right_rail_width_ - max_side_total;
+    const float right_reduction = std::min(overflow, right_rail_width_ - min_right_width);
+    right_rail_width_ -= right_reduction;
+    overflow -= right_reduction;
+    const float left_reduction = std::min(overflow, sidebar_width_ - min_sidebar_width);
+    sidebar_width_ -= left_reduction;
   }
+  sidebar_width_ = std::max(min_sidebar_width, sidebar_width_);
+  right_rail_width_ = std::max(min_right_width, right_rail_width_);
+  float main_width =
+      std::max(min_main_width,
+               layout_size.x - sidebar_width_ - right_rail_width_ - splitter_width * 2.0f);
+
+  ImGui::SetCursorScreenPos(layout_origin);
+  ImGui::BeginChild("SidebarShell", ImVec2(sidebar_width_, layout_size.y), false,
+                    ImGuiWindowFlags_NoScrollbar);
+  DrawSidebar();
+  ImGui::EndChild();
+
+  ImGui::SetCursorScreenPos(
+      ImVec2(layout_origin.x + sidebar_width_, layout_origin.y));
+  ImGui::InvisibleButton("SidebarSplitter", ImVec2(splitter_width, layout_size.y));
+  if (ImGui::IsItemHovered() || ImGui::IsItemActive()) {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+  }
+  if (ImGui::IsItemActive()) {
+    sidebar_width_ += ImGui::GetIO().MouseDelta.x;
+    layout_preset_ = "Custom";
+  }
+  ImGui::GetWindowDrawList()->AddRectFilled(
+      ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
+      ImGui::GetColorU32(ImVec4(0.24f, 0.28f, 0.34f, 0.85f)), 4.0f);
+
+  const float main_x = layout_origin.x + sidebar_width_ + splitter_width;
+  main_width =
+      std::max(min_main_width,
+               layout_size.x - sidebar_width_ - right_rail_width_ - splitter_width * 2.0f);
+  ImGui::SetCursorScreenPos(ImVec2(main_x, layout_origin.y));
+  ImGui::BeginChild("MainShell", ImVec2(main_width, layout_size.y), false,
+                    ImGuiWindowFlags_NoScrollbar);
+  DrawMainSurface();
+  ImGui::EndChild();
+
+  const float right_splitter_x = main_x + main_width;
+  ImGui::SetCursorScreenPos(ImVec2(right_splitter_x, layout_origin.y));
+  ImGui::InvisibleButton("RightRailSplitter", ImVec2(splitter_width, layout_size.y));
+  if (ImGui::IsItemHovered() || ImGui::IsItemActive()) {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+  }
+  if (ImGui::IsItemActive()) {
+    right_rail_width_ -= ImGui::GetIO().MouseDelta.x;
+    layout_preset_ = "Custom";
+  }
+  ImGui::GetWindowDrawList()->AddRectFilled(
+      ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
+      ImGui::GetColorU32(ImVec4(0.24f, 0.28f, 0.34f, 0.85f)), 4.0f);
+
+  const float right_x = right_splitter_x + splitter_width;
+  ImGui::SetCursorScreenPos(ImVec2(right_x, layout_origin.y));
+  ImGui::BeginChild("RightRailShell", ImVec2(right_rail_width_, layout_size.y), false,
+                    ImGuiWindowFlags_NoScrollbar);
+  DrawRightRail();
+  ImGui::EndChild();
+
+  ImGui::SetCursorScreenPos(
+      ImVec2(layout_origin.x, layout_origin.y + layout_size.y));
 
   PersistWorkspaceStateIfNeeded();
   ImGui::End();
