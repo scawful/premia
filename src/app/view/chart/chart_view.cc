@@ -347,6 +347,22 @@ void ChartView::SetSymbolChangeHandler(
   symbol_change_handler_ = handler;
 }
 
+void ChartView::SetActivePresetId(const std::string& preset_id) {
+  if (preset_id.empty()) {
+    return;
+  }
+  if (preset_id == "Custom") {
+    active_preset_ = preset_id;
+    pending_refresh_ = true;
+    return;
+  }
+  ApplyPreset(preset_id);
+}
+
+auto ChartView::GetActivePresetId() const -> const std::string& {
+  return active_preset_;
+}
+
 void ChartView::Update() {
   if (!isInit) {
     initChart();

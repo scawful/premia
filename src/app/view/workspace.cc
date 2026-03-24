@@ -4,11 +4,18 @@
 #include <imgui/imgui.h>
 
 #include <algorithm>
+#include <cstdlib>
+#include <filesystem>
+#include <fstream>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 #include <string>
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "premia/core/application/composition_root.hpp"
 
@@ -21,6 +28,7 @@ using core::application::HoldingRow;
 using core::application::Money;
 using core::domain::ConnectionStatus;
 using core::domain::Provider;
+namespace pt = boost::property_tree;
 
 constexpr ImGuiWindowFlags kMainEditorFlags =
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar |
@@ -209,9 +217,120 @@ void NewMasterFrame() {
   }
 }
 
+auto WorkspaceStatePath() -> std::filesystem::path {
+  std::filesystem::path path;
+  if (const char* override_path = std::getenv("PREMIA_RUNTIME_DIR");
+      override_path != nullptr && override_path[0] != '\0') {
+    path = std::filesystem::path(override_path);
+#if defined(__APPLE__)
+  } else if (const char* home = std::getenv("HOME"); home != nullptr && home[0] != '\0') {
+    path = std::filesystem::path(home) / "Library/Application Support/Premia";
+#elif defined(_WIN32)
+  } else if (const char* appdata = std::getenv("APPDATA");
+             appdata != nullptr && appdata[0] != '\0') {
+    path = std::filesystem::path(appdata) / "Premia";
+#else
+  } else if (const char* xdg = std::getenv("XDG_STATE_HOME");
+             xdg != nullptr && xdg[0] != '\0') {
+    path = std::filesystem::path(xdg) / "premia";
+  } else if (const char* home = std::getenv("HOME"); home != nullptr && home[0] != '\0') {
+    path = std::filesystem::path(home) / ".local/state/premia";
+#endif
+  } else {
+    path = std::filesystem::current_path() / ".premia-runtime";
+  }
+  std::error_code ec;
+  std::filesystem::create_directories(path, ec);
+  return path / "workspace_state.json";
+}
+
 }  // namespace
 
-Workspace::Workspace() { WireEvents(); }
+Workspace::Workspace() {
+  WireEvents();
+  LoadWorkspaceState();
+}
+
+void Workspace::LoadWorkspaceState() {
+  const auto state_path = WorkspaceStatePath();
+  if (!std::filesystem::exists(state_path)) {
+    persisted_surface_key_ = CurrentSurfaceKey();
+    persisted_account_id_ = active_account_id_;
+    persisted_symbol_ = ticket_symbol_;
+    persisted_chart_preset_ = chart_view_.GetActivePresetId();
+    workspace_state_loaded_ = true;
+    return;
+  }
+
+  try {
+    pt::ptree tree;
+    std::ifstream input(state_path);
+    if (!input.good()) {
+      throw std::runtime_error("workspace state unavailable");
+    }
+    pt::read_json(input, tree);
+    active_account_id_ = tree.get<std::string>("activeAccountId", active_account_id_);
+    ticket_symbol_ = tree.get<std::string>("focusedSymbol", ticket_symbol_);
+    const auto surface_key = tree.get<std::string>("activeSurface", "overview");
+    if (surface_key == "watchlists") {
+      active_surface_ = Surface::kWatchlists;
+    } else if (surface_key == "chart") {
+      active_surface_ = Surface::kChart;
+    } else if (surface_key == "options") {
+      active_surface_ = Surface::kOptions;
+    } else if (surface_key == "trade") {
+      active_surface_ = Surface::kTrade;
+    } else if (surface_key == "account") {
+      active_surface_ = Surface::kAccount;
+    } else {
+      active_surface_ = Surface::kOverview;
+    }
+
+    const auto preset = tree.get<std::string>("chartPreset", "1Y");
+    chart_view_.SetActivePresetId(preset);
+    persisted_surface_key_ = surface_key;
+    persisted_account_id_ = active_account_id_;
+    persisted_symbol_ = ticket_symbol_;
+    persisted_chart_preset_ = chart_view_.GetActivePresetId();
+  } catch (const std::exception&) {
+    persisted_surface_key_ = CurrentSurfaceKey();
+    persisted_account_id_ = active_account_id_;
+    persisted_symbol_ = ticket_symbol_;
+    persisted_chart_preset_ = chart_view_.GetActivePresetId();
+  }
+
+  workspace_state_loaded_ = true;
+}
+
+void Workspace::PersistWorkspaceStateIfNeeded() {
+  if (!workspace_state_loaded_) {
+    return;
+  }
+
+  const auto surface_key = CurrentSurfaceKey();
+  const auto chart_preset = chart_view_.GetActivePresetId();
+  const auto state_path = WorkspaceStatePath();
+  if (std::filesystem::exists(state_path) &&
+      surface_key == persisted_surface_key_ &&
+      active_account_id_ == persisted_account_id_ &&
+      ticket_symbol_ == persisted_symbol_ &&
+      chart_preset == persisted_chart_preset_) {
+    return;
+  }
+
+  pt::ptree tree;
+  tree.put("activeAccountId", active_account_id_);
+  tree.put("focusedSymbol", ticket_symbol_);
+  tree.put("activeSurface", surface_key);
+  tree.put("chartPreset", chart_preset);
+  std::ofstream output(state_path);
+  pt::write_json(output, tree);
+
+  persisted_surface_key_ = surface_key;
+  persisted_account_id_ = active_account_id_;
+  persisted_symbol_ = ticket_symbol_;
+  persisted_chart_preset_ = chart_preset;
+}
 
 void Workspace::WireEvents() {
   if (events_wired_) {
@@ -365,13 +484,14 @@ void Workspace::RefreshWorkspaceData() {
     }
     open_orders_ = root.Orders().GetOpenOrders(active_account_id_);
     order_history_ = root.Orders().GetOrderHistory(active_account_id_);
-    if (!home_data_.top_holdings.empty()) {
-      ticket_symbol_ = home_data_.top_holdings.front().symbol;
-    } else if (!account_detail_.positions.empty()) {
-      ticket_symbol_ = account_detail_.positions.front().symbol;
-    }
     if (ticket_symbol_.empty()) {
-      ticket_symbol_ = "AAPL";
+      if (!home_data_.top_holdings.empty()) {
+        ticket_symbol_ = home_data_.top_holdings.front().symbol;
+      } else if (!account_detail_.positions.empty()) {
+        ticket_symbol_ = account_detail_.positions.front().symbol;
+      } else {
+        ticket_symbol_ = "AAPL";
+      }
     }
     SelectSymbol(ticket_symbol_);
     data_loaded_ = true;
@@ -408,6 +528,24 @@ auto Workspace::BuildOrderIntent() const -> core::application::OrderIntentReques
                          (request.asset_type == "EQUITY" ||
                           !selected_option_contract_symbol_.empty());
   return request;
+}
+
+auto Workspace::CurrentSurfaceKey() const -> std::string {
+  switch (active_surface_) {
+    case Surface::kOverview:
+      return "overview";
+    case Surface::kWatchlists:
+      return "watchlists";
+    case Surface::kChart:
+      return "chart";
+    case Surface::kOptions:
+      return "options";
+    case Surface::kTrade:
+      return "trade";
+    case Surface::kAccount:
+      return "account";
+  }
+  return "overview";
 }
 
 auto Workspace::ActiveAccountSource() const -> std::string {
@@ -1150,6 +1288,7 @@ void Workspace::DrawRightRail() {
 
 void Workspace::Update() {
   ApplyWorkspaceTheme();
+  PersistWorkspaceStateIfNeeded();
   NewMasterFrame();
   WireEvents();
   if (!data_loaded_) {
@@ -1181,6 +1320,7 @@ void Workspace::Update() {
     ImGui::EndTable();
   }
 
+  PersistWorkspaceStateIfNeeded();
   ImGui::End();
 }
 

@@ -1,5 +1,10 @@
 #include "candle_chart.h"
 
+#include <algorithm>
+#include <cmath>
+#include <sstream>
+
+#include <imgui/imgui.h>
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
@@ -32,6 +37,63 @@ int CandleChart::binary_search(const std::vector<double>& arr, int l, int r,
   return -1;
 }
 
+int CandleChart::nearest_index(const std::vector<double>& arr, double x) {
+  if (arr.empty()) {
+    return -1;
+  }
+  const auto lower = std::lower_bound(arr.begin(), arr.end(), x);
+  if (lower == arr.begin()) {
+    return 0;
+  }
+  if (lower == arr.end()) {
+    return static_cast<int>(arr.size()) - 1;
+  }
+  const auto next_index = static_cast<int>(lower - arr.begin());
+  const auto prev_index = next_index - 1;
+  return std::fabs(arr[next_index] - x) < std::fabs(arr[prev_index] - x)
+             ? next_index
+             : prev_index;
+}
+
+void CandleChart::DrawReadoutCard() {
+  if (model == nullptr || !model->isActive() || model->getNumCandles() == 0) {
+    return;
+  }
+
+  const int index = hovered_index_ >= 0 ? hovered_index_ : model->getNumCandles() - 1;
+  const auto candle = model->getCandle(index);
+  const double absolute_change = candle.close - candle.open;
+  const double percent_change = candle.open == 0.0 ? 0.0
+                                                   : (absolute_change / candle.open) * 100.0;
+
+  ImGui::BeginChild("CandleReadoutCard", ImVec2(0.0f, 82.0f), true);
+  ImGui::Text("%s", model->getTickerSymbol().c_str());
+  ImGui::SameLine();
+  ImGui::TextDisabled("%s", hovered_index_ >= 0 ? "Hovered candle" : "Latest candle");
+  ImGui::TextDisabled("%s", candle.datetime.c_str());
+
+  if (ImGui::BeginTable("CandleReadoutTable", 6,
+                        ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_BordersInnerV)) {
+    ImGui::TableNextColumn();
+    ImGui::Text("Open\n$%.2f", candle.open);
+    ImGui::TableNextColumn();
+    ImGui::Text("High\n$%.2f", candle.high);
+    ImGui::TableNextColumn();
+    ImGui::Text("Low\n$%.2f", candle.low);
+    ImGui::TableNextColumn();
+    ImGui::Text("Close\n$%.2f", candle.close);
+    ImGui::TableNextColumn();
+    ImGui::TextColored(absolute_change < 0.0 ? ImVec4(0.89f, 0.34f, 0.36f, 1.0f)
+                                             : ImVec4(0.24f, 0.78f, 0.55f, 1.0f),
+                       "Change\n%+.2f (%+.2f%%)", absolute_change,
+                       percent_change);
+    ImGui::TableNextColumn();
+    ImGui::Text("Volume\n%.0f", candle.volume);
+    ImGui::EndTable();
+  }
+  ImGui::EndChild();
+}
+
 /**
  * @brief Build the ImGui candle chart
  * @author @scawful
@@ -43,40 +105,55 @@ int CandleChart::binary_search(const std::vector<double>& arr, int l, int r,
  * @param tooltip
  */
 void CandleChart::DrawCandles(float width_percent, int count, ImVec4 bullCol,
-                              ImVec4 bearCol, bool tooltip) {
+                               ImVec4 bearCol, bool tooltip) {
   ImDrawList* Draw_list = ImPlot::GetPlotDrawList();
   // calc real value width
   double half_width =
       count > 1 ? (model->getDate(1) - model->getDate(0)) * width_percent
                 : width_percent;
-  // custom tool
-  if (ImPlot::IsPlotHovered() && tooltip) {
+  hovered_index_ = -1;
+  if (ImPlot::IsPlotHovered()) {
     ImPlotPoint mouse = ImPlot::GetPlotMousePos();
-    mouse.x =
-        ImPlot::RoundTime(ImPlotTime::FromDouble(mouse.x), ImPlotTimeUnit_Day)
-            .ToDouble();
-    float tool_l = ImPlot::PlotToPixels(mouse.x - half_width * 1.5, mouse.y).x;
-    float tool_r = ImPlot::PlotToPixels(mouse.x + half_width * 1.5, mouse.y).x;
-    float tool_t = ImPlot::GetPlotPos().y;
-    float tool_b = tool_t + ImPlot::GetPlotSize().y;
-    ImPlot::PushPlotClipRect();
-    Draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b),
-                             IM_COL32(128, 128, 128, 64));
-    ImPlot::PopPlotClipRect();
-    // find mouse location index
-    int idx = binary_search(model->getDates(), 0, count - 1, mouse.x);
-    // render tool tip (won't be affected by plot clip rect)
+    int idx = nearest_index(model->getDates(), mouse.x);
     if (idx != -1) {
-      ImGui::BeginTooltip();
-      char buff[32];
-      ImPlot::FormatDate(ImPlotTime::FromDouble(model->getDate(idx)), buff, 32,
-                         ImPlotDateFmt_DayMoYr, ImPlot::GetStyle().UseISO8601);
-      ImGui::Text("Day:   %s", buff);
-      ImGui::Text("Open:  $%.2f", model->getCandle(idx).open);
-      ImGui::Text("Close: $%.2f", model->getCandle(idx).close);
-      ImGui::Text("Low:   $%.2f", model->getCandle(idx).low);
-      ImGui::Text("High:  $%.2f", model->getCandle(idx).high);
-      ImGui::EndTooltip();
+      hovered_index_ = idx;
+      const auto candle = model->getCandle(idx);
+      const auto x = model->getDate(idx);
+      const auto close_point = ImPlot::PlotToPixels(x, candle.close);
+      const float tool_l = ImPlot::PlotToPixels(x - half_width * 1.5, candle.close).x;
+      const float tool_r = ImPlot::PlotToPixels(x + half_width * 1.5, candle.close).x;
+      const float tool_t = ImPlot::GetPlotPos().y;
+      const float tool_b = tool_t + ImPlot::GetPlotSize().y;
+      const float plot_l = ImPlot::GetPlotPos().x;
+      const float plot_r = plot_l + ImPlot::GetPlotSize().x;
+      ImPlot::PushPlotClipRect();
+      Draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b),
+                               IM_COL32(128, 128, 128, 48));
+      Draw_list->AddLine(ImVec2(close_point.x, tool_t),
+                         ImVec2(close_point.x, tool_b),
+                         IM_COL32(198, 176, 72, 180), 1.0f);
+      Draw_list->AddLine(ImVec2(plot_l, close_point.y),
+                         ImVec2(plot_r, close_point.y),
+                         IM_COL32(102, 168, 255, 120), 1.0f);
+      ImPlot::PopPlotClipRect();
+
+      if (tooltip) {
+        ImGui::BeginTooltip();
+        char buff[32];
+        ImPlot::FormatDate(ImPlotTime::FromDouble(model->getDate(idx)), buff, 32,
+                           ImPlotDateFmt_DayMoYr, ImPlot::GetStyle().UseISO8601);
+        ImGui::Text("Day:    %s", buff);
+        ImGui::Text("Open:   $%.2f", candle.open);
+        ImGui::Text("High:   $%.2f", candle.high);
+        ImGui::Text("Low:    $%.2f", candle.low);
+        ImGui::Text("Close:  $%.2f", candle.close);
+        ImGui::Text("Volume: %.0f", candle.volume);
+        ImGui::Text("Change: %+.2f (%+.2f%%)", candle.close - candle.open,
+                    candle.open == 0.0 ? 0.0
+                                       : ((candle.close - candle.open) / candle.open) *
+                                             100.0);
+        ImGui::EndTooltip();
+      }
     }
   }
 
@@ -131,6 +208,8 @@ void CandleChart::DrawCandleChart() {
     if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
     ImGui::EndPopup();
   }
+
+  DrawReadoutCard();
 
   ImPlot::GetStyle().UseLocalTime = true;
 

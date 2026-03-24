@@ -33,6 +33,8 @@ class Workspace {
   };
 
   void WireEvents();
+  void LoadWorkspaceState();
+  void PersistWorkspaceStateIfNeeded();
   void RefreshWorkspaceData();
   void RefreshTradeQuote();
   void SelectSymbol(const std::string& symbol);
@@ -61,6 +63,7 @@ class Workspace {
       bool selectable = false);
 
   auto BuildOrderIntent() const -> core::application::OrderIntentRequest;
+  auto CurrentSurfaceKey() const -> std::string;
   auto ActiveAccountSource() const -> std::string;
   auto ActiveMarketDataSource() const -> std::string;
   auto PreferredTradingVenue() const -> std::string;
@@ -74,6 +77,11 @@ class Workspace {
   std::string last_refresh_at_;
   std::string active_account_id_;
   std::string selected_order_id_;
+  std::string persisted_surface_key_;
+  std::string persisted_account_id_;
+  std::string persisted_symbol_;
+  std::string persisted_chart_preset_;
+  bool workspace_state_loaded_ = false;
 
   MenuView menu_view_;
   ConsoleView console_view_;

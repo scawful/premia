@@ -18,9 +18,11 @@ class ChartView : public View {
   std::string getName() override;
   void addLogger(const Logger& logger) override;
   void addEvent(const std::string& key, const EventHandler& event) override;
-   void SetTickerSymbol(const std::string& symbol);
-   void SetSymbolChangeHandler(
-       const std::function<void(const std::string&)>& handler);
+  void SetTickerSymbol(const std::string& symbol);
+  void SetSymbolChangeHandler(
+      const std::function<void(const std::string&)>& handler);
+  void SetActivePresetId(const std::string& preset_id);
+  auto GetActivePresetId() const -> const std::string&;
   void Update() override;
 
  private:
