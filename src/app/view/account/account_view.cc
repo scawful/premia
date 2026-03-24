@@ -62,6 +62,14 @@ auto FormatAmount(double amount) -> std::string {
   return oss.str();
 }
 
+auto HeatmapColor(double pnl_percent) -> ImVec4 {
+  const float intensity = static_cast<float>(std::min(std::abs(pnl_percent) / 5.0, 1.0));
+  if (pnl_percent < 0.0) {
+    return ImVec4(0.36f + 0.32f * intensity, 0.16f, 0.18f, 0.96f);
+  }
+  return ImVec4(0.12f, 0.28f + 0.36f * intensity, 0.22f, 0.96f);
+}
+
 void DrawMetricCard(const char* id, const char* label, const std::string& value,
                     const ImVec4& color, const std::string& note) {
   ImGui::BeginChild(id, ImVec2(0.0f, 84.0f), true);
@@ -155,6 +163,49 @@ void AccountView::DrawCoreAccountPreview() {
                          (holding.market_value.amount + " / " +
                           std::to_string(static_cast<int>(ratio * 100.0f)) + "%")
                              .c_str());
+    }
+    ImGui::EndChild();
+  }
+
+  ImGui::Spacing();
+
+  if (ImGui::BeginChild("PortfolioHeatmapCard", ImVec2(0.0f, 210.0f), true)) {
+    ImGui::Text("Portfolio Heatmap");
+    ImGui::TextDisabled("Largest positions by weight, tinted by daily performance.");
+
+    std::vector<core::application::AccountPositionRow> ranked_positions = account.positions;
+    std::sort(ranked_positions.begin(), ranked_positions.end(),
+              [](const auto& lhs, const auto& rhs) {
+                return ParseAmount(lhs.market_value.amount) >
+                       ParseAmount(rhs.market_value.amount);
+              });
+
+    const auto visible_count = std::min<size_t>(6, ranked_positions.size());
+    if (visible_count == 0) {
+      ImGui::TextDisabled("No positions available for heatmap rendering.");
+    } else if (ImGui::BeginTable("PortfolioHeatmapTable", 3,
+                                 ImGuiTableFlags_SizingStretchSame |
+                                     ImGuiTableFlags_BordersInnerV)) {
+      for (size_t index = 0; index < visible_count; ++index) {
+        if (index % 3 == 0) {
+          ImGui::TableNextRow();
+        }
+        ImGui::TableSetColumnIndex(static_cast<int>(index % 3));
+        const auto& holding = ranked_positions[index];
+        const auto pnl_percent = ParseAmount(holding.day_profit_loss_percent);
+        const auto allocation = AllocationRatio(ParseAmount(holding.market_value.amount),
+                                                portfolio_total);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, HeatmapColor(pnl_percent));
+        ImGui::BeginChild(("HeatmapCell" + holding.symbol).c_str(),
+                          ImVec2(0.0f, 92.0f), true);
+        ImGui::Text("%s", holding.symbol.c_str());
+        ImGui::TextDisabled("$%s", holding.market_value.amount.c_str());
+        ImGui::Text("Alloc: %d%%", static_cast<int>(allocation * 100.0f));
+        ImGui::Text("Day: %s%%", holding.day_profit_loss_percent.c_str());
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+      }
+      ImGui::EndTable();
     }
     ImGui::EndChild();
   }

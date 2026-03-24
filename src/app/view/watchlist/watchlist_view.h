@@ -2,7 +2,9 @@
 #define WatchlistView_hpp
 
 #include <functional>
+#include <unordered_map>
 #include <string>
+#include <vector>
 
 #include "premia/core/application/screen_models.hpp"
 #include "view/view.h"
@@ -14,12 +16,26 @@ class WatchlistView : public View {
   std::string selected_symbol_;
   std::string filter_text_;
   int movement_filter_ = 0;
+  bool state_loaded_ = false;
+  std::unordered_map<std::string, std::vector<std::string>> pinned_symbols_by_watchlist_;
+  std::unordered_map<std::string, std::vector<std::string>> ordered_symbols_by_watchlist_;
   std::function<void(const std::string&)> symbol_selection_handler_;
   EventMap events;
   Logger logger;
 
   void DrawCoreWatchlistPreview();
   void DrawWatchlistSummary(const core::application::WatchlistScreenData& screen);
+  void LoadState();
+  void PersistState() const;
+  void EnsureWatchlistOrdering(const core::application::WatchlistScreenData& screen);
+  auto BuildOrderedRows(const core::application::WatchlistScreenData& screen) const
+      -> std::vector<core::application::WatchlistRow>;
+  auto IsPinned(const std::string& watchlist_id, const std::string& symbol) const
+      -> bool;
+  void TogglePinned(const std::string& watchlist_id, const std::string& symbol);
+  void MoveSymbolBefore(const std::string& watchlist_id,
+                        const std::string& symbol,
+                        const std::string& before_symbol);
 
  public:
   std::string getName() override;
