@@ -12,7 +12,11 @@ Watchlist::Watchlist() = default;
 
 int Watchlist::getNumInstruments() const { return ((int)instruments.size()); }
 
+unsigned int Watchlist::getId() const { return watchlist_id; }
+
 std::string Watchlist::getName() const { return name; }
+
+std::string Watchlist::getAccountId() const { return account_id; }
 
 std::string Watchlist::getInstrumentSymbol(int item_id) {
   return instruments[item_id].getSymbol();

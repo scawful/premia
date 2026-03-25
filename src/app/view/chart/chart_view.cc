@@ -149,6 +149,40 @@ void ChartView::initChart() {
   currentChart = "CANDLESTICK";
   charts["CANDLESTICK"] = std::make_shared<CandleChart>();
   charts["CANDLESTICK"]->importModel(model);
+  charts["CANDLESTICK"]->setOverlayEditHandler(
+      [this](const std::string& marker_id, double price) {
+        std::ostringstream formatted;
+        formatted << std::fixed << std::setprecision(2) << price;
+        const auto formatted_price = formatted.str();
+        auto& annotations = manual_annotations_[AnnotationStorageKey()];
+        for (auto& marker : annotations) {
+          if (marker.id != marker_id) {
+            continue;
+          }
+          marker.price = formatted_price;
+          if (marker.kind == "entry") {
+            trade_entry_price_ = formatted_price;
+          } else if (marker.kind == "stop") {
+            trade_stop_price_ = formatted_price;
+          } else if (marker.kind == "target") {
+            trade_target_price_ = formatted_price;
+          }
+          PersistAnnotationState();
+          RefreshOverlayMarkers();
+          return;
+        }
+        for (size_t index = 0; index < editable_orders_.size(); ++index) {
+          if (tickerSymbol + ":order:" + editable_orders_[index].order_id != marker_id) {
+            continue;
+          }
+          selected_editable_order_index_ = static_cast<int>(index);
+          editable_order_id_ = editable_orders_[index].order_id;
+          editable_order_price_ = static_cast<float>(price);
+          order_edit_message_ = "Updated chart-side order replace preview.";
+          RefreshOverlayMarkers();
+          return;
+        }
+      });
   isInit = true;
 }
 

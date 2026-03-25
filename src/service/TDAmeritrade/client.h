@@ -103,6 +103,13 @@ class Client {
 
   // Watchlists
   std::string get_watchlist_by_account(const std::string &account_id) const;
+  std::string create_watchlist(const std::string &account_id,
+                               const std::string &payload) const;
+  std::string replace_watchlist(const std::string &account_id,
+                                const std::string &watchlist_id,
+                                const std::string &payload) const;
+  std::string delete_watchlist(const std::string &account_id,
+                               const std::string &watchlist_id) const;
 
   // Price History
   std::string get_price_history(const std::string &symbol, PeriodType ptype,
@@ -174,6 +181,9 @@ class Client {
   // API functions
   std::string send_request(const std::string &endpoint) const;
   std::string send_authorized_request(const std::string &endpoint) const;
+  std::string send_authorized_json_request(const std::string &endpoint,
+                                           const std::string &method,
+                                           const std::string &data = "") const;
   void post_authorized_request(const std::string &endpoint,
                                const std::string &data) const;
   void put_authorized_request(const std::string &endpoint,

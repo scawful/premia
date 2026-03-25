@@ -122,6 +122,8 @@ void CandleChart::DrawOverlayMarkers() {
   const float left = ImPlot::GetPlotPos().x;
   const float right = left + ImPlot::GetPlotSize().x;
   const auto latest_close = model->getCandle(model->getNumCandles() - 1).close;
+  const auto mouse = ImPlot::GetPlotMousePos();
+  std::string hovered_editable_id;
   double entry_price = 0.0;
   double stop_price = 0.0;
   double target_price = 0.0;
@@ -156,6 +158,13 @@ void CandleChart::DrawOverlayMarkers() {
       color = IM_COL32(90, 206, 132, 220);
       target_price = marker_price;
     }
+    if (marker.kind == "entry" || marker.kind == "stop" || marker.kind == "target" ||
+        marker.kind == "order") {
+      const auto mouse_pixels = ImPlot::PlotToPixels(mouse.x, mouse.y);
+      if (std::fabs(mouse_pixels.y - point.y) < 8.0f) {
+        hovered_editable_id = marker.id;
+      }
+    }
     draw_list->AddLine(ImVec2(left, point.y), ImVec2(right, point.y), color, 1.25f);
     draw_list->AddText(ImVec2(left + 8.0f, point.y - 14.0f), color,
                        (marker.label + " @ $" +
@@ -185,6 +194,19 @@ void CandleChart::DrawOverlayMarkers() {
     draw_list->AddRectFilled(ImVec2(left, std::min(entry_point.y, target_point.y)),
                              ImVec2(right, std::max(entry_point.y, target_point.y)),
                              IM_COL32(90, 206, 132, 28));
+  }
+  if (!hovered_editable_id.empty() && ImPlot::IsPlotHovered()) {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+      dragging_marker_id_ = hovered_editable_id;
+    }
+  }
+  if (!dragging_marker_id_.empty() && ImGui::IsMouseDown(ImGuiMouseButton_Left) &&
+      overlay_edit_handler_) {
+    overlay_edit_handler_(dragging_marker_id_, mouse.y);
+  }
+  if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+    dragging_marker_id_.clear();
   }
   ImPlot::PopPlotClipRect();
 }
@@ -349,6 +371,11 @@ void CandleChart::fetchData(const std::string &ticker, tda::PeriodType ptype,
 
 void CandleChart::importModel(std::shared_ptr<ChartModel> newModel) {
   this->model = newModel;
+}
+
+void CandleChart::setOverlayEditHandler(
+    std::function<void(const std::string&, double)> handler) {
+  overlay_edit_handler_ = std::move(handler);
 }
 
 void CandleChart::Update() { DrawCandleChart(); }

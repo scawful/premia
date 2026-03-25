@@ -43,7 +43,9 @@ class Watchlist {
 
   int getNumInstruments() const;
 
+  unsigned int getId() const;
   std::string getName() const;
+  std::string getAccountId() const;
   std::string getInstrumentSymbol(int item_id);
   std::string getInstrumentDescription(int item_id);
   std::string getInstrumentType(int item_id);

@@ -41,8 +41,10 @@ namespace premiatests::TdaGuardrailTests {
 
 TEST(TdaProviders, PlaceholderConfigFailsFast) {
   const auto config = MakePlaceholderConfig();
+  const auto overlay = config.parent_path() / "watchlists.json";
 
-  premia::providers::tda::WatchlistProvider watchlists(config.string());
+  premia::providers::tda::WatchlistProvider watchlists(config.string(),
+                                                       overlay.string());
   premia::providers::tda::PortfolioProvider portfolio(config.string());
   premia::providers::tda::AccountDetailProvider account(config.string());
   premia::providers::tda::OptionsProvider options(config.string());

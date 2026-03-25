@@ -4,6 +4,7 @@
 #include <implot/implot.h>
 #include <implot/implot_internal.h>
 
+#include <functional>
 #include <string>
 
 #include "model/chart/chart_model.h"
@@ -15,6 +16,8 @@ class Chart {
   virtual ~Chart() = default;
 
   virtual void importModel(std::shared_ptr<ChartModel>) = 0;
+  virtual void setOverlayEditHandler(
+      std::function<void(const std::string&, double)>) = 0;
   virtual void fetchData(const std::string& ticker, tda::PeriodType ptype,
                          int period_amt, tda::FrequencyType ftype, int freq_amt,
                          bool ext) = 0;

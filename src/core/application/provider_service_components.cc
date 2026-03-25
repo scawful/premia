@@ -733,7 +733,7 @@ auto MarketOptionsService::GetOptionChainSnapshot(
 
 auto WatchlistService::ListWatchlists() const -> std::vector<WatchlistSummary> {
   try {
-    providers::tda::WatchlistProvider provider(TdaConfigPath());
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
     return provider.ListWatchlists();
   } catch (const std::exception&) {
   }
@@ -744,7 +744,7 @@ auto WatchlistService::ListWatchlists() const -> std::vector<WatchlistSummary> {
 auto WatchlistService::GetWatchlistScreen(const std::string& watchlist_id) const
     -> WatchlistScreenData {
   try {
-    providers::tda::WatchlistProvider provider(TdaConfigPath());
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
     return provider.GetWatchlistScreen(watchlist_id);
   } catch (const std::exception&) {
   }
@@ -754,6 +754,11 @@ auto WatchlistService::GetWatchlistScreen(const std::string& watchlist_id) const
 
 auto WatchlistService::CreateWatchlist(const std::string& name)
     -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.CreateWatchlist(name);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.CreateWatchlist(name);
 }
@@ -761,6 +766,11 @@ auto WatchlistService::CreateWatchlist(const std::string& name)
 auto WatchlistService::RenameWatchlist(const std::string& watchlist_id,
                                        const std::string& name)
     -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.RenameWatchlist(watchlist_id, name);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.RenameWatchlist(watchlist_id, name);
 }
@@ -768,6 +778,11 @@ auto WatchlistService::RenameWatchlist(const std::string& watchlist_id,
 auto WatchlistService::AddWatchlistSymbol(const std::string& watchlist_id,
                                           const std::string& symbol)
     -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.AddWatchlistSymbol(watchlist_id, symbol);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.AddWatchlistSymbol(watchlist_id, symbol);
 }
@@ -775,6 +790,11 @@ auto WatchlistService::AddWatchlistSymbol(const std::string& watchlist_id,
 auto WatchlistService::RemoveWatchlistSymbol(const std::string& watchlist_id,
                                              const std::string& symbol)
     -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.RemoveWatchlistSymbol(watchlist_id, symbol);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.RemoveWatchlistSymbol(watchlist_id, symbol);
 }
@@ -782,6 +802,11 @@ auto WatchlistService::RemoveWatchlistSymbol(const std::string& watchlist_id,
 auto WatchlistService::PinWatchlistSymbol(const std::string& watchlist_id,
                                           const std::string& symbol,
                                           bool pinned) -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.PinWatchlistSymbol(watchlist_id, symbol, pinned);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.PinWatchlistSymbol(watchlist_id, symbol, pinned);
 }
@@ -790,6 +815,11 @@ auto WatchlistService::MoveWatchlistSymbol(const std::string& watchlist_id,
                                            const std::string& symbol,
                                            const std::string& before_symbol)
     -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.MoveWatchlistSymbol(watchlist_id, symbol, before_symbol);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.MoveWatchlistSymbol(watchlist_id, symbol, before_symbol);
 }
@@ -802,6 +832,11 @@ auto WatchlistService::ArchiveWatchlist(const std::string& watchlist_id,
 
 auto WatchlistService::DeleteWatchlist(const std::string& watchlist_id)
     -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.DeleteWatchlist(watchlist_id);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.DeleteWatchlist(watchlist_id);
 }
@@ -810,6 +845,12 @@ auto WatchlistService::MoveSymbolToWatchlist(
     const std::string& source_watchlist_id,
     const std::string& destination_watchlist_id,
     const std::string& symbol) -> WatchlistSummary {
+  try {
+    providers::tda::WatchlistProvider provider(TdaConfigPath(), kWatchlistsPath);
+    return provider.MoveSymbolToWatchlist(source_watchlist_id,
+                                          destination_watchlist_id, symbol);
+  } catch (const std::exception&) {
+  }
   providers::local::WatchlistProvider provider(kWatchlistsPath);
   return provider.MoveSymbolToWatchlist(source_watchlist_id,
                                         destination_watchlist_id, symbol);

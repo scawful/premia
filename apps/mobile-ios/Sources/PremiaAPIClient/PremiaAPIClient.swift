@@ -376,6 +376,54 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
     @available(macOS 10.15, iOS 13.0, *)
+    public func pinSymbol(_ symbol: String, inWatchlist id: String, pinned: Bool) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.pinWatchlistSymbol(
+                watchlistId: id,
+                symbol: symbol,
+                pinWatchlistSymbolRequest: PremiaAPIClientGeneratedAPI.PinWatchlistSymbolRequest(pinned: pinned),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func archiveWatchlist(id: String, archived: Bool) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.archiveWatchlist(
+                watchlistId: id,
+                archiveWatchlistRequest: PremiaAPIClientGeneratedAPI.ArchiveWatchlistRequest(archived: archived),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func deleteWatchlist(id: String) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.deleteWatchlist(
+                watchlistId: id,
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func transferSymbol(_ symbol: String, fromWatchlist sourceID: String, toWatchlist destinationID: String) async throws -> PremiaWatchlistSummaryModel {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.WatchlistsAPI.transferWatchlistSymbol(
+                watchlistId: sourceID,
+                transferWatchlistSymbolRequest: PremiaAPIClientGeneratedAPI.TransferWatchlistSymbolRequest(symbol: symbol, destinationWatchlistId: destinationID),
+                apiConfiguration: apiConfiguration
+            )
+        }
+        return mapWatchlist(response.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
     public func previewOrder(_ intent: PremiaOrderIntent) async throws -> PremiaOrderPreview {
         let response = try await executeMapped {
             try await PremiaAPIClientGeneratedAPI.TradingAPI.previewOrder(

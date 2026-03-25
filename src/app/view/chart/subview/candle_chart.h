@@ -13,6 +13,8 @@ class CandleChart : public Chart {
   void Update() override;
 
   void importModel(std::shared_ptr<ChartModel> newModel) override;
+  void setOverlayEditHandler(
+      std::function<void(const std::string&, double)> handler) override;
   void fetchData(const std::string& ticker, tda::PeriodType ptype,
                  int period_amt, tda::FrequencyType ftype, int freq_amt,
                  bool ext) override;
@@ -22,6 +24,8 @@ class CandleChart : public Chart {
   std::string quoteDetails;
   std::shared_ptr<ChartModel> model;
   int hovered_index_ = -1;
+  std::string dragging_marker_id_;
+  std::function<void(const std::string&, double)> overlay_edit_handler_;
 
   int binary_search(const std::vector<double>& arr, int l, int r, double x);
   int nearest_index(const std::vector<double>& arr, double x);

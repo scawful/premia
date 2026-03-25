@@ -129,6 +129,32 @@ std::string Client::send_authorized_request(const std::string &endpoint) const {
   return response;
 }
 
+std::string Client::send_authorized_json_request(const std::string &endpoint,
+                                                 const std::string &method,
+                                                 const std::string &data) const {
+  CURL *curl = curl_easy_init();
+  CURLHeader headers = nullptr;
+  std::string response;
+  std::string auth_bearer = "Authorization: Bearer " + access_token;
+
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  headers = curl_slist_append(headers, auth_bearer.c_str());
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
+  if (!data.empty()) {
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.length());
+  }
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, json_write);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "premia-agent/1.0");
+  curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+  curl_easy_perform(curl);
+  curl_easy_cleanup(curl);
+  return response;
+}
+
 void Client::post_authorized_request(const std::string &endpoint,
                                      const std::string &data) const {
   CURL *curl;
@@ -452,6 +478,33 @@ std::string Client::get_watchlist_by_account(
       "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
   string_replace(url, "{accountNum}", account_id);
   return send_authorized_request(url);
+}
+
+std::string Client::create_watchlist(const std::string &account_id,
+                                     const std::string &payload) const {
+  std::string endpoint =
+      "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists";
+  string_replace(endpoint, "{accountNum}", account_id);
+  return send_authorized_json_request(endpoint, "POST", payload);
+}
+
+std::string Client::replace_watchlist(const std::string &account_id,
+                                      const std::string &watchlist_id,
+                                      const std::string &payload) const {
+  std::string endpoint =
+      "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists/{watchlistId}";
+  string_replace(endpoint, "{accountNum}", account_id);
+  string_replace(endpoint, "{watchlistId}", watchlist_id);
+  return send_authorized_json_request(endpoint, "PUT", payload);
+}
+
+std::string Client::delete_watchlist(const std::string &account_id,
+                                     const std::string &watchlist_id) const {
+  std::string endpoint =
+      "https://api.tdameritrade.com/v1/accounts/{accountNum}/watchlists/{watchlistId}";
+  string_replace(endpoint, "{accountNum}", account_id);
+  string_replace(endpoint, "{watchlistId}", watchlist_id);
+  return send_authorized_json_request(endpoint, "DELETE");
 }
 
 std::string Client::get_price_history(const std::string &symbol,
