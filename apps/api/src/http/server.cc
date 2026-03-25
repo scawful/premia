@@ -294,6 +294,14 @@ auto HandleGet(const std::string& raw_target)
             service.GetChartScreen(symbol, range, interval, extended_hours,
                                    account_id)));
   }
+  if (path == "/v1/screens/rsu-overlay") {
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeRSUOverlayResponse(
+            core::application::CompositionRoot::Instance()
+                .RSUOverlay()
+                .GetRSUOverlay()));
+  }
   if (path == "/v1/stream/events") {
     return MakeTextResponse(
         http::status::ok, "text/event-stream",

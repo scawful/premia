@@ -1,10 +1,35 @@
 #include "premia/core/application/scaffold_application_service.hpp"
 
+#include <cstdio>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+
 #include "premia/core/application/composition_root.hpp"
 
 #include "provider_service_components.hpp"
 
 namespace premia::core::application {
+
+namespace {
+
+auto FormatUsdAmount(double value) -> std::string {
+  std::ostringstream oss;
+  oss.precision(2);
+  oss << std::fixed << value;
+  return oss.str();
+}
+
+auto PriceStringToDouble(const std::string& s) -> double {
+  if (s.empty()) return 0.0;
+  try {
+    return std::stod(s);
+  } catch (...) {
+    return 0.0;
+  }
+}
+
+}  // namespace
 
 auto ProviderBackedApplicationService::Instance() -> ProviderBackedApplicationService& {
   return CompositionRoot::Instance().AppService();
@@ -16,7 +41,8 @@ ProviderBackedApplicationService::ProviderBackedApplicationService()
       market_options_service_(std::make_unique<detail::MarketOptionsService>()),
       watchlist_service_(std::make_unique<detail::WatchlistService>()),
       order_service_(std::make_unique<detail::OrderService>()),
-      workflow_service_(std::make_unique<detail::WorkflowService>(*connection_service_)) {}
+      workflow_service_(std::make_unique<detail::WorkflowService>(*connection_service_)),
+      rsu_service_(std::make_unique<detail::RsuOverlayService>()) {}
 
 ProviderBackedApplicationService::~ProviderBackedApplicationService() = default;
 
@@ -255,6 +281,53 @@ auto ProviderBackedApplicationService::GetOpenOrders(
 auto ProviderBackedApplicationService::GetOrderHistory(
     const std::string& account_id) const -> std::vector<OrderRecordData> {
   return order_service_->GetOrderHistory(account_id);
+}
+
+auto ProviderBackedApplicationService::GetRSUOverlay() const
+    -> RSUOverlayScreen {
+  RSUOverlayScreen screen;
+  screen.account = portfolio_service_->GetAccountDetail();
+
+  auto grants = rsu_service_->GetGrantsWithVesting();
+
+  // Look up current price for each grant symbol in the account positions.
+  for (auto& grant : grants) {
+    for (const auto& position : screen.account.positions) {
+      if (position.symbol == grant.symbol) {
+        grant.current_price = position.average_price;
+        break;
+      }
+    }
+    const double price = PriceStringToDouble(grant.current_price.amount);
+    grant.vested_value = {FormatUsdAmount(price * grant.vested_units), "USD"};
+    grant.unvested_value = {FormatUsdAmount(price * grant.unvested_units), "USD"};
+  }
+
+  // Aggregate totals across all grants.
+  double total_vested = 0.0;
+  double total_unvested = 0.0;
+  int total_units_all = 0;
+  int total_vested_all = 0;
+  for (const auto& grant : grants) {
+    total_vested += PriceStringToDouble(grant.vested_value.amount);
+    total_unvested += PriceStringToDouble(grant.unvested_value.amount);
+    total_units_all += grant.total_units;
+    total_vested_all += grant.vested_units;
+
+    if (screen.next_vest_date.empty() && !grant.next_vest_date.empty()) {
+      screen.next_vest_date = grant.next_vest_date;
+      screen.next_vest_units = grant.next_vest_units;
+    }
+  }
+
+  screen.total_vested_value = {FormatUsdAmount(total_vested), "USD"};
+  screen.total_unvested_value = {FormatUsdAmount(total_unvested), "USD"};
+  screen.vest_progress_percent =
+      (total_units_all > 0)
+          ? (100.0 * total_vested_all / total_units_all)
+          : 0.0;
+  screen.grants = std::move(grants);
+  return screen;
 }
 
 auto ProviderBackedApplicationService::CreateLinkToken(

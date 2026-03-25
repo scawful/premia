@@ -567,6 +567,50 @@ auto SerializePlaidLinkTokenResponse(
                                     {"expiration", data.expiration}});
 }
 
+auto SerializeRSUOverlayResponse(const application::RSUOverlayScreen& data)
+    -> std::string {
+  json::array grants_array;
+  for (const auto& grant : data.grants) {
+    json::array schedule_array;
+    for (const auto& event : grant.vest_schedule) {
+      schedule_array.emplace_back(json::object{{"date", event.date},
+                                               {"units", event.units},
+                                               {"vested", event.vested}});
+    }
+    grants_array.emplace_back(json::object{
+        {"id", grant.id},
+        {"symbol", grant.symbol},
+        {"grantDate", grant.grant_date},
+        {"totalUnits", grant.total_units},
+        {"vestedUnits", grant.vested_units},
+        {"unvestedUnits", grant.unvested_units},
+        {"currentPrice", MakeMoney(grant.current_price)},
+        {"vestedValue", MakeMoney(grant.vested_value)},
+        {"unvestedValue", MakeMoney(grant.unvested_value)},
+        {"nextVestDate",
+         grant.next_vest_date.empty() ? json::value(nullptr)
+                                      : json::value(grant.next_vest_date)},
+        {"nextVestUnits", grant.next_vest_units},
+        {"vestProgressPercent", grant.vest_progress_percent},
+        {"schedule", schedule_array}});
+  }
+  return WriteEnvelope(json::object{
+      {"totalVestedValue", MakeMoney(data.total_vested_value)},
+      {"totalUnvestedValue", MakeMoney(data.total_unvested_value)},
+      {"nextVestDate",
+       data.next_vest_date.empty() ? json::value(nullptr)
+                                   : json::value(data.next_vest_date)},
+      {"nextVestUnits", data.next_vest_units},
+      {"vestProgressPercent", data.vest_progress_percent},
+      {"grants", grants_array},
+      {"account",
+       json::object{{"accountId", data.account.account_id},
+                    {"cash", MakeMoney(data.account.cash)},
+                    {"netLiquidation", MakeMoney(data.account.net_liquidation)},
+                    {"positions",
+                     MakeAccountPositionArray(data.account.positions)}}}});
+}
+
 auto SerializeErrorResponse(const std::string& code, const std::string& message,
                             const std::string& action,
                             const std::string& provider) -> std::string {

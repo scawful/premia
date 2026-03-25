@@ -18,6 +18,7 @@ class MarketOptionsService;
 class WatchlistService;
 class OrderService;
 class WorkflowService;
+class RsuOverlayService;
 }  // namespace detail
 
 class ProviderBackedApplicationService : public BrokerConnectionService,
@@ -28,7 +29,8 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
                                          public WatchlistService,
                                          public OrderService,
                                          public BankLinkService,
-                                         public ConnectionWorkflowService {
+                                         public ConnectionWorkflowService,
+                                         public RSUOverlayService {
  public:
   static auto Instance() -> ProviderBackedApplicationService&;
 
@@ -121,6 +123,8 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   auto GetOrderHistory(const std::string& account_id) const
       -> std::vector<OrderRecordData> override;
 
+  auto GetRSUOverlay() const -> RSUOverlayScreen override;
+
   auto CreateLinkToken(const PlaidLinkTokenRequest& request)
       -> PlaidLinkTokenData override;
 
@@ -144,6 +148,7 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   std::unique_ptr<detail::WatchlistService> watchlist_service_;
   std::unique_ptr<detail::OrderService> order_service_;
   std::unique_ptr<detail::WorkflowService> workflow_service_;
+  std::unique_ptr<detail::RsuOverlayService> rsu_service_;
 };
 
 using ScaffoldApplicationService = ProviderBackedApplicationService;

@@ -1,6 +1,7 @@
 #ifndef PREMIA_CORE_APPLICATION_PROVIDER_SERVICE_COMPONENTS_HPP
 #define PREMIA_CORE_APPLICATION_PROVIDER_SERVICE_COMPONENTS_HPP
 
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -11,6 +12,17 @@ namespace premia::core::application::detail {
 auto MakeHoldingsFromAccount(const AccountDetail& detail,
                              premia::core::domain::Provider provider)
     -> std::vector<HoldingRow>;
+
+struct GrantConfig {
+  std::string id;
+  std::string symbol;
+  std::string grant_date;
+  int total_units = 0;
+  int cliff_months = 12;
+};
+
+auto ComputeGrantVesting(const GrantConfig& config, std::time_t now)
+    -> StockUnitGrant;
 
 class ConnectionService {
  public:
@@ -108,6 +120,12 @@ class OrderService {
       -> std::vector<OrderRecordData>;
   auto GetOrderHistory(const std::string& account_id) const
       -> std::vector<OrderRecordData>;
+};
+
+class RsuOverlayService {
+ public:
+  auto GetGrantsWithVesting(std::time_t now = 0) const
+      -> std::vector<StockUnitGrant>;
 };
 
 class WorkflowService {

@@ -76,6 +76,52 @@ private struct MultiAccountHomeEnvelopeDTO: Decodable {
     let meta: Meta
 }
 
+private struct RSUOverlayEnvelopeDTO: Decodable {
+    struct Meta: Decodable {
+        let requestId: String
+        let asOf: Date?
+    }
+
+    struct MoneyDTO: Decodable {
+        let amount: String
+        let currency: String
+    }
+
+    struct VestEventDTO: Decodable {
+        let date: String
+        let units: Int
+        let vested: Bool
+    }
+
+    struct GrantDTO: Decodable {
+        let id: String
+        let symbol: String
+        let grantDate: String
+        let totalUnits: Int
+        let vestedUnits: Int
+        let unvestedUnits: Int
+        let currentPrice: MoneyDTO
+        let vestedValue: MoneyDTO
+        let unvestedValue: MoneyDTO
+        let nextVestDate: String?
+        let nextVestUnits: Int
+        let vestProgressPercent: Double
+        let schedule: [VestEventDTO]
+    }
+
+    struct Payload: Decodable {
+        let totalVestedValue: MoneyDTO
+        let totalUnvestedValue: MoneyDTO
+        let nextVestDate: String?
+        let nextVestUnits: Int
+        let vestProgressPercent: Double
+        let grants: [GrantDTO]
+    }
+
+    let data: Payload
+    let meta: Meta
+}
+
 private struct ChartAnnotationsRequestDTO: Encodable {
     struct Annotation: Encodable {
         let id: String
@@ -1301,5 +1347,66 @@ public final class PremiaAPIClient: @unchecked Sendable {
         case .limit:
             return .limit
         }
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func loadRSUOverlay() async throws -> PremiaRSUOverlaySnapshot {
+        let url = configuration.baseURL.appending(path: "v1/screens/rsu-overlay")
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let http = response as? HTTPURLResponse else {
+            throw PremiaAPIClientError(code: "INVALID_RESPONSE", message: "RSU overlay response was invalid.")
+        }
+        if !(200...299).contains(http.statusCode) {
+            if let decoded = try? JSONDecoder().decode(PremiaAPIClientGeneratedAPI.ModelErrorResponse.self, from: data) {
+                throw PremiaAPIClientError(
+                    code: decoded.error.code,
+                    message: decoded.error.message,
+                    statusCode: http.statusCode,
+                    provider: decoded.error.provider.map(mapProvider),
+                    retryable: decoded.error.retryable,
+                    action: mapAction(decoded.error.action)
+                )
+            }
+            throw PremiaAPIClientError(code: "HTTP_\(http.statusCode)", message: "RSU overlay request failed.", statusCode: http.statusCode, retryable: http.statusCode >= 500, action: .retry)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let envelope = try decoder.decode(RSUOverlayEnvelopeDTO.self, from: data)
+        let payload = envelope.data
+
+        func mapMoneyDTO(_ dto: RSUOverlayEnvelopeDTO.MoneyDTO) -> PremiaMoney {
+            PremiaMoney(amount: dto.amount, currency: dto.currency)
+        }
+
+        let grants = payload.grants.map { g in
+            PremiaRSUOverlaySnapshot.Grant(
+                id: g.id,
+                symbol: g.symbol,
+                grantDate: g.grantDate,
+                totalUnits: g.totalUnits,
+                vestedUnits: g.vestedUnits,
+                unvestedUnits: g.unvestedUnits,
+                currentPrice: mapMoneyDTO(g.currentPrice),
+                vestedValue: mapMoneyDTO(g.vestedValue),
+                unvestedValue: mapMoneyDTO(g.unvestedValue),
+                nextVestDate: g.nextVestDate,
+                nextVestUnits: g.nextVestUnits,
+                vestProgressPercent: g.vestProgressPercent,
+                schedule: g.schedule.map {
+                    PremiaRSUOverlaySnapshot.VestEvent(date: $0.date, units: $0.units, vested: $0.vested)
+                }
+            )
+        }
+
+        return PremiaRSUOverlaySnapshot(
+            totalVestedValue: mapMoneyDTO(payload.totalVestedValue),
+            totalUnvestedValue: mapMoneyDTO(payload.totalUnvestedValue),
+            nextVestDate: payload.nextVestDate,
+            nextVestUnits: payload.nextVestUnits,
+            vestProgressPercent: payload.vestProgressPercent,
+            grants: grants,
+            asOf: envelope.meta.asOf
+        )
     }
 }

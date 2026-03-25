@@ -47,6 +47,8 @@ auto SerializeSchwabOAuthStartResponse(
     const core::application::SchwabOAuthStartData& data) -> std::string;
 auto SerializePlaidLinkTokenResponse(
     const core::application::PlaidLinkTokenData& data) -> std::string;
+auto SerializeRSUOverlayResponse(const core::application::RSUOverlayScreen& data)
+    -> std::string;
 auto SerializeErrorResponse(const std::string& code, const std::string& message,
                             const std::string& action,
                             const std::string& provider = "") -> std::string;

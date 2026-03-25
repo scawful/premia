@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <functional>
@@ -1386,6 +1387,133 @@ auto WorkflowService::CurrentUtcTimestamp() const -> std::string {
   std::ostringstream oss;
   oss << std::put_time(&utc_time, "%Y-%m-%dT%H:%M:%SZ");
   return oss.str();
+}
+
+// ── RSU vesting helpers ──────────────────────────────────────────────────────
+
+namespace {
+
+constexpr char kRsuGrantsPath[] = "assets/rsu_grants.json";
+
+auto ParseDateTm(const std::string& date_str) -> std::tm {
+  std::tm tm{};
+  int year = 0, month = 0, day = 0;
+  if (std::sscanf(date_str.c_str(), "%d-%d-%d", &year, &month, &day) == 3) {
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
+    tm.tm_mday = day;
+    tm.tm_isdst = -1;
+    std::mktime(&tm);
+  }
+  return tm;
+}
+
+auto FormatDateTm(const std::tm& tm) -> std::string {
+  std::ostringstream oss;
+  oss << std::setfill('0') << std::setw(4) << (tm.tm_year + 1900) << '-'
+      << std::setw(2) << (tm.tm_mon + 1) << '-' << std::setw(2) << tm.tm_mday;
+  return oss.str();
+}
+
+auto AddMonthsToTm(std::tm base, int months) -> std::tm {
+  base.tm_mon += months;
+  base.tm_isdst = -1;
+  std::mktime(&base);
+  return base;
+}
+
+}  // namespace
+
+auto ComputeGrantVesting(const GrantConfig& config, std::time_t now)
+    -> StockUnitGrant {
+  if (now == 0) {
+    now = std::time(nullptr);
+  }
+
+  const std::tm grant_tm = ParseDateTm(config.grant_date);
+
+  // Standard 4-year/1-year-cliff schedule:
+  //   cliff event = total_units / 4
+  //   12 quarterly events = remaining units / 12 (last gets remainder)
+  const int cliff_units = config.total_units / 4;
+  const int post_cliff_units = config.total_units - cliff_units;
+  const int per_quarter = post_cliff_units / 12;
+
+  std::vector<VestEvent> schedule;
+  schedule.reserve(13);
+
+  // Cliff event
+  std::tm cliff_tm = AddMonthsToTm(grant_tm, config.cliff_months);
+  const std::time_t cliff_time = std::mktime(&cliff_tm);
+  schedule.push_back({FormatDateTm(cliff_tm), cliff_units, now >= cliff_time});
+
+  // 12 quarterly events after cliff
+  for (int q = 1; q <= 12; ++q) {
+    std::tm vest_tm = AddMonthsToTm(cliff_tm, q * 3);
+    const std::time_t vest_time = std::mktime(&vest_tm);
+    const int units =
+        (q == 12) ? (post_cliff_units - per_quarter * 11) : per_quarter;
+    schedule.push_back({FormatDateTm(vest_tm), units, now >= vest_time});
+  }
+
+  int vested_units = 0;
+  std::string next_vest_date;
+  int next_vest_units = 0;
+  for (const auto& event : schedule) {
+    if (event.vested) {
+      vested_units += event.units;
+    } else if (next_vest_date.empty()) {
+      next_vest_date = event.date;
+      next_vest_units = event.units;
+    }
+  }
+
+  StockUnitGrant grant;
+  grant.id = config.id;
+  grant.symbol = config.symbol;
+  grant.grant_date = config.grant_date;
+  grant.total_units = config.total_units;
+  grant.vested_units = vested_units;
+  grant.unvested_units = config.total_units - vested_units;
+  grant.next_vest_date = next_vest_date;
+  grant.next_vest_units = next_vest_units;
+  grant.vest_progress_percent =
+      (config.total_units > 0)
+          ? (100.0 * vested_units / config.total_units)
+          : 0.0;
+  grant.vest_schedule = std::move(schedule);
+  return grant;
+}
+
+auto RsuOverlayService::GetGrantsWithVesting(std::time_t now) const
+    -> std::vector<StockUnitGrant> {
+  std::ifstream file(kRsuGrantsPath);
+  if (!file.good()) {
+    return {};
+  }
+
+  pt::ptree tree;
+  try {
+    pt::read_json(file, tree);
+  } catch (const std::exception&) {
+    return {};
+  }
+
+  std::vector<StockUnitGrant> grants;
+  for (const auto& [key, node] : tree.get_child("grants")) {
+    GrantConfig config;
+    config.id = node.get<std::string>("id", "");
+    config.symbol = node.get<std::string>("symbol", "");
+    config.grant_date = node.get<std::string>("grant_date", "");
+    config.total_units = node.get<int>("total_units", 0);
+    config.cliff_months = node.get<int>("cliff_months", 12);
+    if (config.id.empty() || config.grant_date.empty() ||
+        config.total_units <= 0) {
+      continue;
+    }
+    grants.push_back(ComputeGrantVesting(config, now));
+  }
+  return grants;
 }
 
 }  // namespace premia::core::application::detail

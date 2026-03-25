@@ -18,6 +18,7 @@ class CompositionRoot {
   auto Watchlists() -> WatchlistService&;
   auto Orders() -> OrderService&;
   auto Workflows() -> ConnectionWorkflowService&;
+  auto RSUOverlay() -> RSUOverlayService&;
 
  private:
   CompositionRoot() = default;

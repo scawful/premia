@@ -17,6 +17,7 @@ tags:
   - name: Bootstrap
   - name: Home
   - name: Account
+  - name: RSU
   - name: Watchlists
   - name: Quotes
   - name: Charts
@@ -709,6 +710,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConnectionSummaryResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/rsu-overlay:
+    get:
+      tags: [RSU]
+      summary: Load RSU/GSU vesting overlay for Schwab positions.
+      operationId: getRSUOverlay
+      responses:
+        '200':
+          description: RSU overlay screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSUOverlayResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
   /v1/stream/events:
@@ -2176,3 +2191,81 @@ components:
           type: string
         destinationWatchlistId:
           type: string
+    VestEvent:
+      type: object
+      required: [date, units, vested]
+      properties:
+        date:
+          type: string
+          format: date
+        units:
+          type: integer
+        vested:
+          type: boolean
+    StockUnitGrant:
+      type: object
+      required: [id, symbol, grantDate, totalUnits, vestedUnits, unvestedUnits, currentPrice, vestedValue, unvestedValue, nextVestUnits, vestProgressPercent, schedule]
+      properties:
+        id:
+          type: string
+        symbol:
+          type: string
+        grantDate:
+          type: string
+          format: date
+        totalUnits:
+          type: integer
+        vestedUnits:
+          type: integer
+        unvestedUnits:
+          type: integer
+        currentPrice:
+          $ref: '#/components/schemas/Money'
+        vestedValue:
+          $ref: '#/components/schemas/Money'
+        unvestedValue:
+          $ref: '#/components/schemas/Money'
+        nextVestDate:
+          type: string
+          format: date
+          nullable: true
+        nextVestUnits:
+          type: integer
+        vestProgressPercent:
+          type: number
+          format: double
+        schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/VestEvent'
+    RSUOverlayData:
+      type: object
+      required: [totalVestedValue, totalUnvestedValue, nextVestUnits, vestProgressPercent, grants, account]
+      properties:
+        totalVestedValue:
+          $ref: '#/components/schemas/Money'
+        totalUnvestedValue:
+          $ref: '#/components/schemas/Money'
+        nextVestDate:
+          type: string
+          format: date
+          nullable: true
+        nextVestUnits:
+          type: integer
+        vestProgressPercent:
+          type: number
+          format: double
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockUnitGrant'
+        account:
+          $ref: '#/components/schemas/AccountDetail'
+    RSUOverlayResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/RSUOverlayData'
+        meta:
+          $ref: '#/components/schemas/Meta'

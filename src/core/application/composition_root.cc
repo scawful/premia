@@ -43,4 +43,8 @@ auto CompositionRoot::Workflows() -> ConnectionWorkflowService& {
   return app_service_;
 }
 
+auto CompositionRoot::RSUOverlay() -> RSUOverlayService& {
+  return app_service_;
+}
+
 }  // namespace premia::core::application

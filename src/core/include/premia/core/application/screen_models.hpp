@@ -262,6 +262,38 @@ struct ChartScreenData {
   std::vector<ChartAnnotationVersionSummary> annotation_versions;
 };
 
+struct VestEvent {
+  std::string date;
+  int units = 0;
+  bool vested = false;
+};
+
+struct StockUnitGrant {
+  std::string id;
+  std::string symbol;
+  std::string grant_date;
+  int total_units = 0;
+  int vested_units = 0;
+  int unvested_units = 0;
+  Money current_price;
+  Money vested_value;
+  Money unvested_value;
+  std::string next_vest_date;
+  int next_vest_units = 0;
+  double vest_progress_percent = 0.0;
+  std::vector<VestEvent> vest_schedule;
+};
+
+struct RSUOverlayScreen {
+  Money total_vested_value;
+  Money total_unvested_value;
+  std::string next_vest_date;
+  int next_vest_units = 0;
+  double vest_progress_percent = 0.0;
+  std::vector<StockUnitGrant> grants;
+  AccountDetail account;
+};
+
 }  // namespace premia::core::application
 
 #endif  // PREMIA_CORE_APPLICATION_SCREEN_MODELS_HPP

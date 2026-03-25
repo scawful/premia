@@ -145,6 +145,13 @@ class OrderService {
       -> std::vector<OrderRecordData> = 0;
 };
 
+class RSUOverlayService {
+ public:
+  virtual ~RSUOverlayService() = default;
+
+  virtual auto GetRSUOverlay() const -> RSUOverlayScreen = 0;
+};
+
 }  // namespace premia::core::application
 
 #endif  // PREMIA_CORE_APPLICATION_SERVICE_CONTRACTS_HPP
