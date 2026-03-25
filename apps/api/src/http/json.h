@@ -14,6 +14,8 @@ auto SerializeBootstrapResponse(const core::application::BootstrapData& data)
     -> std::string;
 auto SerializeHomeScreenResponse(const core::application::HomeScreenData& data)
     -> std::string;
+auto SerializeMultiAccountHomeScreenResponse(
+    const core::application::MultiAccountHomeScreen& data) -> std::string;
 auto SerializeAccountScreenResponse(const core::application::AccountDetail& data)
     -> std::string;
 auto SerializeWatchlistsResponse(

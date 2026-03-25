@@ -61,6 +61,20 @@ paths:
                 $ref: '#/components/schemas/HomeScreenResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/home/multi-account:
+    get:
+      tags: [Home]
+      summary: Load the multi-account aggregate home screen.
+      operationId: getMultiAccountHomeScreen
+      responses:
+        '200':
+          description: Multi-account aggregate home screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiAccountHomeScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /v1/screens/account:
     get:
       tags: [Account]
@@ -1226,6 +1240,23 @@ components:
         meta:
           requestId: req_2
           asOf: '2026-03-22T18:17:47Z'
+    MultiAccountSummaryRow:
+      type: object
+      required: [provider, accountId, displayName, balance, dayChange, holdingsCount]
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+        accountId:
+          type: string
+        displayName:
+          type: string
+        balance:
+          $ref: '#/components/schemas/Money'
+        dayChange:
+          $ref: '#/components/schemas/AbsolutePercentChange'
+        holdingsCount:
+          type: integer
+          minimum: 0
     BrokerageAccountSummary:
       type: object
       required: [provider, accountId, displayName, totalValue, holdingsCount]
@@ -1241,6 +1272,34 @@ components:
         holdingsCount:
           type: integer
           minimum: 0
+    MultiAccountHomeData:
+      type: object
+      required: [connections, aggregateNetWorth, aggregateDayChange, accounts, topHoldings]
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectionSummary'
+        aggregateNetWorth:
+          $ref: '#/components/schemas/Money'
+        aggregateDayChange:
+          $ref: '#/components/schemas/AbsolutePercentChange'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/MultiAccountSummaryRow'
+        topHoldings:
+          type: array
+          items:
+            $ref: '#/components/schemas/HoldingRow'
+    MultiAccountHomeScreenResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/MultiAccountHomeData'
+        meta:
+          $ref: '#/components/schemas/Meta'
     AccountPositionRow:
       type: object
       required: [symbol, name, dayProfitLoss, dayProfitLossPercent, averagePrice, marketValue, quantity]

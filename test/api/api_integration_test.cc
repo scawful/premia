@@ -638,4 +638,48 @@ TEST_F(ApiIntegrationFixture, SeededProviderTokensDriveBootstrapStates) {
   EXPECT_FALSE(FindConnectionReauthRequired(bootstrap_tree, "plaid"));
 }
 
+TEST_F(ApiIntegrationFixture, MultiAccountHomeReturnsFallbackAggregate) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  const auto response =
+      HttpRequest("GET", Url("/v1/screens/home/multi-account"));
+  ASSERT_EQ(response.status_code, 200);
+  const auto tree = ParseJson(response.body);
+
+  // Must have the envelope meta fields
+  EXPECT_FALSE(tree.get<std::string>("meta.requestId").empty());
+  EXPECT_FALSE(tree.get<std::string>("meta.asOf").empty());
+
+  // Aggregate fields must be present
+  EXPECT_FALSE(
+      tree.get<std::string>("data.aggregateNetWorth.amount").empty());
+  EXPECT_FALSE(
+      tree.get<std::string>("data.aggregateDayChange.absolute.amount").empty());
+
+  // Local fallback account must be present
+  const auto& accounts = tree.get_child("data.accounts");
+  EXPECT_FALSE(accounts.empty());
+  const auto& first = accounts.begin()->second;
+  EXPECT_EQ(first.get<std::string>("provider"), "internal");
+  EXPECT_EQ(first.get<std::string>("accountId"), "local_acc");
+  EXPECT_EQ(first.get<std::string>("balance.amount"), "128345.22");
+
+  // Aggregate net worth must equal the sum of account balances
+  double aggregate = 0.0;
+  for (const auto& item : accounts) {
+    aggregate +=
+        std::stod(item.second.get<std::string>("balance.amount"));
+  }
+  EXPECT_DOUBLE_EQ(
+      std::stod(tree.get<std::string>("data.aggregateNetWorth.amount")),
+      aggregate);
+
+  // Top holdings from the local provider must be present
+  EXPECT_FALSE(tree.get_child("data.topHoldings").empty());
+
+  // Connections array must be present
+  EXPECT_FALSE(tree.get_child("data.connections").empty());
+}
+
 }  // namespace premiatests::ApiIntegrationTests

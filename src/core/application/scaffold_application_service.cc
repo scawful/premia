@@ -37,6 +37,14 @@ auto ProviderBackedApplicationService::GetHomeScreenData() const -> HomeScreenDa
   return GetHomeScreenDataForAccount("");
 }
 
+auto ProviderBackedApplicationService::GetMultiAccountHomeScreen() const
+    -> MultiAccountHomeScreen {
+  MultiAccountHomeScreen screen =
+      portfolio_service_->GetMultiAccountHomeScreen();
+  screen.connections = connection_service_->GetConnections();
+  return screen;
+}
+
 auto ProviderBackedApplicationService::GetHomeScreenDataForAccount(
     const std::string& account_id) const -> HomeScreenData {
   HomeScreenData data;

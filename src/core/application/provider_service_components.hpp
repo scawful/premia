@@ -36,6 +36,7 @@ class PortfolioAccountService {
   auto GetAccountDetail() const -> AccountDetail;
   auto GetAccountDetailForAccount(const std::string& account_id) const
       -> AccountDetail;
+  auto GetMultiAccountHomeScreen() const -> MultiAccountHomeScreen;
 };
 
 class MarketOptionsService {

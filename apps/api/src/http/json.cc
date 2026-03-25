@@ -361,6 +361,28 @@ auto SerializeHomeScreenResponse(const application::HomeScreenData& data)
                                                    data.market.next_transition_at}}}});
 }
 
+auto SerializeMultiAccountHomeScreenResponse(
+    const application::MultiAccountHomeScreen& data) -> std::string {
+  json::array accounts;
+  for (const auto& account : data.accounts) {
+    accounts.emplace_back(json::object{
+        {"provider", domain::ProviderToString(account.provider)},
+        {"accountId", account.account_id},
+        {"displayName", account.display_name},
+        {"balance", MakeMoney(account.balance)},
+        {"dayChange", MakeAbsolutePercentChange(account.day_change)},
+        {"holdingsCount", account.holdings_count}});
+  }
+  return WriteEnvelope(
+      json::object{{"connections",
+                    MakeConnectionSummaryArray(data.connections)},
+                   {"aggregateNetWorth", MakeMoney(data.aggregate_net_worth)},
+                   {"aggregateDayChange",
+                    MakeAbsolutePercentChange(data.aggregate_day_change)},
+                   {"accounts", accounts},
+                   {"topHoldings", MakeHoldingArray(data.top_holdings)}});
+}
+
 auto SerializeAccountScreenResponse(const application::AccountDetail& data)
     -> std::string {
   return WriteEnvelope(json::object{{"accountId", data.account_id},

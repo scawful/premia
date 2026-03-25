@@ -157,6 +157,23 @@ struct HomeScreenData {
   MarketSummary market;
 };
 
+struct MultiAccountSummaryRow {
+  Provider provider = Provider::kInternal;
+  std::string account_id;
+  std::string display_name;
+  Money balance;
+  AbsolutePercentChange day_change;
+  int holdings_count = 0;
+};
+
+struct MultiAccountHomeScreen {
+  std::vector<ConnectionSummary> connections;
+  Money aggregate_net_worth;
+  AbsolutePercentChange aggregate_day_change;
+  std::vector<MultiAccountSummaryRow> accounts;
+  std::vector<HoldingRow> top_holdings;
+};
+
 struct WatchlistScreenData {
   WatchlistSummary watchlist;
   std::vector<WatchlistSummary> available_watchlists;

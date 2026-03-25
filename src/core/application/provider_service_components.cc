@@ -319,6 +319,25 @@ auto ParsePriceString(const std::string& value) -> double {
   }
 }
 
+auto FormatDecimal(double value) -> std::string {
+  std::ostringstream oss;
+  oss << std::fixed << std::setprecision(2) << value;
+  return oss.str();
+}
+
+auto ComputeDayChangeFromPositions(const AccountDetail& detail)
+    -> AbsolutePercentChange {
+  double total_day_pl = 0.0;
+  for (const auto& pos : detail.positions) {
+    total_day_pl += ParsePriceString(pos.day_profit_loss.amount);
+  }
+  const double net_liq = ParsePriceString(detail.net_liquidation.amount);
+  const double prev = net_liq - total_day_pl;
+  const std::string pct =
+      prev > 0.001 ? FormatDecimal(total_day_pl / prev * 100.0) : "0.00";
+  return AbsolutePercentChange{MakeMoney(FormatDecimal(total_day_pl)), pct};
+}
+
 auto LooksFilledStatus(std::string status) -> bool {
   std::transform(status.begin(), status.end(), status.begin(),
                  [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
@@ -815,6 +834,114 @@ auto PortfolioAccountService::GetAccountDetailForAccount(
   }
   providers::local::AccountDetailProvider provider(kAccountPath);
   return provider.GetAccountDetail();
+}
+
+auto PortfolioAccountService::GetMultiAccountHomeScreen() const
+    -> MultiAccountHomeScreen {
+  MultiAccountHomeScreen screen;
+  std::vector<HoldingRow> all_holdings;
+  double aggregate_net_worth = 0.0;
+  double aggregate_day_pl = 0.0;
+
+  // Try Schwab — may surface multiple accounts
+  try {
+    providers::schwab::AccountDetailProvider schwab_provider(SchwabConfigPath(),
+                                                             SchwabTokenPath());
+    const auto summaries = schwab_provider.ListBrokerageAccounts();
+    for (const auto& summary : summaries) {
+      try {
+        const auto detail =
+            schwab_provider.GetAccountDetailForAccount(summary.account_id);
+        const auto change = ComputeDayChangeFromPositions(detail);
+        MultiAccountSummaryRow row;
+        row.provider = Provider::kSchwab;
+        row.account_id = detail.account_id;
+        row.display_name = summary.display_name;
+        row.balance = detail.net_liquidation;
+        row.day_change = change;
+        row.holdings_count = static_cast<int>(detail.positions.size());
+        screen.accounts.push_back(std::move(row));
+        const auto holdings =
+            MakeHoldingsFromAccount(detail, Provider::kSchwab);
+        all_holdings.insert(all_holdings.end(), holdings.begin(),
+                            holdings.end());
+        aggregate_net_worth +=
+            ParsePriceString(detail.net_liquidation.amount);
+        aggregate_day_pl += ParsePriceString(change.absolute.amount);
+      } catch (const std::exception&) {
+      }
+    }
+  } catch (const std::exception&) {
+  }
+
+  // Try IBKR — single account
+  try {
+    providers::ibkr::AccountDetailProvider ibkr_provider(IbkrConfigPath());
+    const auto detail = ibkr_provider.GetAccountDetail();
+    const auto change = ComputeDayChangeFromPositions(detail);
+    MultiAccountSummaryRow row;
+    row.provider = Provider::kIBKR;
+    row.account_id = detail.account_id;
+    row.display_name = "Interactive Brokers";
+    row.balance = detail.net_liquidation;
+    row.day_change = change;
+    row.holdings_count = static_cast<int>(detail.positions.size());
+    screen.accounts.push_back(std::move(row));
+    const auto holdings = MakeHoldingsFromAccount(detail, Provider::kIBKR);
+    all_holdings.insert(all_holdings.end(), holdings.begin(), holdings.end());
+    aggregate_net_worth += ParsePriceString(detail.net_liquidation.amount);
+    aggregate_day_pl += ParsePriceString(change.absolute.amount);
+  } catch (const std::exception&) {
+  }
+
+  // Try TDA — single account
+  try {
+    providers::tda::AccountDetailProvider tda_provider(TdaConfigPath());
+    const auto detail = tda_provider.GetAccountDetail();
+    const auto change = ComputeDayChangeFromPositions(detail);
+    MultiAccountSummaryRow row;
+    row.provider = Provider::kTDA;
+    row.account_id = detail.account_id;
+    row.display_name = "TDAmeritrade";
+    row.balance = detail.net_liquidation;
+    row.day_change = change;
+    row.holdings_count = static_cast<int>(detail.positions.size());
+    screen.accounts.push_back(std::move(row));
+    const auto holdings = MakeHoldingsFromAccount(detail, Provider::kTDA);
+    all_holdings.insert(all_holdings.end(), holdings.begin(), holdings.end());
+    aggregate_net_worth += ParsePriceString(detail.net_liquidation.amount);
+    aggregate_day_pl += ParsePriceString(change.absolute.amount);
+  } catch (const std::exception&) {
+  }
+
+  // Fall back to local when no live provider responded
+  if (screen.accounts.empty()) {
+    providers::local::AccountDetailProvider local_acct(kAccountPath);
+    const auto detail = local_acct.GetAccountDetail();
+    const auto change = ComputeDayChangeFromPositions(detail);
+    MultiAccountSummaryRow row;
+    row.provider = Provider::kInternal;
+    row.account_id = detail.account_id;
+    row.display_name = "Local Preview";
+    row.balance = detail.net_liquidation;
+    row.day_change = change;
+    row.holdings_count = static_cast<int>(detail.positions.size());
+    screen.accounts.push_back(std::move(row));
+    providers::local::PortfolioProvider local_portfolio(kPortfolioPath);
+    const auto holdings = local_portfolio.GetTopHoldings();
+    all_holdings.insert(all_holdings.end(), holdings.begin(), holdings.end());
+    aggregate_net_worth += ParsePriceString(detail.net_liquidation.amount);
+    aggregate_day_pl += ParsePriceString(change.absolute.amount);
+  }
+
+  screen.aggregate_net_worth = MakeMoney(FormatDecimal(aggregate_net_worth));
+  const double prev = aggregate_net_worth - aggregate_day_pl;
+  const std::string pct =
+      prev > 0.001 ? FormatDecimal(aggregate_day_pl / prev * 100.0) : "0.00";
+  screen.aggregate_day_change =
+      AbsolutePercentChange{MakeMoney(FormatDecimal(aggregate_day_pl)), pct};
+  screen.top_holdings = std::move(all_holdings);
+  return screen;
 }
 
 auto MarketOptionsService::GetQuoteDetail(const std::string& symbol) const

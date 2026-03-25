@@ -214,6 +214,12 @@ auto HandleGet(const std::string& raw_target)
         http::status::ok,
         SerializeHomeScreenResponse(service.GetHomeScreenDataForAccount(account_id)));
   }
+  if (path == "/v1/screens/home/multi-account") {
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeMultiAccountHomeScreenResponse(
+            service.GetMultiAccountHomeScreen()));
+  }
   if (path == "/v1/screens/account") {
     const auto params = ParseQuery(query);
     const auto account_id = params.count("accountId") ? params.at("accountId") : "";

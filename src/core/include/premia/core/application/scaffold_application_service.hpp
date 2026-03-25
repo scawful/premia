@@ -38,6 +38,7 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   auto GetHomeScreenData() const -> HomeScreenData;
   auto GetHomeScreenDataForAccount(const std::string& account_id) const
       -> HomeScreenData;
+  auto GetMultiAccountHomeScreen() const -> MultiAccountHomeScreen;
   auto ListBrokerageAccounts() const -> std::vector<BrokerageAccountSummary>;
   auto GetPortfolioSummaryForAccount(const std::string& account_id) const
       -> PortfolioSummary;

@@ -31,6 +31,78 @@ private struct BootstrapEnvelopeDTO: Decodable {
     let meta: Meta
 }
 
+private struct MultiAccountHomeEnvelopeDTO: Decodable {
+    struct Meta: Decodable {
+        let requestId: String
+        let asOf: Date?
+    }
+
+    struct Payload: Decodable {
+        struct MoneyDTO: Decodable {
+            let amount: String
+            let currency: String
+        }
+
+        struct ChangeDTO: Decodable {
+            let absolute: MoneyDTO
+            let percent: String
+        }
+
+        struct AccountRowDTO: Decodable {
+            let provider: String
+            let accountId: String
+            let displayName: String
+            let balance: MoneyDTO
+            let dayChange: ChangeDTO
+            let holdingsCount: Int
+        }
+
+        struct HoldingRowDTO: Decodable {
+            let id: String
+            let symbol: String
+            let name: String
+            let quantity: String
+            let marketValue: MoneyDTO
+            let dayChange: ChangeDTO
+        }
+
+        let aggregateNetWorth: MoneyDTO
+        let aggregateDayChange: ChangeDTO
+        let accounts: [AccountRowDTO]
+        let topHoldings: [HoldingRowDTO]
+    }
+
+    let data: Payload
+    let meta: Meta
+}
+
+private struct ChartAnnotationsRequestDTO: Encodable {
+    struct Annotation: Encodable {
+        let id: String
+        let label: String
+        let price: String
+        let kind: String
+    }
+
+    let annotations: [Annotation]
+}
+
+public struct PremiaMultiAccountSummaryRow: Sendable {
+    public let provider: String
+    public let accountId: String
+    public let displayName: String
+    public let balance: PremiaMoney
+    public let dayChange: PremiaAbsolutePercentChange
+    public let holdingsCount: Int
+}
+
+public struct PremiaMultiAccountHomeSnapshot: Sendable {
+    public let aggregateNetWorth: PremiaMoney
+    public let aggregateDayChange: PremiaAbsolutePercentChange
+    public let accounts: [PremiaMultiAccountSummaryRow]
+    public let topHoldings: [PremiaHoldingSummary]
+    public let asOf: Date?
+}
 public struct PremiaAPIConfiguration: Sendable, Equatable {
     public let baseURL: URL
 
@@ -109,6 +181,64 @@ public final class PremiaAPIClient: @unchecked Sendable {
                 nextTransitionAt: response.data.market.nextTransitionAt
             ),
             asOf: response.meta.asOf
+        )
+    }
+
+    public func loadMultiAccountHome() async throws -> PremiaMultiAccountHomeSnapshot {
+        let url = configuration.baseURL.appending(path: "v1/screens/home/multi-account")
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let http = response as? HTTPURLResponse else {
+            throw PremiaAPIClientError(code: "INVALID_RESPONSE", message: "Multi-account home response was invalid.")
+        }
+        if !(200...299).contains(http.statusCode) {
+            if let decoded = try? JSONDecoder().decode(PremiaAPIClientGeneratedAPI.ModelErrorResponse.self, from: data) {
+                throw PremiaAPIClientError(
+                    code: decoded.error.code,
+                    message: decoded.error.message,
+                    statusCode: http.statusCode,
+                    provider: decoded.error.provider.map(mapProvider),
+                    retryable: decoded.error.retryable,
+                    action: mapAction(decoded.error.action)
+                )
+            }
+            throw PremiaAPIClientError(code: "HTTP_\(http.statusCode)", message: "Multi-account home request failed.", statusCode: http.statusCode, retryable: http.statusCode >= 500, action: .retry)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let envelope = try decoder.decode(MultiAccountHomeEnvelopeDTO.self, from: data)
+
+        let mapMoneyDTO = { (m: MultiAccountHomeEnvelopeDTO.Payload.MoneyDTO) in
+            PremiaMoney(amount: m.amount, currency: m.currency)
+        }
+        let mapChangeDTO = { (c: MultiAccountHomeEnvelopeDTO.Payload.ChangeDTO) in
+            PremiaAbsolutePercentChange(absolute: mapMoneyDTO(c.absolute), percent: c.percent)
+        }
+
+        return PremiaMultiAccountHomeSnapshot(
+            aggregateNetWorth: mapMoneyDTO(envelope.data.aggregateNetWorth),
+            aggregateDayChange: mapChangeDTO(envelope.data.aggregateDayChange),
+            accounts: envelope.data.accounts.map { account in
+                PremiaMultiAccountSummaryRow(
+                    provider: account.provider,
+                    accountId: account.accountId,
+                    displayName: account.displayName,
+                    balance: mapMoneyDTO(account.balance),
+                    dayChange: mapChangeDTO(account.dayChange),
+                    holdingsCount: account.holdingsCount
+                )
+            },
+            topHoldings: envelope.data.topHoldings.map { holding in
+                PremiaHoldingSummary(
+                    id: holding.id,
+                    symbol: holding.symbol,
+                    name: holding.name,
+                    quantity: holding.quantity,
+                    marketValue: mapMoneyDTO(holding.marketValue),
+                    dayChange: mapChangeDTO(holding.dayChange)
+                )
+            },
+            asOf: envelope.meta.asOf
         )
     }
 
