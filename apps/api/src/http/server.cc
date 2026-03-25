@@ -157,6 +157,22 @@ auto GetOptionalBool(const json::object& object, const std::string& key,
   return it->value().as_bool();
 }
 
+auto ParseOrderTemplate(const json::object& object)
+    -> core::application::OrderTemplate {
+  core::application::OrderTemplate tmpl;
+  tmpl.name = GetRequiredString(object, "name");
+  tmpl.symbol = GetOptionalString(object, "symbol");
+  tmpl.order_type = GetOptionalString(object, "orderType");
+  tmpl.action = GetRequiredString(object, "action");
+  tmpl.quantity = GetRequiredString(object, "quantity");
+  tmpl.is_dollar_amount = GetOptionalBool(object, "isDollarAmount", false);
+  tmpl.time_in_force = GetOptionalString(object, "timeInForce");
+  tmpl.session = GetOptionalString(object, "session");
+  tmpl.asset_type = GetOptionalString(object, "assetType");
+  tmpl.provider_preference = GetOptionalString(object, "providerPreference");
+  return tmpl;
+}
+
 auto ParseChartAnnotations(const json::object& object)
     -> std::vector<core::application::ChartAnnotation> {
   const auto it = object.find("annotations");
@@ -301,6 +317,14 @@ auto HandleGet(const std::string& raw_target)
             core::application::CompositionRoot::Instance()
                 .RSUOverlay()
                 .GetRSUOverlay()));
+  }
+  if (path == "/v1/order-templates") {
+    return MakeJsonResponse(
+        http::status::ok,
+        SerializeOrderTemplatesResponse(
+            core::application::CompositionRoot::Instance()
+                .OrderTemplates()
+                .ListOrderTemplates()));
   }
   if (path == "/v1/stream/events") {
     return MakeTextResponse(
@@ -511,6 +535,51 @@ auto HandleMutation(const http::request<http::string_body>& request)
           SerializeWatchlistResponse(service.MoveSymbolToWatchlist(
               segments[2], GetRequiredString(payload, "destinationWatchlistId"),
               GetRequiredString(payload, "symbol"))));
+    }
+
+    if (path == "/v1/order-templates" && request.method() == http::verb::post) {
+      return MakeJsonResponse(
+          http::status::created,
+          SerializeOrderTemplateResponse(
+              core::application::CompositionRoot::Instance()
+                  .OrderTemplates()
+                  .CreateOrderTemplate(ParseOrderTemplate(payload))));
+    }
+
+    if (segments.size() == 3 && segments[0] == "v1" &&
+        segments[1] == "order-templates" &&
+        request.method() == http::verb::put) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeOrderTemplateResponse(
+              core::application::CompositionRoot::Instance()
+                  .OrderTemplates()
+                  .UpdateOrderTemplate(segments[2], ParseOrderTemplate(payload))));
+    }
+
+    if (segments.size() == 3 && segments[0] == "v1" &&
+        segments[1] == "order-templates" &&
+        request.method() == http::verb::delete_) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeOrderTemplateResponse(
+              core::application::CompositionRoot::Instance()
+                  .OrderTemplates()
+                  .DeleteOrderTemplate(segments[2])));
+    }
+
+    if (path == "/v1/quick-trade/preview" && request.method() == http::verb::post) {
+      core::application::QuickTradePreviewRequest qt_request;
+      qt_request.symbol = GetRequiredString(payload, "symbol");
+      qt_request.template_id = GetRequiredString(payload, "templateId");
+      qt_request.account_id = GetOptionalString(payload, "accountId");
+      qt_request.confirm_live = GetOptionalBool(payload, "confirmLive", false);
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeOrderPreviewResponse(
+              core::application::CompositionRoot::Instance()
+                  .OrderTemplates()
+                  .PreviewQuickTrade(qt_request)));
     }
 
     if (segments.size() == 5 && segments[0] == "v1" && segments[1] == "screens" &&

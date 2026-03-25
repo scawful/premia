@@ -152,6 +152,22 @@ class RSUOverlayService {
   virtual auto GetRSUOverlay() const -> RSUOverlayScreen = 0;
 };
 
+class OrderTemplateService {
+ public:
+  virtual ~OrderTemplateService() = default;
+
+  virtual auto ListOrderTemplates() const -> std::vector<OrderTemplate> = 0;
+  virtual auto CreateOrderTemplate(const OrderTemplate& tmpl)
+      -> OrderTemplate = 0;
+  virtual auto UpdateOrderTemplate(const std::string& id,
+                                   const OrderTemplate& tmpl)
+      -> OrderTemplate = 0;
+  virtual auto DeleteOrderTemplate(const std::string& id)
+      -> OrderTemplate = 0;
+  virtual auto PreviewQuickTrade(const QuickTradePreviewRequest& request)
+      -> OrderPreviewData = 0;
+};
+
 }  // namespace premia::core::application
 
 #endif  // PREMIA_CORE_APPLICATION_SERVICE_CONTRACTS_HPP

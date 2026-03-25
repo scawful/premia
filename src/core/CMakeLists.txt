@@ -20,6 +20,7 @@ target_link_libraries(
   premia_provider_local_account_detail
   premia_provider_local_options
   premia_provider_local_orders
+  premia_provider_local_order_templates
   premia_provider_local_portfolio
   premia_provider_local_watchlists
   premia_provider_tda_account_detail

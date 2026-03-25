@@ -41,6 +41,10 @@ auto SerializeOrderReplacementResponse(
     const core::application::OrderReplacementData& data) -> std::string;
 auto SerializeOrderRecordsResponse(
     const std::vector<core::application::OrderRecordData>& data) -> std::string;
+auto SerializeOrderTemplateResponse(
+    const core::application::OrderTemplate& data) -> std::string;
+auto SerializeOrderTemplatesResponse(
+    const std::vector<core::application::OrderTemplate>& data) -> std::string;
 auto SerializeConnectionSummaryResponse(
     const core::application::ConnectionSummary& data) -> std::string;
 auto SerializeSchwabOAuthStartResponse(

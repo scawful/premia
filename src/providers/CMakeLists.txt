@@ -140,6 +140,19 @@ target_include_directories(
 target_compile_features(premia_provider_local_orders PUBLIC cxx_std_17)
 
 add_library(
+  premia_provider_local_order_templates
+  local/order_template_provider.cc
+)
+
+target_include_directories(
+  premia_provider_local_order_templates
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(premia_provider_local_order_templates PUBLIC cxx_std_17)
+
+add_library(
   premia_provider_tda_options
   tda/options_provider.cc
 )

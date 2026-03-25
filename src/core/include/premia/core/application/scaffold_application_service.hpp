@@ -17,6 +17,7 @@ class PortfolioAccountService;
 class MarketOptionsService;
 class WatchlistService;
 class OrderService;
+class OrderTemplateService;
 class WorkflowService;
 class RsuOverlayService;
 }  // namespace detail
@@ -28,6 +29,7 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
                                          public OptionsService,
                                          public WatchlistService,
                                          public OrderService,
+                                         public OrderTemplateService,
                                          public BankLinkService,
                                          public ConnectionWorkflowService,
                                          public RSUOverlayService {
@@ -124,6 +126,14 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
       -> std::vector<OrderRecordData> override;
 
   auto GetRSUOverlay() const -> RSUOverlayScreen override;
+  auto ListOrderTemplates() const -> std::vector<OrderTemplate> override;
+  auto CreateOrderTemplate(const OrderTemplate& tmpl)
+      -> OrderTemplate override;
+  auto UpdateOrderTemplate(const std::string& id, const OrderTemplate& tmpl)
+      -> OrderTemplate override;
+  auto DeleteOrderTemplate(const std::string& id) -> OrderTemplate override;
+  auto PreviewQuickTrade(const QuickTradePreviewRequest& request)
+      -> OrderPreviewData override;
 
   auto CreateLinkToken(const PlaidLinkTokenRequest& request)
       -> PlaidLinkTokenData override;
@@ -147,6 +157,7 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   std::unique_ptr<detail::MarketOptionsService> market_options_service_;
   std::unique_ptr<detail::WatchlistService> watchlist_service_;
   std::unique_ptr<detail::OrderService> order_service_;
+  std::unique_ptr<detail::OrderTemplateService> order_template_service_;
   std::unique_ptr<detail::WorkflowService> workflow_service_;
   std::unique_ptr<detail::RsuOverlayService> rsu_service_;
 };

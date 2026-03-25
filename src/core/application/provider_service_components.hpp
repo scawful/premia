@@ -128,6 +128,17 @@ class RsuOverlayService {
       -> std::vector<StockUnitGrant>;
 };
 
+class OrderTemplateService {
+ public:
+  auto ListOrderTemplates() const -> std::vector<OrderTemplate>;
+  auto CreateOrderTemplate(const OrderTemplate& tmpl) -> OrderTemplate;
+  auto UpdateOrderTemplate(const std::string& id, const OrderTemplate& tmpl)
+      -> OrderTemplate;
+  auto DeleteOrderTemplate(const std::string& id) -> OrderTemplate;
+  auto PreviewQuickTrade(const QuickTradePreviewRequest& request)
+      -> OrderPreviewData;
+};
+
 class WorkflowService {
  public:
   explicit WorkflowService(ConnectionService& connection_service);

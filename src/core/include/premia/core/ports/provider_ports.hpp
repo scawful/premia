@@ -123,6 +123,23 @@ class OrderProviderPort {
       -> std::vector<premia::core::application::OrderRecordData> = 0;
 };
 
+class OrderTemplateProviderPort {
+ public:
+  virtual ~OrderTemplateProviderPort() = default;
+
+  virtual auto ListTemplates() const
+      -> std::vector<premia::core::application::OrderTemplate> = 0;
+  virtual auto CreateTemplate(
+      const premia::core::application::OrderTemplate& tmpl)
+      -> premia::core::application::OrderTemplate = 0;
+  virtual auto UpdateTemplate(
+      const std::string& id,
+      const premia::core::application::OrderTemplate& tmpl)
+      -> premia::core::application::OrderTemplate = 0;
+  virtual auto DeleteTemplate(const std::string& id)
+      -> premia::core::application::OrderTemplate = 0;
+};
+
 }  // namespace premia::core::ports
 
 #endif  // PREMIA_CORE_PORTS_PROVIDER_PORTS_HPP

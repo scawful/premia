@@ -792,6 +792,74 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
 
+    // MARK: - Order Templates
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func listOrderTemplates() async throws -> [PremiaOrderTemplate] {
+        let url = configuration.baseURL.appending(path: "v1/order-templates")
+        let (data, response) = try await URLSession.shared.data(from: url)
+        try throwIfError(data: data, response: response, context: "list order templates")
+        let decoder = makeDecoder()
+        let envelope = try decoder.decode(OrderTemplateListEnvelopeDTO.self, from: data)
+        return envelope.data.templates.map(mapOrderTemplate)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func createOrderTemplate(_ request: PremiaCreateOrderTemplateRequest) async throws -> PremiaOrderTemplate {
+        let url = configuration.baseURL.appending(path: "v1/order-templates")
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = try makeEncoder().encode(request)
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        try throwIfError(data: data, response: response, context: "create order template")
+        let envelope = try makeDecoder().decode(OrderTemplateSingleEnvelopeDTO.self, from: data)
+        return mapOrderTemplate(envelope.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func updateOrderTemplate(id: String, request: PremiaCreateOrderTemplateRequest) async throws -> PremiaOrderTemplate {
+        let url = configuration.baseURL.appending(path: "v1/order-templates").appending(path: id)
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "PUT"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = try makeEncoder().encode(request)
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        try throwIfError(data: data, response: response, context: "update order template")
+        let envelope = try makeDecoder().decode(OrderTemplateSingleEnvelopeDTO.self, from: data)
+        return mapOrderTemplate(envelope.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func deleteOrderTemplate(id: String) async throws -> PremiaOrderTemplate {
+        let url = configuration.baseURL.appending(path: "v1/order-templates").appending(path: id)
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "DELETE"
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        try throwIfError(data: data, response: response, context: "delete order template")
+        let envelope = try makeDecoder().decode(OrderTemplateSingleEnvelopeDTO.self, from: data)
+        return mapOrderTemplate(envelope.data)
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func previewQuickTrade(_ request: PremiaQuickTradePreviewRequest) async throws -> PremiaOrderPreview {
+        let url = configuration.baseURL.appending(path: "v1/quick-trade/preview")
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let body = QuickTradePreviewRequestDTO(
+            symbol: request.symbol,
+            templateId: request.templateID,
+            accountId: request.accountID,
+            confirmLive: request.confirmLive
+        )
+        urlRequest.httpBody = try makeEncoder().encode(body)
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        try throwIfError(data: data, response: response, context: "quick-trade preview")
+        let envelope = try makeDecoder().decode(OrderPreviewEnvelopeDTO.self, from: data)
+        return mapOrderPreviewDTO(envelope.data, asOf: envelope.meta.asOf)
+    }
+
     @available(macOS 10.15, iOS 13.0, *)
     private func executeMapped<T>(_ operation: () async throws -> T) async throws -> T {
         do {
@@ -1409,4 +1477,143 @@ public final class PremiaAPIClient: @unchecked Sendable {
             asOf: envelope.meta.asOf
         )
     }
+
+    // MARK: - Order Template helpers
+
+    private func makeDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }
+
+    private func makeEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }
+
+    private func throwIfError(data: Data, response: URLResponse, context: String) throws {
+        guard let http = response as? HTTPURLResponse else {
+            throw PremiaAPIClientError(code: "INVALID_RESPONSE", message: "\(context): response was not HTTP.")
+        }
+        if !(200...299).contains(http.statusCode) {
+            if let decoded = try? makeDecoder().decode(PremiaAPIClientGeneratedAPI.ModelErrorResponse.self, from: data) {
+                throw PremiaAPIClientError(
+                    code: decoded.error.code,
+                    message: decoded.error.message,
+                    statusCode: http.statusCode,
+                    provider: decoded.error.provider.map(mapProvider),
+                    retryable: decoded.error.retryable,
+                    action: mapAction(decoded.error.action)
+                )
+            }
+            throw PremiaAPIClientError(
+                code: "HTTP_\(http.statusCode)",
+                message: "\(context) failed.",
+                statusCode: http.statusCode,
+                retryable: http.statusCode >= 500,
+                action: http.statusCode == 401 ? .reauth : .retry
+            )
+        }
+    }
+
+    private func mapOrderTemplate(_ dto: OrderTemplateDTO) -> PremiaOrderTemplate {
+        PremiaOrderTemplate(
+            id: dto.id,
+            name: dto.name,
+            symbol: dto.symbol.flatMap { $0.isEmpty ? nil : $0 },
+            orderType: dto.orderType.flatMap { PremiaOrderType(rawValue: $0) },
+            action: PremiaOrderInstruction(rawValue: dto.action) ?? .buy,
+            quantity: dto.quantity,
+            isDollarAmount: dto.isDollarAmount ?? false,
+            timeInForce: dto.timeInForce.flatMap { PremiaOrderTimeInForce(rawValue: $0) },
+            session: dto.session,
+            assetType: dto.assetType.flatMap { PremiaAssetType(rawValue: $0) },
+            providerPreference: dto.providerPreference.flatMap { $0.isEmpty ? nil : $0 },
+            createdAt: dto.createdAt,
+            updatedAt: dto.updatedAt
+        )
+    }
+
+    private func mapOrderPreviewDTO(_ dto: OrderPreviewDTO, asOf: Date?) -> PremiaOrderPreview {
+        PremiaOrderPreview(
+            previewID: dto.previewId,
+            accountID: dto.accountId,
+            symbol: dto.symbol,
+            assetType: mapAssetTypeValue(dto.assetType),
+            instruction: mapInstructionValue(dto.instruction),
+            quantity: dto.quantity,
+            orderType: mapOrderTypeValue(dto.orderType),
+            limitPrice: dto.limitPrice,
+            estimatedTotal: dto.estimatedTotal,
+            mode: dto.mode,
+            status: dto.status,
+            warnings: dto.warnings,
+            asOf: asOf
+        )
+    }
+}
+
+// MARK: - Private DTOs for order template endpoints
+
+private struct OrderTemplateDTO: Decodable {
+    let id: String
+    let name: String
+    let symbol: String?
+    let orderType: String?
+    let action: String
+    let quantity: String
+    let isDollarAmount: Bool?
+    let timeInForce: String?
+    let session: String?
+    let assetType: String?
+    let providerPreference: String?
+    let createdAt: Date?
+    let updatedAt: Date?
+}
+
+private struct OrderTemplateMeta: Decodable {
+    let requestId: String
+    let asOf: Date?
+}
+
+private struct OrderTemplateSingleEnvelopeDTO: Decodable {
+    let data: OrderTemplateDTO
+    let meta: OrderTemplateMeta
+}
+
+private struct OrderTemplateListPayloadDTO: Decodable {
+    let templates: [OrderTemplateDTO]
+}
+
+private struct OrderTemplateListEnvelopeDTO: Decodable {
+    let data: OrderTemplateListPayloadDTO
+    let meta: OrderTemplateMeta
+}
+
+private struct OrderPreviewDTO: Decodable {
+    let previewId: String
+    let accountId: String
+    let symbol: String
+    let assetType: String
+    let instruction: String
+    let quantity: String
+    let orderType: String
+    let limitPrice: String
+    let estimatedTotal: String
+    let mode: String
+    let status: String
+    let warnings: [String]
+}
+
+private struct OrderPreviewEnvelopeDTO: Decodable {
+    let data: OrderPreviewDTO
+    let meta: OrderTemplateMeta
+}
+
+private struct QuickTradePreviewRequestDTO: Encodable {
+    let symbol: String
+    let templateId: String
+    let accountId: String?
+    let confirmLive: Bool
 }

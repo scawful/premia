@@ -132,6 +132,33 @@ struct OrderRecordData {
   std::string message;
 };
 
+// An order template stores reusable parameters for fast order entry from a
+// watchlist symbol. symbol is optional — if empty the template applies to any
+// symbol. quantity may represent shares ("10") or a dollar amount ("500.00")
+// depending on is_dollar_amount.
+struct OrderTemplate {
+  std::string id;
+  std::string name;
+  std::string symbol;           // optional; empty means symbol-agnostic
+  std::string order_type;       // "MARKET", "LIMIT"
+  std::string action;           // "BUY", "SELL"
+  std::string quantity;         // shares or dollar amount as decimal string
+  bool is_dollar_amount = false;
+  std::string time_in_force;    // "DAY", "GTC"
+  std::string session;          // "NORMAL", "EXTENDED"
+  std::string asset_type;       // "EQUITY", "OPTION"
+  std::string provider_preference; // optional, e.g. "schwab"
+  std::string created_at;
+  std::string updated_at;
+};
+
+struct QuickTradePreviewRequest {
+  std::string symbol;
+  std::string template_id;
+  std::string account_id;  // optional
+  bool confirm_live = false;
+};
+
 }  // namespace premia::core::application
 
 #endif  // PREMIA_CORE_APPLICATION_WORKFLOW_MODELS_HPP

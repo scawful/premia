@@ -185,6 +185,108 @@ public struct PremiaOrderReplacement: Codable, Sendable, Equatable {
     }
 }
 
+public enum PremiaOrderTimeInForce: String, Codable, Sendable, Equatable {
+    case day = "DAY"
+    case gtc = "GTC"
+}
+
+public struct PremiaOrderTemplate: Codable, Sendable, Equatable, Identifiable {
+    public let id: String
+    public let name: String
+    public let symbol: String?
+    public let orderType: PremiaOrderType?
+    public let action: PremiaOrderInstruction
+    public let quantity: String
+    public let isDollarAmount: Bool
+    public let timeInForce: PremiaOrderTimeInForce?
+    public let session: String?
+    public let assetType: PremiaAssetType?
+    public let providerPreference: String?
+    public let createdAt: Date?
+    public let updatedAt: Date?
+
+    public init(
+        id: String,
+        name: String,
+        symbol: String? = nil,
+        orderType: PremiaOrderType? = nil,
+        action: PremiaOrderInstruction,
+        quantity: String,
+        isDollarAmount: Bool = false,
+        timeInForce: PremiaOrderTimeInForce? = nil,
+        session: String? = nil,
+        assetType: PremiaAssetType? = nil,
+        providerPreference: String? = nil,
+        createdAt: Date? = nil,
+        updatedAt: Date? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.symbol = symbol
+        self.orderType = orderType
+        self.action = action
+        self.quantity = quantity
+        self.isDollarAmount = isDollarAmount
+        self.timeInForce = timeInForce
+        self.session = session
+        self.assetType = assetType
+        self.providerPreference = providerPreference
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+}
+
+public struct PremiaCreateOrderTemplateRequest: Codable, Sendable, Equatable {
+    public let name: String
+    public let symbol: String?
+    public let orderType: PremiaOrderType?
+    public let action: PremiaOrderInstruction
+    public let quantity: String
+    public let isDollarAmount: Bool
+    public let timeInForce: PremiaOrderTimeInForce?
+    public let session: String?
+    public let assetType: PremiaAssetType?
+    public let providerPreference: String?
+
+    public init(
+        name: String,
+        symbol: String? = nil,
+        orderType: PremiaOrderType? = nil,
+        action: PremiaOrderInstruction,
+        quantity: String,
+        isDollarAmount: Bool = false,
+        timeInForce: PremiaOrderTimeInForce? = nil,
+        session: String? = nil,
+        assetType: PremiaAssetType? = nil,
+        providerPreference: String? = nil
+    ) {
+        self.name = name
+        self.symbol = symbol
+        self.orderType = orderType
+        self.action = action
+        self.quantity = quantity
+        self.isDollarAmount = isDollarAmount
+        self.timeInForce = timeInForce
+        self.session = session
+        self.assetType = assetType
+        self.providerPreference = providerPreference
+    }
+}
+
+public struct PremiaQuickTradePreviewRequest: Codable, Sendable, Equatable {
+    public let symbol: String
+    public let templateID: String
+    public let accountID: String?
+    public let confirmLive: Bool
+
+    public init(symbol: String, templateID: String, accountID: String? = nil, confirmLive: Bool = false) {
+        self.symbol = symbol
+        self.templateID = templateID
+        self.accountID = accountID
+        self.confirmLive = confirmLive
+    }
+}
+
 public struct PremiaOrderRecord: Codable, Sendable, Equatable, Identifiable {
     public let id: String
     public let accountID: String

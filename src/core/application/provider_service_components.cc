@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 
+#include <boost/lexical_cast.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
@@ -23,6 +24,7 @@
 #include "premia/providers/local/account_detail_provider.hpp"
 #include "premia/providers/local/options_provider.hpp"
 #include "premia/providers/local/order_provider.hpp"
+#include "premia/providers/local/order_template_provider.hpp"
 #include "premia/providers/local/portfolio_provider.hpp"
 #include "premia/providers/local/watchlist_provider.hpp"
 #include "premia/providers/plaid/workflow_provider.hpp"
@@ -62,6 +64,7 @@ constexpr char kPortfolioPath[] = "assets/portfolio.json";
 constexpr char kAccountPath[] = "assets/account.json";
 constexpr char kOptionsPath[] = "assets/options.json";
 constexpr char kOrdersPath[] = "assets/orders.json";
+constexpr char kOrderTemplatesPath[] = "assets/order_templates.json";
 
 auto MakeMoney(std::string amount) -> Money {
   return Money{std::move(amount), "USD"};
@@ -1323,6 +1326,101 @@ auto OrderService::GetOrderHistory(const std::string& account_id) const
   }
   providers::local::OrderProvider provider(kOrdersPath);
   return provider.GetOrderHistory(account_id);
+}
+
+auto OrderTemplateService::ListOrderTemplates() const
+    -> std::vector<OrderTemplate> {
+  providers::local::OrderTemplateProvider provider(kOrderTemplatesPath);
+  return provider.ListTemplates();
+}
+
+auto OrderTemplateService::CreateOrderTemplate(const OrderTemplate& tmpl)
+    -> OrderTemplate {
+  providers::local::OrderTemplateProvider provider(kOrderTemplatesPath);
+  return provider.CreateTemplate(tmpl);
+}
+
+auto OrderTemplateService::UpdateOrderTemplate(const std::string& id,
+                                               const OrderTemplate& tmpl)
+    -> OrderTemplate {
+  providers::local::OrderTemplateProvider provider(kOrderTemplatesPath);
+  return provider.UpdateTemplate(id, tmpl);
+}
+
+auto OrderTemplateService::DeleteOrderTemplate(const std::string& id)
+    -> OrderTemplate {
+  providers::local::OrderTemplateProvider provider(kOrderTemplatesPath);
+  return provider.DeleteTemplate(id);
+}
+
+auto OrderTemplateService::PreviewQuickTrade(
+    const QuickTradePreviewRequest& request) -> OrderPreviewData {
+  // Load the template by scanning the list.
+  providers::local::OrderTemplateProvider template_provider(kOrderTemplatesPath);
+  const auto templates = template_provider.ListTemplates();
+  const OrderTemplate* found = nullptr;
+  for (const auto& t : templates) {
+    if (t.id == request.template_id) {
+      found = &t;
+      break;
+    }
+  }
+  if (found == nullptr) {
+    throw std::runtime_error("order template not found: " + request.template_id);
+  }
+
+  // Resolve the symbol: request symbol takes precedence; fall back to template.
+  const auto symbol = !request.symbol.empty() ? request.symbol : found->symbol;
+  if (symbol.empty()) {
+    throw std::runtime_error("symbol is required for quick-trade preview");
+  }
+
+  // Hydrate price from market data (Schwab preferred, local fallback).
+  std::string limit_price;
+  const auto quote_detail = BuildQuoteFallback(symbol);
+  try {
+    providers::schwab::MarketDataProvider market_provider(SchwabConfigPath(),
+                                                          SchwabTokenPath());
+    const auto live = market_provider.GetQuoteDetail(symbol);
+    limit_price = live.quote.last_price.amount;
+  } catch (const std::exception&) {
+    limit_price = quote_detail.quote.last_price.amount;
+  }
+
+  // Compute quantity from dollar amount if requested.
+  std::string quantity = found->quantity;
+  if (found->is_dollar_amount) {
+    try {
+      const double price = boost::lexical_cast<double>(limit_price);
+      const double dollars = boost::lexical_cast<double>(found->quantity);
+      if (price > 0.0) {
+        const int shares = static_cast<int>(dollars / price);
+        quantity = std::to_string(shares);
+      }
+    } catch (const boost::bad_lexical_cast&) {
+      quantity = "0";
+    }
+  }
+
+  // Build and preview the intent using the local order provider.
+  OrderIntentRequest intent;
+  intent.account_id = request.account_id;
+  intent.symbol = symbol;
+  intent.asset_type = found->asset_type.empty() ? "EQUITY" : found->asset_type;
+  intent.instruction = found->action;
+  intent.quantity = quantity;
+  intent.order_type = found->order_type.empty() ? "MARKET" : found->order_type;
+  intent.limit_price = (found->order_type == "MARKET") ? "" : limit_price;
+  intent.duration = found->time_in_force.empty() ? "DAY" : found->time_in_force;
+  intent.session = found->session.empty() ? "NORMAL" : found->session;
+  intent.confirm_live = request.confirm_live;
+
+  providers::local::OrderProvider order_provider(kOrdersPath);
+  auto preview = order_provider.PreviewOrder(intent);
+  // Tag template origin in the first warning slot so callers can identify it.
+  preview.warnings.insert(preview.warnings.begin(),
+                          "Quick-trade preview from template: " + found->name);
+  return preview;
 }
 
 WorkflowService::WorkflowService(ConnectionService& connection_service)

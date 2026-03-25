@@ -43,6 +43,7 @@ add_executable(
   core/rsu_overlay_service_test.cc
   providers/ibkr_guardrail_test.cc
   providers/local_order_provider_test.cc
+  providers/local_order_template_provider_test.cc
   providers/schwab_order_guardrail_test.cc
   providers/schwab_guardrail_test.cc
   providers/tda_guardrail_test.cc

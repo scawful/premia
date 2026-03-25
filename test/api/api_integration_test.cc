@@ -682,4 +682,96 @@ TEST_F(ApiIntegrationFixture, MultiAccountHomeReturnsFallbackAggregate) {
   EXPECT_FALSE(tree.get_child("data.connections").empty());
 }
 
+TEST_F(ApiIntegrationFixture, OrderTemplatesCrudFlow) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  // Seed an empty template store.
+  WriteWorkspaceAsset(workspace_, "order_templates.json", "{\"templates\": []}");
+
+  // List — should be empty initially.
+  const auto list0 = HttpRequest("GET", Url("/v1/order-templates"));
+  ASSERT_EQ(list0.status_code, 200);
+  EXPECT_TRUE(ParseJson(list0.body).get_child("data.templates").empty());
+
+  // Create a template.
+  const auto create_resp = HttpRequest(
+      "POST", Url("/v1/order-templates"),
+      R"({"name":"Buy $500 VTI","action":"BUY","quantity":"500.00","isDollarAmount":true,"orderType":"MARKET","assetType":"EQUITY"})");
+  ASSERT_EQ(create_resp.status_code, 201);
+  const auto created = ParseJson(create_resp.body);
+  const auto tmpl_id = created.get<std::string>("data.id");
+  EXPECT_FALSE(tmpl_id.empty());
+  EXPECT_EQ(created.get<std::string>("data.name"), "Buy $500 VTI");
+  EXPECT_EQ(created.get<bool>("data.isDollarAmount"), true);
+
+  // List — should have one template.
+  const auto list1 = HttpRequest("GET", Url("/v1/order-templates"));
+  ASSERT_EQ(list1.status_code, 200);
+  EXPECT_EQ(list1.body.find("Buy $500 VTI"), std::string::npos == list1.body.find("Buy $500 VTI") ? std::string::npos : list1.body.find("Buy $500 VTI"), list1.body.find("Buy $500 VTI"));
+  EXPECT_NE(list1.body.find("Buy $500 VTI"), std::string::npos);
+
+  // Update the template.
+  const auto update_resp = HttpRequest(
+      "PUT", Url("/v1/order-templates/" + tmpl_id),
+      R"({"name":"Buy $1000 VTI","action":"BUY","quantity":"1000.00","isDollarAmount":true,"orderType":"MARKET","assetType":"EQUITY"})");
+  ASSERT_EQ(update_resp.status_code, 200);
+  const auto updated = ParseJson(update_resp.body);
+  EXPECT_EQ(updated.get<std::string>("data.name"), "Buy $1000 VTI");
+  EXPECT_EQ(updated.get<std::string>("data.id"), tmpl_id);
+
+  // Delete the template.
+  const auto del_resp = HttpRequest("DELETE", Url("/v1/order-templates/" + tmpl_id));
+  ASSERT_EQ(del_resp.status_code, 200);
+  EXPECT_EQ(ParseJson(del_resp.body).get<std::string>("data.id"), tmpl_id);
+
+  // List — empty again.
+  const auto list2 = HttpRequest("GET", Url("/v1/order-templates"));
+  ASSERT_EQ(list2.status_code, 200);
+  EXPECT_TRUE(ParseJson(list2.body).get_child("data.templates").empty());
+}
+
+TEST_F(ApiIntegrationFixture, QuickTradePreviewHydratesTemplateWithSymbol) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  WriteWorkspaceAsset(workspace_, "order_templates.json", "{\"templates\": []}");
+
+  // Create a dollar-amount template with no symbol binding.
+  const auto create_resp = HttpRequest(
+      "POST", Url("/v1/order-templates"),
+      R"({"name":"Market buy $200","action":"BUY","quantity":"200.00","isDollarAmount":true,"orderType":"MARKET","assetType":"EQUITY"})");
+  ASSERT_EQ(create_resp.status_code, 201);
+  const auto tmpl_id = ParseJson(create_resp.body).get<std::string>("data.id");
+
+  // Quick-trade preview against AAPL.
+  const auto preview_resp = HttpRequest(
+      "POST", Url("/v1/quick-trade/preview"),
+      R"({"symbol":"AAPL","templateId":")" + tmpl_id + R"("})");
+  ASSERT_EQ(preview_resp.status_code, 200);
+  const auto preview = ParseJson(preview_resp.body);
+  EXPECT_EQ(preview.get<std::string>("data.symbol"), "AAPL");
+  EXPECT_EQ(preview.get<std::string>("data.instruction"), "BUY");
+  EXPECT_EQ(preview.get<std::string>("data.assetType"), "EQUITY");
+  EXPECT_EQ(preview.get<std::string>("data.status"), "preview");
+  // Quantity should be a computed integer (200/price) — just ensure it's non-zero.
+  const auto quantity_str = preview.get<std::string>("data.quantity");
+  EXPECT_FALSE(quantity_str.empty());
+  EXPECT_NE(quantity_str, "0");
+}
+
+TEST_F(ApiIntegrationFixture, QuickTradePreviewReturnsErrorForUnknownTemplate) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "POSIX-only process launch helper";
+#endif
+  WriteWorkspaceAsset(workspace_, "order_templates.json", "{\"templates\": []}");
+
+  const auto preview_resp = HttpRequest(
+      "POST", Url("/v1/quick-trade/preview"),
+      R"({"symbol":"AAPL","templateId":"tmpl_nonexistent"})");
+  ASSERT_EQ(preview_resp.status_code, 400);
+  const auto tree = ParseJson(preview_resp.body);
+  EXPECT_EQ(tree.get<std::string>("error.code"), "INVALID_REQUEST");
+}
+
 }  // namespace premiatests::ApiIntegrationTests

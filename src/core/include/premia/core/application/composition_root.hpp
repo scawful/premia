@@ -17,6 +17,7 @@ class CompositionRoot {
   auto Options() -> OptionsService&;
   auto Watchlists() -> WatchlistService&;
   auto Orders() -> OrderService&;
+  auto OrderTemplates() -> OrderTemplateService&;
   auto Workflows() -> ConnectionWorkflowService&;
   auto RSUOverlay() -> RSUOverlayService&;
 

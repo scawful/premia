@@ -25,6 +25,7 @@ tags:
   - name: Trading
   - name: Connections
   - name: Streaming
+  - name: OrderTemplates
 security:
   - bearerAuth: []
 paths:
@@ -724,6 +725,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RSUOverlayResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/order-templates:
+    get:
+      tags: [Trading]
+      summary: List saved order templates.
+      operationId: listOrderTemplates
+      responses:
+        '200':
+          description: Order templates list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTemplatesResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    post:
+      tags: [Trading]
+      summary: Create an order template.
+      operationId: createOrderTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderTemplateRequest'
+      responses:
+        '201':
+          description: Template created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTemplateResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/order-templates/{templateId}:
+    put:
+      tags: [Trading]
+      summary: Update an order template.
+      operationId: updateOrderTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderTemplateRequest'
+      responses:
+        '200':
+          description: Template updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTemplateResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    delete:
+      tags: [Trading]
+      summary: Delete an order template.
+      operationId: deleteOrderTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTemplateResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/quick-trade/preview:
+    post:
+      tags: [Trading]
+      summary: Preview a quick-trade order from a watchlist symbol and template.
+      operationId: previewQuickTrade
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuickTradePreviewRequest'
+      responses:
+        '200':
+          description: Pre-filled order preview ready for confirmation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderPreviewResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
   /v1/stream/events:
@@ -2269,3 +2368,110 @@ components:
           $ref: '#/components/schemas/RSUOverlayData'
         meta:
           $ref: '#/components/schemas/Meta'
+
+    OrderTemplate:
+      type: object
+      required: [id, name, action, quantity]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        symbol:
+          type: string
+          description: Optional symbol binding. Empty means any symbol.
+        orderType:
+          type: string
+          enum: [MARKET, LIMIT]
+        action:
+          type: string
+          enum: [BUY, SELL, BUY_TO_OPEN, SELL_TO_CLOSE, BUY_TO_CLOSE, SELL_TO_OPEN]
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+          description: Share count or dollar amount (see isDollarAmount).
+        isDollarAmount:
+          type: boolean
+          description: When true, quantity represents a dollar investment amount.
+        timeInForce:
+          type: string
+          enum: [DAY, GTC]
+        session:
+          type: string
+          enum: [NORMAL, EXTENDED]
+        assetType:
+          type: string
+          enum: [EQUITY, OPTION]
+        providerPreference:
+          type: string
+          description: Optional preferred broker, e.g. "schwab".
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    OrderTemplateRequest:
+      type: object
+      required: [name, action, quantity]
+      properties:
+        name:
+          type: string
+        symbol:
+          type: string
+        orderType:
+          type: string
+          enum: [MARKET, LIMIT]
+        action:
+          type: string
+          enum: [BUY, SELL, BUY_TO_OPEN, SELL_TO_CLOSE, BUY_TO_CLOSE, SELL_TO_OPEN]
+        quantity:
+          $ref: '#/components/schemas/DecimalString'
+        isDollarAmount:
+          type: boolean
+        timeInForce:
+          type: string
+          enum: [DAY, GTC]
+        session:
+          type: string
+          enum: [NORMAL, EXTENDED]
+        assetType:
+          type: string
+          enum: [EQUITY, OPTION]
+        providerPreference:
+          type: string
+    OrderTemplateResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/OrderTemplate'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    OrderTemplatesResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [templates]
+          properties:
+            templates:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderTemplate'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    QuickTradePreviewRequest:
+      type: object
+      required: [symbol, templateId]
+      properties:
+        symbol:
+          type: string
+          description: Watchlist symbol to trade. Overrides any symbol bound to the template.
+        templateId:
+          type: string
+          description: ID of the saved order template to hydrate.
+        accountId:
+          type: string
+        confirmLive:
+          type: boolean

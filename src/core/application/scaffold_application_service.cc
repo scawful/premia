@@ -41,6 +41,7 @@ ProviderBackedApplicationService::ProviderBackedApplicationService()
       market_options_service_(std::make_unique<detail::MarketOptionsService>()),
       watchlist_service_(std::make_unique<detail::WatchlistService>()),
       order_service_(std::make_unique<detail::OrderService>()),
+      order_template_service_(std::make_unique<detail::OrderTemplateService>()),
       workflow_service_(std::make_unique<detail::WorkflowService>(*connection_service_)),
       rsu_service_(std::make_unique<detail::RsuOverlayService>()) {}
 
@@ -328,6 +329,31 @@ auto ProviderBackedApplicationService::GetRSUOverlay() const
           : 0.0;
   screen.grants = std::move(grants);
   return screen;
+}
+
+auto ProviderBackedApplicationService::ListOrderTemplates() const
+    -> std::vector<OrderTemplate> {
+  return order_template_service_->ListOrderTemplates();
+}
+
+auto ProviderBackedApplicationService::CreateOrderTemplate(
+    const OrderTemplate& tmpl) -> OrderTemplate {
+  return order_template_service_->CreateOrderTemplate(tmpl);
+}
+
+auto ProviderBackedApplicationService::UpdateOrderTemplate(
+    const std::string& id, const OrderTemplate& tmpl) -> OrderTemplate {
+  return order_template_service_->UpdateOrderTemplate(id, tmpl);
+}
+
+auto ProviderBackedApplicationService::DeleteOrderTemplate(
+    const std::string& id) -> OrderTemplate {
+  return order_template_service_->DeleteOrderTemplate(id);
+}
+
+auto ProviderBackedApplicationService::PreviewQuickTrade(
+    const QuickTradePreviewRequest& request) -> OrderPreviewData {
+  return order_template_service_->PreviewQuickTrade(request);
 }
 
 auto ProviderBackedApplicationService::CreateLinkToken(

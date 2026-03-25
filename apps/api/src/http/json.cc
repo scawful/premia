@@ -549,6 +549,38 @@ auto SerializeOrderRecordsResponse(
   return WriteEnvelope(json::object{{"orders", records}});
 }
 
+auto MakeOrderTemplate(const application::OrderTemplate& tmpl) -> json::object {
+  return {
+      {"id", tmpl.id},
+      {"name", tmpl.name},
+      {"symbol", tmpl.symbol},
+      {"orderType", tmpl.order_type},
+      {"action", tmpl.action},
+      {"quantity", tmpl.quantity},
+      {"isDollarAmount", tmpl.is_dollar_amount},
+      {"timeInForce", tmpl.time_in_force},
+      {"session", tmpl.session},
+      {"assetType", tmpl.asset_type},
+      {"providerPreference", tmpl.provider_preference},
+      {"createdAt", tmpl.created_at},
+      {"updatedAt", tmpl.updated_at},
+  };
+}
+
+auto SerializeOrderTemplateResponse(const application::OrderTemplate& data)
+    -> std::string {
+  return WriteEnvelope(MakeOrderTemplate(data));
+}
+
+auto SerializeOrderTemplatesResponse(
+    const std::vector<application::OrderTemplate>& data) -> std::string {
+  json::array templates;
+  for (const auto& tmpl : data) {
+    templates.emplace_back(MakeOrderTemplate(tmpl));
+  }
+  return WriteEnvelope(json::object{{"templates", templates}});
+}
+
 auto SerializeConnectionSummaryResponse(const application::ConnectionSummary& data)
     -> std::string {
   return WriteEnvelope(MakeConnectionSummary(data));

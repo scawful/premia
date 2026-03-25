@@ -39,6 +39,10 @@ auto CompositionRoot::Orders() -> OrderService& {
   return app_service_;
 }
 
+auto CompositionRoot::OrderTemplates() -> OrderTemplateService& {
+  return app_service_;
+}
+
 auto CompositionRoot::Workflows() -> ConnectionWorkflowService& {
   return app_service_;
 }
