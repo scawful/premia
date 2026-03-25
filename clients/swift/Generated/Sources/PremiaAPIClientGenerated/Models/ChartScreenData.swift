@@ -21,8 +21,9 @@ public struct ChartScreenData: Sendable, Codable, Hashable {
     public var series: ChartSeries
     public var stats: ChartStats?
     public var annotations: [ChartAnnotation]
+    public var annotationVersions: [ChartAnnotationVersionSummary]
 
-    public init(instrument: Instrument, range: String, interval: String, timezone: String, series: ChartSeries, stats: ChartStats? = nil, annotations: [ChartAnnotation]) {
+    public init(instrument: Instrument, range: String, interval: String, timezone: String, series: ChartSeries, stats: ChartStats? = nil, annotations: [ChartAnnotation], annotationVersions: [ChartAnnotationVersionSummary]) {
         self.instrument = instrument
         self.range = range
         self.interval = interval
@@ -30,6 +31,7 @@ public struct ChartScreenData: Sendable, Codable, Hashable {
         self.series = series
         self.stats = stats
         self.annotations = annotations
+        self.annotationVersions = annotationVersions
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -40,6 +42,7 @@ public struct ChartScreenData: Sendable, Codable, Hashable {
         case series
         case stats
         case annotations
+        case annotationVersions
     }
 
     // Encodable protocol methods
@@ -53,6 +56,7 @@ public struct ChartScreenData: Sendable, Codable, Hashable {
         try container.encode(series, forKey: .series)
         try container.encodeIfPresent(stats, forKey: .stats)
         try container.encode(annotations, forKey: .annotations)
+        try container.encode(annotationVersions, forKey: .annotationVersions)
     }
 }
 

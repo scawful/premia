@@ -331,36 +331,110 @@ auto ChartAnnotationStatePath() -> std::string {
   return (infrastructure::secrets::RuntimeRoot() / "chart_annotations.json").string();
 }
 
-auto LoadPersistedChartAnnotations(const std::string& account_id,
-                                   const std::string& symbol)
+struct PersistedChartAnnotationState {
+  std::vector<ChartAnnotation> current;
+  std::vector<ChartAnnotationVersionSummary> versions;
+  std::map<std::string, std::vector<ChartAnnotation>> version_annotations;
+};
+
+auto ChartAnnotationStorageKey(const std::string& account_id,
+                               const std::string& symbol) -> std::string {
+  return (account_id.empty() ? std::string("default") : account_id) + "|" + symbol;
+}
+
+auto SerializeChartAnnotations(const std::vector<ChartAnnotation>& annotations)
+    -> pt::ptree {
+  pt::ptree items;
+  for (const auto& annotation : annotations) {
+    pt::ptree item;
+    item.put("id", annotation.id);
+    item.put("label", annotation.label);
+    item.put("price", annotation.price);
+    item.put("kind", annotation.kind);
+    items.push_back({"", item});
+  }
+  return items;
+}
+
+auto ParseChartAnnotationsTree(const pt::ptree& items)
     -> std::vector<ChartAnnotation> {
+  std::vector<ChartAnnotation> annotations;
+  for (const auto& item : items) {
+    annotations.push_back(ChartAnnotation{item.second.get<std::string>("id", ""),
+                                          item.second.get<std::string>("label", ""),
+                                          item.second.get<std::string>("price", "0.00"),
+                                          item.second.get<std::string>("kind", "annotation")});
+  }
+  return annotations;
+}
+
+auto CurrentChartVersionTimestamp() -> std::string {
+  const auto now = std::chrono::system_clock::now();
+  const auto now_time = std::chrono::system_clock::to_time_t(now);
+  std::tm utc_time{};
+#if defined(_WIN32)
+  gmtime_s(&utc_time, &now_time);
+#else
+  gmtime_r(&now_time, &utc_time);
+#endif
+  std::ostringstream stream;
+  stream << std::put_time(&utc_time, "%Y-%m-%dT%H:%M:%SZ");
+  return stream.str();
+}
+
+auto CurrentChartVersionId(const std::string& symbol) -> std::string {
+  const auto now = std::chrono::system_clock::now().time_since_epoch();
+  const auto millis =
+      std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+  return symbol + ":v:" + std::to_string(millis);
+}
+
+auto LoadPersistedChartAnnotationState(const std::string& account_id,
+                                       const std::string& symbol)
+    -> PersistedChartAnnotationState {
   std::ifstream input(ChartAnnotationStatePath());
   if (!input.good()) {
     return {};
   }
 
-  std::vector<ChartAnnotation> annotations;
+  PersistedChartAnnotationState state;
   try {
     pt::ptree tree;
     pt::read_json(input, tree);
-    const auto key = (account_id.empty() ? std::string("default") : account_id) +
-                     "|" + symbol;
-    if (auto items = tree.get_child_optional("annotations." + key)) {
-      for (const auto& item : *items) {
-        annotations.push_back(ChartAnnotation{item.second.get<std::string>("id", ""),
-                                             item.second.get<std::string>("label", ""),
-                                             item.second.get<std::string>("price", "0.00"),
-                                             item.second.get<std::string>("kind", "annotation")});
+    const auto key = ChartAnnotationStorageKey(account_id, symbol);
+    if (auto entry = tree.get_child_optional("annotations." + key)) {
+      const bool looks_like_legacy_array =
+          !entry->empty() && entry->front().second.find("id") != entry->front().second.not_found();
+      if (looks_like_legacy_array) {
+        state.current = ParseChartAnnotationsTree(*entry);
+      } else {
+        if (auto current = entry->get_child_optional("current")) {
+          state.current = ParseChartAnnotationsTree(*current);
+        }
+        if (auto versions = entry->get_child_optional("versions")) {
+          for (const auto& version_node : *versions) {
+            ChartAnnotationVersionSummary summary;
+            summary.id = version_node.second.get<std::string>("id", "");
+            summary.saved_at = version_node.second.get<std::string>("savedAt", "");
+            summary.annotation_count =
+                version_node.second.get<int>("annotationCount", 0);
+            state.versions.push_back(summary);
+            if (auto annotations = version_node.second.get_child_optional("annotations")) {
+              state.version_annotations[summary.id] =
+                  ParseChartAnnotationsTree(*annotations);
+            }
+          }
+        }
       }
     }
   } catch (const std::exception&) {
   }
-  return annotations;
+  return state;
 }
 
-void SavePersistedChartAnnotations(const std::string& account_id,
-                                   const std::string& symbol,
-                                   const std::vector<ChartAnnotation>& annotations) {
+void SavePersistedChartAnnotationState(const std::string& account_id,
+                                       const std::string& symbol,
+                                       PersistedChartAnnotationState state) {
   pt::ptree root;
   {
     std::ifstream input(ChartAnnotationStatePath());
@@ -373,21 +447,60 @@ void SavePersistedChartAnnotations(const std::string& account_id,
     }
   }
 
-  const auto key = (account_id.empty() ? std::string("default") : account_id) +
-                   "|" + symbol;
-  pt::ptree items;
-  for (const auto& annotation : annotations) {
-    pt::ptree item;
-    item.put("id", annotation.id);
-    item.put("label", annotation.label);
-    item.put("price", annotation.price);
-    item.put("kind", annotation.kind);
-    items.push_back({"", item});
+  const auto key = ChartAnnotationStorageKey(account_id, symbol);
+  pt::ptree entry;
+  entry.add_child("current", SerializeChartAnnotations(state.current));
+  pt::ptree versions_tree;
+  for (const auto& version : state.versions) {
+    pt::ptree version_tree;
+    version_tree.put("id", version.id);
+    version_tree.put("savedAt", version.saved_at);
+    version_tree.put("annotationCount", version.annotation_count);
+    const auto annotations_it = state.version_annotations.find(version.id);
+    version_tree.add_child(
+        "annotations",
+        SerializeChartAnnotations(annotations_it == state.version_annotations.end()
+                                      ? std::vector<ChartAnnotation>{}
+                                      : annotations_it->second));
+    versions_tree.push_back({"", version_tree});
   }
-  root.put_child("annotations." + key, items);
+  entry.add_child("versions", versions_tree);
+  root.put_child("annotations." + key, entry);
 
   std::ofstream output(ChartAnnotationStatePath());
   pt::write_json(output, root);
+}
+
+auto LoadPersistedChartAnnotations(const std::string& account_id,
+                                   const std::string& symbol)
+    -> std::vector<ChartAnnotation> {
+  return LoadPersistedChartAnnotationState(account_id, symbol).current;
+}
+
+auto LoadPersistedChartAnnotationVersions(const std::string& account_id,
+                                          const std::string& symbol)
+    -> std::vector<ChartAnnotationVersionSummary> {
+  return LoadPersistedChartAnnotationState(account_id, symbol).versions;
+}
+
+void PushChartAnnotationVersion(PersistedChartAnnotationState& state,
+                                const std::string& symbol,
+                                const std::vector<ChartAnnotation>& annotations) {
+  if (annotations.empty()) {
+    return;
+  }
+  const auto version_id = CurrentChartVersionId(symbol);
+  const auto saved_at = CurrentChartVersionTimestamp();
+  state.versions.insert(state.versions.begin(),
+                        ChartAnnotationVersionSummary{version_id,
+                                                      saved_at,
+                                                      static_cast<int>(annotations.size())});
+  state.version_annotations[version_id] = annotations;
+  if (state.versions.size() > 12) {
+    const auto removed = state.versions.back().id;
+    state.versions.pop_back();
+    state.version_annotations.erase(removed);
+  }
 }
 
 auto BuildChartAnnotations(const std::string& symbol,
@@ -432,6 +545,18 @@ auto BuildChartAnnotations(const std::string& symbol,
   } catch (const std::exception&) {
   }
   return annotations;
+}
+
+auto BuildChartAnnotationVersions(const std::string& symbol,
+                                  const std::string& account_id)
+    -> std::vector<ChartAnnotationVersionSummary> {
+  try {
+    PortfolioAccountService portfolio_service;
+    const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
+    return LoadPersistedChartAnnotationVersions(account.account_id, symbol);
+  } catch (const std::exception&) {
+    return {};
+  }
 }
 
 auto MakeBrokerageAccountSummary(const AccountDetail& detail, Provider provider,
@@ -731,13 +856,18 @@ auto MarketOptionsService::GetChartScreen(const std::string& symbol,
     if (chart.series.bars.empty()) {
       auto fallback_chart = fallback;
       fallback_chart.annotations = BuildChartAnnotations(symbol, account_id);
+      fallback_chart.annotation_versions =
+          BuildChartAnnotationVersions(symbol, account_id);
       return fallback_chart;
     }
     chart.annotations = BuildChartAnnotations(symbol, account_id);
+    chart.annotation_versions = BuildChartAnnotationVersions(symbol, account_id);
     return chart;
   } catch (const std::exception&) {
     auto fallback_chart = fallback;
     fallback_chart.annotations = BuildChartAnnotations(symbol, account_id);
+    fallback_chart.annotation_versions =
+        BuildChartAnnotationVersions(symbol, account_id);
     return fallback_chart;
   }
 }
@@ -754,10 +884,13 @@ auto MarketOptionsService::ReplaceChartAnnotations(
   for (const auto& annotation : annotations) {
     if (annotation.kind == "annotation" || annotation.kind == "entry" ||
         annotation.kind == "stop" || annotation.kind == "target") {
-      persisted.push_back(annotation);
+        persisted.push_back(annotation);
     }
   }
-  SavePersistedChartAnnotations(account.account_id, symbol, persisted);
+  auto state = LoadPersistedChartAnnotationState(account.account_id, symbol);
+  PushChartAnnotationVersion(state, symbol, state.current);
+  state.current = persisted;
+  SavePersistedChartAnnotationState(account.account_id, symbol, state);
   return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
 }
 
@@ -767,17 +900,20 @@ auto MarketOptionsService::UpsertChartAnnotation(
   PortfolioAccountService portfolio_service;
   const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
 
-  auto persisted = LoadPersistedChartAnnotations(account.account_id, symbol);
+  auto state = LoadPersistedChartAnnotationState(account.account_id, symbol);
+  auto persisted = state.current;
   auto existing = std::find_if(persisted.begin(), persisted.end(),
                                [&annotation](const ChartAnnotation& item) {
                                  return item.id == annotation.id;
                                });
+  PushChartAnnotationVersion(state, symbol, state.current);
   if (existing == persisted.end()) {
     persisted.push_back(annotation);
   } else {
     *existing = annotation;
   }
-  SavePersistedChartAnnotations(account.account_id, symbol, persisted);
+  state.current = persisted;
+  SavePersistedChartAnnotationState(account.account_id, symbol, state);
   return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
 }
 
@@ -787,13 +923,33 @@ auto MarketOptionsService::DeleteChartAnnotation(
   PortfolioAccountService portfolio_service;
   const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
 
-  auto persisted = LoadPersistedChartAnnotations(account.account_id, symbol);
+  auto state = LoadPersistedChartAnnotationState(account.account_id, symbol);
+  auto persisted = state.current;
+  PushChartAnnotationVersion(state, symbol, state.current);
   persisted.erase(std::remove_if(persisted.begin(), persisted.end(),
                                  [&annotation_id](const ChartAnnotation& item) {
                                    return item.id == annotation_id;
                                  }),
                   persisted.end());
-  SavePersistedChartAnnotations(account.account_id, symbol, persisted);
+  state.current = persisted;
+  SavePersistedChartAnnotationState(account.account_id, symbol, state);
+  return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
+}
+
+auto MarketOptionsService::RollbackChartAnnotations(
+    const std::string& symbol, const std::string& version_id,
+    const std::string& account_id) -> ChartScreenData {
+  PortfolioAccountService portfolio_service;
+  const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
+
+  auto state = LoadPersistedChartAnnotationState(account.account_id, symbol);
+  const auto version_it = state.version_annotations.find(version_id);
+  if (version_it == state.version_annotations.end()) {
+    throw std::runtime_error("chart annotation version not found");
+  }
+  PushChartAnnotationVersion(state, symbol, state.current);
+  state.current = version_it->second;
+  SavePersistedChartAnnotationState(account.account_id, symbol, state);
   return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
 }
 

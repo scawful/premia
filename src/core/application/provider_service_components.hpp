@@ -58,6 +58,10 @@ class MarketOptionsService {
                              const std::string& annotation_id,
                              const std::string& account_id = "")
       -> ChartScreenData;
+  auto RollbackChartAnnotations(const std::string& symbol,
+                                const std::string& version_id,
+                                const std::string& account_id = "")
+      -> ChartScreenData;
   auto GetOptionChainSnapshot(const std::string& symbol,
                               const std::string& strike_count,
                               const std::string& strategy,

@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **series** | [**ChartSeries**](ChartSeries.md) |  | 
 **stats** | [**ChartStats**](ChartStats.md) |  | [optional] 
 **annotations** | [ChartAnnotation] |  | 
+**annotationVersions** | [ChartAnnotationVersionSummary] |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

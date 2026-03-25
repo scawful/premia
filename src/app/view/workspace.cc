@@ -1263,6 +1263,29 @@ void Workspace::DrawTradingPlanCard() {
         }
       }
     }
+
+    if (!chart.annotation_versions.empty()) {
+      ImGui::Separator();
+      ImGui::Text("Recent Versions");
+      const auto visible_versions =
+          std::min<size_t>(3, chart.annotation_versions.size());
+      for (size_t index = 0; index < visible_versions; ++index) {
+        const auto& version = chart.annotation_versions[index];
+        ImGui::TextDisabled("%s", version.saved_at.c_str());
+        ImGui::SameLine();
+        ImGui::Text("%d markers", version.annotation_count);
+        if (ImGui::Button((std::string("Rollback##") + version.id).c_str(),
+                          ImVec2(-FLT_MIN, 0.0f))) {
+          core::application::CompositionRoot::Instance()
+              .AppService()
+              .RollbackChartAnnotations(ticket_symbol_, version.id,
+                                        active_account_id_);
+          workspace_message_ = "Rolled back the trading plan to a previous version.";
+          RefreshWorkspaceData();
+          break;
+        }
+      }
+    }
   } catch (const std::exception& ex) {
     ImGui::TextDisabled("Trading plan unavailable: %s", ex.what());
   }

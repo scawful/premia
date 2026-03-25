@@ -39,6 +39,7 @@ Class | Method | HTTP request | Description
 *ChartsAPI* | [**getChartScreen**](docs/ChartsAPI.md#getchartscreen) | **GET** /v1/screens/charts/{symbol} | Load chart data for a symbol.
 *ChartsAPI* | [**patchChartAnnotation**](docs/ChartsAPI.md#patchchartannotation) | **PATCH** /v1/screens/charts/{symbol}/annotations/{annotationId} | Upsert a single editable chart annotation.
 *ChartsAPI* | [**replaceChartAnnotations**](docs/ChartsAPI.md#replacechartannotations) | **PUT** /v1/screens/charts/{symbol}/annotations | Replace editable chart annotations for a symbol.
+*ChartsAPI* | [**rollbackChartAnnotations**](docs/ChartsAPI.md#rollbackchartannotations) | **POST** /v1/screens/charts/{symbol}/annotations/rollback | Roll back editable chart annotations to a saved version.
 *ConnectionsAPI* | [**completePlaidLink**](docs/ConnectionsAPI.md#completeplaidlink) | **POST** /v1/connections/plaid/link-complete | Complete the Plaid link flow.
 *ConnectionsAPI* | [**completeSchwabOAuth**](docs/ConnectionsAPI.md#completeschwaboauth) | **POST** /v1/connections/schwab/oauth/complete | Complete the Schwab OAuth flow.
 *ConnectionsAPI* | [**createPlaidLinkToken**](docs/ConnectionsAPI.md#createplaidlinktoken) | **POST** /v1/connections/plaid/link-token | Create a Plaid link token.
@@ -80,6 +81,7 @@ Class | Method | HTTP request | Description
  - [BrokerageAccountSummary](docs/BrokerageAccountSummary.md)
  - [Candle](docs/Candle.md)
  - [ChartAnnotation](docs/ChartAnnotation.md)
+ - [ChartAnnotationVersionSummary](docs/ChartAnnotationVersionSummary.md)
  - [ChartScreenData](docs/ChartScreenData.md)
  - [ChartScreenResponse](docs/ChartScreenResponse.md)
  - [ChartSeries](docs/ChartSeries.md)
@@ -131,6 +133,7 @@ Class | Method | HTTP request | Description
  - [QuoteScreenResponse](docs/QuoteScreenResponse.md)
  - [QuoteSnapshot](docs/QuoteSnapshot.md)
  - [ReplaceChartAnnotationsRequest](docs/ReplaceChartAnnotationsRequest.md)
+ - [RollbackChartAnnotationsRequest](docs/RollbackChartAnnotationsRequest.md)
  - [SchwabOAuthStartData](docs/SchwabOAuthStartData.md)
  - [SchwabOAuthStartResponse](docs/SchwabOAuthStartResponse.md)
  - [StartSchwabOAuthRequest](docs/StartSchwabOAuthRequest.md)

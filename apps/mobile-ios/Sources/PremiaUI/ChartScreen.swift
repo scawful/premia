@@ -236,6 +236,36 @@ public struct ChartScreen: View {
                     .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
 
+                if let versions = snapshot?.annotationVersions, !versions.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Annotation History")
+                            .font(.headline)
+                        ForEach(versions) { version in
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(version.id)
+                                        .font(.caption.weight(.semibold))
+                                    if let savedAt = version.savedAt {
+                                        Text(savedAt.formatted(date: .abbreviated, time: .shortened))
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer()
+                                Text("\(version.annotationCount) markers")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Button("Rollback") {
+                                    Task { await rollback(versionID: version.id) }
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+
                 List(snapshot?.candles ?? []) { candle in
                     VStack(alignment: .leading) {
                         Text(candle.time)
@@ -493,6 +523,22 @@ public struct ChartScreen: View {
             error = clientError
         } catch let caughtError {
             error = PremiaAPIClientError(code: "CHART_RISKBOX_DELETE_FAILED", message: caughtError.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func rollback(versionID: String) async {
+        do {
+            let updated = try await session.client.rollbackChartAnnotations(symbol: symbol, accountID: session.selectedAccountID, versionID: versionID)
+            snapshot = updated
+            annotations = updated.annotations
+            tradeEntryPrice = annotations.first(where: { $0.kind == "entry" })?.price ?? ""
+            tradeStopPrice = annotations.first(where: { $0.kind == "stop" })?.price ?? ""
+            tradeTargetPrice = annotations.first(where: { $0.kind == "target" })?.price ?? ""
+        } catch let clientError as PremiaAPIClientError {
+            error = clientError
+        } catch let caughtError {
+            error = PremiaAPIClientError(code: "CHART_ANNOTATION_ROLLBACK_FAILED", message: caughtError.localizedDescription)
         }
     }
 

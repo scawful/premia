@@ -446,6 +446,16 @@ TEST_F(ApiIntegrationFixture, ChartScreenSerializesAnnotations) {
   ASSERT_EQ(response.status_code, 200);
   const auto tree = ParseJson(response.body);
   EXPECT_FALSE(tree.get_child("data.annotations").empty());
+  const auto& versions = tree.get_child("data.annotationVersions");
+  EXPECT_FALSE(versions.empty());
+  std::string rollback_version_id;
+  for (const auto& version : versions) {
+    if (version.second.get<int>("annotationCount", 0) >= 2) {
+      rollback_version_id = version.second.get<std::string>("id");
+      break;
+    }
+  }
+  ASSERT_FALSE(rollback_version_id.empty());
   bool found_test_note = false;
   bool found_test_entry = false;
   for (const auto& item : tree.get_child("data.annotations")) {
@@ -460,6 +470,20 @@ TEST_F(ApiIntegrationFixture, ChartScreenSerializesAnnotations) {
   }
   EXPECT_TRUE(found_test_note);
   EXPECT_FALSE(found_test_entry);
+
+  const auto rollback = HttpRequest(
+      "POST", Url("/v1/screens/charts/AAPL/annotations/rollback"),
+      std::string("{\"accountId\":\"local_acc\",\"versionId\":\"") +
+          rollback_version_id + "\"}");
+  ASSERT_EQ(rollback.status_code, 200);
+  const auto rollback_tree = ParseJson(rollback.body);
+  bool restored_entry = false;
+  for (const auto& item : rollback_tree.get_child("data.annotations")) {
+    if (item.second.get<std::string>("id") == "test-entry") {
+      restored_entry = true;
+    }
+  }
+  EXPECT_TRUE(restored_entry);
 }
 
 TEST_F(ApiIntegrationFixture, OrderLifecyclePersistsAcrossOpenAndHistoryRoutes) {

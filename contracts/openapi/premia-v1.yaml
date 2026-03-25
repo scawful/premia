@@ -422,6 +422,28 @@ paths:
                 $ref: '#/components/schemas/ChartScreenResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/charts/{symbol}/annotations/rollback:
+    post:
+      tags: [Charts]
+      summary: Roll back editable chart annotations to a saved version.
+      operationId: rollbackChartAnnotations
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollbackChartAnnotationsRequest'
+      responses:
+        '200':
+          description: Updated chart screen after rollback.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /v1/screens/options/{symbol}:
     get:
       tags: [Options]
@@ -993,6 +1015,18 @@ components:
           type: string
         kind:
           type: string
+    ChartAnnotationVersionSummary:
+      type: object
+      required: [id, savedAt, annotationCount]
+      properties:
+        id:
+          type: string
+        savedAt:
+          type: string
+          format: date-time
+        annotationCount:
+          type: integer
+          minimum: 0
     ReplaceChartAnnotationsRequest:
       type: object
       required: [annotations]
@@ -1014,6 +1048,14 @@ components:
         price:
           type: string
         kind:
+          type: string
+    RollbackChartAnnotationsRequest:
+      type: object
+      required: [versionId]
+      properties:
+        accountId:
+          type: string
+        versionId:
           type: string
     BootstrapData:
       type: object
@@ -1403,7 +1445,7 @@ components:
           asOf: '2026-03-22T18:44:58Z'
     ChartScreenData:
       type: object
-      required: [instrument, range, interval, timezone, series, annotations]
+      required: [instrument, range, interval, timezone, series, annotations, annotationVersions]
       properties:
         instrument:
           $ref: '#/components/schemas/Instrument'
@@ -1421,6 +1463,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChartAnnotation'
+        annotationVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartAnnotationVersionSummary'
     ChartScreenResponse:
       type: object
       required: [data, meta]
@@ -1459,6 +1505,10 @@ components:
               label: Avg Cost
               price: '200.50'
               kind: avg_cost
+          annotationVersions:
+            - id: AAPL:2026-03-25T20:19:11Z
+              savedAt: '2026-03-25T20:19:11Z'
+              annotationCount: 2
         meta:
           requestId: req_4
           asOf: '2026-03-22T18:44:58Z'

@@ -48,10 +48,11 @@ public struct PremiaChartSnapshot: Codable, Sendable, Equatable {
     public let seriesType: String
     public let candles: [PremiaCandle]
     public let annotations: [PremiaChartAnnotation]
+    public let annotationVersions: [PremiaChartAnnotationVersionSummary]
     public let change: PremiaAbsolutePercentChange?
     public let asOf: Date?
 
-    public init(instrument: PremiaInstrument, range: String, interval: String, timezone: String, seriesType: String, candles: [PremiaCandle], annotations: [PremiaChartAnnotation], change: PremiaAbsolutePercentChange?, asOf: Date?) {
+    public init(instrument: PremiaInstrument, range: String, interval: String, timezone: String, seriesType: String, candles: [PremiaCandle], annotations: [PremiaChartAnnotation], annotationVersions: [PremiaChartAnnotationVersionSummary], change: PremiaAbsolutePercentChange?, asOf: Date?) {
         self.instrument = instrument
         self.range = range
         self.interval = interval
@@ -59,6 +60,7 @@ public struct PremiaChartSnapshot: Codable, Sendable, Equatable {
         self.seriesType = seriesType
         self.candles = candles
         self.annotations = annotations
+        self.annotationVersions = annotationVersions
         self.change = change
         self.asOf = asOf
     }
@@ -75,6 +77,18 @@ public struct PremiaChartAnnotation: Codable, Sendable, Equatable, Identifiable 
         self.label = label
         self.price = price
         self.kind = kind
+    }
+}
+
+public struct PremiaChartAnnotationVersionSummary: Codable, Sendable, Equatable, Identifiable {
+    public let id: String
+    public let savedAt: Date?
+    public let annotationCount: Int
+
+    public init(id: String, savedAt: Date?, annotationCount: Int) {
+        self.id = id
+        self.savedAt = savedAt
+        self.annotationCount = annotationCount
     }
 }
 

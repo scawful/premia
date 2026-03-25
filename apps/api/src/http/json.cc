@@ -179,6 +179,18 @@ auto MakeChartAnnotationArray(
   return array;
 }
 
+auto MakeChartAnnotationVersionArray(
+    const std::vector<application::ChartAnnotationVersionSummary>& versions)
+    -> json::array {
+  json::array array;
+  for (const auto& version : versions) {
+    array.emplace_back(json::object{{"id", version.id},
+                                    {"savedAt", version.saved_at},
+                                    {"annotationCount", version.annotation_count}});
+  }
+  return array;
+}
+
 auto MakeAccountPositionArray(
     const std::vector<application::AccountPositionRow>& positions) -> json::array {
   json::array array;
@@ -409,6 +421,9 @@ auto SerializeChartScreenResponse(const application::ChartScreenData& data)
                                     {"series", MakeChartSeries(data.series)},
                                     {"annotations",
                                      MakeChartAnnotationArray(data.annotations)},
+                                    {"annotationVersions",
+                                     MakeChartAnnotationVersionArray(
+                                         data.annotation_versions)},
                                     {"stats",
                                      json::object{{"change",
                                                    MakeAbsolutePercentChange(

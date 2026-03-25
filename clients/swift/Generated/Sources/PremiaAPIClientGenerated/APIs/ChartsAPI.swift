@@ -238,5 +238,49 @@ open class ChartsAPI {
 
         return localVariableRequestBuilder.init(method: "PUT", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
+
+    /**
+     Roll back editable chart annotations to a saved version.
+     
+     - parameter symbol: (path)  
+     - parameter rollbackChartAnnotationsRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: ChartScreenResponse
+     */
+    open class func rollbackChartAnnotations(symbol: String, rollbackChartAnnotationsRequest: RollbackChartAnnotationsRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> ChartScreenResponse {
+        return try await rollbackChartAnnotationsWithRequestBuilder(symbol: symbol, rollbackChartAnnotationsRequest: rollbackChartAnnotationsRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Roll back editable chart annotations to a saved version.
+     - POST /v1/screens/charts/{symbol}/annotations/rollback
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter symbol: (path)  
+     - parameter rollbackChartAnnotationsRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<ChartScreenResponse> 
+     */
+    open class func rollbackChartAnnotationsWithRequestBuilder(symbol: String, rollbackChartAnnotationsRequest: RollbackChartAnnotationsRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<ChartScreenResponse> {
+        var localVariablePath = "/v1/screens/charts/{symbol}/annotations/rollback"
+        let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
+        let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: rollbackChartAnnotationsRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<ChartScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
 }
 }

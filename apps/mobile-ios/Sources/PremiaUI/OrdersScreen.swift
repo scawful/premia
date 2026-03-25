@@ -19,6 +19,21 @@ public struct OrdersScreen: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
 
+                    if !session.brokerageAccounts.isEmpty {
+                        Picker("Account", selection: Binding(
+                            get: { session.selectedAccountID ?? session.brokerageAccounts.first?.id ?? "" },
+                            set: { newValue in
+                                session.selectedAccountID = newValue
+                                Task { await load() }
+                            }
+                        )) {
+                            ForEach(session.brokerageAccounts) { account in
+                                Text(account.displayName).tag(account.id)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                    }
+
                     Picker("Orders", selection: $selection) {
                         Text("Open").tag(0)
                         Text("History").tag(1)
@@ -40,6 +55,7 @@ public struct OrdersScreen: View {
         isLoading = true
         error = nil
         do {
+            try await session.refreshAccountContext()
             async let open = session.client.loadOpenOrders(accountID: session.selectedAccountID)
             async let history = session.client.loadOrderHistory(accountID: session.selectedAccountID)
             openOrders = try await open

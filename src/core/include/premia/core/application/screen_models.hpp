@@ -130,6 +130,12 @@ struct ChartAnnotation {
   std::string kind;
 };
 
+struct ChartAnnotationVersionSummary {
+  std::string id;
+  std::string saved_at;
+  int annotation_count = 0;
+};
+
 struct MarketSummary {
   std::string session;
   std::string next_transition_at;
@@ -236,6 +242,7 @@ struct ChartScreenData {
   ChartSeries series;
   ChartStats stats;
   std::vector<ChartAnnotation> annotations;
+  std::vector<ChartAnnotationVersionSummary> annotation_versions;
 };
 
 }  // namespace premia::core::application

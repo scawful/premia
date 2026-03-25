@@ -138,6 +138,13 @@ auto ProviderBackedApplicationService::DeleteChartAnnotation(
                                                         account_id);
 }
 
+auto ProviderBackedApplicationService::RollbackChartAnnotations(
+    const std::string& symbol, const std::string& version_id,
+    const std::string& account_id) -> ChartScreenData {
+  return market_options_service_->RollbackChartAnnotations(symbol, version_id,
+                                                           account_id);
+}
+
 auto ProviderBackedApplicationService::GetOptionChainSnapshot(
     const std::string& symbol, const std::string& strike_count,
     const std::string& strategy, const std::string& range,

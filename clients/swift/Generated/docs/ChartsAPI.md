@@ -8,6 +8,7 @@ Method | HTTP request | Description
 [**getChartScreen**](ChartsAPI.md#getchartscreen) | **GET** /v1/screens/charts/{symbol} | Load chart data for a symbol.
 [**patchChartAnnotation**](ChartsAPI.md#patchchartannotation) | **PATCH** /v1/screens/charts/{symbol}/annotations/{annotationId} | Upsert a single editable chart annotation.
 [**replaceChartAnnotations**](ChartsAPI.md#replacechartannotations) | **PUT** /v1/screens/charts/{symbol}/annotations | Replace editable chart annotations for a symbol.
+[**rollbackChartAnnotations**](ChartsAPI.md#rollbackchartannotations) | **POST** /v1/screens/charts/{symbol}/annotations/rollback | Roll back editable chart annotations to a saved version.
 
 
 # **deleteChartAnnotation**
@@ -204,6 +205,56 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **symbol** | **String** |  | 
  **replaceChartAnnotationsRequest** | [**ReplaceChartAnnotationsRequest**](ReplaceChartAnnotationsRequest.md) |  | 
+
+### Return type
+
+[**ChartScreenResponse**](ChartScreenResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **rollbackChartAnnotations**
+```swift
+    open class func rollbackChartAnnotations(symbol: String, rollbackChartAnnotationsRequest: RollbackChartAnnotationsRequest, completion: @escaping (_ data: ChartScreenResponse?, _ error: Error?) -> Void)
+```
+
+Roll back editable chart annotations to a saved version.
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import PremiaAPIClientGenerated
+
+let symbol = "symbol_example" // String | 
+let rollbackChartAnnotationsRequest = RollbackChartAnnotationsRequest(accountId: "accountId_example", versionId: "versionId_example") // RollbackChartAnnotationsRequest | 
+
+// Roll back editable chart annotations to a saved version.
+ChartsAPI.rollbackChartAnnotations(symbol: symbol, rollbackChartAnnotationsRequest: rollbackChartAnnotationsRequest) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **symbol** | **String** |  | 
+ **rollbackChartAnnotationsRequest** | [**RollbackChartAnnotationsRequest**](RollbackChartAnnotationsRequest.md) |  | 
 
 ### Return type
 

@@ -55,6 +55,10 @@ class MarketDataService {
                                      const std::string& annotation_id,
                                      const std::string& account_id = "")
       -> ChartScreenData = 0;
+  virtual auto RollbackChartAnnotations(const std::string& symbol,
+                                        const std::string& version_id,
+                                        const std::string& account_id = "")
+      -> ChartScreenData = 0;
 };
 
 class OptionsService {

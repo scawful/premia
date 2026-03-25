@@ -174,6 +174,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             seriesType: response.data.series.type.rawValue,
             candles: response.data.series.bars.map(mapCandle),
             annotations: response.data.annotations.map(mapChartAnnotation),
+            annotationVersions: response.data.annotationVersions.map(mapChartAnnotationVersion),
             change: response.data.stats?.change.map(mapChange),
             asOf: response.meta.asOf
         )
@@ -207,6 +208,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             seriesType: response.data.series.type.rawValue,
             candles: response.data.series.bars.map(mapCandle),
             annotations: response.data.annotations.map(mapChartAnnotation),
+            annotationVersions: response.data.annotationVersions.map(mapChartAnnotationVersion),
             change: response.data.stats?.change.map(mapChange),
             asOf: response.meta.asOf
         )
@@ -236,6 +238,7 @@ public final class PremiaAPIClient: @unchecked Sendable {
             seriesType: response.data.series.type.rawValue,
             candles: response.data.series.bars.map(mapCandle),
             annotations: response.data.annotations.map(mapChartAnnotation),
+            annotationVersions: response.data.annotationVersions.map(mapChartAnnotationVersion),
             change: response.data.stats?.change.map(mapChange),
             asOf: response.meta.asOf
         )
@@ -260,6 +263,34 @@ public final class PremiaAPIClient: @unchecked Sendable {
             seriesType: response.data.series.type.rawValue,
             candles: response.data.series.bars.map(mapCandle),
             annotations: response.data.annotations.map(mapChartAnnotation),
+            annotationVersions: response.data.annotationVersions.map(mapChartAnnotationVersion),
+            change: response.data.stats?.change.map(mapChange),
+            asOf: response.meta.asOf
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func rollbackChartAnnotations(symbol: String, accountID: String? = nil, versionID: String) async throws -> PremiaChartSnapshot {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.ChartsAPI.rollbackChartAnnotations(
+                symbol: symbol,
+                rollbackChartAnnotationsRequest: PremiaAPIClientGeneratedAPI.RollbackChartAnnotationsRequest(
+                    accountId: accountID,
+                    versionId: versionID
+                ),
+                apiConfiguration: apiConfiguration
+            )
+        }
+
+        return PremiaChartSnapshot(
+            instrument: mapInstrument(response.data.instrument),
+            range: response.data.range,
+            interval: response.data.interval,
+            timezone: response.data.timezone,
+            seriesType: response.data.series.type.rawValue,
+            candles: response.data.series.bars.map(mapCandle),
+            annotations: response.data.annotations.map(mapChartAnnotation),
+            annotationVersions: response.data.annotationVersions.map(mapChartAnnotationVersion),
             change: response.data.stats?.change.map(mapChange),
             asOf: response.meta.asOf
         )
@@ -775,6 +806,14 @@ public final class PremiaAPIClient: @unchecked Sendable {
             label: annotation.label,
             price: annotation.price,
             kind: annotation.kind
+        )
+    }
+
+    private func mapChartAnnotationVersion(_ version: PremiaAPIClientGeneratedAPI.ChartAnnotationVersionSummary) -> PremiaChartAnnotationVersionSummary {
+        PremiaChartAnnotationVersionSummary(
+            id: version.id,
+            savedAt: version.savedAt,
+            annotationCount: version.annotationCount
         )
     }
 

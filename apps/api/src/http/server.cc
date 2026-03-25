@@ -186,6 +186,10 @@ auto ParseChartAnnotation(const json::object& object, const std::string& annotat
           GetRequiredString(object, "kind")};
 }
 
+auto ParseRollbackVersionId(const json::object& object) -> std::string {
+  return GetRequiredString(object, "versionId");
+}
+
 auto HandleGet(const std::string& raw_target)
     -> http::response<http::string_body> {
   const auto [path, query] = SplitTarget(raw_target);
@@ -523,6 +527,16 @@ auto HandleMutation(const http::request<http::string_body>& request)
           SerializeChartScreenResponse(service.DeleteChartAnnotation(
               segments[3], segments[5],
               params.count("accountId") ? params.at("accountId") : "")));
+    }
+
+    if (segments.size() == 6 && segments[0] == "v1" && segments[1] == "screens" &&
+        segments[2] == "charts" && segments[4] == "annotations" &&
+        segments[5] == "rollback" && request.method() == http::verb::post) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeChartScreenResponse(service.RollbackChartAnnotations(
+              segments[3], ParseRollbackVersionId(payload),
+              GetOptionalString(payload, "accountId"))));
     }
   } catch (const std::exception& e) {
     return MakeJsonResponse(

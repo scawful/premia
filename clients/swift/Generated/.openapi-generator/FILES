@@ -38,6 +38,7 @@ Sources/PremiaAPIClientGenerated/Models/BootstrapResponse.swift
 Sources/PremiaAPIClientGenerated/Models/BrokerageAccountSummary.swift
 Sources/PremiaAPIClientGenerated/Models/Candle.swift
 Sources/PremiaAPIClientGenerated/Models/ChartAnnotation.swift
+Sources/PremiaAPIClientGenerated/Models/ChartAnnotationVersionSummary.swift
 Sources/PremiaAPIClientGenerated/Models/ChartScreenData.swift
 Sources/PremiaAPIClientGenerated/Models/ChartScreenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/ChartSeries.swift
@@ -89,6 +90,7 @@ Sources/PremiaAPIClientGenerated/Models/QuoteDetail.swift
 Sources/PremiaAPIClientGenerated/Models/QuoteScreenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/QuoteSnapshot.swift
 Sources/PremiaAPIClientGenerated/Models/ReplaceChartAnnotationsRequest.swift
+Sources/PremiaAPIClientGenerated/Models/RollbackChartAnnotationsRequest.swift
 Sources/PremiaAPIClientGenerated/Models/SchwabOAuthStartData.swift
 Sources/PremiaAPIClientGenerated/Models/SchwabOAuthStartResponse.swift
 Sources/PremiaAPIClientGenerated/Models/StartSchwabOAuthRequest.swift
@@ -116,6 +118,7 @@ docs/BootstrapResponse.md
 docs/BrokerageAccountSummary.md
 docs/Candle.md
 docs/ChartAnnotation.md
+docs/ChartAnnotationVersionSummary.md
 docs/ChartScreenData.md
 docs/ChartScreenResponse.md
 docs/ChartSeries.md
@@ -172,6 +175,7 @@ docs/QuoteScreenResponse.md
 docs/QuoteSnapshot.md
 docs/QuotesAPI.md
 docs/ReplaceChartAnnotationsRequest.md
+docs/RollbackChartAnnotationsRequest.md
 docs/SchwabOAuthStartData.md
 docs/SchwabOAuthStartResponse.md
 docs/StartSchwabOAuthRequest.md
