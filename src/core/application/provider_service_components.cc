@@ -358,6 +358,38 @@ auto LoadPersistedChartAnnotations(const std::string& account_id,
   return annotations;
 }
 
+void SavePersistedChartAnnotations(const std::string& account_id,
+                                   const std::string& symbol,
+                                   const std::vector<ChartAnnotation>& annotations) {
+  pt::ptree root;
+  {
+    std::ifstream input(ChartAnnotationStatePath());
+    if (input.good()) {
+      try {
+        pt::read_json(input, root);
+      } catch (const std::exception&) {
+        root.clear();
+      }
+    }
+  }
+
+  const auto key = (account_id.empty() ? std::string("default") : account_id) +
+                   "|" + symbol;
+  pt::ptree items;
+  for (const auto& annotation : annotations) {
+    pt::ptree item;
+    item.put("id", annotation.id);
+    item.put("label", annotation.label);
+    item.put("price", annotation.price);
+    item.put("kind", annotation.kind);
+    items.push_back({"", item});
+  }
+  root.put_child("annotations." + key, items);
+
+  std::ofstream output(ChartAnnotationStatePath());
+  pt::write_json(output, root);
+}
+
 auto BuildChartAnnotations(const std::string& symbol)
     -> std::vector<ChartAnnotation> {
   std::vector<ChartAnnotation> annotations;
@@ -706,6 +738,24 @@ auto MarketOptionsService::GetChartScreen(const std::string& symbol,
     fallback_chart.annotations = BuildChartAnnotations(symbol);
     return fallback_chart;
   }
+}
+
+auto MarketOptionsService::ReplaceChartAnnotations(
+    const std::string& symbol,
+    const std::vector<ChartAnnotation>& annotations) -> ChartScreenData {
+  PortfolioAccountService portfolio_service;
+  const auto account = portfolio_service.GetAccountDetail();
+
+  std::vector<ChartAnnotation> persisted;
+  persisted.reserve(annotations.size());
+  for (const auto& annotation : annotations) {
+    if (annotation.kind == "annotation" || annotation.kind == "entry" ||
+        annotation.kind == "stop" || annotation.kind == "target") {
+      persisted.push_back(annotation);
+    }
+  }
+  SavePersistedChartAnnotations(account.account_id, symbol, persisted);
+  return GetChartScreen(symbol, "1M", "1D", false);
 }
 
 auto MarketOptionsService::GetOptionChainSnapshot(

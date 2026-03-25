@@ -15,6 +15,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #if !defined(_WIN32)
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -140,22 +141,53 @@ auto MakeTempWorkspace(const std::string& name) -> fs::path {
 class PremiaApiProcess {
  public:
   explicit PremiaApiProcess(fs::path workspace)
-      : workspace_(std::move(workspace)),
-        port_(8300 + (std::rand() % 400)) {}
+      : workspace_(std::move(workspace)), port_(NextPort()) {}
 
   void Start() {
+    ASSERT_EQ(pipe(control_pipe_), 0);
     pid_ = fork();
     ASSERT_GE(pid_, 0);
     if (pid_ == 0) {
-      chdir(workspace_.c_str());
-      const auto runtime_dir = (workspace_ / ".runtime").string();
-      setenv("PREMIA_RUNTIME_DIR", runtime_dir.c_str(), 1);
-      setenv("PREMIA_DISABLE_KEYCHAIN", "1", 1);
-      const auto port_string = std::to_string(port_);
-      execl(PREMIA_API_BIN, PREMIA_API_BIN, "--host", kHost, "--port",
-            port_string.c_str(), nullptr);
-      _exit(127);
+      close(control_pipe_[1]);
+      setpgid(0, 0);
+      const pid_t api_pid = fork();
+      if (api_pid == 0) {
+        chdir(workspace_.c_str());
+        const auto runtime_dir = (workspace_ / ".runtime").string();
+        setenv("PREMIA_RUNTIME_DIR", runtime_dir.c_str(), 1);
+        setenv("PREMIA_DISABLE_KEYCHAIN", "1", 1);
+        const auto log_path = (workspace_ / "premia_api_test.log").string();
+        const int log_fd = open(log_path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
+        if (log_fd >= 0) {
+          dup2(log_fd, STDOUT_FILENO);
+          dup2(log_fd, STDERR_FILENO);
+          close(log_fd);
+        }
+        const auto port_string = std::to_string(port_);
+        execl(PREMIA_API_BIN, PREMIA_API_BIN, "--host", kHost, "--port",
+              port_string.c_str(), nullptr);
+        _exit(127);
+      }
+
+      char buffer = 0;
+      while (read(control_pipe_[0], &buffer, 1) > 0) {
+      }
+      kill(api_pid, SIGTERM);
+      for (int attempt = 0; attempt < 20; ++attempt) {
+        int status = 0;
+        const auto result = waitpid(api_pid, &status, WNOHANG);
+        if (result == api_pid) {
+          _exit(0);
+        }
+        usleep(50000);
+      }
+      kill(api_pid, SIGKILL);
+      int status = 0;
+      waitpid(api_pid, &status, 0);
+      _exit(0);
     }
+
+    close(control_pipe_[0]);
 
     const auto health_url = BaseUrl() + "/health";
     for (int attempt = 0; attempt < 40; ++attempt) {
@@ -181,17 +213,42 @@ class PremiaApiProcess {
 
   ~PremiaApiProcess() {
     if (pid_ > 0) {
-      kill(pid_, SIGTERM);
-      int status = 0;
-      waitpid(pid_, &status, 0);
+      Stop();
     }
     fs::remove_all(workspace_);
   }
 
  private:
+  static auto NextPort() -> int {
+    static int next_port = 8300;
+    return next_port++;
+  }
+
+  void Stop() {
+    if (control_pipe_[1] >= 0) {
+      close(control_pipe_[1]);
+      control_pipe_[1] = -1;
+    }
+    for (int attempt = 0; attempt < 20; ++attempt) {
+      int status = 0;
+      const auto result = waitpid(pid_, &status, WNOHANG);
+      if (result == pid_) {
+        pid_ = -1;
+        return;
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    kill(-pid_, SIGKILL);
+    int status = 0;
+    waitpid(pid_, &status, 0);
+    pid_ = -1;
+  }
+
   fs::path workspace_;
   int port_ = 0;
   pid_t pid_ = -1;
+  int control_pipe_[2] = {-1, -1};
 };
 #endif
 
@@ -353,8 +410,9 @@ TEST_F(ApiIntegrationFixture, WatchlistArchiveDeleteAndTransferRoutesWork) {
             200);
   const auto watchlists = HttpRequest("GET", Url("/v1/watchlists"));
   ASSERT_EQ(watchlists.status_code, 200);
+  const auto watchlists_tree = ParseJson(watchlists.body);
   bool found_archived = false;
-  for (const auto& item : ParseJson(watchlists.body).get_child("data.watchlists")) {
+  for (const auto& item : watchlists_tree.get_child("data.watchlists")) {
     if (item.second.get<std::string>("id") == destination_id) {
       found_archived = item.second.get<bool>("isArchived");
     }
@@ -369,11 +427,23 @@ TEST_F(ApiIntegrationFixture, ChartScreenSerializesAnnotations) {
 #if defined(_WIN32)
   GTEST_SKIP() << "POSIX-only process launch helper";
 #endif
+  const auto update = HttpRequest(
+      "PUT", Url("/v1/screens/charts/AAPL/annotations"),
+      R"({"annotations":[{"id":"test-note","label":"Test Note","price":"215.50","kind":"annotation"},{"id":"test-entry","label":"Entry","price":"216.00","kind":"entry"}]})");
+  ASSERT_EQ(update.status_code, 200);
+
   const auto response =
       HttpRequest("GET", Url("/v1/screens/charts/AAPL?range=1M&interval=1D"));
   ASSERT_EQ(response.status_code, 200);
   const auto tree = ParseJson(response.body);
   EXPECT_FALSE(tree.get_child("data.annotations").empty());
+  bool found_test_note = false;
+  for (const auto& item : tree.get_child("data.annotations")) {
+    if (item.second.get<std::string>("id") == "test-note") {
+      found_test_note = true;
+    }
+  }
+  EXPECT_TRUE(found_test_note);
 }
 
 TEST_F(ApiIntegrationFixture, OrderLifecyclePersistsAcrossOpenAndHistoryRoutes) {

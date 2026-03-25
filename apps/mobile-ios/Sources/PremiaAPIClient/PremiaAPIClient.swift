@@ -31,6 +31,17 @@ private struct BootstrapEnvelopeDTO: Decodable {
     let meta: Meta
 }
 
+private struct ChartAnnotationsRequestDTO: Encodable {
+    struct Annotation: Encodable {
+        let id: String
+        let label: String
+        let price: String
+        let kind: String
+    }
+
+    let annotations: [Annotation]
+}
+
 public struct PremiaAPIConfiguration: Sendable, Equatable {
     public let baseURL: URL
 
@@ -173,6 +184,43 @@ public final class PremiaAPIClient: @unchecked Sendable {
             change: response.data.stats?.change.map(mapChange),
             asOf: response.meta.asOf
         )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func replaceChartAnnotations(symbol: String, annotations: [PremiaChartAnnotation]) async throws -> PremiaChartSnapshot {
+        let payload = ChartAnnotationsRequestDTO(
+            annotations: annotations.map {
+                .init(id: $0.id, label: $0.label, price: $0.price, kind: $0.kind)
+            }
+        )
+
+        var request = URLRequest(url: configuration.baseURL
+            .appending(path: "v1/screens/charts")
+            .appending(path: symbol)
+            .appending(path: "annotations"))
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(payload)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw PremiaAPIClientError(code: "INVALID_RESPONSE", message: "Chart annotation response was invalid.")
+        }
+        if !(200...299).contains(http.statusCode) {
+            if let decoded = try? JSONDecoder().decode(PremiaAPIClientGeneratedAPI.ModelErrorResponse.self, from: data) {
+                throw PremiaAPIClientError(
+                    code: decoded.error.code,
+                    message: decoded.error.message,
+                    statusCode: http.statusCode,
+                    provider: decoded.error.provider.map(mapProvider),
+                    retryable: decoded.error.retryable,
+                    action: mapAction(decoded.error.action)
+                )
+            }
+            throw PremiaAPIClientError(code: "HTTP_\(http.statusCode)", message: "Chart annotation update failed.", statusCode: http.statusCode, retryable: http.statusCode >= 500, action: .retry)
+        }
+
+        return try await loadChart(symbol: symbol)
     }
 
     @available(macOS 10.15, iOS 13.0, *)

@@ -41,6 +41,9 @@ class MarketDataService {
   virtual auto GetChartScreen(const std::string& symbol, const std::string& range,
                               const std::string& interval,
                               bool extended_hours) const -> ChartScreenData = 0;
+  virtual auto ReplaceChartAnnotations(
+      const std::string& symbol,
+      const std::vector<ChartAnnotation>& annotations) -> ChartScreenData = 0;
 };
 
 class OptionsService {

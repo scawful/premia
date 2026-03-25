@@ -58,6 +58,9 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   auto GetChartScreen(const std::string& symbol, const std::string& range,
                       const std::string& interval,
                       bool extended_hours) const -> ChartScreenData override;
+  auto ReplaceChartAnnotations(const std::string& symbol,
+                               const std::vector<ChartAnnotation>& annotations)
+      -> ChartScreenData override;
   auto GetOptionChainSnapshot(const std::string& symbol,
                               const std::string& strike_count,
                               const std::string& strategy,

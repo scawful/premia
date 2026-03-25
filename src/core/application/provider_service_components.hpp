@@ -44,6 +44,9 @@ class MarketOptionsService {
   auto GetChartScreen(const std::string& symbol, const std::string& range,
                       const std::string& interval,
                       bool extended_hours) const -> ChartScreenData;
+  auto ReplaceChartAnnotations(const std::string& symbol,
+                               const std::vector<ChartAnnotation>& annotations)
+      -> ChartScreenData;
   auto GetOptionChainSnapshot(const std::string& symbol,
                               const std::string& strike_count,
                               const std::string& strategy,

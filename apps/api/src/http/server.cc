@@ -157,6 +157,27 @@ auto GetOptionalBool(const json::object& object, const std::string& key,
   return it->value().as_bool();
 }
 
+auto ParseChartAnnotations(const json::object& object)
+    -> std::vector<core::application::ChartAnnotation> {
+  const auto it = object.find("annotations");
+  if (it == object.end() || !it->value().is_array()) {
+    throw std::runtime_error("field 'annotations' must be an array");
+  }
+
+  std::vector<core::application::ChartAnnotation> annotations;
+  for (const auto& value : it->value().as_array()) {
+    if (!value.is_object()) {
+      throw std::runtime_error("chart annotations must be objects");
+    }
+    const auto& item = value.as_object();
+    annotations.push_back({GetRequiredString(item, "id"),
+                           GetRequiredString(item, "label"),
+                           GetRequiredString(item, "price"),
+                           GetRequiredString(item, "kind")});
+  }
+  return annotations;
+}
+
 auto HandleGet(const std::string& raw_target)
     -> http::response<http::string_body> {
   const auto [path, query] = SplitTarget(raw_target);
@@ -459,6 +480,15 @@ auto HandleMutation(const http::request<http::string_body>& request)
               segments[2], GetRequiredString(payload, "destinationWatchlistId"),
               GetRequiredString(payload, "symbol"))));
     }
+
+    if (segments.size() == 5 && segments[0] == "v1" && segments[1] == "screens" &&
+        segments[2] == "charts" && segments[4] == "annotations" &&
+        request.method() == http::verb::put) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeChartScreenResponse(service.ReplaceChartAnnotations(
+              segments[3], ParseChartAnnotations(payload))));
+    }
   } catch (const std::exception& e) {
     return MakeJsonResponse(
         http::status::bad_request,
@@ -480,6 +510,7 @@ auto HandleRequest(const http::request<http::string_body>& request)
       return HandleGet(target);
     case http::verb::post:
     case http::verb::patch:
+    case http::verb::put:
     case http::verb::delete_:
       return HandleMutation(request);
     default:

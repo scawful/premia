@@ -115,6 +115,12 @@ auto ProviderBackedApplicationService::GetChartScreen(const std::string& symbol,
                                                  extended_hours);
 }
 
+auto ProviderBackedApplicationService::ReplaceChartAnnotations(
+    const std::string& symbol,
+    const std::vector<ChartAnnotation>& annotations) -> ChartScreenData {
+  return market_options_service_->ReplaceChartAnnotations(symbol, annotations);
+}
+
 auto ProviderBackedApplicationService::GetOptionChainSnapshot(
     const std::string& symbol, const std::string& strike_count,
     const std::string& strategy, const std::string& range,
