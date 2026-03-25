@@ -109,16 +109,19 @@ auto ProviderBackedApplicationService::GetQuoteDetail(const std::string& symbol)
 auto ProviderBackedApplicationService::GetChartScreen(const std::string& symbol,
                                                       const std::string& range,
                                                       const std::string& interval,
-                                                      bool extended_hours) const
+                                                      bool extended_hours,
+                                                      const std::string& account_id) const
     -> ChartScreenData {
   return market_options_service_->GetChartScreen(symbol, range, interval,
-                                                 extended_hours);
+                                                 extended_hours, account_id);
 }
 
 auto ProviderBackedApplicationService::ReplaceChartAnnotations(
     const std::string& symbol,
-    const std::vector<ChartAnnotation>& annotations) -> ChartScreenData {
-  return market_options_service_->ReplaceChartAnnotations(symbol, annotations);
+    const std::vector<ChartAnnotation>& annotations,
+    const std::string& account_id) -> ChartScreenData {
+  return market_options_service_->ReplaceChartAnnotations(symbol, annotations,
+                                                          account_id);
 }
 
 auto ProviderBackedApplicationService::GetOptionChainSnapshot(

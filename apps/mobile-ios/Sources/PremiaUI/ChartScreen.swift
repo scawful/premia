@@ -14,6 +14,7 @@ public struct ChartScreen: View {
     @State private var tradeEntryPrice = ""
     @State private var tradeStopPrice = ""
     @State private var tradeTargetPrice = ""
+    @State private var draggingAnnotationID: String?
 
     public init(symbol: String) {
         self.symbol = symbol
@@ -48,6 +49,33 @@ public struct ChartScreen: View {
                         }
                     }
                     .frame(height: 240)
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            Rectangle()
+                                .fill(.clear)
+                                .contentShape(Rectangle())
+                                .gesture(
+                                    DragGesture(minimumDistance: 0)
+                                        .onChanged { value in
+                                            guard let plotFrame = proxy.plotFrame else { return }
+                                            let frame = geometry[plotFrame]
+                                            guard frame.contains(value.location) else { return }
+                                            let localY = value.location.y - frame.origin.y
+                                            guard let price: Double = proxy.value(atY: localY) else { return }
+
+                                            if draggingAnnotationID == nil {
+                                                draggingAnnotationID = nearestEditableAnnotationID(for: price)
+                                            }
+                                            guard let draggingAnnotationID else { return }
+                                            updateAnnotation(annotationID: draggingAnnotationID, price: price)
+                                        }
+                                        .onEnded { _ in
+                                            draggingAnnotationID = nil
+                                            Task { await persistAnnotations() }
+                                        }
+                                )
+                        }
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -162,6 +190,34 @@ public struct ChartScreen: View {
 
     private func isEditable(_ annotation: PremiaChartAnnotation) -> Bool {
         ["annotation", "entry", "stop", "target"].contains(annotation.kind)
+    }
+
+    private func nearestEditableAnnotationID(for price: Double) -> String? {
+        let editable = annotations.filter(isEditable)
+        guard !editable.isEmpty else { return nil }
+        return editable.min(by: { abs((Double($0.price) ?? 0) - price) < abs((Double($1.price) ?? 0) - price) })?.id
+    }
+
+    private func updateAnnotation(annotationID: String, price: Double) {
+        let formattedPrice = String(format: "%.2f", price)
+        annotations = annotations.map { annotation in
+            guard annotation.id == annotationID else { return annotation }
+            return PremiaChartAnnotation(
+                id: annotation.id,
+                label: annotation.label,
+                price: formattedPrice,
+                kind: annotation.kind
+            )
+        }
+        if let entry = annotations.first(where: { $0.kind == "entry" })?.price {
+            tradeEntryPrice = entry
+        }
+        if let stop = annotations.first(where: { $0.kind == "stop" })?.price {
+            tradeStopPrice = stop
+        }
+        if let target = annotations.first(where: { $0.kind == "target" })?.price {
+            tradeTargetPrice = target
+        }
     }
 
     private func addAnnotation() {

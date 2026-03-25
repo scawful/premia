@@ -36,6 +36,7 @@ Class | Method | HTTP request | Description
 *AccountAPI* | [**getAccountScreen**](docs/AccountAPI.md#getaccountscreen) | **GET** /v1/screens/account | Load the account screen payload.
 *BootstrapAPI* | [**getBootstrap**](docs/BootstrapAPI.md#getbootstrap) | **GET** /v1/bootstrap | Load app bootstrap state.
 *ChartsAPI* | [**getChartScreen**](docs/ChartsAPI.md#getchartscreen) | **GET** /v1/screens/charts/{symbol} | Load chart data for a symbol.
+*ChartsAPI* | [**replaceChartAnnotations**](docs/ChartsAPI.md#replacechartannotations) | **PUT** /v1/screens/charts/{symbol}/annotations | Replace editable chart annotations for a symbol.
 *ConnectionsAPI* | [**completePlaidLink**](docs/ConnectionsAPI.md#completeplaidlink) | **POST** /v1/connections/plaid/link-complete | Complete the Plaid link flow.
 *ConnectionsAPI* | [**completeSchwabOAuth**](docs/ConnectionsAPI.md#completeschwaboauth) | **POST** /v1/connections/schwab/oauth/complete | Complete the Schwab OAuth flow.
 *ConnectionsAPI* | [**createPlaidLinkToken**](docs/ConnectionsAPI.md#createplaidlinktoken) | **POST** /v1/connections/plaid/link-token | Create a Plaid link token.
@@ -125,6 +126,7 @@ Class | Method | HTTP request | Description
  - [QuoteDetail](docs/QuoteDetail.md)
  - [QuoteScreenResponse](docs/QuoteScreenResponse.md)
  - [QuoteSnapshot](docs/QuoteSnapshot.md)
+ - [ReplaceChartAnnotationsRequest](docs/ReplaceChartAnnotationsRequest.md)
  - [SchwabOAuthStartData](docs/SchwabOAuthStartData.md)
  - [SchwabOAuthStartResponse](docs/SchwabOAuthStartResponse.md)
  - [StartSchwabOAuthRequest](docs/StartSchwabOAuthRequest.md)

@@ -43,9 +43,12 @@ class MarketOptionsService {
   auto GetQuoteDetail(const std::string& symbol) const -> QuoteDetail;
   auto GetChartScreen(const std::string& symbol, const std::string& range,
                       const std::string& interval,
-                      bool extended_hours) const -> ChartScreenData;
+                      bool extended_hours,
+                      const std::string& account_id = "") const
+      -> ChartScreenData;
   auto ReplaceChartAnnotations(const std::string& symbol,
-                               const std::vector<ChartAnnotation>& annotations)
+                               const std::vector<ChartAnnotation>& annotations,
+                               const std::string& account_id = "")
       -> ChartScreenData;
   auto GetOptionChainSnapshot(const std::string& symbol,
                               const std::string& strike_count,

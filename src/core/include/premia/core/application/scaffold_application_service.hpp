@@ -57,9 +57,12 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
   auto GetQuoteDetail(const std::string& symbol) const -> QuoteDetail override;
   auto GetChartScreen(const std::string& symbol, const std::string& range,
                       const std::string& interval,
-                      bool extended_hours) const -> ChartScreenData override;
+                      bool extended_hours,
+                      const std::string& account_id = "") const
+      -> ChartScreenData override;
   auto ReplaceChartAnnotations(const std::string& symbol,
-                               const std::vector<ChartAnnotation>& annotations)
+                               const std::vector<ChartAnnotation>& annotations,
+                               const std::string& account_id = "")
       -> ChartScreenData override;
   auto GetOptionChainSnapshot(const std::string& symbol,
                               const std::string& strike_count,

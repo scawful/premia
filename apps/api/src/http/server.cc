@@ -261,6 +261,7 @@ auto HandleGet(const std::string& raw_target)
   if (StartsWith(path, "/v1/screens/charts/")) {
     const auto symbol = path.substr(std::string("/v1/screens/charts/").size());
     const auto params = ParseQuery(query);
+    const auto account_id = params.count("accountId") ? params.at("accountId") : "";
     const auto range = params.count("range") ? params.at("range") : "1M";
     const auto interval = params.count("interval") ? params.at("interval") : "1D";
     const auto extended_hours = params.count("extendedHours") != 0 &&
@@ -268,7 +269,8 @@ auto HandleGet(const std::string& raw_target)
     return MakeJsonResponse(
         http::status::ok,
         SerializeChartScreenResponse(
-            service.GetChartScreen(symbol, range, interval, extended_hours)));
+            service.GetChartScreen(symbol, range, interval, extended_hours,
+                                   account_id)));
   }
   if (path == "/v1/stream/events") {
     return MakeTextResponse(
@@ -487,7 +489,8 @@ auto HandleMutation(const http::request<http::string_body>& request)
       return MakeJsonResponse(
           http::status::ok,
           SerializeChartScreenResponse(service.ReplaceChartAnnotations(
-              segments[3], ParseChartAnnotations(payload))));
+              segments[3], ParseChartAnnotations(payload),
+              GetOptionalString(payload, "accountId"))));
     }
   } catch (const std::exception& e) {
     return MakeJsonResponse(

@@ -86,6 +86,7 @@ Sources/PremiaAPIClientGenerated/Models/Provider.swift
 Sources/PremiaAPIClientGenerated/Models/QuoteDetail.swift
 Sources/PremiaAPIClientGenerated/Models/QuoteScreenResponse.swift
 Sources/PremiaAPIClientGenerated/Models/QuoteSnapshot.swift
+Sources/PremiaAPIClientGenerated/Models/ReplaceChartAnnotationsRequest.swift
 Sources/PremiaAPIClientGenerated/Models/SchwabOAuthStartData.swift
 Sources/PremiaAPIClientGenerated/Models/SchwabOAuthStartResponse.swift
 Sources/PremiaAPIClientGenerated/Models/StartSchwabOAuthRequest.swift
@@ -166,6 +167,7 @@ docs/QuoteDetail.md
 docs/QuoteScreenResponse.md
 docs/QuoteSnapshot.md
 docs/QuotesAPI.md
+docs/ReplaceChartAnnotationsRequest.md
 docs/SchwabOAuthStartData.md
 docs/SchwabOAuthStartResponse.md
 docs/StartSchwabOAuthRequest.md

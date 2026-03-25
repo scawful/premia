@@ -463,7 +463,8 @@ void ChartView::DrawCoreContractPreview() {
   const auto connections = service.GetConnections();
   const auto quote = service.GetQuoteDetail(preview_symbol);
   const auto chart = service.GetChartScreen(preview_symbol, GetSelectedRangeLabel(),
-                                            GetSelectedIntervalLabel(), true);
+                                            GetSelectedIntervalLabel(), true,
+                                            active_account_id_);
 
   ImGui::Separator();
   ImGui::Text("Core Contract Preview");

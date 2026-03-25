@@ -390,12 +390,13 @@ void SavePersistedChartAnnotations(const std::string& account_id,
   pt::write_json(output, root);
 }
 
-auto BuildChartAnnotations(const std::string& symbol)
+auto BuildChartAnnotations(const std::string& symbol,
+                           const std::string& account_id)
     -> std::vector<ChartAnnotation> {
   std::vector<ChartAnnotation> annotations;
   try {
     PortfolioAccountService portfolio_service;
-    const auto account = portfolio_service.GetAccountDetail();
+    const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
     annotations = LoadPersistedChartAnnotations(account.account_id, symbol);
     for (const auto& position : account.positions) {
       if (position.symbol != symbol) {
@@ -715,7 +716,8 @@ auto MarketOptionsService::GetQuoteDetail(const std::string& symbol) const
 auto MarketOptionsService::GetChartScreen(const std::string& symbol,
                                           const std::string& range,
                                           const std::string& interval,
-                                          bool extended_hours) const
+                                          bool extended_hours,
+                                          const std::string& account_id) const
     -> ChartScreenData {
   const auto fallback = BuildChartFallback(symbol, range, interval, extended_hours);
   try {
@@ -728,23 +730,24 @@ auto MarketOptionsService::GetChartScreen(const std::string& symbol,
     }
     if (chart.series.bars.empty()) {
       auto fallback_chart = fallback;
-      fallback_chart.annotations = BuildChartAnnotations(symbol);
+      fallback_chart.annotations = BuildChartAnnotations(symbol, account_id);
       return fallback_chart;
     }
-    chart.annotations = BuildChartAnnotations(symbol);
+    chart.annotations = BuildChartAnnotations(symbol, account_id);
     return chart;
   } catch (const std::exception&) {
     auto fallback_chart = fallback;
-    fallback_chart.annotations = BuildChartAnnotations(symbol);
+    fallback_chart.annotations = BuildChartAnnotations(symbol, account_id);
     return fallback_chart;
   }
 }
 
 auto MarketOptionsService::ReplaceChartAnnotations(
     const std::string& symbol,
-    const std::vector<ChartAnnotation>& annotations) -> ChartScreenData {
+    const std::vector<ChartAnnotation>& annotations,
+    const std::string& account_id) -> ChartScreenData {
   PortfolioAccountService portfolio_service;
-  const auto account = portfolio_service.GetAccountDetail();
+  const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
 
   std::vector<ChartAnnotation> persisted;
   persisted.reserve(annotations.size());
@@ -755,7 +758,7 @@ auto MarketOptionsService::ReplaceChartAnnotations(
     }
   }
   SavePersistedChartAnnotations(account.account_id, symbol, persisted);
-  return GetChartScreen(symbol, "1M", "1D", false);
+  return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
 }
 
 auto MarketOptionsService::GetOptionChainSnapshot(

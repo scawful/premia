@@ -305,6 +305,11 @@ paths:
       operationId: getChartScreen
       parameters:
         - $ref: '#/components/parameters/Symbol'
+        - name: accountId
+          in: query
+          required: false
+          schema:
+            type: string
         - name: range
           in: query
           required: false
@@ -325,6 +330,28 @@ paths:
       responses:
         '200':
           description: Chart screen data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/charts/{symbol}/annotations:
+    put:
+      tags: [Charts]
+      summary: Replace editable chart annotations for a symbol.
+      operationId: replaceChartAnnotations
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceChartAnnotationsRequest'
+      responses:
+        '200':
+          description: Updated chart screen with persisted annotations.
           content:
             application/json:
               schema:
@@ -902,6 +929,16 @@ components:
           type: string
         kind:
           type: string
+    ReplaceChartAnnotationsRequest:
+      type: object
+      required: [annotations]
+      properties:
+        accountId:
+          type: string
+        annotations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartAnnotation'
     BootstrapData:
       type: object
       required: [session, connections]

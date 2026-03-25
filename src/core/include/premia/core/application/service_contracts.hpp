@@ -40,10 +40,13 @@ class MarketDataService {
   virtual auto GetQuoteDetail(const std::string& symbol) const -> QuoteDetail = 0;
   virtual auto GetChartScreen(const std::string& symbol, const std::string& range,
                               const std::string& interval,
-                              bool extended_hours) const -> ChartScreenData = 0;
+                              bool extended_hours,
+                              const std::string& account_id = "") const
+      -> ChartScreenData = 0;
   virtual auto ReplaceChartAnnotations(
       const std::string& symbol,
-      const std::vector<ChartAnnotation>& annotations) -> ChartScreenData = 0;
+      const std::vector<ChartAnnotation>& annotations,
+      const std::string& account_id = "") -> ChartScreenData = 0;
 };
 
 class OptionsService {
