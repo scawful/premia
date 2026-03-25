@@ -13,6 +13,21 @@ public struct HomeScreen: View {
         AsyncStateView(isLoading: isLoading, error: error, retry: { Task { await load() } }) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    if !session.brokerageAccounts.isEmpty {
+                        Picker("Account", selection: Binding(
+                            get: { session.selectedAccountID ?? session.brokerageAccounts.first?.id ?? "" },
+                            set: { newValue in
+                                session.selectedAccountID = newValue
+                                Task { await load() }
+                            }
+                        )) {
+                            ForEach(session.brokerageAccounts) { account in
+                                Text(account.displayName).tag(account.id)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                    }
+
                     if let snapshot {
                         PrimaryBrokerBanner(connections: snapshot.connections)
 
@@ -74,7 +89,8 @@ public struct HomeScreen: View {
         isLoading = true
         error = nil
         do {
-            snapshot = try await session.client.loadHome()
+            try await session.refreshAccountContext()
+            snapshot = try await session.client.loadHome(accountID: session.selectedAccountID)
         } catch let clientError as PremiaAPIClientError {
             error = clientError
         } catch let caughtError {

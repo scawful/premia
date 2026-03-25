@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 # **getAccountScreen**
 ```swift
-    open class func getAccountScreen(completion: @escaping (_ data: AccountScreenResponse?, _ error: Error?) -> Void)
+    open class func getAccountScreen(accountId: String? = nil, completion: @escaping (_ data: AccountScreenResponse?, _ error: Error?) -> Void)
 ```
 
 Load the account screen payload.
@@ -19,9 +19,10 @@ Load the account screen payload.
 // The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
 import PremiaAPIClientGenerated
 
+let accountId = "accountId_example" // String |  (optional)
 
 // Load the account screen payload.
-AccountAPI.getAccountScreen() { (response, error) in
+AccountAPI.getAccountScreen(accountId: accountId) { (response, error) in
     guard error == nil else {
         print(error)
         return
@@ -34,7 +35,10 @@ AccountAPI.getAccountScreen() { (response, error) in
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **accountId** | **String** |  | [optional] 
 
 ### Return type
 

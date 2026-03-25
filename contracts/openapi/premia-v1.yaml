@@ -66,6 +66,12 @@ paths:
       tags: [Account]
       summary: Load the account screen payload.
       operationId: getAccountScreen
+      parameters:
+        - name: accountId
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Account screen data.
@@ -358,6 +364,58 @@ paths:
       responses:
         '200':
           description: Updated chart screen with persisted annotations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /v1/screens/charts/{symbol}/annotations/{annotationId}:
+    patch:
+      tags: [Charts]
+      summary: Upsert a single editable chart annotation.
+      operationId: patchChartAnnotation
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+        - name: annotationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchChartAnnotationRequest'
+      responses:
+        '200':
+          description: Updated chart screen with persisted annotations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartScreenResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    delete:
+      tags: [Charts]
+      summary: Delete a single editable chart annotation.
+      operationId: deleteChartAnnotation
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+        - name: annotationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: accountId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated chart screen after deleting the annotation.
           content:
             application/json:
               schema:
@@ -945,6 +1003,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChartAnnotation'
+    PatchChartAnnotationRequest:
+      type: object
+      required: [label, price, kind]
+      properties:
+        accountId:
+          type: string
+        label:
+          type: string
+        price:
+          type: string
+        kind:
+          type: string
     BootstrapData:
       type: object
       required: [session, connections]

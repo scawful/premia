@@ -761,6 +761,42 @@ auto MarketOptionsService::ReplaceChartAnnotations(
   return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
 }
 
+auto MarketOptionsService::UpsertChartAnnotation(
+    const std::string& symbol, const ChartAnnotation& annotation,
+    const std::string& account_id) -> ChartScreenData {
+  PortfolioAccountService portfolio_service;
+  const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
+
+  auto persisted = LoadPersistedChartAnnotations(account.account_id, symbol);
+  auto existing = std::find_if(persisted.begin(), persisted.end(),
+                               [&annotation](const ChartAnnotation& item) {
+                                 return item.id == annotation.id;
+                               });
+  if (existing == persisted.end()) {
+    persisted.push_back(annotation);
+  } else {
+    *existing = annotation;
+  }
+  SavePersistedChartAnnotations(account.account_id, symbol, persisted);
+  return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
+}
+
+auto MarketOptionsService::DeleteChartAnnotation(
+    const std::string& symbol, const std::string& annotation_id,
+    const std::string& account_id) -> ChartScreenData {
+  PortfolioAccountService portfolio_service;
+  const auto account = portfolio_service.GetAccountDetailForAccount(account_id);
+
+  auto persisted = LoadPersistedChartAnnotations(account.account_id, symbol);
+  persisted.erase(std::remove_if(persisted.begin(), persisted.end(),
+                                 [&annotation_id](const ChartAnnotation& item) {
+                                   return item.id == annotation_id;
+                                 }),
+                  persisted.end());
+  SavePersistedChartAnnotations(account.account_id, symbol, persisted);
+  return GetChartScreen(symbol, "1M", "1D", false, account.account_id);
+}
+
 auto MarketOptionsService::GetOptionChainSnapshot(
     const std::string& symbol, const std::string& strike_count,
     const std::string& strategy, const std::string& range,

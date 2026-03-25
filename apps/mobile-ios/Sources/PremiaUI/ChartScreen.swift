@@ -85,8 +85,11 @@ public struct ChartScreen: View {
                                             updateAnnotation(annotationID: draggingAnnotationID, price: price)
                                         }
                                         .onEnded { _ in
+                                            let annotationID = draggingAnnotationID
                                             draggingAnnotationID = nil
-                                            Task { await persistAnnotations() }
+                                            if let annotationID {
+                                                Task { await persistAnnotation(annotationID: annotationID) }
+                                            }
                                         }
                                 )
                         }
@@ -246,7 +249,7 @@ public struct ChartScreen: View {
         )
         newAnnotationLabel = ""
         newAnnotationPrice = ""
-        Task { await persistAnnotations() }
+        Task { await persistAnnotation(annotationID: annotations.last?.id ?? "") }
     }
 
     private func nudge(annotationID: String, delta: Double) {
@@ -260,12 +263,12 @@ public struct ChartScreen: View {
                 kind: annotation.kind
             )
         }
-        Task { await persistAnnotations() }
+        Task { await persistAnnotation(annotationID: annotationID) }
     }
 
     private func remove(annotationID: String) {
         annotations.removeAll { $0.id == annotationID }
-        Task { await persistAnnotations() }
+        Task { await deleteAnnotation(annotationID: annotationID) }
     }
 
     private func applyRiskBox() {
@@ -276,7 +279,7 @@ public struct ChartScreen: View {
         if !tradeTargetPrice.isEmpty {
             upsertRiskMarker(kind: "target", label: "Target", price: tradeTargetPrice)
         }
-        Task { await persistAnnotations() }
+        Task { await persistRiskBox() }
     }
 
     private func clearRiskBox() {
@@ -284,7 +287,7 @@ public struct ChartScreen: View {
         tradeEntryPrice = ""
         tradeStopPrice = ""
         tradeTargetPrice = ""
-        Task { await persistAnnotations() }
+        Task { await clearPersistedRiskBox() }
     }
 
     private func upsertRiskMarker(kind: String, label: String, price: String) {
@@ -296,10 +299,11 @@ public struct ChartScreen: View {
     }
 
     @MainActor
-    private func persistAnnotations() async {
+    private func persistAnnotation(annotationID: String) async {
+        guard let annotation = annotations.first(where: { $0.id == annotationID }),
+              isEditable(annotation) else { return }
         do {
-            let editableAnnotations = annotations.filter(isEditable)
-            let updated = try await session.client.replaceChartAnnotations(symbol: symbol, accountID: session.selectedAccountID, annotations: editableAnnotations)
+            let updated = try await session.client.upsertChartAnnotation(symbol: symbol, accountID: session.selectedAccountID, annotation: annotation)
             snapshot = updated
             annotations = updated.annotations
             tradeEntryPrice = annotations.first(where: { $0.kind == "entry" })?.price ?? ""
@@ -309,6 +313,58 @@ public struct ChartScreen: View {
             error = clientError
         } catch let caughtError {
             error = PremiaAPIClientError(code: "CHART_ANNOTATION_SAVE_FAILED", message: caughtError.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func deleteAnnotation(annotationID: String) async {
+        do {
+            let updated = try await session.client.deleteChartAnnotation(symbol: symbol, accountID: session.selectedAccountID, annotationID: annotationID)
+            snapshot = updated
+            annotations = updated.annotations
+            tradeEntryPrice = annotations.first(where: { $0.kind == "entry" })?.price ?? ""
+            tradeStopPrice = annotations.first(where: { $0.kind == "stop" })?.price ?? ""
+            tradeTargetPrice = annotations.first(where: { $0.kind == "target" })?.price ?? ""
+        } catch let clientError as PremiaAPIClientError {
+            error = clientError
+        } catch let caughtError {
+            error = PremiaAPIClientError(code: "CHART_ANNOTATION_DELETE_FAILED", message: caughtError.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func persistRiskBox() async {
+        do {
+            for kind in ["entry", "stop", "target"] {
+                guard let annotation = annotations.first(where: { $0.kind == kind }) else { continue }
+                let updated = try await session.client.upsertChartAnnotation(symbol: symbol, accountID: session.selectedAccountID, annotation: annotation)
+                snapshot = updated
+                annotations = updated.annotations
+            }
+            tradeEntryPrice = annotations.first(where: { $0.kind == "entry" })?.price ?? ""
+            tradeStopPrice = annotations.first(where: { $0.kind == "stop" })?.price ?? ""
+            tradeTargetPrice = annotations.first(where: { $0.kind == "target" })?.price ?? ""
+        } catch let clientError as PremiaAPIClientError {
+            error = clientError
+        } catch let caughtError {
+            error = PremiaAPIClientError(code: "CHART_RISKBOX_SAVE_FAILED", message: caughtError.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func clearPersistedRiskBox() async {
+        do {
+            for kind in ["entry", "stop", "target"] {
+                if let annotation = snapshot?.annotations.first(where: { $0.kind == kind }) {
+                    let updated = try await session.client.deleteChartAnnotation(symbol: symbol, accountID: session.selectedAccountID, annotationID: annotation.id)
+                    snapshot = updated
+                    annotations = updated.annotations
+                }
+            }
+        } catch let clientError as PremiaAPIClientError {
+            error = clientError
+        } catch let caughtError {
+            error = PremiaAPIClientError(code: "CHART_RISKBOX_DELETE_FAILED", message: caughtError.localizedDescription)
         }
     }
 

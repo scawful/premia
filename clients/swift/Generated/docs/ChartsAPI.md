@@ -4,9 +4,63 @@ All URIs are relative to *https://api.premia.local*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**deleteChartAnnotation**](ChartsAPI.md#deletechartannotation) | **DELETE** /v1/screens/charts/{symbol}/annotations/{annotationId} | Delete a single editable chart annotation.
 [**getChartScreen**](ChartsAPI.md#getchartscreen) | **GET** /v1/screens/charts/{symbol} | Load chart data for a symbol.
+[**patchChartAnnotation**](ChartsAPI.md#patchchartannotation) | **PATCH** /v1/screens/charts/{symbol}/annotations/{annotationId} | Upsert a single editable chart annotation.
 [**replaceChartAnnotations**](ChartsAPI.md#replacechartannotations) | **PUT** /v1/screens/charts/{symbol}/annotations | Replace editable chart annotations for a symbol.
 
+
+# **deleteChartAnnotation**
+```swift
+    open class func deleteChartAnnotation(symbol: String, annotationId: String, accountId: String? = nil, completion: @escaping (_ data: ChartScreenResponse?, _ error: Error?) -> Void)
+```
+
+Delete a single editable chart annotation.
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import PremiaAPIClientGenerated
+
+let symbol = "symbol_example" // String | 
+let annotationId = "annotationId_example" // String | 
+let accountId = "accountId_example" // String |  (optional)
+
+// Delete a single editable chart annotation.
+ChartsAPI.deleteChartAnnotation(symbol: symbol, annotationId: annotationId, accountId: accountId) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **symbol** | **String** |  | 
+ **annotationId** | **String** |  | 
+ **accountId** | **String** |  | [optional] 
+
+### Return type
+
+[**ChartScreenResponse**](ChartScreenResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getChartScreen**
 ```swift
@@ -60,6 +114,58 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **patchChartAnnotation**
+```swift
+    open class func patchChartAnnotation(symbol: String, annotationId: String, patchChartAnnotationRequest: PatchChartAnnotationRequest, completion: @escaping (_ data: ChartScreenResponse?, _ error: Error?) -> Void)
+```
+
+Upsert a single editable chart annotation.
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import PremiaAPIClientGenerated
+
+let symbol = "symbol_example" // String | 
+let annotationId = "annotationId_example" // String | 
+let patchChartAnnotationRequest = PatchChartAnnotationRequest(accountId: "accountId_example", label: "label_example", price: "price_example", kind: "kind_example") // PatchChartAnnotationRequest | 
+
+// Upsert a single editable chart annotation.
+ChartsAPI.patchChartAnnotation(symbol: symbol, annotationId: annotationId, patchChartAnnotationRequest: patchChartAnnotationRequest) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **symbol** | **String** |  | 
+ **annotationId** | **String** |  | 
+ **patchChartAnnotationRequest** | [**PatchChartAnnotationRequest**](PatchChartAnnotationRequest.md) |  | 
+
+### Return type
+
+[**ChartScreenResponse**](ChartScreenResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

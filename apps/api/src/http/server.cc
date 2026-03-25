@@ -178,6 +178,14 @@ auto ParseChartAnnotations(const json::object& object)
   return annotations;
 }
 
+auto ParseChartAnnotation(const json::object& object, const std::string& annotation_id)
+    -> core::application::ChartAnnotation {
+  return {annotation_id,
+          GetRequiredString(object, "label"),
+          GetRequiredString(object, "price"),
+          GetRequiredString(object, "kind")};
+}
+
 auto HandleGet(const std::string& raw_target)
     -> http::response<http::string_body> {
   const auto [path, query] = SplitTarget(raw_target);
@@ -203,12 +211,14 @@ auto HandleGet(const std::string& raw_target)
         SerializeHomeScreenResponse(service.GetHomeScreenDataForAccount(account_id)));
   }
   if (path == "/v1/screens/account") {
+    const auto params = ParseQuery(query);
+    const auto account_id = params.count("accountId") ? params.at("accountId") : "";
     return MakeJsonResponse(
         http::status::ok,
         SerializeAccountScreenResponse(
             core::application::CompositionRoot::Instance()
-                .AccountDetails()
-                .GetAccountDetail()));
+                .AppService()
+                .GetAccountDetailForAccount(account_id)));
   }
   if (path == "/v1/orders/open") {
     const auto params = ParseQuery(query);
@@ -289,7 +299,7 @@ auto HandleMutation(const http::request<http::string_body>& request)
     -> http::response<http::string_body> {
   const std::string target{request.target().data(), request.target().size()};
   const auto [path, query] = SplitTarget(target);
-  (void)query;
+  const auto params = ParseQuery(query);
 
   auto& service = core::application::CompositionRoot::Instance().AppService();
 
@@ -493,6 +503,26 @@ auto HandleMutation(const http::request<http::string_body>& request)
           SerializeChartScreenResponse(service.ReplaceChartAnnotations(
               segments[3], ParseChartAnnotations(payload),
               GetOptionalString(payload, "accountId"))));
+    }
+
+    if (segments.size() == 6 && segments[0] == "v1" && segments[1] == "screens" &&
+        segments[2] == "charts" && segments[4] == "annotations" &&
+        request.method() == http::verb::patch) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeChartScreenResponse(service.UpsertChartAnnotation(
+              segments[3], ParseChartAnnotation(payload, segments[5]),
+              GetOptionalString(payload, "accountId"))));
+    }
+
+    if (segments.size() == 6 && segments[0] == "v1" && segments[1] == "screens" &&
+        segments[2] == "charts" && segments[4] == "annotations" &&
+        request.method() == http::verb::delete_) {
+      return MakeJsonResponse(
+          http::status::ok,
+          SerializeChartScreenResponse(service.DeleteChartAnnotation(
+              segments[3], segments[5],
+              params.count("accountId") ? params.at("accountId") : "")));
     }
   } catch (const std::exception& e) {
     return MakeJsonResponse(

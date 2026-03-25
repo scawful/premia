@@ -64,6 +64,14 @@ class ProviderBackedApplicationService : public BrokerConnectionService,
                                const std::vector<ChartAnnotation>& annotations,
                                const std::string& account_id = "")
       -> ChartScreenData override;
+  auto UpsertChartAnnotation(const std::string& symbol,
+                             const ChartAnnotation& annotation,
+                             const std::string& account_id = "")
+      -> ChartScreenData override;
+  auto DeleteChartAnnotation(const std::string& symbol,
+                             const std::string& annotation_id,
+                             const std::string& account_id = "")
+      -> ChartScreenData override;
   auto GetOptionChainSnapshot(const std::string& symbol,
                               const std::string& strike_count,
                               const std::string& strategy,

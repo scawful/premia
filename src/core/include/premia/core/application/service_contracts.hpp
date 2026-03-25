@@ -47,6 +47,14 @@ class MarketDataService {
       const std::string& symbol,
       const std::vector<ChartAnnotation>& annotations,
       const std::string& account_id = "") -> ChartScreenData = 0;
+  virtual auto UpsertChartAnnotation(const std::string& symbol,
+                                     const ChartAnnotation& annotation,
+                                     const std::string& account_id = "")
+      -> ChartScreenData = 0;
+  virtual auto DeleteChartAnnotation(const std::string& symbol,
+                                     const std::string& annotation_id,
+                                     const std::string& account_id = "")
+      -> ChartScreenData = 0;
 };
 
 class OptionsService {

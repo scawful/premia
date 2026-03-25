@@ -13,6 +13,58 @@ extension PremiaAPIClientGeneratedAPI {
 open class ChartsAPI {
 
     /**
+     Delete a single editable chart annotation.
+     
+     - parameter symbol: (path)  
+     - parameter annotationId: (path)  
+     - parameter accountId: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: ChartScreenResponse
+     */
+    open class func deleteChartAnnotation(symbol: String, annotationId: String, accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> ChartScreenResponse {
+        return try await deleteChartAnnotationWithRequestBuilder(symbol: symbol, annotationId: annotationId, accountId: accountId, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Delete a single editable chart annotation.
+     - DELETE /v1/screens/charts/{symbol}/annotations/{annotationId}
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter symbol: (path)  
+     - parameter annotationId: (path)  
+     - parameter accountId: (query)  (optional)
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<ChartScreenResponse> 
+     */
+    open class func deleteChartAnnotationWithRequestBuilder(symbol: String, annotationId: String, accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<ChartScreenResponse> {
+        var localVariablePath = "/v1/screens/charts/{symbol}/annotations/{annotationId}"
+        let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
+        let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
+        let annotationIdPreEscape = "\(APIHelper.mapValueToPathItem(annotationId))"
+        let annotationIdPostEscape = annotationIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{annotationId}", with: annotationIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters: [String: any Sendable]? = nil
+
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems([
+            "accountId": (wrappedValue: accountId?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+        ])
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            :
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<ChartScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "DELETE", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
      * enum for parameter range
      */
     public enum ModelRange_getChartScreen: String, Sendable, CaseIterable {
@@ -92,6 +144,55 @@ open class ChartsAPI {
         let localVariableRequestBuilder: RequestBuilder<ChartScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
 
         return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
+    }
+
+    /**
+     Upsert a single editable chart annotation.
+     
+     - parameter symbol: (path)  
+     - parameter annotationId: (path)  
+     - parameter patchChartAnnotationRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: ChartScreenResponse
+     */
+    open class func patchChartAnnotation(symbol: String, annotationId: String, patchChartAnnotationRequest: PatchChartAnnotationRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> ChartScreenResponse {
+        return try await patchChartAnnotationWithRequestBuilder(symbol: symbol, annotationId: annotationId, patchChartAnnotationRequest: patchChartAnnotationRequest, apiConfiguration: apiConfiguration).execute().body
+    }
+
+    /**
+     Upsert a single editable chart annotation.
+     - PATCH /v1/screens/charts/{symbol}/annotations/{annotationId}
+     - Bearer Token:
+       - type: http
+       - name: bearerAuth
+     - parameter symbol: (path)  
+     - parameter annotationId: (path)  
+     - parameter patchChartAnnotationRequest: (body)  
+     - parameter apiConfiguration: The configuration for the http request.
+     - returns: RequestBuilder<ChartScreenResponse> 
+     */
+    open class func patchChartAnnotationWithRequestBuilder(symbol: String, annotationId: String, patchChartAnnotationRequest: PatchChartAnnotationRequest, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<ChartScreenResponse> {
+        var localVariablePath = "/v1/screens/charts/{symbol}/annotations/{annotationId}"
+        let symbolPreEscape = "\(APIHelper.mapValueToPathItem(symbol))"
+        let symbolPostEscape = symbolPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{symbol}", with: symbolPostEscape, options: .literal, range: nil)
+        let annotationIdPreEscape = "\(APIHelper.mapValueToPathItem(annotationId))"
+        let annotationIdPostEscape = annotationIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        localVariablePath = localVariablePath.replacingOccurrences(of: "{annotationId}", with: annotationIdPostEscape, options: .literal, range: nil)
+        let localVariableURLString = apiConfiguration.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: patchChartAnnotationRequest, codableHelper: apiConfiguration.codableHelper)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: (any Sendable)?] = [
+            "Content-Type": "application/json",
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<ChartScreenResponse>.Type = apiConfiguration.requestBuilderFactory.getBuilder()
+
+        return localVariableRequestBuilder.init(method: "PATCH", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true, apiConfiguration: apiConfiguration)
     }
 
     /**

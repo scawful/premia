@@ -78,6 +78,7 @@ Sources/PremiaAPIClientGenerated/Models/OrderReplacementData.swift
 Sources/PremiaAPIClientGenerated/Models/OrderReplacementResponse.swift
 Sources/PremiaAPIClientGenerated/Models/OrderSubmissionData.swift
 Sources/PremiaAPIClientGenerated/Models/OrderSubmissionResponse.swift
+Sources/PremiaAPIClientGenerated/Models/PatchChartAnnotationRequest.swift
 Sources/PremiaAPIClientGenerated/Models/PinWatchlistSymbolRequest.swift
 Sources/PremiaAPIClientGenerated/Models/PlaidLinkTokenData.swift
 Sources/PremiaAPIClientGenerated/Models/PlaidLinkTokenResponse.swift
@@ -159,6 +160,7 @@ docs/OrderReplacementData.md
 docs/OrderReplacementResponse.md
 docs/OrderSubmissionData.md
 docs/OrderSubmissionResponse.md
+docs/PatchChartAnnotationRequest.md
 docs/PinWatchlistSymbolRequest.md
 docs/PlaidLinkTokenData.md
 docs/PlaidLinkTokenResponse.md

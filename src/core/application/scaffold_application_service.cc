@@ -124,6 +124,20 @@ auto ProviderBackedApplicationService::ReplaceChartAnnotations(
                                                           account_id);
 }
 
+auto ProviderBackedApplicationService::UpsertChartAnnotation(
+    const std::string& symbol, const ChartAnnotation& annotation,
+    const std::string& account_id) -> ChartScreenData {
+  return market_options_service_->UpsertChartAnnotation(symbol, annotation,
+                                                        account_id);
+}
+
+auto ProviderBackedApplicationService::DeleteChartAnnotation(
+    const std::string& symbol, const std::string& annotation_id,
+    const std::string& account_id) -> ChartScreenData {
+  return market_options_service_->DeleteChartAnnotation(symbol, annotation_id,
+                                                        account_id);
+}
+
 auto ProviderBackedApplicationService::GetOptionChainSnapshot(
     const std::string& symbol, const std::string& strike_count,
     const std::string& strategy, const std::string& range,

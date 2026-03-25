@@ -35,7 +35,9 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AccountAPI* | [**getAccountScreen**](docs/AccountAPI.md#getaccountscreen) | **GET** /v1/screens/account | Load the account screen payload.
 *BootstrapAPI* | [**getBootstrap**](docs/BootstrapAPI.md#getbootstrap) | **GET** /v1/bootstrap | Load app bootstrap state.
+*ChartsAPI* | [**deleteChartAnnotation**](docs/ChartsAPI.md#deletechartannotation) | **DELETE** /v1/screens/charts/{symbol}/annotations/{annotationId} | Delete a single editable chart annotation.
 *ChartsAPI* | [**getChartScreen**](docs/ChartsAPI.md#getchartscreen) | **GET** /v1/screens/charts/{symbol} | Load chart data for a symbol.
+*ChartsAPI* | [**patchChartAnnotation**](docs/ChartsAPI.md#patchchartannotation) | **PATCH** /v1/screens/charts/{symbol}/annotations/{annotationId} | Upsert a single editable chart annotation.
 *ChartsAPI* | [**replaceChartAnnotations**](docs/ChartsAPI.md#replacechartannotations) | **PUT** /v1/screens/charts/{symbol}/annotations | Replace editable chart annotations for a symbol.
 *ConnectionsAPI* | [**completePlaidLink**](docs/ConnectionsAPI.md#completeplaidlink) | **POST** /v1/connections/plaid/link-complete | Complete the Plaid link flow.
 *ConnectionsAPI* | [**completeSchwabOAuth**](docs/ConnectionsAPI.md#completeschwaboauth) | **POST** /v1/connections/schwab/oauth/complete | Complete the Schwab OAuth flow.
@@ -118,6 +120,7 @@ Class | Method | HTTP request | Description
  - [OrderReplacementResponse](docs/OrderReplacementResponse.md)
  - [OrderSubmissionData](docs/OrderSubmissionData.md)
  - [OrderSubmissionResponse](docs/OrderSubmissionResponse.md)
+ - [PatchChartAnnotationRequest](docs/PatchChartAnnotationRequest.md)
  - [PinWatchlistSymbolRequest](docs/PinWatchlistSymbolRequest.md)
  - [PlaidLinkTokenData](docs/PlaidLinkTokenData.md)
  - [PlaidLinkTokenResponse](docs/PlaidLinkTokenResponse.md)

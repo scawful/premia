@@ -432,18 +432,34 @@ TEST_F(ApiIntegrationFixture, ChartScreenSerializesAnnotations) {
       R"({"annotations":[{"id":"test-note","label":"Test Note","price":"215.50","kind":"annotation"},{"id":"test-entry","label":"Entry","price":"216.00","kind":"entry"}]})");
   ASSERT_EQ(update.status_code, 200);
 
+  const auto patch = HttpRequest(
+      "PATCH", Url("/v1/screens/charts/AAPL/annotations/test-note"),
+      R"({"label":"Patched Note","price":"217.25","kind":"annotation"})");
+  ASSERT_EQ(patch.status_code, 200);
+
+  const auto erase = HttpRequest(
+      "DELETE", Url("/v1/screens/charts/AAPL/annotations/test-entry?accountId=local_acc"));
+  ASSERT_EQ(erase.status_code, 200);
+
   const auto response =
       HttpRequest("GET", Url("/v1/screens/charts/AAPL?range=1M&interval=1D"));
   ASSERT_EQ(response.status_code, 200);
   const auto tree = ParseJson(response.body);
   EXPECT_FALSE(tree.get_child("data.annotations").empty());
   bool found_test_note = false;
+  bool found_test_entry = false;
   for (const auto& item : tree.get_child("data.annotations")) {
     if (item.second.get<std::string>("id") == "test-note") {
       found_test_note = true;
+      EXPECT_EQ(item.second.get<std::string>("label"), "Patched Note");
+      EXPECT_EQ(item.second.get<std::string>("price"), "217.25");
+    }
+    if (item.second.get<std::string>("id") == "test-entry") {
+      found_test_entry = true;
     }
   }
   EXPECT_TRUE(found_test_note);
+  EXPECT_FALSE(found_test_entry);
 }
 
 TEST_F(ApiIntegrationFixture, OrderLifecyclePersistsAcrossOpenAndHistoryRoutes) {

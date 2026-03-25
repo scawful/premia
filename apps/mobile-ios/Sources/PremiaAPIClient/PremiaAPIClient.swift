@@ -113,9 +113,9 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
     @available(macOS 10.15, iOS 13.0, *)
-    public func loadAccount() async throws -> PremiaAccountDetailSnapshot {
+    public func loadAccount(accountID: String? = nil) async throws -> PremiaAccountDetailSnapshot {
         let response = try await executeMapped {
-            try await PremiaAPIClientGeneratedAPI.AccountAPI.getAccountScreen(apiConfiguration: apiConfiguration)
+            try await PremiaAPIClientGeneratedAPI.AccountAPI.getAccountScreen(accountId: accountID, apiConfiguration: apiConfiguration)
         }
         return PremiaAccountDetailSnapshot(
             accountID: response.data.accountId,
@@ -195,6 +195,59 @@ public final class PremiaAPIClient: @unchecked Sendable {
                         )
                     }
                 ),
+                apiConfiguration: apiConfiguration
+            )
+        }
+
+        return PremiaChartSnapshot(
+            instrument: mapInstrument(response.data.instrument),
+            range: response.data.range,
+            interval: response.data.interval,
+            timezone: response.data.timezone,
+            seriesType: response.data.series.type.rawValue,
+            candles: response.data.series.bars.map(mapCandle),
+            annotations: response.data.annotations.map(mapChartAnnotation),
+            change: response.data.stats?.change.map(mapChange),
+            asOf: response.meta.asOf
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func upsertChartAnnotation(symbol: String, accountID: String? = nil, annotation: PremiaChartAnnotation) async throws -> PremiaChartSnapshot {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.ChartsAPI.patchChartAnnotation(
+                symbol: symbol,
+                annotationId: annotation.id,
+                patchChartAnnotationRequest: PremiaAPIClientGeneratedAPI.PatchChartAnnotationRequest(
+                    accountId: accountID,
+                    label: annotation.label,
+                    price: annotation.price,
+                    kind: annotation.kind
+                ),
+                apiConfiguration: apiConfiguration
+            )
+        }
+
+        return PremiaChartSnapshot(
+            instrument: mapInstrument(response.data.instrument),
+            range: response.data.range,
+            interval: response.data.interval,
+            timezone: response.data.timezone,
+            seriesType: response.data.series.type.rawValue,
+            candles: response.data.series.bars.map(mapCandle),
+            annotations: response.data.annotations.map(mapChartAnnotation),
+            change: response.data.stats?.change.map(mapChange),
+            asOf: response.meta.asOf
+        )
+    }
+
+    @available(macOS 10.15, iOS 13.0, *)
+    public func deleteChartAnnotation(symbol: String, accountID: String? = nil, annotationID: String) async throws -> PremiaChartSnapshot {
+        let response = try await executeMapped {
+            try await PremiaAPIClientGeneratedAPI.ChartsAPI.deleteChartAnnotation(
+                symbol: symbol,
+                annotationId: annotationID,
+                accountId: accountID,
                 apiConfiguration: apiConfiguration
             )
         }
