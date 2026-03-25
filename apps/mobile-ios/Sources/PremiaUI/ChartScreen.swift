@@ -15,6 +15,11 @@ public struct ChartScreen: View {
     @State private var tradeStopPrice = ""
     @State private var tradeTargetPrice = ""
     @State private var draggingAnnotationID: String?
+    @State private var draftQuantity = "1"
+    @State private var draftInstruction: PremiaOrderInstruction = .buy
+    @State private var draftLimitPrice = ""
+    @State private var orderPreview: PremiaOrderPreview?
+    @State private var orderSubmission: PremiaOrderSubmission?
 
     public init(symbol: String) {
         self.symbol = symbol
@@ -127,6 +132,66 @@ public struct ChartScreen: View {
                         Button("Clear") {
                             clearRiskBox()
                         }
+                    }
+                }
+                .padding()
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Order Template")
+                        .font(.headline)
+                    Text("Turn saved entry, stop, and target levels into previewable order drafts for the selected account.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    HStack {
+                        Button("Use Entry Buy") {
+                            applyTemplate(kind: "entry")
+                        }
+                        .buttonStyle(.bordered)
+                        Button("Use Stop Sell") {
+                            applyTemplate(kind: "stop")
+                        }
+                        .buttonStyle(.bordered)
+                        Button("Use Target Sell") {
+                            applyTemplate(kind: "target")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+
+                    HStack {
+                        TextField("Quantity", text: $draftQuantity)
+                            .frame(width: 92)
+                        TextField("Limit", text: $draftLimitPrice)
+                            .frame(width: 92)
+                        Picker("Side", selection: $draftInstruction) {
+                            Text("Buy").tag(PremiaOrderInstruction.buy)
+                            Text("Sell").tag(PremiaOrderInstruction.sell)
+                        }
+                        .pickerStyle(.menu)
+                    }
+
+                    HStack {
+                        Button("Preview Draft") {
+                            Task { await previewDraft() }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(draftLimitPrice.isEmpty || draftQuantity.isEmpty)
+                        Button("Stage Draft") {
+                            Task { await submitDraft() }
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(draftLimitPrice.isEmpty || draftQuantity.isEmpty)
+                    }
+
+                    if let orderPreview {
+                        Text("Preview: \(orderPreview.instruction.rawValue) \(orderPreview.quantity) @ $\(orderPreview.limitPrice) · \(orderPreview.status)")
+                            .font(.caption)
+                    }
+                    if let orderSubmission {
+                        Text("Latest submission: \(orderSubmission.status) · \(orderSubmission.message)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding()
@@ -295,6 +360,69 @@ public struct ChartScreen: View {
             annotations[index] = PremiaChartAnnotation(id: annotations[index].id, label: label, price: price, kind: kind)
         } else {
             annotations.append(PremiaChartAnnotation(id: "mobile-\(kind)", label: label, price: price, kind: kind))
+        }
+    }
+
+    private func applyTemplate(kind: String) {
+        guard let annotation = annotations.first(where: { $0.kind == kind }) else { return }
+        draftLimitPrice = annotation.price
+        switch kind {
+        case "entry":
+            draftInstruction = .buy
+        case "stop", "target":
+            draftInstruction = .sell
+        default:
+            break
+        }
+    }
+
+    @MainActor
+    private func previewDraft() async {
+        do {
+            orderPreview = try await session.client.previewOrder(
+                PremiaOrderIntent(
+                    accountID: session.selectedAccountID,
+                    symbol: symbol,
+                    assetType: .equity,
+                    instruction: draftInstruction,
+                    quantity: draftQuantity,
+                    orderType: .limit,
+                    limitPrice: draftLimitPrice,
+                    duration: "DAY",
+                    session: "NORMAL",
+                    confirmLive: false
+                )
+            )
+            orderSubmission = nil
+        } catch let clientError as PremiaAPIClientError {
+            error = clientError
+        } catch let caughtError {
+            error = PremiaAPIClientError(code: "CHART_TEMPLATE_PREVIEW_FAILED", message: caughtError.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func submitDraft() async {
+        do {
+            orderSubmission = try await session.client.submitOrder(
+                PremiaOrderIntent(
+                    accountID: session.selectedAccountID,
+                    symbol: symbol,
+                    assetType: .equity,
+                    instruction: draftInstruction,
+                    quantity: draftQuantity,
+                    orderType: .limit,
+                    limitPrice: draftLimitPrice,
+                    duration: "DAY",
+                    session: "NORMAL",
+                    confirmLive: false
+                )
+            )
+            orderPreview = nil
+        } catch let clientError as PremiaAPIClientError {
+            error = clientError
+        } catch let caughtError {
+            error = PremiaAPIClientError(code: "CHART_TEMPLATE_SUBMIT_FAILED", message: caughtError.localizedDescription)
         }
     }
 

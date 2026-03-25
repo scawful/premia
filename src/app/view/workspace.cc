@@ -1231,11 +1231,35 @@ void Workspace::DrawTradingPlanCard() {
         ImGui::SameLine();
         ImGui::TextDisabled("%s", annotation.kind.c_str());
         ImGui::Text("$%s", annotation.price.c_str());
-        if (ImGui::Button((std::string("Use as Limit##") + annotation.id).c_str(),
-                          ImVec2(-FLT_MIN, 0.0f))) {
+        const auto apply_template = [this, &annotation](const char* message) {
           ticket_limit_price_ = annotation.price;
           ticket_order_type_ = 0;
-          workspace_message_ = "Loaded a trading plan level into the ticket limit price.";
+          workspace_message_ = message;
+        };
+        if (annotation.kind == "entry") {
+          if (ImGui::Button((std::string("Use Entry Buy##") + annotation.id).c_str(),
+                            ImVec2(-FLT_MIN, 0.0f))) {
+            ticket_instruction_ = 0;
+            ticket_asset_type_ = 0;
+            apply_template("Loaded the entry level as a buy-limit ticket template.");
+          }
+        } else if (annotation.kind == "stop") {
+          if (ImGui::Button((std::string("Use Stop Sell##") + annotation.id).c_str(),
+                            ImVec2(-FLT_MIN, 0.0f))) {
+            ticket_instruction_ = 1;
+            ticket_asset_type_ = 0;
+            apply_template("Loaded the stop level as a protective sell template.");
+          }
+        } else if (annotation.kind == "target") {
+          if (ImGui::Button((std::string("Use Target Sell##") + annotation.id).c_str(),
+                            ImVec2(-FLT_MIN, 0.0f))) {
+            ticket_instruction_ = 1;
+            ticket_asset_type_ = 0;
+            apply_template("Loaded the target level as a take-profit sell template.");
+          }
+        } else if (ImGui::Button((std::string("Use as Limit##") + annotation.id).c_str(),
+                                 ImVec2(-FLT_MIN, 0.0f))) {
+          apply_template("Loaded a trading plan level into the ticket limit price.");
         }
       }
     }
