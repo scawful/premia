@@ -196,9 +196,11 @@ auto HandleGet(const std::string& raw_target)
         SerializeBootstrapResponse(service.GetBootstrapData()));
   }
   if (path == "/v1/screens/home") {
+    const auto params = ParseQuery(query);
+    const auto account_id = params.count("accountId") ? params.at("accountId") : "";
     return MakeJsonResponse(
         http::status::ok,
-        SerializeHomeScreenResponse(service.GetHomeScreenData()));
+        SerializeHomeScreenResponse(service.GetHomeScreenDataForAccount(account_id)));
   }
   if (path == "/v1/screens/account") {
     return MakeJsonResponse(

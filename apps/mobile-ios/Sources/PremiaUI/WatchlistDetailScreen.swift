@@ -19,6 +19,19 @@ public struct WatchlistDetailScreen: View {
             VStack(spacing: 16) {
                 if let snapshot {
                     Form {
+                        if !session.brokerageAccounts.isEmpty {
+                            Section("Account Context") {
+                                Picker("Selected Account", selection: Binding(
+                                    get: { session.selectedAccountID ?? session.brokerageAccounts.first?.id ?? "" },
+                                    set: { session.selectedAccountID = $0 }
+                                )) {
+                                    ForEach(session.brokerageAccounts) { account in
+                                        Text(account.displayName).tag(account.id)
+                                    }
+                                }
+                            }
+                        }
+
                         Section("Manage Symbols") {
                             HStack {
                                 TextField("Add Symbol", text: $addSymbol)
@@ -103,6 +116,7 @@ public struct WatchlistDetailScreen: View {
         isLoading = true
         error = nil
         do {
+            try await session.refreshAccountContext()
             snapshot = try await session.client.loadWatchlist(id: watchlistID)
             if selectedTransferWatchlistID.isEmpty {
                 selectedTransferWatchlistID = snapshot?.availableWatchlists.first(where: { $0.id != watchlistID && !$0.isArchived })?.id ?? ""

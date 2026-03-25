@@ -18,6 +18,18 @@ public struct WatchlistsScreen: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
+                if !session.brokerageAccounts.isEmpty {
+                    Picker("Linked Account Context", selection: Binding(
+                        get: { session.selectedAccountID ?? session.brokerageAccounts.first?.id ?? "" },
+                        set: { session.selectedAccountID = $0 }
+                    )) {
+                        ForEach(session.brokerageAccounts) { account in
+                            Text(account.displayName).tag(account.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+
                 List {
                     if !activeWatchlists.isEmpty {
                         Section("Active") {
@@ -76,6 +88,7 @@ public struct WatchlistsScreen: View {
         isLoading = true
         error = nil
         do {
+            try await session.refreshAccountContext()
             watchlists = try await session.client.loadWatchlists()
         } catch let clientError as PremiaAPIClientError {
             error = clientError

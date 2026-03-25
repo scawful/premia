@@ -4,6 +4,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **connections** | [ConnectionSummary] |  | 
+**brokerageAccounts** | [BrokerageAccountSummary] |  | 
+**activeAccountId** | **String** |  | 
 **portfolio** | [**PortfolioSummary**](PortfolioSummary.md) |  | 
 **topHoldings** | [HoldingRow] |  | 
 **watchlists** | [WatchlistSummary] |  | 

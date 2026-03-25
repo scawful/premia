@@ -15,13 +15,17 @@ extension PremiaAPIClientGeneratedAPI {
 public struct HomeScreenData: Sendable, Codable, Hashable {
 
     public var connections: [ConnectionSummary]
+    public var brokerageAccounts: [BrokerageAccountSummary]
+    public var activeAccountId: String
     public var portfolio: PortfolioSummary
     public var topHoldings: [HoldingRow]
     public var watchlists: [WatchlistSummary]
     public var market: HomeScreenDataMarket
 
-    public init(connections: [ConnectionSummary], portfolio: PortfolioSummary, topHoldings: [HoldingRow], watchlists: [WatchlistSummary], market: HomeScreenDataMarket) {
+    public init(connections: [ConnectionSummary], brokerageAccounts: [BrokerageAccountSummary], activeAccountId: String, portfolio: PortfolioSummary, topHoldings: [HoldingRow], watchlists: [WatchlistSummary], market: HomeScreenDataMarket) {
         self.connections = connections
+        self.brokerageAccounts = brokerageAccounts
+        self.activeAccountId = activeAccountId
         self.portfolio = portfolio
         self.topHoldings = topHoldings
         self.watchlists = watchlists
@@ -30,6 +34,8 @@ public struct HomeScreenData: Sendable, Codable, Hashable {
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case connections
+        case brokerageAccounts
+        case activeAccountId
         case portfolio
         case topHoldings
         case watchlists
@@ -41,6 +47,8 @@ public struct HomeScreenData: Sendable, Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(connections, forKey: .connections)
+        try container.encode(brokerageAccounts, forKey: .brokerageAccounts)
+        try container.encode(activeAccountId, forKey: .activeAccountId)
         try container.encode(portfolio, forKey: .portfolio)
         try container.encode(topHoldings, forKey: .topHoldings)
         try container.encode(watchlists, forKey: .watchlists)

@@ -15,11 +15,12 @@ open class HomeAPI {
     /**
      Load the home screen payload.
      
+     - parameter accountId: (query)  (optional)
      - parameter apiConfiguration: The configuration for the http request.
      - returns: HomeScreenResponse
      */
-    open class func getHomeScreen(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> HomeScreenResponse {
-        return try await getHomeScreenWithRequestBuilder(apiConfiguration: apiConfiguration).execute().body
+    open class func getHomeScreen(accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) async throws(ErrorResponse) -> HomeScreenResponse {
+        return try await getHomeScreenWithRequestBuilder(accountId: accountId, apiConfiguration: apiConfiguration).execute().body
     }
 
     /**
@@ -28,15 +29,19 @@ open class HomeAPI {
      - Bearer Token:
        - type: http
        - name: bearerAuth
+     - parameter accountId: (query)  (optional)
      - parameter apiConfiguration: The configuration for the http request.
      - returns: RequestBuilder<HomeScreenResponse> 
      */
-    open class func getHomeScreenWithRequestBuilder(apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<HomeScreenResponse> {
+    open class func getHomeScreenWithRequestBuilder(accountId: String? = nil, apiConfiguration: PremiaAPIClientGeneratedAPIConfiguration = PremiaAPIClientGeneratedAPIConfiguration.shared) -> RequestBuilder<HomeScreenResponse> {
         let localVariablePath = "/v1/screens/home"
         let localVariableURLString = apiConfiguration.basePath + localVariablePath
         let localVariableParameters: [String: any Sendable]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems([
+            "accountId": (wrappedValue: accountId?.asParameter(codableHelper: apiConfiguration.codableHelper), isExplode: true),
+        ])
 
         let localVariableNillableHeaders: [String: (any Sendable)?] = [
             :

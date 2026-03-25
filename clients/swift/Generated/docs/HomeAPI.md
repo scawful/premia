@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 # **getHomeScreen**
 ```swift
-    open class func getHomeScreen(completion: @escaping (_ data: HomeScreenResponse?, _ error: Error?) -> Void)
+    open class func getHomeScreen(accountId: String? = nil, completion: @escaping (_ data: HomeScreenResponse?, _ error: Error?) -> Void)
 ```
 
 Load the home screen payload.
@@ -19,9 +19,10 @@ Load the home screen payload.
 // The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
 import PremiaAPIClientGenerated
 
+let accountId = "accountId_example" // String |  (optional)
 
 // Load the home screen payload.
-HomeAPI.getHomeScreen() { (response, error) in
+HomeAPI.getHomeScreen(accountId: accountId) { (response, error) in
     guard error == nil else {
         print(error)
         return
@@ -34,7 +35,10 @@ HomeAPI.getHomeScreen() { (response, error) in
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **accountId** | **String** |  | [optional] 
 
 ### Return type
 

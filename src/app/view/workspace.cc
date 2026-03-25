@@ -1211,6 +1211,41 @@ void Workspace::DrawTradingStatusCard() {
   ImGui::EndChild();
 }
 
+void Workspace::DrawTradingPlanCard() {
+  ImGui::BeginChild("TradingPlanCard", ImVec2(0.0f, 210.0f), true);
+  ImGui::Text("Trading Plan");
+  ImGui::TextDisabled(
+      "Shared chart annotations for the active account and focused symbol show up here so options and trade workflows stay aligned.");
+
+  try {
+    const auto chart = core::application::CompositionRoot::Instance()
+                           .AppService()
+                           .GetChartScreen(ticket_symbol_, "1M", "1D", true,
+                                           active_account_id_);
+    if (chart.annotations.empty()) {
+      ImGui::TextDisabled("No saved annotations for %s.", ticket_symbol_.c_str());
+    } else {
+      for (const auto& annotation : chart.annotations) {
+        ImGui::Separator();
+        ImGui::Text("%s", annotation.label.c_str());
+        ImGui::SameLine();
+        ImGui::TextDisabled("%s", annotation.kind.c_str());
+        ImGui::Text("$%s", annotation.price.c_str());
+        if (ImGui::Button((std::string("Use as Limit##") + annotation.id).c_str(),
+                          ImVec2(-FLT_MIN, 0.0f))) {
+          ticket_limit_price_ = annotation.price;
+          ticket_order_type_ = 0;
+          workspace_message_ = "Loaded a trading plan level into the ticket limit price.";
+        }
+      }
+    }
+  } catch (const std::exception& ex) {
+    ImGui::TextDisabled("Trading plan unavailable: %s", ex.what());
+  }
+
+  ImGui::EndChild();
+}
+
 void Workspace::DrawSelectedOrderCard() {
   ImGui::BeginChild("SelectedOrderCard", ImVec2(0.0f, 138.0f), true);
   ImGui::Text("Selected Order");
@@ -1436,6 +1471,8 @@ void Workspace::DrawTradeDesk() {
     ImGui::BeginChild("TradeDeskTicketPanel", ImVec2(0.0f, 0.0f), true);
     DrawTradingStatusCard();
     ImGui::Spacing();
+    DrawTradingPlanCard();
+    ImGui::Spacing();
     DrawQuickTradeTicket(true);
     ImGui::EndChild();
 
@@ -1527,6 +1564,8 @@ void Workspace::DrawMainSurface() {
 void Workspace::DrawRightRail() {
   ImGui::BeginChild("WorkspaceRightRail", ImVec2(0.0f, 0.0f), true);
   DrawLinkedSymbolCard();
+  ImGui::Spacing();
+  DrawTradingPlanCard();
   ImGui::Spacing();
   DrawTradingStatusCard();
   ImGui::Spacing();

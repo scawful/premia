@@ -75,6 +75,7 @@ Class | Method | HTTP request | Description
  - [BootstrapData](docs/BootstrapData.md)
  - [BootstrapDataSession](docs/BootstrapDataSession.md)
  - [BootstrapResponse](docs/BootstrapResponse.md)
+ - [BrokerageAccountSummary](docs/BrokerageAccountSummary.md)
  - [Candle](docs/Candle.md)
  - [ChartAnnotation](docs/ChartAnnotation.md)
  - [ChartScreenData](docs/ChartScreenData.md)

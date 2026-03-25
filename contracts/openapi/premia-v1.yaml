@@ -46,6 +46,12 @@ paths:
       tags: [Home]
       summary: Load the home screen payload.
       operationId: getHomeScreen
+      parameters:
+        - name: accountId
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Home screen data.
@@ -999,12 +1005,18 @@ components:
           asOf: '2026-03-22T18:17:20Z'
     HomeScreenData:
       type: object
-      required: [connections, portfolio, topHoldings, watchlists, market]
+      required: [connections, brokerageAccounts, activeAccountId, portfolio, topHoldings, watchlists, market]
       properties:
         connections:
           type: array
           items:
             $ref: '#/components/schemas/ConnectionSummary'
+        brokerageAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrokerageAccountSummary'
+        activeAccountId:
+          type: string
         portfolio:
           $ref: '#/components/schemas/PortfolioSummary'
         topHoldings:
@@ -1047,6 +1059,22 @@ components:
                 marketData: true
                 options: true
                 banking: false
+          brokerageAccounts:
+            - provider: schwab
+              accountId: '12345678'
+              displayName: Charles Schwab (...5678)
+              totalValue:
+                amount: '128345.22'
+                currency: USD
+              holdingsCount: 12
+            - provider: ibkr
+              accountId: U8249962
+              displayName: Interactive Brokers
+              totalValue:
+                amount: '4.17'
+                currency: USD
+              holdingsCount: 0
+          activeAccountId: '12345678'
           portfolio:
             totalValue:
               amount: '128345.22'
@@ -1086,6 +1114,21 @@ components:
         meta:
           requestId: req_2
           asOf: '2026-03-22T18:17:47Z'
+    BrokerageAccountSummary:
+      type: object
+      required: [provider, accountId, displayName, totalValue, holdingsCount]
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+        accountId:
+          type: string
+        displayName:
+          type: string
+        totalValue:
+          $ref: '#/components/schemas/Money'
+        holdingsCount:
+          type: integer
+          minimum: 0
     AccountPositionRow:
       type: object
       required: [symbol, name, dayProfitLoss, dayProfitLossPercent, averagePrice, marketValue, quantity]

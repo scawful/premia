@@ -93,12 +93,14 @@ public final class PremiaAPIClient: @unchecked Sendable {
     }
 
     @available(macOS 10.15, iOS 13.0, *)
-    public func loadHome() async throws -> PremiaHomeSnapshot {
+    public func loadHome(accountID: String? = nil) async throws -> PremiaHomeSnapshot {
         let response = try await executeMapped {
-            try await PremiaAPIClientGeneratedAPI.HomeAPI.getHomeScreen(apiConfiguration: apiConfiguration)
+            try await PremiaAPIClientGeneratedAPI.HomeAPI.getHomeScreen(accountId: accountID, apiConfiguration: apiConfiguration)
         }
         return PremiaHomeSnapshot(
             connections: response.data.connections.map(mapConnection),
+            brokerageAccounts: response.data.brokerageAccounts.map(mapBrokerageAccount),
+            activeAccountID: response.data.activeAccountId,
             portfolio: mapPortfolio(response.data.portfolio),
             topHoldings: response.data.topHoldings.map(mapHolding),
             watchlists: response.data.watchlists.map(mapWatchlist),
@@ -687,6 +689,16 @@ public final class PremiaAPIClient: @unchecked Sendable {
             name: watchlist.name,
             instrumentCount: watchlist.instrumentCount,
             isArchived: watchlist.isArchived
+        )
+    }
+
+    private func mapBrokerageAccount(_ account: PremiaAPIClientGeneratedAPI.BrokerageAccountSummary) -> PremiaBrokerageAccountSummaryModel {
+        PremiaBrokerageAccountSummaryModel(
+            id: account.accountId,
+            provider: PremiaProvider(rawValue: account.provider.rawValue) ?? .internal,
+            displayName: account.displayName,
+            totalValue: mapMoney(account.totalValue),
+            holdingsCount: account.holdingsCount
         )
     }
 

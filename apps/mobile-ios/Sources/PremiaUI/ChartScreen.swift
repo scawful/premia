@@ -27,6 +27,21 @@ public struct ChartScreen: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
+                if !session.brokerageAccounts.isEmpty {
+                    Picker("Account", selection: Binding(
+                        get: { session.selectedAccountID ?? session.brokerageAccounts.first?.id ?? "" },
+                        set: { newValue in
+                            session.selectedAccountID = newValue
+                            Task { await load() }
+                        }
+                    )) {
+                        ForEach(session.brokerageAccounts) { account in
+                            Text(account.displayName).tag(account.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+
                 if let snapshot {
                     Chart(snapshot.candles) { candle in
                         LineMark(
@@ -284,7 +299,7 @@ public struct ChartScreen: View {
     private func persistAnnotations() async {
         do {
             let editableAnnotations = annotations.filter(isEditable)
-            let updated = try await session.client.replaceChartAnnotations(symbol: symbol, annotations: editableAnnotations)
+            let updated = try await session.client.replaceChartAnnotations(symbol: symbol, accountID: session.selectedAccountID, annotations: editableAnnotations)
             snapshot = updated
             annotations = updated.annotations
             tradeEntryPrice = annotations.first(where: { $0.kind == "entry" })?.price ?? ""
@@ -302,7 +317,8 @@ public struct ChartScreen: View {
         isLoading = true
         error = nil
         do {
-            snapshot = try await session.client.loadChart(symbol: symbol)
+            try await session.refreshAccountContext()
+            snapshot = try await session.client.loadChart(symbol: symbol, accountID: session.selectedAccountID)
             annotations = snapshot?.annotations ?? []
             tradeEntryPrice = annotations.first(where: { $0.kind == "entry" })?.price ?? ""
             tradeStopPrice = annotations.first(where: { $0.kind == "stop" })?.price ?? ""

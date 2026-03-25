@@ -35,6 +35,7 @@ Sources/PremiaAPIClientGenerated/Models/ArchiveWatchlistRequest.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapData.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapDataSession.swift
 Sources/PremiaAPIClientGenerated/Models/BootstrapResponse.swift
+Sources/PremiaAPIClientGenerated/Models/BrokerageAccountSummary.swift
 Sources/PremiaAPIClientGenerated/Models/Candle.swift
 Sources/PremiaAPIClientGenerated/Models/ChartAnnotation.swift
 Sources/PremiaAPIClientGenerated/Models/ChartScreenData.swift
@@ -111,6 +112,7 @@ docs/BootstrapAPI.md
 docs/BootstrapData.md
 docs/BootstrapDataSession.md
 docs/BootstrapResponse.md
+docs/BrokerageAccountSummary.md
 docs/Candle.md
 docs/ChartAnnotation.md
 docs/ChartScreenData.md
