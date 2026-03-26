@@ -708,7 +708,6 @@ TEST_F(ApiIntegrationFixture, OrderTemplatesCrudFlow) {
   // List — should have one template.
   const auto list1 = HttpRequest("GET", Url("/v1/order-templates"));
   ASSERT_EQ(list1.status_code, 200);
-  EXPECT_EQ(list1.body.find("Buy $500 VTI"), std::string::npos == list1.body.find("Buy $500 VTI") ? std::string::npos : list1.body.find("Buy $500 VTI"), list1.body.find("Buy $500 VTI"));
   EXPECT_NE(list1.body.find("Buy $500 VTI"), std::string::npos);
 
   // Update the template.

@@ -1394,7 +1394,7 @@ auto OrderTemplateService::PreviewQuickTrade(
       const double price = boost::lexical_cast<double>(limit_price);
       const double dollars = boost::lexical_cast<double>(found->quantity);
       if (price > 0.0) {
-        const int shares = static_cast<int>(dollars / price);
+        const int shares = std::max(1, static_cast<int>(dollars / price));
         quantity = std::to_string(shares);
       }
     } catch (const boost::bad_lexical_cast&) {
